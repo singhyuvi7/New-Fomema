@@ -69,12 +69,24 @@ function radiographerClick(dataTarget) {
     }
 }
 
+function FilterOpcl(value) {
+    // Toggle the "show" class for the selected element
+    $('#' + value).toggleClass("show");
+
+    // Collapse other elements if the selected one is open
+    if ($('#' + value).hasClass("show")) {
+        // Remove "show" class from all elements except the selected one
+        $('#time-period, #Sector, #State, #Country, #age, #Gender, #Registration, #ForeginWorker, #doctorcode, #xray, #laboratory, #CustomerType, #gender, #customer, #Reg').not('#' + value).removeClass("show");
+    }
+}
+
 
 function CommunicableOpenClose() {
     if ($('#collapseOne19').hasClass("show")) {
         $('#collapseOne19').removeClass("show")
     } else {
         $("#collapseOne19").addClass("show");
+        $('#collapseTwo19').removeClass("show");
     }
 }
 
@@ -83,6 +95,7 @@ function NonCommunicableOpenClose() {
         $('#collapseTwo19').removeClass("show")
     } else {
         $("#collapseTwo19").addClass("show");
+        $('#collapseOne19').removeClass("show");
     }
 }
 
