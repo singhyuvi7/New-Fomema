@@ -1,6 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<%= javascript_include_tag 'dashboards/common' %>
 <div id="sidebar">
   <div class="filter_row">
     <div class="filter_div">
@@ -501,68 +502,7 @@
         }
     };
 
-    function FilterOpcl(value) {
-        switch (value) {
-            case 'time-period':
-                if ($('#time-period.opcl').hasClass("show")) {
-                    $('#time-period.opcl').removeClass("show")
-                } else {
-                    $("#time-period.opcl").addClass("show");
-                }
-                break;
-            case 'Sector':
-                if ($('#Sector.opcl').hasClass("show")) {
-                    $('#Sector.opcl').removeClass("show")
-                } else {
-                    $("#Sector.opcl").addClass("show");
-                }
-                break;
-            case 'State':
-                if ($('#State.opcl').hasClass("show")) {
-                    $('#State.opcl').removeClass("show")
-                } else {
-                    $("#State.opcl").addClass("show");
-                }
-                break;
-            case 'Country':
-                if ($('#Country.opcl').hasClass("show")) {
-                    $('#Country.opcl').removeClass("show")
-                } else {
-                    $("#Country.opcl").addClass("show");
-                }
-                break;
-            case 'age':
-                if ($('#age.opcl').hasClass("show")) {
-                    $('#age.opcl').removeClass("show")
-                } else {
-                    $("#age.opcl").addClass("show");
-                }
-                break;
-            case 'Gender':
-                if ($('#Gender.opcl').hasClass("show")) {
-                    $('#Gender.opcl').removeClass("show")
-                } else {
-                    $("#Gender.opcl").addClass("show");
-                }
-                break;
-            case 'Registration':
-                if ($('#Registration.opcl').hasClass("show")) {
-                    $('#Registration.opcl').removeClass("show")
-                } else {
-                    $("#Registration.opcl").addClass("show");
-                }
-                break;
-            case 'ForeginWorker':
-                if ($('#ForeginWorker.opcl').hasClass("show")) {
-                    $('#ForeginWorker.opcl').removeClass("show")
-                } else {
-                    $("#ForeginWorker.opcl").addClass("show");
-                }
-                break;
-        }
-    }
-
-
+  
 </script>
 
 <script>
