@@ -14,9 +14,7 @@
             <div class="filtereaccordion" id="filter">
               <div class="card">
                 <div class="card-header" id="faqhead1">
-                  <a href="#" class="filter-link" data-toggle="collapse" data-target="#time-period"
-                     aria-expanded="true" aria-controls="time-period">
-                    Time Period</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('time-period')" data-target="#time-period" aria-expanded="false" aria-controls="time-period" style="cursor: pointer">Time Period</a>
                 </div>
                 <div id="time-period" class="collapse show" aria-labelledby="faqhead1" data-parent="#filter">
                   <div class="card-body">
@@ -57,8 +55,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter2">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#doctorcode" aria-expanded="true" aria-controls="doctorcode">Doctor
-                    Code</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('doctorcode')" data-target="#doctorcode" aria-expanded="true" aria-controls="doctorcode" style="cursor: pointer">Doctor Code</a>
                 </div>
                 <div id="doctorcode" class="collapse" aria-labelledby="filter2" data-parent="#filter">
                   <div class="card-body">
@@ -72,8 +69,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter3">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#xray" aria-expanded="true" aria-controls="xray">X-ray
-                    Facility Code</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('xray')" data-target="#xray" aria-expanded="true" aria-controls="xray" style="cursor: pointer">X-ray Facility Code</a>
                 </div>
                 <div id="xray" class="collapse" aria-labelledby="filter3" data-parent="#filter">
                   <div class="card-body">
@@ -87,8 +83,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter4">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#laboratory" aria-expanded="true" aria-controls="laboratory">Laboratory
-                    Code</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('laboratory')" data-target="#laboratory" aria-expanded="true" aria-controls="laboratory" style="cursor: pointer">Laboratory Code</a>
                 </div>
                 <div id="laboratory" class="collapse" aria-labelledby="filter4" data-parent="#filter">
                   <div class="card-body">
