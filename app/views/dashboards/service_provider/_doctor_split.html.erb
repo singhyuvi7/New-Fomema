@@ -3,13 +3,13 @@
   <div class="card-body p-0">
     <% if has_permission?('DASHBOARD_SP_DOCTOR') %>
       <ul class="card-ul">
-        <li class="card-li dropdown-toggle" type="button" id="div_doctor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="card-li dropdown-toggle" type="button" id="activeListItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span> Active</span> <span style="font-weight: bold;">
           <div id='doctorsactive'>
                <%= @doctorsactive %>
           </div>
         </span>
-          <div class="listcard-ul dropdown-menu" aria-labelledby="div_doctor">
+          <div class="listcard-ul dropdown-menu custom-dropdown w-100 " aria-labelledby="div_doctor">
             <div style="background: #0032AB; color: #DDE7FF;width: 100%; float: left;">
               <span style="width: 50%;float: left;padding: 0px 7px;">State  </span>
               <span style="width: 50%;float: left;text-align: center;padding: 0px 10px 0px 37px;">Doctor</span>
@@ -29,5 +29,16 @@
     <% end %>
   </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#activeListItem').click(function() {
+            $('.custom-dropdown-radio').slideUp('fast');
+            $('.custom-dropdown-xray').slideUp('fast');
+            $('.custom-dropdown-lab').slideUp('fast');
+            $('.custom-dropdown').slideToggle('fast');
+        });
+    });
+</script>
 
 

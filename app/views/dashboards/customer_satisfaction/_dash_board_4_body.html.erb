@@ -1771,7 +1771,7 @@
                   };
 
                   // Create SVG element
-                  svg = el.append('svg').attr('width', width + margin.left + margin.right).attr('height', height / 2.2 + margin.top + margin.bottom);     // height/1.5 To Remove Extra Bottom Space
+                  svg = el.append('svg').attr('width', width + margin.left + margin.right).attr('height', height / 2.2 + margin.top + margin.bottom).style('padding', '0');
 
                   // Add layer for the panel
                   chart = svg.append('g').attr('transform', "translate(" + ((width + margin.left) / 2) + ", " + ((height + margin.top) / 2) + ")");

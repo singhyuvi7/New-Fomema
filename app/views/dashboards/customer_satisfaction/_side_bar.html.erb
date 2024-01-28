@@ -1,6 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<%= javascript_include_tag 'dashboards/common' %>
 <div id="sidebar">
   <div class="filter_row">
     <div class="filter_div mt-0">
@@ -12,8 +13,7 @@
 
               <div class="card">
                 <div class="card-header" id="faqhead1">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#time-period" aria-expanded="false" aria-controls="time-period">Time
-                    Period</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('time-period')" data-target="#time-period" aria-expanded="false" aria-controls="time-period" style="cursor: pointer">Time Period</a>
                 </div>
                 <div id="time-period" class="collapse" aria-labelledby="faqhead1" data-parent="#filter">
                   <div class="card-body">
@@ -54,8 +54,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="faqhead1">
-                  <a href="#" class="filter-link" data-toggle="collapse" data-target="#Sector"
-                     aria-expanded="true" aria-controls="Sector">Sector</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('Sector')" data-target="#Sector" aria-expanded="true" aria-controls="Sector" style="cursor: pointer">Sector</a>
                 </div>
 
                 <div id="Sector" class="collapse show" aria-labelledby="faqhead1" data-parent="#filter">
@@ -76,8 +75,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter2">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#customer"
-                     aria-expanded="true" aria-controls="customer">Customer Type</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('customer')" data-target="#customer" aria-expanded="true" aria-controls="customer" style="cursor: pointer">Customer Type</a>
                 </div>
 
                 <div id="customer" class="collapse" aria-labelledby="filter2" data-parent="#filter">
@@ -101,8 +99,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter3">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#Reg"
-                     aria-expanded="true" aria-controls="Reg">Registration Medium</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('Reg')" data-target="#Reg" aria-expanded="true" aria-controls="Reg" style="cursor: pointer">Registration Medium</a>
                 </div>
 
                 <div id="Reg" class="collapse" aria-labelledby="filter3" data-parent="#filter">
@@ -123,8 +120,7 @@
               </div>
               <div class="card">
                 <div class="card-header" id="filter4">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#age"
-                     aria-expanded="true" aria-controls="age">Age Group</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('age')" data-target="#age" aria-expanded="false" aria-controls="age" style="cursor: pointer">Age</a>
                 </div>
 
                 <div id="age" class="collapse" aria-labelledby="filter4" data-parent="#filter">
@@ -158,8 +154,7 @@
 
               <div class="card">
                 <div class="card-header" id="filter5">
-                  <a href="#" class="filter-link collapsed" data-toggle="collapse" data-target="#gender"
-                     aria-expanded="true" aria-controls="gender">Gender</a>
+                <a class="filter-link collapsed" onclick="FilterOpcl('gender')" data-target="#gender" aria-expanded="true" aria-controls="gender" style="cursor: pointer">Gender</a>
                 </div>
 
                 <div id="gender" class="collapse" aria-labelledby="filter5" data-parent="#filter">

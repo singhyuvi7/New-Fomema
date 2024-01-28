@@ -18,12 +18,12 @@
             <ul>
               <li >
                 <a class="dropdown-item"  onclick="radiographerClick('Radiographer')">
-                  <input type="checkbox" data-target="XQCC-Pool-Received"> Received
+                  <input type="checkbox"  class="checkbox-xqcc"  data-target="XQCC-Pool-Received"> Received
                 </a>
               </li>
               <li>
                 <a onclick="radiographerClick('Radiographer1')" class="dropdown-item">
-                  <input type="checkbox" data-target="XQCC-Pool-Reviewed"> Reviewed
+                  <input type="checkbox"  class="checkbox-xqcc"  data-target="XQCC-Pool-Reviewed"> Reviewed
                 </a>
               </li>
             </ul>
@@ -35,12 +35,12 @@
             <ul>
               <li>
                 <a onclick="radiographerClick('PCR')" class="dropdown-item">
-                  <input type="checkbox" data-target="PCR-Pool-Received"> Received
+                  <input type="checkbox" class="checkbox-pcr"  data-target="PCR-Pool-Received"> Received
                 </a>
               </li>
               <li>
                 <a  onclick="radiographerClick('PCR1')" class="dropdown-item">
-                  <input type="checkbox" data-target="PCR-Pool-Reviewed"> Reviewed
+                  <input type="checkbox" class="checkbox-pcr"  data-target="PCR-Pool-Reviewed"> Reviewed
                 </a>
               </li>
             </ul>
@@ -52,12 +52,12 @@
             <ul>
               <li>
                 <a onclick="radiographerClick('XQCC')" class="dropdown-item">
-                  <input type="checkbox" data-target="X-ray-Pending-Received"> Received
+                  <input type="checkbox" class="checkbox-xray" data-target="X-ray-Pending-Received"> Received
                 </a>
               </li>
               <li>
                 <a onclick="radiographerClick('XQCC1')" class="dropdown-item">
-                  <input type="checkbox" data-target="X-ray-Pending-Reviewed"> Reviewed
+                  <input type="checkbox" class="checkbox-xray"  data-target="X-ray-Pending-Reviewed"> Reviewed
                 </a>
               </li>
             </ul>
@@ -69,12 +69,12 @@
             <ul>
               <li>
                 <a onclick="radiographerClick('X-raypending')"  class="dropdown-item">
-                  <input type="checkbox" data-target="X-ray-Pending-Decision-Received"> Received
+                  <input type="checkbox" class="checkbox-xray-decision" data-target="X-ray-Pending-Decision-Received"> Received
                 </a>
               </li>
               <li>
                 <a onclick="radiographerClick('X-raypending1')" class="dropdown-item">
-                  <input type="checkbox" data-target="X-ray-Pending-Decision-Reviewed"> Reviewed
+                  <input type="checkbox" class="checkbox-xray-decision" data-target="X-ray-Pending-Decision-Reviewed"> Reviewed
                 </a>
               </li>
             </ul>
@@ -86,12 +86,12 @@
             <ul>
               <li>
                 <a onclick="radiographerClick('Medicalr')" class="dropdown-item">
-                  <input type="checkbox" data-target="Medical-Review-Received"> Received
+                  <input type="checkbox" class="checkbox-medical" data-target="Medical-Review-Received"> Received
                 </a>
               </li>
               <li>
                 <a onclick="radiographerClick('Medicalr1')" class="dropdown-item">
-                  <input type="checkbox" data-target="Medical-Review-Reviewed"> Reviewed
+                  <input type="checkbox" class="checkbox-medical" data-target="Medical-Review-Reviewed"> Reviewed
                 </a>
               </li>
             </ul>
@@ -110,60 +110,70 @@
   <ul class="sub-ulcard">
     <li>
       <div class="collapse" id="Radiographer">
-        <div class="sub-licard-header" id="XQCC-Pool-Received">XQCC Pool Received
+        <div class="sub-licard-header" id="XQCC-Pool-Received">
+        <span>XQCC Pool Received</span>
           <span><%= @xqcc_poolreceive %></span>
         </div>
       </div>
       <div class="collapse" id="Radiographer1">
-        <div class="sub-licard-body" id="XQCC-Pool-Reviewed">XQCC Pool Reviewed
+        <div class="sub-licard-header" id="XQCC-Pool-Reviewed">
+        <span>XQCC Pool Reviewed</span>
           <span><%= @xqcc_poolreview %></span>
         </div>
       </div>
     </li>
     <li>
       <div class="collapse" id="PCR">
-        <div class="sub-licard-header" id="PCR-Pool-Received">PCR Pool Received
+        <div class="sub-licard-header" id="PCR-Pool-Received">
+        <span>PCR Pool Received</span>
           <span><%= @pcr_poolreceived %></span>
         </div>
       </div>
       <div class="collapse" id="PCR1">
-        <div class="sub-licard-body" id="PCR-Pool-Reviewed">PCR Pool Reviewed
+        <div class="sub-licard-header" id="PCR-Pool-Reviewed">
+        <span>PCR Pool Reviewed</span>
           <span><%= @pcr_poolreviewed %></span>
         </div>
       </div>
     </li>
     <li>
       <div class="collapse" id="XQCC">
-        <div class="sub-licard-header" id="X-ray-Pending-Received">X-Ray Pending Received
+        <div class="sub-licard-header" id="X-ray-Pending-Received">
+        <span>X-Ray Pending Received</span>
           <span><%= @x_ray_pending_review %></span>
         </div>
       </div>
       <div class="collapse" id="XQCC1">
-        <div class="sub-licard-body" id="X-ray-Pending-Reviewed">X-Ray Pending Reviewed
+        <div class="sub-licard-header" id="X-ray-Pending-Reviewed">
+        <span>X-Ray Pending Reviewed</span>
           <span><%= @x_ray_pending_review %></span>
         </div>
       </div>
     </li>
     <li>
       <div class="collapse" id="X-raypending">
-        <div class="sub-licard-header" id="X-ray-Pending-Decision-Received">X-Ray Pending Decision Received
+        <div class="sub-licard-header" id="X-ray-Pending-Decision-Received">
+        <span>X-Ray Pending Decision Received</span>
           <span><%= @x_ray_pending_decision %></span>
         </div>
       </div>
       <div class="collapse" id="X-raypending1">
-        <div class="sub-licard-body" id="X-ray-Pending-Decision-Reviewed">X-Ray Pending Decision Reviewed
+        <div class="sub-licard-header" id="X-ray-Pending-Decision-Reviewed">
+        <span>X-Ray Pending Decision Reviewed</span>
           <span><%= @x_ray_pending_decision %></span>
         </div>
       </div>
     </li>
     <li>
       <div class="collapse" id="Medicalr">
-        <div class="sub-licard-header" id="Medical-Review-Received">Medical Review Received
+        <div class="sub-licard-header" id="Medical-Review-Received">
+        <span>Medical Review Received</span>
           <span><%= @medical_review %></span>
         </div>
       </div>
       <div class="collapse" id="Medicalr1">
-        <div class="sub-licard-body" id="Medical-Review-Reviewed">Medical Review Reviewed
+        <div class="sub-licard-header" id="Medical-Review-Reviewed">
+        <span>Medical Review Reviewed</span>
           <span><%= @medical_review %></span>
         </div>
       </div>
