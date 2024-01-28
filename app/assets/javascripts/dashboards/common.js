@@ -9,20 +9,48 @@ function refreshClick(){
         $("#refreshopen").addClass("show");
     }
 }
+
+
 function radiographerClick(dataTarget) {
     const ulContainer = document.querySelector('.sub-ulcard');
     const allSections = ulContainer.querySelectorAll('.collapse');
 
-    if (dataTarget === 'selectAll') {
-        const selectAllCheckbox = document.getElementById('select-all');
-        const isSelectAllChecked = selectAllCheckbox.checked;
+    const selectAllCheckbox = document.getElementById('select-all');
+    const isSelectAllChecked = selectAllCheckbox.checked;
 
+    // Handle "Select All" checkbox separately
+    if (dataTarget === 'selectAll') {
         allSections.forEach((section) => {
             if (isSelectAllChecked) {
                 section.classList.add('show');
             } else {
                 section.classList.remove('show');
             }
+        });
+
+        const allCheckboxesXQCC = document.querySelectorAll('.checkbox-xqcc');
+        allCheckboxesXQCC.forEach((checkbox) => {
+            checkbox.checked = isSelectAllChecked;
+        });
+
+        const allCheckboxesPCR = document.querySelectorAll('.checkbox-pcr');
+        allCheckboxesPCR.forEach((checkbox) => {
+            checkbox.checked = isSelectAllChecked;
+        });
+
+        const allCheckboxesXray = document.querySelectorAll('.checkbox-xray');
+        allCheckboxesXray.forEach((checkbox) => {
+            checkbox.checked = isSelectAllChecked;
+        });
+
+        const allCheckboxesXrayDecision = document.querySelectorAll('.checkbox-xray-decision');
+        allCheckboxesXrayDecision.forEach((checkbox) => {
+            checkbox.checked = isSelectAllChecked;
+        });
+
+        const allCheckboxesMedical = document.querySelectorAll('.checkbox-medical');
+        allCheckboxesMedical.forEach((checkbox) => {
+            checkbox.checked = isSelectAllChecked;
         });
     } else {
         const section = document.getElementById(dataTarget);
@@ -33,8 +61,15 @@ function radiographerClick(dataTarget) {
         } else {
             section.classList.add('show');
         }
+
+        const checkbox = section.querySelector('.section-checkbox');
+        if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+        }
     }
 }
+
+
 function CommunicableOpenClose() {
     if ($('#collapseOne19').hasClass("show")) {
         $('#collapseOne19').removeClass("show")

@@ -2733,4 +2733,12 @@ div#loadingDiv {
     top: 0;
     margin: auto;
 }
+
+.collapse > .sub-licard-header > span:first-child {
+    width: 75%;
+    float: left;
+    line-height: normal;
+    padding: 7px 0px;
+}
+
 /* loader css end */
