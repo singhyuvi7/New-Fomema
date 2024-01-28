@@ -1,0 +1,8 @@
+.card
+  .card-header
+    %strong Finance - Portal Transaction Listing
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render '/internal/reports/finance/portal_transactions/filter_daterange_branch', filter_link: portal_transactions_internal_finance_reports_path
+      = render '/internal/reports/finance/portal_transactions/pdf_template'

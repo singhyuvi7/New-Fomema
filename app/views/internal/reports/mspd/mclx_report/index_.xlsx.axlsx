@@ -1,0 +1,63 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  table_name_style = style.add_style(b: true)
+  detail_header_style = style.add_style(bg_color: 'fcff3a', border: { style: :thin, color: '00' })
+  digital_header_style = style.add_style(bg_color: '63c530', border: { style: :thin, color: '00' })
+  analog_header_style = style.add_style(bg_color: '52c9ec', border: { style: :thin, color: '00' })
+  data_style = style.add_style(border: { style: :thin, color: '00' })
+
+  # digital worksheet
+  wb.add_worksheet(name: 'Digital') do |sheet|
+    # total non comply detail
+    sheet.add_row ['NON COMPLY DETAILS (DIGITAL)'], style: table_name_style
+    sheet.add_row %w[REVIEW_DATE XRAY_CODE XRAY_NAME PARAMETER_CODE TOTAL_NC], style: detail_header_style
+    @data.dig(:digital, :total_non_comply_detail).each do |row_data|
+      sheet.add_row row_data.to_a.flatten, style: data_style
+    end
+    sheet.add_row ['date format in mm/dd/yyyy']
+    3.times { sheet.add_row }
+
+    # total submission, total view, total view by gp, total view by cr, total non comply
+    table_names = ['TOTAL SUBMISSION DIGITAL FILM', 'TOTAL VIEW DIGITAL FILM', 'TOTAL VIEW BY GP', 'TOTAL VIEW BY CR', 'TOTAL NON COMPLY DIGITAL FILM']
+    titles = %w[SUBMIT_DIGI DIGI_VIEW DIGI_GP DIGI_CR FLIM_NC_DIGI]
+    attributes = %i[total_submission total_view total_view_by_gp total_view_by_cr total_non_comply total_non_comply_detail]
+
+    table_names.each.with_index do |table_name, index|
+      sheet.add_row [table_name], style: table_name_style
+      sheet.add_row %W[XRAY_CODE #{titles[index]}], style: digital_header_style
+      @data.dig(:digital, attributes[index]).each do |row_data|
+        sheet.add_row row_data.to_a.flatten, style: data_style
+      end
+      3.times { sheet.add_row }
+    end
+    sheet.column_widths 15, nil, nil, nil
+  end
+
+  # analog worksheet
+  wb.add_worksheet(name: 'Analog') do |sheet|
+    # total non comply detail
+    sheet.add_row ['NON COMPLY DETAILS (ANALOG)'], style: table_name_style
+    sheet.add_row %w[REVIEW_DATE XRAY_CODE XRAY_NAME PARAMETER_CODE TOTAL_NC], style: digital_header_style
+    @data.dig(:analog, :total_non_comply_detail).each do |row_data|
+      sheet.add_row row_data.to_a.flatten, style: data_style
+    end
+    sheet.add_row ['date format in mm/dd/yyyy']
+    3.times { sheet.add_row }
+
+    # total submission, total view, total view by gp, total view by cr, total non comply
+    table_names = ['TOTAL SUBMISSION ANALOG FILM', 'TOTAL VIEW ANALOG FILM', 'TOTAL VIEW BY GP', 'TOTAL VIEW BY CR', 'TOTAL NON COMPLY ANALOG FILM']
+    titles = %w[SUBMIT_ANA ANA_VIEW ANA_GP ANA_CR FLIM_NC_ANA]
+    attributes = %i[total_submission total_view total_view_by_gp total_view_by_cr total_non_comply total_non_comply_detail]
+
+    table_names.each.with_index do |table_name, index|
+      sheet.add_row [table_name], style: table_name_style
+      sheet.add_row %W[XRAY_CODE XRAY_NAME #{titles[index]}], style: analog_header_style
+      @data.dig(:analog, attributes[index]).each do |row_data|
+        sheet.add_row row_data.to_a.flatten, style: data_style
+      end
+      3.times { sheet.add_row }
+    end
+    sheet.column_widths 15, nil, nil, nil
+  end
+end

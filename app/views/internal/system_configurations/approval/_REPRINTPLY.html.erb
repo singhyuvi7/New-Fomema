@@ -1,0 +1,13 @@
+<% code = "REPRINTPLY" %>
+<label class="col-md-4 col-form-label"><%= raw @system_configurations[code].name %></label>
+<div class="col-md-8">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="<%= code %>_1" type="radio" value="1" name="<%= code %>" required<%= " checked" if @system_configurations[code].new_value == '1' %><%= " disabled" if @system_configurations[code].new_value != '1' %>>
+        <label class="form-check-label" for="<%= code %>_1">Yes</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="<%= code %>_0" type="radio" value="0" name="<%= code %>" required<%= " checked" if @system_configurations[code].new_value == '0' %><%= " disabled" if @system_configurations[code].new_value != '0' %>>
+        <label class="form-check-label" for="<%= code %>_0">No</label>
+    </div>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations[code].value == '1' ? 'Yes' : 'No' %></p>
+</div>

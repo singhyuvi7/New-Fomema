@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "AGENCY_RENEWAL_X_DAYS_BEFORE_EXPIRY" %>"><%= @system_configurations["AGENCY_RENEWAL_X_DAYS_BEFORE_EXPIRY"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "AGENCY_RENEWAL_X_DAYS_BEFORE_EXPIRY", @system_configurations["AGENCY_RENEWAL_X_DAYS_BEFORE_EXPIRY"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["AGENCY_RENEWAL_X_DAYS_BEFORE_EXPIRY"].value %></p>
+</div>

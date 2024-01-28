@@ -1,0 +1,68 @@
+<div class="card">
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render partial: '/internal/xray_facilities/shared/xray_facility' %>
+
+        <%=render partial: '/internal/xray_facilities/shared/tabs', locals: {active_tab: "favourite_radiologists"} %>
+
+        <div class="tab-content">
+            <div class="tab-pane active">
+
+                <%=render "/shared/all_flash" %>
+
+                <div class="row">
+                    <div class="col module-actions text-right">
+                        <% if has_permission?('CREATE_FAVOURITE_RADIOLOGIST') %>
+                            <%=raw index_table_new_button(new_internal_xray_facility_favourite_radiologist_path) %>
+                        <% end %>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="<%= index_table_class %>">
+                                <thead>
+                                    <tr>
+                                        <th class="module-row-numbers">#</th>
+                                        <th>Code</th>
+                                        <th>Doctor Name</th>
+                                        <th class="module-row-actions">Action(s)</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <% if @favourite_radiologists.blank? %>
+                                        <tr>
+                                            <td colspan="4" class="text-danger">No records found.</td>
+                                        </tr>
+                                    <% else %>
+
+                                        <% @favourite_radiologists.each.with_index((@favourite_radiologists.current_page - 1) * get_per + 1) do |favourite_radiologist, index| %>
+                                            <tr>
+                                                <td class="module-row-numbers"><%= index %></td>
+                                                <td><%= favourite_radiologist.radiologist.code%></td>
+                                                <td><%= favourite_radiologist.radiologist.name %></td>
+                                                <td class="module-row-actions">
+                                                    <% if has_permission?('DELETE_FAVOURITE_RADIOLOGIST') %>
+                                                        <%=raw index_table_delete_button(internal_xray_facility_favourite_radiologist_path(@xray_facility, favourite_radiologist)) %>
+                                                    <% end %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
+
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <%= paginate @favourite_radiologists %>
+                </div>
+            </div>
+            <!-- /tab-pane -->
+        </div>
+    <!-- /tab-content -->
+    </div>
+</div>

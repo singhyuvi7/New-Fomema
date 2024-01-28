@@ -1,0 +1,95 @@
+<script>
+$(document).ready(function(){
+    action = '<%= params[:action] %>'
+    if(action == 'show' || action == 'approval'){
+        $(".form-check-input:checked, input:checkbox:checked").each(function(i, obj) {
+            $(this).addClass('outline-active-checkbox')
+        });
+
+        $("textarea[name$='_comment]']").each(function() {
+            if ($(this).val() != '') {
+                $(this).addClass('outline-active-checkbox')
+            }
+        });
+    }
+
+    visitable_type = '<%= @visit_report.visitable_type %>'
+    if(visitable_type == 'Doctor'){
+        has_personnel_signature = '<%= !@visit_report.visit_report_doctor&.personnel_signature.blank? %>'
+        has_officer_signature = '<%= !@visit_report.visit_report_doctor&.fomema_officer_signature.blank? %>'
+    }else{
+        has_personnel_signature = '<%= !@visit_report.visit_report_xray_facility&.personnel_signature.blank? %>'
+        has_officer_signature = '<%= !@visit_report.visit_report_xray_facility&.fomema_officer_signature.blank? %>'
+    }
+
+    toggle_edit_signature(!(has_personnel_signature == 'true'), 'labPersonnelModal')
+    toggle_edit_signature(!(has_officer_signature == 'true'), 'fomemaOfficerModal')
+
+    $('#labPersonnelModal, #fomemaOfficerModal').on('shown.bs.modal', function (e) {
+        init_signature_canvas($(this).attr('id'))
+    })
+
+    $('#labPersonnelModal, #fomemaOfficerModal').on('shown.bs.modal', function (e) {
+        init_signature_canvas($(this).attr('id'))
+    })
+
+    $( ".signature-clear-btn" ).click(function(e) {
+        modal_id = $(this).closest('.modal').attr('id')
+        var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    $('.signature-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(true, modal_id)
+        init_signature_canvas(modal_id)
+    }); 
+
+    $('.signature-cancel-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(false, modal_id)
+    }); 
+
+    $( "#submitToClinicBtn" ).click(function(e) {
+        $('#submitToClinicForm').submit();
+    });
+
+    function init_signature_canvas(modal_id){
+        var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+        if(canvas){
+            var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        }
+    }
+
+    function toggle_edit_signature(allow_edit, modal_id){
+        has_signature = modal_id == 'labPersonnelModal' ? has_personnel_signature : has_officer_signature
+
+        if(allow_edit){
+            $('#'+modal_id+' .signature-img').addClass('d-none').removeClass('d-block')
+            $('#'+modal_id+' #JohnHancock-canvas').addClass('d-block').removeClass('d-none')
+            $('#'+modal_id+' .personnel-detail-input').attr('disabled',false)
+            $('#'+modal_id+' .signature-clear-btn').show()
+            $('#'+modal_id+' .signature-save-btn').show()
+            $('#'+modal_id+' .signature-edit-btn').hide()
+        }else{
+            $('#'+modal_id+' .signature-img').addClass('d-block').removeClass('d-none')
+            $('#'+modal_id+' #JohnHancock-canvas').addClass('d-none').removeClass('d-block')
+            $('#'+modal_id+' .personnel-detail-input').attr('disabled', true)
+            $('#'+modal_id+' .signature-clear-btn').hide()
+            $('#'+modal_id+' .signature-save-btn').hide()
+            $('#'+modal_id+' .signature-edit-btn').show()
+        }
+
+        if((has_signature == 'true') && allow_edit){
+            $('#'+modal_id+' .signature-cancel-edit-btn').show()
+        }else{
+            $('#'+modal_id+' .signature-cancel-edit-btn').hide()
+        }
+    }
+    });
+
+</script>

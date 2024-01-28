@@ -1,0 +1,227 @@
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/lqcc_visit_summary" %>
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+    
+    action = params[:action]
+    not_summary = ['download'].include?(action)
+    visit_report_lab = not_summary ? @visit_report.visit_report_laboratory : @visit_report.visit_report_laboratory_summary
+    officers = @visit_report.visit_report_visitors
+
+    facility_adequacy = [
+        [:adequate_facility, "Adequate Facility"],
+        [:adequate_staff, "Adequate Staff"],
+        [:adequate_instrument, "Adequate Instrument"]
+    ].map do |key, value|
+        comment = visit_report_lab.try("#{ key }_comment")
+        items = visit_report_lab.try("#{ key }_items")
+
+        {
+            number: "",
+            name: value,
+            key: key.to_s,
+            yes: visit_report_lab.try(key) == 'YES',
+            no: visit_report_lab.try(key) == 'NO',
+            na: visit_report_lab.try(key) == 'NA',
+            value: visit_report_lab.try("#{ key }_name"),
+            has_acc_option: true,
+            comment: comment,
+            items: items
+        }
+    end
+
+    pre_analytical = [
+        {
+            name: 'Appropriate Specimen Transportation',
+            sub: [
+                [:despatch_transportation, "Despatch Transportation"],
+                [:transport_to_test_lab, "Transportation to Testing Laboratory"]
+            ]
+        },{
+            name: 'Appropriate Specimen Packaging',
+            sub: [
+                [:despatch_bag, "Despatch Bag"],
+                [:packaging_to_test_lab, "Packaging to Testing Laboratory"]
+            ]
+        },{
+            name: 'Record of Specimen Traceability',
+            sub: [
+                [:clinic_to_despatch, "Clinic to Despatch"],
+                [:despatch_to, "Despatch to Collection Centre"],
+                [:collection_centre_to_test_lab, "Collection Centre to Testing Laboratory"]
+            ]
+        },{
+            name: 'Pre-Analytical Procedure',
+            sub: [
+                [:registration_record, "Specimen Registration Record"],
+                [:rejection_register, "Specimen Rejection Register"],
+                [:rejection_criteria,"Specimen Rejection Criteria"]
+            ]
+        }
+    ].map do |item|
+        if !item[:sub].blank?
+            item[:sub] = item[:sub].map do |key,value|
+                comment = visit_report_lab.try("#{ key }_comment")
+                items = visit_report_lab.try("#{ key }_items")
+
+                {
+                    number: "",
+                    name: value,
+                    key: key.to_s,
+                    yes: visit_report_lab.try(key) == 'YES',
+                    no: visit_report_lab.try(key) == 'NO',
+                    na: visit_report_lab.try(key) == 'NA',
+                    value: visit_report_lab.try("#{ key }_name"),
+                    has_acc_option: true,
+                    comment: comment,
+                    items: items
+                }
+            end
+        else
+            key = item[:value]
+            comment = visit_report_lab.try("#{ key }_comment")
+            items = visit_report_lab.try("#{ key }_items")
+
+            item = {
+                number: "",
+                name: item[:name],
+                key: key.to_s,
+                yes: visit_report_lab.try(key) == 'YES',
+                no: visit_report_lab.try(key) == 'NO',
+                na: visit_report_lab.try(key) == 'NA',
+                value: visit_report_lab.try("#{ key }_name"),
+                has_acc_option: item[:has_acc_option],
+                comment: comment,
+                items: items
+            }
+        end
+        item
+    end
+
+    specimen_storage = [
+        {
+            name: 'Specimen Storage',
+            sub: [
+                [:adequate_space, "Adequate Space"],
+                [:appropriate_temperature, "Appropriate Temperature"]
+            ]
+        },{
+            name: 'Others',
+            value: :others,
+            has_acc_option: false,
+            sub: []
+        }
+    ].map do |item|
+        if !item[:sub].blank?
+            item[:sub] = item[:sub].map do |key,value|
+                comment = visit_report_lab.try("#{ key }_comment")
+                items = visit_report_lab.try("#{ key }_items")
+
+                {
+                    number: "",
+                    name: value,
+                    key: key.to_s,
+                    yes: visit_report_lab.try(key) == 'YES',
+                    no: visit_report_lab.try(key) == 'NO',
+                    na: visit_report_lab.try(key) == 'NA',
+                    value: visit_report_lab.try("#{ key }_name"),
+                    has_acc_option: true,
+                    comment: comment,
+                    items: items
+                }
+            end
+        else
+            key = item[:value]
+            comment = visit_report_lab.try("#{ key }_comment")
+            items = visit_report_lab.try("#{ key }_items")
+
+            item = {
+                number: "",
+                name: item[:name],
+                key: key.to_s,
+                yes: visit_report_lab.try(key) == 'YES',
+                no: visit_report_lab.try(key) == 'NO',
+                na: visit_report_lab.try(key) == 'NA',
+                value: visit_report_lab.try("#{ key }"),
+                has_acc_option: item[:has_acc_option],
+                comment: comment,
+                items: items
+            }
+        end
+        item
+    end
+
+    conclusion = [
+        [:satisfactory, "Satisfactory"]
+    ].map do |key, value|
+        comment = visit_report_lab.try("#{ key }_comment")
+        {
+            number: "",
+            name: value,
+            key: key.to_s,
+            yes: visit_report_lab.try(key) == 'YES',
+            no: visit_report_lab.try(key) == 'NO',
+            na: visit_report_lab.try(key) == 'NA',
+            has_acc_option: true,
+            comment: comment,
+        }
+    end
+
+    sections = [
+        ['Facility Adequacy', facility_adequacy],
+        ['Pre-Analytical', pre_analytical],
+        ['Specimen Storage', specimen_storage],
+        ['Conclusion', conclusion]
+    ]
+%>
+
+<div class="visit-summary page-container">
+
+<%=render 'internal/visit_reports/laboratories/pdf/visit_details', {visit_report_lab: visit_report_lab, officers: officers} %>
+<hr>
+
+    <div class="visit-findings medical-results-content medical-history">
+        <h3>Part 2: Visit Findings</h3>
+
+        <% sections.each do |name, section| %>
+            <div class="finding-section">
+                <table>
+                    <tbody>
+                        <hr>
+                        <tr>
+                            <td class="table-name" colspan="2"><%= name %></td>
+                            <td class="text-center bold">YES</td>
+                            <td class="text-center bold">NO</td>
+                            <td class="text-center bold">N/A</td>
+                        </tr>
+
+                        <% section.each.with_index(1) do |finding, index| %>
+                            <%=render 'internal/visit_reports/laboratories/pdf/collection/finding', {finding: finding, index: index} %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        <% end %>
+    </div>
+    <!-- signature -->
+    <% if !not_summary %>
+        <div class="collection-signature">
+            <div class="d-flex">
+                <div class="signature-box-1">
+                    <div>Laboratory's Personnel Acknowledgement</div>
+                    <%= image_tag visit_report_lab.lab_personnel_signature, class: "signature-img" if !visit_report_lab.lab_personnel_signature.blank? %>
+                    <div>(<%= visit_report_lab.lab_personnel_name %>)</div>
+                    <div><%= visit_report_lab.lab_personnel_designation %></div>
+                </div>
+
+                <div class="signature-box-2">
+                    <div>Fomema's Officer</div>
+                    <%= image_tag visit_report_lab.fomema_officer_signature, class: "signature-img" if !visit_report_lab.fomema_officer_signature.blank? %>
+                    <div>(<%= visit_report_lab.fomema_officer_name %>)</div>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- end signature -->
+</div>

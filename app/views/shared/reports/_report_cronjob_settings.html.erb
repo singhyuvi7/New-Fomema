@@ -1,0 +1,184 @@
+<% if has_permission?("EDIT_REPORT_CRONJOBS") %>
+    <div id="cronjob-settings-dialog-open" class="btn btn-primary font-weight-bold float-right ml-2">
+        <div class="d-flex align-items-center"><i class="fas fa-cogs font-size-10 mr-2"></i> Cronjob Settings</div>
+    </div>
+
+    <div id="dialog-report-cronjob-settings" class="hidden modal-xl" title="Automated Report Settings" data-name="<%= action_name %>">
+        <div class="mail-field main-email-field hidden align-items-center mb-2">
+            <%= text_field_tag "main_email[]", "", placeholder: "Email address", class: "form-control mr-2" %>
+            <i class="remove-email-field fa fa-times font-size-10 p-2 clickable"></i>
+        </div>
+
+        <div class="mail-field cc-email-field hidden align-items-center mb-2">
+            <%= text_field_tag "cc_email[]", "", placeholder: "Email address", class: "form-control mr-2" %>
+            <i class="remove-email-field fa fa-times font-size-10 p-2 clickable"></i>
+        </div>
+
+        <% if false # Removed for now. %>
+        <!-- <div class="cron-schedule-field mb-2 hidden align-items-center justify-content-between">
+            <div class="d-flex">
+                <span class="mr-3">Run cronjob </span>
+                <%= select_tag "schedule[0][type]", options_for_select(["Daily", "Weekly", "Monthly"], nil), class: "form-control w-em-8 type-schedule" %>
+
+                <div class="schedule-value hidden align-items-center" type="month">
+                    <span class="w-em-6 text-center">on the</span>
+                    <%= select_tag "schedule[0][month_value]", options_for_select((1..28).map {|x| "#{ x.ordinalize } day"} + ["3rd last day", "2nd last day", "last day"], nil), class: "form-control w-em-10 type-month" %>
+                </div>
+
+                <div class="schedule-value hidden align-items-center" type="week">
+                    <span class="w-em-6 text-center">every</span>
+                    <%= select_tag "schedule[0][week_value]", options_for_select(Date::DAYNAMES, nil), class: "form-control w-em-10 type-week" %>
+                </div>
+
+                <div class="schedule-time d-flex align-items-center">
+                    <span class="w-em-6 text-center">at</span>
+                    <%= select_tag "schedule[0][time]", options_for_select((0..23).map {|x| Time.parse("#{x}:00").strftime("%-l:00%p")}, nil), class: "form-control w-em-10" %>
+                </div>
+            </div>
+
+            <i class="remove-schedule-field fa fa-times font-size-10 ml-2 p-2 clickable"></i>
+        </div> -->
+        <% end %>
+
+        <%= form_tag update_settings_internal_reports_path, class: "disable-enter-keypress" do %>
+            <%= hidden_field_tag :redirect_url, request.url %>
+            <%= hidden_field_tag :report_name, action_name %>
+
+            <div class="recipient-container">
+                <label>Main Recipients</label>
+                <br><span class="add-new-field text-primary clickable mt-2" data-type="main-email">+ Add email</span>
+            </div>
+
+            <div class="recipient-container mt-4">
+                <label>CC Recipients</label>
+                <br><span class="add-new-field text-primary clickable mt-2" data-type="cc-email">+ Add email</span>
+            </div>
+
+            <!-- <div class="mt-4">
+                <label>Schedule</label>
+
+                <br><span class="add-new-schedule text-primary clickable mt-2">+ Add scheduled report</span>
+            </div>
+ -->
+            <div class="text-right">
+                <%= submit_tag "Update Settings", id: "", class: "btn btn-success font-weight-bold" %>
+            </div>
+        <% end %>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            $('#cronjob-settings-dialog-open').click(function() {
+                var button = $(this);
+
+                if (button.hasClass('btn-primary')) {
+                    toggleButtonState(button, 'loading');
+                    var dialog      = $('#dialog-report-cronjob-settings');
+                    retrieveSettings(dialog, button);
+                }
+            });
+
+            function retrieveSettings(dialog, button) {
+                var reportName  = dialog.attr('data-name');
+                var retrieveUrl = '<%= retrieve_settings_internal_reports_path %>';
+
+                $.ajax({
+                    url: retrieveUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { report_name: reportName },
+                })
+                .done(function(response) {
+                    toggleButtonState(button, 'ready');
+                    $('.recipient-container .mail-field').remove();
+
+                    $(response.main).each(function() {
+                        insertEmailField('main-email', this);
+                    });
+
+                    $(response.cc).each(function() {
+                        insertEmailField('cc-email', this);
+                    });
+
+                    dialog.dialog({
+                        modal: true,
+                        minWidth: 800,
+                        dialogClass: `dialog__title-primary shadow`,
+                        buttons: {
+                            Close: function() {
+                                $(this).dialog('close');
+                            }
+                        },
+                        beforeClose: function() {
+                            return confirm('Any unsaved changes will be lost. Confirm?');
+                        }
+                    });
+                });
+            }
+
+            function toggleButtonState(button, state) {
+                if (state === 'ready') {
+                    button.html(`<div class="d-flex align-items-center"><i class="fas fa-cogs font-size-10 mr-2"></i> Cronjob Settings</div>`);
+                    button.addClass('btn-primary').removeClass('btn-secondary');
+                } else {
+                    button.html(`<div class="d-flex align-items-center"><i class="fas fa-circle-notch fa-spin font-size-10 mr-2"></i> Loading</div>`);
+                    button.removeClass('btn-primary').addClass('btn-secondary');
+                }
+            }
+
+            $('.add-new-field').click(function() {
+                var type    = $(this).attr('data-type');
+                insertEmailField(type, '');
+            });
+
+            function insertEmailField(type, value) {
+                var field = $(`.${ type }-field:first`).clone();
+                field.find('input').val(value);
+                field.removeClass('hidden').addClass('d-flex');
+                field.insertBefore(`.add-new-field[data-type="${ type }"]`);
+                removeEmailField(field.find('.remove-email-field'));
+            }
+
+            removeEmailField($('.remove-email-field'));
+
+            function removeEmailField(button) {
+                button.click(function() {
+                    $(this).closest('div.mail-field').remove();
+                });
+            }
+
+            // $('.add-new-schedule').click(function() {
+            //     var container = $(`.cron-schedule-field:first`).clone();
+            //     container.removeClass('hidden').addClass('d-flex');
+            //     container.insertBefore(this);
+            //     addScheduleListeners(container);
+            //     removeScheduleField(container.find('.remove-schedule-field'));
+            // });
+
+            // removeScheduleField($('.remove-schedule-field'));
+
+            // function removeScheduleField(button) {
+            //     button.click(function() {
+            //         $(this).closest('div.cron-schedule-field').remove();
+            //     });
+            // }
+
+            // addScheduleListeners($('.cron-schedule-field'));
+
+            // function addScheduleListeners(cronContainer) {
+            //     var container = $(cronContainer);
+
+            //     container.find('.type-schedule').change(function() {
+            //         var type = $(this).val();
+            //         container.find('.schedule-value').removeClass('d-flex').addClass('hidden');
+
+            //         if (type === 'Monthly') {
+            //             container.find('.schedule-value[type="month"]').addClass('d-flex').removeClass('hidden');
+            //         } else if (type === 'Weekly') {
+            //             container.find('.schedule-value[type="week"]').addClass('d-flex').removeClass('hidden');
+            //         }
+            //     });
+            // }
+        </script>
+    <% end %>
+<% end %>

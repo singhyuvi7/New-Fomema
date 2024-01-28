@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Facility</strong> - Operation Hours
+    </div>
+
+
+    <div class="card-body">
+        <%= render "internal/shared/operation_hours" %>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+        <%=raw show_back_button(internal_xray_facility_path(@xray_facility)) %>
+        </div>
+    </div>
+</div>

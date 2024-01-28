@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Password Policies</strong> - New Password Policy
+    </div>
+    <%= form_for @password_policy, url: internal_password_policies_path do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

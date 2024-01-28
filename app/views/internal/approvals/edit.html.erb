@@ -1,0 +1,7 @@
+<div class="card">
+  <div class="card-header"><strong><%= @item.resource_type.to_s.tableize %></strong> - Editing <%= @item.resource_type.to_s.tableize.singularize %></div>
+    <%= form_for @item.resource_type.classify.constantize.new, url: internal_approval_path, method: :put  do |form| %>
+      <% form.object.assign_attributes(@item.params) %>
+      <%= render "internal/#{@item.resource_type.to_s.tableize}/form", { form: form } %>
+    <% end %>
+</div>

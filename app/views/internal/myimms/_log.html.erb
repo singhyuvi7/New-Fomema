@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No.</th>
+                        <th>Transaction Code</th>
+                        <th>Passport No.</th>
+                        <th>Nationality</th>
+                        <th>Date of Birth</th>
+                        <th>Worker Name</th>
+                        <th>Gender</th>
+                        <th>Exam Date</th>
+                        <th>Medical Status</th>
+                        <th>Operation Type</th>
+                        <th>Status</th>
+                        <th>Response</th>
+                        <th>Send Date</th>
+                        <th>Reply Date</th>
+                        <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @myimms_requests.blank? %>
+                    <tr>
+                        <td colspan="17" class="text-danger">No records found.</td>
+                    </tr>
+                    <% else %>
+
+                    <% @myimms_requests.each.with_index((@myimms_requests.current_page - 1) * get_per + 1) do |myimms_request, index| %>
+                    <tr>
+                        <% 
+                                transaction = myimms_request&.myimms_transaction&.transactionz
+                                myimms_response = MyimmsResponse.where(:myimms_request_id => myimms_request.id).first
+                                if myimms_response.present?
+                                    myimms_status = MyimmsTransaction::RESPONSE_STATUS[myimms_response.status]
+                                    myimms_status = myimms_status.present? ? myimms_status : 'FAILED'
+                                    response =  myimms_response.response
+                                else
+                                    myimms_status = MyimmsTransaction::RESPONSE_STATUS['0']
+                                    response = "Failed to submit to JIM"
+                                end
+                            %>
+
+                        <td class="module-row-numbers"><%= index %></td>
+                        <td><%= myimms_request.txn_id %></td>
+                        <td><%= myimms_request.doc_no %></td>
+                        <td><%= Country.where(:code => myimms_request.nat).pluck(:name).first %></td>
+                        <td><%= transaction&.fw_date_of_birth.present? ? transaction&.fw_date_of_birth.strftime('%d/%m/%Y') : transaction&.foreign_worker&.date_of_birth&.strftime('%d/%m/%Y') %></td>
+                        <td><%= myimms_request.name %></td>
+                        <td><%= myimms_request.sex == '1' ? 'M' : 'F' %></td>
+                        <td><%= myimms_request.med_dt.present? ? Date.strptime(myimms_request.med_dt, '%Y%m%d').strftime("%d/%m/%Y") : '-' %></td>
+                        <td><%= myimms_request.med_sts == '1' ? 'Suitable' : 'Unsuitable' %></td>
+                        <td><%= myimms_request.sts_ind == 'I' ? 'Insert' : 'Update' %></td>
+                        <td><%= myimms_status %></td>
+                        <td><%= response %></td>
+                        <td><%= myimms_request&.created_at.try(:strftime,"%d/%m/%Y %l:%M:%S %p") %></td>
+                        <td><%= myimms_response&.created_at.try(:strftime,"%d/%m/%Y %l:%M:%S %p") %></td>
+                        <td class="module-row-actions">
+                            <%=raw index_table_show_button(internal_transaction_path(transaction)) if !transaction.blank? %>
+                        </td>
+                    </tr>
+                    <% end %>
+
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <%= paginate @myimms_transactions %>
+</div>

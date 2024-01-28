@@ -1,0 +1,9 @@
+<% @xray_reviews.each do |xray_review| %>
+    <%= render 'internal/xray_reviews/shared/identical_row', {xray_review: xray_review, show_checkbox: true, show_remove: false} %>
+<% end %>
+
+<% if @xray_reviews.blank? %>
+<tr>
+    <td colspan="9">No XQCC Review found with these search options</td>
+</tr>
+<% end %>

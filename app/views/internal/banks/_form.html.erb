@@ -1,0 +1,83 @@
+<div class="card-body">
+
+    <%#= render 'shared/all_validation_flash', { model_obj: @bank } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status, class: 'required' %>
+                <%= form.select :status, options_for_select(Bank::STATUSES.invert, form.object.status), {include_blank: form_select_option_text}, {class: "form-control", required: true} %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :local_bank, "Local Bank", class: 'required' %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input" id="bank_local_bank_TRUE" type="radio" value="true" name="bank[local_bank]" required<%= " checked" if form.object.local_bank %>>
+                        <label class="form-check-label" for="bank_local_bank_TRUE">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input" id="bank_local_bank_FALSE" type="radio" value="false" name="bank[local_bank]" required<%= " checked" if !form.object.local_bank %>>
+                        <label class="form-check-label" for="bank_local_bank_FALSE">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :swift_code, "Swift Code" %>
+                <%= form.text_field :swift_code, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :bank_draft_expiry_day, "Bank Draft Expiry Day", class: 'required' %>
+                <%= form.number_field :bank_draft_expiry_day, class: 'form-control', required: true, step: 1, min: 0 %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :routing %>
+                <%= form.text_field :routing, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :routing2 %>
+                <%= form.text_field :routing2, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_banks_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

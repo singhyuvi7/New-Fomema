@@ -1,0 +1,67 @@
+<table class="invoice-table table-sm">
+    <thead>
+        <tr>
+            <th style="width: 10%">No.</th>
+            <th style="width: 70%">Description</th>
+            <th style="width: 20%">Amount (RM)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% _index = 0 %>
+        <% @order.order_items.exclude_insurance_fee.exclude_convenient_fee.each.with_index(1) do |order_item, index| %>
+        <% _index = index %>
+        <tr>
+            <td class="text-center"><%= index %></td>
+            <td>
+                <% if ['TRANSACTION_REGISTRATION','SPECIAL_RENEWAL_TRANSACTION_REGISTRATION'].include?(order_item.order.category) && ['FOC','TRANSACTION_MALE','TRANSACTION_FEMALE'].include?(order_item.fee.code) %>
+                    <div><%= "#{Order::CATEGORIES[order_item.order.category]} - #{order_item.gender == 'M' ? 'MALE' : 'FEMALE'}" %></div>
+                <% elsif ['DOCTOR_BIOMETRIC_DEVICE','XRAY_FACILITY_BIOMETRIC_DEVICE'].include?(order_item.order.category) %>
+                    <div><%= Fee.find_by(id: order_item.fee_id).name %></div>
+                <% else %>
+                    <div><%= Order::CATEGORIES[order_item.order.category] %></div>
+                <% end %>
+                <% if ['Employer','Agency'].include?(@order.customerable_type) %>
+                    <% if ['TRANSACTION_REGISTRATION','SPECIAL_RENEWAL_TRANSACTION_REGISTRATION'].include?(@order.category) && ['FOC','TRANSACTION_MALE','TRANSACTION_FEMALE'].include?(order_item.fee.code) %>
+                        <% if @order.customerable_type == 'Agency' %>
+                            <div class="row-details">
+                                <%= "Employer : #{ order_item.transactionz&.employer.name } (#{ order_item.transactionz&.employer.code })" %>
+                            </div>
+                        <% end %>
+                        <div class="row-details">
+                            <%= "Transaction Code : #{ order_item.transactionz&.code }" %>
+                        </div>
+                        <div class="row-details">
+                            <%= "Transaction Name : #{ order_item.transactionz&.fw_name }" %>
+                        </div>
+                    <% elsif ['AGENCY_REGISTRATION', 'AGENCY_RENEWAL'].include?(@order.category) %>
+                        <div class="row-details">
+                            <%= "Agency Code : #{ order_item.order_itemable_type == 'Agency' ? order_item.order_itemable.try(:code) : "-"}" %>
+                        </div>
+                        <div class="row-details">
+                            <%= "Agency Name : #{ order_item.order_itemable_type == 'Agency' ? order_item.order_itemable.try(:name) : "-" }" %>
+                        </div>
+                    <% elsif !order_item.fee.is_convenient_fee? && !order_item.fee.is_insurance_fee? %>
+                        <%
+                            latest_transaction = order_item.additional_information&.key?("transaction_id") ? (!order_item.additional_information["transaction_id"].blank? ? Transaction.with_default_transaction_date.find(order_item.additional_information["transaction_id"]) : nil) : nil
+                        %>
+                        <div class="row-details">
+                            <%= "Transaction Code : #{ order_item.order_itemable_type == 'ForeignWorker' ? (!latest_transaction.blank? ? latest_transaction.code : '-') : order_item.order_itemable.try(:code)}" %>
+                        </div>
+                        <div class="row-details">
+                            <%= "Transaction Name : #{ order_item.order_itemable_type == 'ForeignWorker' ? (!latest_transaction.blank? ? latest_transaction.fw_name : '-') : order_item.order_itemable.try(:fw_name)}" %>
+                        </div>
+                    <% end %>
+                <% end %>
+            </td>
+            <td class="text-center"><%= number_with_precision(order_item.amount, precision: 2) %></td>
+        </tr>
+        <% end %>
+
+        <% if @order.customerable_type != 'Employer' %>
+        <tr>
+            <td class="text-right" colspan="2"><b>Total Payable Amount</b></td>
+            <td class="text-center"><b><%= number_with_precision(@order.amount, precision: 2) %></b></td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>

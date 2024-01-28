@@ -1,0 +1,241 @@
+<div class="card">
+    <div class="card-header">
+        PCR Audit Checklist - Quality
+    </div>
+
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>Parameters</th>
+                <th colspan="2" class="text-center">Status</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td><span class="condition-code">4021</span>ID</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4021]" id="pcr_review_detail_4021_n" value="N"<%= " checked" if !pcr_review.get_condition_detail("4021") %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4021]" id="pcr_review_detail_4021_y" value="Y" <% if pcr_review.get_condition_detail("4021") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4121]" id="pcr_review_comment_4121" rows="2"<%= " required" if pcr_review.get_condition_detail("4021") == 'Y' %>><%= pcr_review.get_condition_comment("4121") %></textarea>
+                </td>
+            </tr>
+
+            <!-- processing -->
+            <tr>
+                <td><span class="condition-code">4022</span>Processing</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4022]" id="pcr_review_detail_4022_n" value="N" <% if !pcr_review.get_condition_detail("4022") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4022]" id="pcr_review_detail_4022_y" value="Y" <% if pcr_review.get_condition_detail("4022") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4122]" id="pcr_review_comment_4122" rows="2"<%= " required" if pcr_review.get_condition_detail("4022") == 'Y' %>><%= pcr_review.get_condition_comment("4122") %></textarea>
+                </td>
+            </tr>
+            <!-- end processing -->
+
+            <!-- positioning -->
+            <tr>
+                <td><span class="condition-code">4023</span>Positioning</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4023]" id="pcr_review_detail_4023_n" value="N" <% if !pcr_review.get_condition_detail("4023") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4023]" id="pcr_review_4023_y" value="Y" <% if pcr_review.get_condition_detail("4023") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4123]" id="pcr_review_comment_4123" rows="2"<%= " required" if pcr_review.get_condition_detail("4023") == 'Y' %>><%= pcr_review.get_condition_comment("4123") %></textarea>
+                </td>
+            </tr>
+            <!-- end positioning -->
+
+            <!-- exposure -->
+            <tr>
+                <td><span class="condition-code">4024</span>Exposure</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4024]" id="pcr_review_detail_4024_n" value="N" <% if !pcr_review.get_condition_detail("4024") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4024]" id="pcr_review_4024_y" value="Y" <% if pcr_review.get_condition_detail("4024") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4124]" id="pcr_review_comment_4124" rows="2"<%= " required" if pcr_review.get_condition_detail("4024") == 'Y' %>><%= pcr_review.get_condition_comment("4124") %></textarea>
+                </td>
+            </tr>
+            <!-- end exposure -->
+
+            <!-- artifacts -->
+            <tr>
+                <td><span class="condition-code">4025</span>Artifacts</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4025]" id="pcr_review_detail_4025_n" value="N" <% if !pcr_review.get_condition_detail("4025") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4025]" id="pcr_review_4025_y" value="Y" <% if pcr_review.get_condition_detail("4025") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4125]" id="pcr_review_comment_4125" rows="2"<%= " required" if pcr_review.get_condition_detail("4025") == 'Y' %>><%= pcr_review.get_condition_comment("4125") %></textarea>
+                </td>
+            </tr>
+            <!-- end artifacts -->
+
+            <!-- inspiratory_effort -->
+            <tr>
+                <td><span class="condition-code">4026</span>Inspiratory Effort</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4026]" id="pcr_review_detail_4026_n" value="N" <% if !pcr_review.get_condition_detail("4026") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4026]" id="pcr_review_4026_y" value="Y" <% if pcr_review.get_condition_detail("4026") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4126]" id="pcr_review_comment_4126" rows="2"<%= " required" if pcr_review.get_condition_detail("4026") == 'Y' %>><%= pcr_review.get_condition_comment("4126") %></textarea>
+                </td>
+            </tr>
+            <!-- end inspiratory_effort -->
+
+            <!-- movement_breathing -->
+            <tr>
+                <td><span class="condition-code">4027</span>Movement / Breathing</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4027]" id="pcr_review_detail_4027_n" value="N" <% if !pcr_review.get_condition_detail("4027") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4027]" id="pcr_review_4027_y" value="Y" <% if pcr_review.get_condition_detail("4027") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4127]" id="pcr_review_comment_4127" rows="2"<%= " required" if pcr_review.get_condition_detail("4027") == 'Y' %>><%= pcr_review.get_condition_comment("4127") %></textarea>
+                </td>
+            </tr>
+            <!-- end movement_breathing -->
+
+            <!-- anatomical_marker -->
+            <tr>
+                <td><span class="condition-code">4028</span>Anatomical Marker</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4028]" id="pcr_review_detail_4028_n" value="N" <% if !pcr_review.get_condition_detail("4028") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4028]" id="pcr_review_4028_y" value="Y" <% if pcr_review.get_condition_detail("4028") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4128]" id="pcr_review_comment_4128" rows="2"<%= " required" if pcr_review.get_condition_detail("4028") == 'Y' %>><%= pcr_review.get_condition_comment("4128") %></textarea>
+                </td>
+            </tr>
+            <!-- end anatomical_marker -->
+
+            <!-- other_quality -->
+            <tr>
+                <td><span class="condition-code">4029</span>Others</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4029]" id="pcr_review_detail_4029_n" value="N" <% if !pcr_review.get_condition_detail("4029") %> checked <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="pcr_review_detail[4029]" id="pcr_review_4029_y" value="Y" <% if pcr_review.get_condition_detail("4029") == 'Y' %> checked <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="pcr_review_comment[4129]" id="pcr_review_comment_4129" rows="2"<%= " required" if pcr_review.get_condition_detail("4029") == 'Y' %>><%= pcr_review.get_condition_comment("4129") %></textarea>
+                </td>
+            </tr>
+            <!-- end other_quality -->
+
+        </tbody>
+    </table>
+</div>

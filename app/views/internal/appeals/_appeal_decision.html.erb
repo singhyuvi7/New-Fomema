@@ -1,0 +1,64 @@
+<div class="p-4 border-bottom">
+    <h3><u>Appeal Decision</u></h3>
+</div>
+
+<% if @previous_approval&.medical_mle2_decision == "REJECTED" %>
+    <div class="border-bottom p-4">
+        <label>Previously rejected appeal approval</label>
+
+        <table>
+            <tr>
+                <th valign="top" class="pr-4">Rejected by</th>
+                <td><%= @previous_approval.medical_mle2.try(:name) %></td>
+            </tr>
+
+            <tr>
+                <th valign="top" class="pr-4">Rejected at</th>
+                <td><%= @previous_approval.medical_mle2_decision_at? ? @previous_approval.medical_mle2_decision_at.strftime("%d/%m/%Y") : nil %></td>
+            </tr>
+
+            <tr>
+                <th valign="top" class="pr-4">Rejected decision</th>
+                <td><%= @previous_approval.medical_mle1_decision %></td>
+            </tr>
+
+            <tr>
+                <th valign="top" class="pr-4">Rejected comment</th>
+                <td><%= simple_format @previous_approval.medical_mle2_comment %></td>
+            </tr>
+        </table>
+    </div>
+<% end %>
+
+<div class="px-4 py-4 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="row-index">1</label>
+    <label class="flex-grow-1 mb-0">Appeal Status</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal.displayed_status %>
+    </div>
+</div>
+
+<div class="px-4 py-3 boolean-field-parent d-flex flex-wrap align-items-center justify-content-end border-bottom">
+    <label class="row-index">2</label>
+    <label class="flex-grow-1 mb-0">Appeal Decision</label>
+
+    <div class="d-flex flex-shrink-0">
+        <% mle_decision = @appeal_approval&.medical_mle1_decision %>
+        <%= hidden_field_tag :medical_mle1_decision, mle_decision, class: "boolean-field" %>
+        <%= raw boolean_field_button(active_color: "success", active: mle_decision == "CONDITIONAL_SUCCESSFUL", readonly: readonly || (@appeal.is_moh && !has_permission?("REVIEW_MOH_APPEALS")), value: "CONDITIONAL_SUCCESSFUL", placeholder: "Conditional Successful", classes: "w-em-13") %>
+        <%= raw boolean_field_button(active_color: "success", active: mle_decision == "SUCCESSFUL", readonly: readonly || (@appeal.is_moh && !has_permission?("REVIEW_MOH_APPEALS")), value: "SUCCESSFUL", placeholder: "Successful", classes: "w-em-10") %>
+        <%= raw boolean_field_button(active_color: "danger", active: mle_decision == "UNSUCCESSFUL", readonly: readonly || (@appeal.is_moh && !has_permission?("REVIEW_MOH_APPEALS")), value: "UNSUCCESSFUL", placeholder: "Unsuccessful", classes: "w-em-10") %>
+        <%= raw boolean_field_button(active_color: "danger", active: mle_decision == "CANCEL/CLOSE", readonly: readonly || (@appeal.is_moh && !has_permission?("REVIEW_MOH_APPEALS")), value: "CANCEL/CLOSE", placeholder: "Cancel / Close", classes: "w-em-10") %>
+        <%= raw boolean_field_button(active_color: "danger", active: mle_decision == "DEFERRED", readonly: readonly || (@appeal.is_moh && !has_permission?("REVIEW_MOH_APPEALS")), value: "DEFERRED", placeholder: "Deferred", classes: "w-em-10") %>
+    </div>
+</div>
+
+<div class="px-4 py-4 border-bottom">
+    <div>
+        <label class="row-index">3</label>
+        <label>Appeal Remarks</label>
+    </div>
+
+    <%= text_area_tag :medical_mle1_comment, @appeal_approval&.medical_mle1_comment, rows: 5, readonly: readonly, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;" %>
+</div>

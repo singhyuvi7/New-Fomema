@@ -1,0 +1,16 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  header_style = s.add_style(b: true, sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: 'Refunds') do |sheet|
+
+    sheet.add_row ["Code","Name","Category","Status","Total(RM)"], style: header_style
+
+    @refund_batch.refunds.each  do |refund|
+        sheet.add_row [refund.code.to_s, "#{refund.customerable&.name} (#{!refund.customerable&.blank? ? refund.customerable&.code : '-'})", Refund::CATEGORIES[refund.category], Refund::STATUSES[refund.status] ? Refund::STATUSES[refund.status] : refund.status, number_to_currency(refund.amount, unit: "", precision: 2)], style: data_style, :types => [:string,nil,nil,nil,:string]
+    end
+
+      sheet.add_row ['','','','Grand Total(RM)', number_to_currency(@refund_batch.refunds.sum(:amount), unit: "", precision: 2)], style: header_style
+  end
+end

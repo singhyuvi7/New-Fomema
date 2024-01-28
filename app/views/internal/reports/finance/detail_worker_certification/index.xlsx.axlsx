@@ -1,0 +1,24 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: 'transactions') do |sheet|
+    sheet.add_row ["#{@company_name.to_s.upcase} - #{@date}"], style: title_style
+    sheet.add_row ["DETAIL WORKER CERTIFICATION ON #{@certification_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{@branch.name || "ALL"}"], style: title_style
+    sheet.add_row
+
+    sheet.add_row @headers, style: header_style
+
+    if @transactions.present?
+      total_amount = 0.0
+      @transactions.each.with_index do |transaction, index|
+        total_amount += transaction.final_amount.to_f
+        sheet.add_row([transaction.certification_date.try(:strftime, get_standard_date_format), transaction.fw_code, transaction.fw_name, transaction.final_amount])
+      end
+    end
+
+    sheet.add_row(['Total', '', '', total_amount])
+  end
+end

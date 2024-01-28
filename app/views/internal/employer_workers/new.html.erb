@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Worker</strong> - New Foreign Worker</div>
+    <%= form_for @foreign_worker, {url: internal_employer_employer_workers_path, html: {multipart: true, class: "with-parsley"}} do |form| %>
+        <%= render 'form', { form: form } %>
+
+        <div class="card-footer">
+        
+            <div class="text-right">
+                <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                <%=raw edit_save_button() %>
+            </div>
+        
+        </div>
+        
+    <% end %>
+
+    <%=render 'search_employer' %>
+</div>
+ 

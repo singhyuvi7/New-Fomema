@@ -1,0 +1,331 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @laboratory } %>
+    <%=render "/shared/all_flash" %>
+
+    <% if ["edit", "update"].include?(params[:action]) && @laboratory.change_address_pending_order %>
+        <div class="alert alert-danger">
+            There is an order <%= @laboratory.change_address_pending_order.code %> is pending for payment. Kindly check before proceed with the changes.
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_NON_FINANCE_INFO_LABORATORY" %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :name, "Laboratory Name", class: 'required' %>
+                    <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :company_name, "Company Name" %>
+                    <%= form.text_field :company_name, class: 'form-control', data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label :business_registration_number, "Business Registration Number", class: 'required' %>
+                    <%= form.text_field :business_registration_number, class: 'form-control', required: true, data: { parsley_maxlength: "30", parsley_maxlength_message: "Maximum length of 30 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "No special characters allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- address -->
+        <% [:address1, :address2, :address3, :address4].each_with_index do |sym, index| %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <% if index == 0 %>
+                            <%= form.label :address, class: "required" %>
+                        <% end %>
+
+                        <%= form.text_field sym, class: "form-control", required: index == 0, data: { parsley_pattern: "[a-zA-Z0-9@.&#,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@), ampersand (&), hash (#) and slashes (/) are allowed" } %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+        <!-- /address -->
+
+        <%= render 'internal/shared/form_state_postcode_town', {form: form} %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :telephone_number, "Telephone Number", class: 'required' %>
+                    <%= form.text_field :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :fax_number, "Fax Number" %>
+                    <%= form.text_field :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :email, class: 'required' %>
+                    <%= form.email_field :email, class: 'form-control', required: true, data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <%= render 'internal/shared/form_pic', {form: form} %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :qualification, class: 'required' %>
+                    <%= form.text_field :qualification, class: 'form-control', required: true, data: { parsley_maxlength: "50", parsley_maxlength_message: "Maximum length of 50 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :pathologist_name, "Pathologist Name" %>
+                    <%= form.text_field :pathologist_name, class: 'form-control', data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z][^0-9]*", parsley_pattern_message: "Must not begin with a special characters and no numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :nsr_number, "NSR Number" %>
+                    <%= form.text_field :nsr_number, class: 'form-control', maxlength: '7', data: { parsley_maxlength: "7", parsley_maxlength_message: "Maximum length of 7 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :renewal_agreement_date, "Renewal Agreement Date" %>
+                    <%= form.date_field :renewal_agreement_date, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :laboratory_type_id, "Laboratory Type", class: 'required' %>
+                    <%= form.select :laboratory_type_id, options_from_collection_for_select(LaboratoryType.order(:name).all, 'id', 'name', form.object.laboratory_type_id), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label :district_health_office_id, "Nearest District Health Office" %>
+                    <%= form.select :district_health_office_id, options_from_collection_for_select(DistrictHealthOffice.order(:name).all, 'id', 'name', form.object.district_health_office_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :samm_number, "SAMM Number", class: 'required' %>
+                    <%= form.text_field :samm_number, class: 'form-control', required: true, maxlength: '4', data: { parsley_maxlength: "4", parsley_maxlength_message: "Maximum length of 4 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :samm_accredited_since, "SAMM Accredited Since", class: 'required'  %>
+                    <%= form.date_field :samm_accredited_since, class: 'form-control', required: true %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :samm_expiry_date, "SAMM Expiry Date", class: 'required' %>
+                    <%= form.date_field :samm_expiry_date, class: 'form-control', required: true %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :web_service, "Web Service", class: 'required' %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :web_service, true, required: true, class: "form-check-input" %>
+                            <label for="laboratory_web_service_true" class="form-check-label">Yes</label>
+                            &emsp;
+                            <%= form.radio_button :web_service, false, class: "form-check-input" %>
+                            <label for="laboratory_web_service_false" class="form-check-label">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% if has_permission?("EDIT_PASSPHRASE_LABORATORY") %>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="web_service_passphrase_clear_text">Web Service Passphrase</label>
+                        <input type="text" name="web_service_passphrase_clear_text" id="web_service_passphrase_clear_text" class="form-control no-uppercase">
+                        <%#= form.label :web_service_passphrase, "Web Service Passphrase" %>
+                        <%#= form.text_field :web_service_passphrase, class: 'form-control no-uppercase' %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_FINANCE_INFO_LABORATORY" %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :male_rate, "Male Worker Rate (RM)", class: 'required' %>
+                    <%= form.text_field :male_rate, class: 'form-control', required: true %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :female_rate, "Female Worker Rate (RM)", class: 'required' %>
+                    <%= form.text_field :female_rate, class: 'form-control', required: true %>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :payment_method_id) %>
+                    <%= form.label :payment_method_id, "Payment Method", class: 'required' %>
+                    <%= form.select :payment_method_id, PaymentMethod.where("category = 'OUT'").order(:name).all.map{ |c| [c.name, c.id, { 'data-code' => c.code} ] }, {include_blank: form_select_option_text}, {class: "form-control select2",required: true, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id} } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :bank_id) %>
+                    <%= form.label :bank_id, class: 'bank-id' %>
+                    <%= form.select :bank_id, options_from_collection_for_select(Bank.where(status: 'ACTIVE').where.not(routing: [nil, '']).order(:name).all, 'id', 'name', form.object.bank_id), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_account_number, "Bank Account Number", class: 'bank-account-number' %>
+                    <%= form.text_field :bank_account_number, class: 'form-control'%>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_payment_id, "Bank Payment ID", class: 'bank_payment_id' %>
+                    <%= form.text_field :bank_payment_id, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :email_payment, "Email (Payment)", class: 'email_payment' %>
+                    <%= form.email_field :email_payment, class: 'form-control', data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_NON_FINANCE_INFO_LABORATORY" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label :comment %>
+                    <%= form.text_area :comment, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if ["edit", "update"].include?(params[:action]) %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= label_tag :fee_id, "Fee" %>
+                    <%= select_tag :fee_id, options_from_collection_for_select(Fee.where(code: ["LABORATORY_CHANGE_ADDRESS", "FOC"]), 'id', 'name', params[:fee_id]), include_blank: form_select_option_text, class: "form-control" %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <%=render "shared/approval_comments", { comments: @laboratory.approval_request.comments } if @laboratory.approval_request %>
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_laboratories_path) %>
+        <%=raw edit_save_draft_button if has_any_permission?("CREATE_DRAFT_LABORATORY", "EDIT_DRAFT_LABORATORY") %>
+        <%=raw edit_submit_for_approval_button if has_any_permission?("CREATE_SUBMIT_APPROVAL_LABORATORY", "EDIT_SUBMIT_APPROVAL_LABORATORY") %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+// $('#draft_submit').click(function () {
+//     $('.laboratory-form').attr('novalidate', 'novalidate').submit();
+// });
+
+// $('label[for="laboratory_web_service_passphrase"]')
+/*$('input[name="laboratory[web_service]"]').click(function(){
+    if ($('#laboratory_web_service_passphrase').length <= 0) {
+        return;
+    }
+    if (this.value == 'true') {
+        $('#laboratory_web_service_passphrase').attr('required', 'required') && $('label[for="laboratory_web_service_passphrase"]').addClass("required");
+    } else {
+        $('#laboratory_web_service_passphrase').attr('required', false) && $('label[for="laboratory_web_service_passphrase"]').removeClass("required");
+    }
+})*/
+
+$('#draft_submit').click(function() {
+    // $('form.with-parsley').parsley().destroy();
+    $('form.with-parsley').parsley().validate();
+});
+
+$('#approval_submit').click(function() {
+    $('form.with-parsley').parsley().validate();
+});
+
+check_payment_method($('#laboratory_payment_method_id').find(":selected").data("code"))
+
+$('#laboratory_payment_method_id').change(function(){
+    code = $('#laboratory_payment_method_id').find(":selected").data("code")
+    check_payment_method(code)
+});
+
+function check_payment_method(code){
+    if(code == 'OUT_CASHORDER' || code == 'OUT_CHEQUE'){
+        $('#laboratory_bank_id').attr('data-parsley-required',false);
+        $('.bank-id').removeClass("required");
+        $('#laboratory_bank_account_number').attr('data-parsley-required',false);
+        $('.bank-account-number').removeClass("required");
+        $('#laboratory_email_payment').attr('data-parsley-required',false);
+        $('.email_payment').removeClass("required");
+        $('#laboratory_bank_payment_id').attr('data-parsley-required',false);
+        $('.bank_payment_id').removeClass("required");
+    }else{
+        $('#laboratory_bank_id').attr('data-parsley-required',true);
+        $('.bank-id').addClass("required");
+        $('#laboratory_bank_account_number').attr('data-parsley-required',true);
+        $('.bank-account-number').addClass("required");
+        $('#laboratory_email_payment').attr('data-parsley-required',true);
+        $('.email_payment').addClass("required");
+        $('#laboratory_bank_payment_id').attr('data-parsley-required',true);
+        $('.bank_payment_id').addClass("required");
+    }
+}
+</script>
+<% end %>

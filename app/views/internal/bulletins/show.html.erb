@@ -1,0 +1,109 @@
+<div class="card">
+
+  <div class="card-header">
+    <strong>Bulletins</strong> - Bulletin Detail
+  </div>
+
+  <div class="card-body">
+
+    <%= render '/shared/all_flash' %>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="bulletin_code">Title</label>
+          <p class="form-control-plaintext">
+            <%== @bulletin.title %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="bulletin_code">Content</label>
+          <p class="form-control-plaintext">
+            <%== @bulletin.content %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col">
+        <label for="bulletin_code">Publish from</label>
+        <p class="form-control-plaintext">
+          <%= @bulletin.publish_from.try(:strftime,"%d/%m/%Y") %>
+        </p>
+      </div>
+      <div class="form-group col">
+        <label for="bulletin_code">Publish to</label>
+        <p class="form-control-plaintext">
+          <%= @bulletin.publish_to.try(:strftime,"%d/%m/%Y") %>
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="bulletin_code">Require acknowledge</label>
+          <p class="form-control-plaintext">
+
+            <% if @bulletin.require_acknowledge %>
+              Yes
+            <% else %>
+              No
+            <% end %>
+
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label for="bulletin_uploads">Uploaded Documents</label>
+        <%= hidden_field_tag :remove_uploaded_file, "" %>
+
+        <table class="table">
+          <tr>
+            <th>Documents</th>
+          </tr>
+
+          <% @bulletin.uploads.each do |upload| %>
+            <tr>
+
+              <td class="filenames">
+                <% upload.documents.each do |document| %>
+                  <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                <% end %>
+              </td>
+
+            </tr>
+          <% end %>
+
+          <% if @bulletin.uploads.blank? %>
+            <tr>
+              <td colspan="2">There are no uploaded documents</td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-footer">
+
+    <div class="text-right">
+      <%= raw show_back_button(internal_bulletins_path) %>
+      <% if has_permission?('EDIT_BULLETIN') %>
+        <%= raw show_edit_button(edit_internal_bulletin_path(@bulletin)) %>
+      <% end %>
+    </div>
+
+  </div>
+
+</div>

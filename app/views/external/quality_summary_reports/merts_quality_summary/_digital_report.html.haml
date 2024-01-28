@@ -1,0 +1,94 @@
+%h1 Digital
+.row
+  .col-6
+    %h5
+      XQCC Quality Summary Report as on #{year}
+  .col-6.text-right
+    %span{ class: "#{'mr-3 pr-5' if @pdf}" } Date: #{@date} Time: #{@time}
+.row
+  .col-12
+    %p.mb-0
+      %b= xray_facility.name
+    %p.mb-0= xray_facility.license_holder_name
+    %p.mb-0= xray_facility.displayed_address
+.mt-3
+  %p
+    %b Xray code:
+    %span= @xray_code
+#non-comply-table.table-responsive
+  %table.table.table-bordered
+    %thead.thead-light
+      %tr
+        %th{ scope: 'col' }
+        %th{ scope: 'col' } Data
+        - all_months(year.to_i).each do |month_display|
+          %th{ scope: 'col' }= month_display
+        %th{ scope: 'col' } Grand Total
+    %tbody
+      - Report::XqccQualitySummaryReportService::DIGITAL_ATTRIBUTES.each do |key, attributes|
+        - attributes.each.with_index do |attribute, index|
+          - grand_total = 0
+          %tr
+            - if index.zero?
+              %td{ rowspan: attributes.size }= key.split('_').map(&:capitalize).join(' ') unless key == 'vacant'
+            %td= Report::XqccQualitySummaryReportService::NON_COMPLY_SUM_TITLES.dig(:digital, key.to_sym, attribute.to_sym)
+            - non_comply_data.each.with_index do |month_data, index|
+              - count = month_data.dig(key.to_sym, attribute.to_sym)
+              - grand_total += count
+              %td= count unless count.zero?
+            %td= grand_total
+      - Report::XqccQualitySummaryReportService::MERTS_SUM_TITLES.dig(:digital).each.with_index do |(key, title), index|
+        - grand_total = 0
+        %tr
+          - if index.zero?
+            %td{ rowspan: Report::XqccQualitySummaryReportService::MERTS_SUM_TITLES.dig(:digital).size }
+          %td= title
+          - xqcc_data.each do |monthly_count|
+            - count = monthly_count.dig(key.to_sym)
+            - grand_total += count
+            %td= monthly_count.dig(key.to_sym) unless count.zero?
+          %td= grand_total
+.row.my-2
+  .col-12.text-center
+    %span Reported By
+    %span.ml-2 GP: #{stats.dig(:reported_by_gp)}
+    %span.ml-2 CR: #{stats.dig(:reported_by_cr)}
+#statistic-data-table.p-2
+  %table.table.table-bordered.text-center.w-100
+    %thead.thead-light
+      %tr
+        %th{ scope: 'col' } SOP Compliance
+        %th{ scope: 'col' } Non SOP Compliance
+    %tbody
+      %tr
+        %td{width: '20%'}
+          = stats.dig(:sop_comply)
+          (#{number_to_percentage(stats.dig(:sop_comply_percent), precision: 2)})
+        %td{width: '20%'}
+          = stats.dig(:sop_non_comply)
+          (#{number_to_percentage(stats.dig(:sop_non_comply_percent), precision: 2)})
+#film-submission-table.p-2
+  %table.table.table-bordered.text-center.w-100
+    %thead.thead-light
+      %tr
+        %th{ width: '20%' } X-Ray Submission
+        %th{ width: '20%' } Viewed Images
+        %th{ width: '20%' } Pending to be viewed
+    %tbody
+      %tr
+        - submitted = stats.dig(:xray_submitted).to_i
+        - viewed = stats.dig(:xray_viewed).to_i
+        - pending = stats.dig(:xray_pending_view).to_i
+        %td= submitted
+        %td
+          = viewed
+          - if submitted.zero?
+            (0%)
+          - else
+            %span (#{number_to_percentage((viewed.to_f / submitted.to_f) * 100, precision: 2 )})
+        %td
+          = pending
+          - if submitted.zero?
+            (0%)
+          - else
+            %span (#{number_to_percentage((pending.to_f / submitted.to_f) * 100, precision: 2 )})

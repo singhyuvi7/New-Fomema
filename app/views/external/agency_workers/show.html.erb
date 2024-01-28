@@ -1,0 +1,90 @@
+
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Foreign Workers</strong> - Foreign Worker Detail
+    </div>
+    <div class="card-body ">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :name %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.name || raw('<i>N/A</i>') %></div>
+               		</div>
+            	</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :gender %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= ForeignWorker::GENDERS[@foreign_worker.gender] %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :date_of_birth %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.date_of_birth&.strftime('%d/%m/%Y') || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :passport_number %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext">  <%= @foreign_worker.passport_number || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :country_id %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.country.try(:name) || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<!--
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :Address, 'Address (Accommodation of foreign worker)' %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext">
+							<%=@foreign_worker.address1%>
+							<br><%=@foreign_worker.address2%>
+							<br><%= @foreign_worker.address3 %>
+							<br><%= @foreign_worker.address4 %> 
+							<br><%= @foreign_worker.postcode %> <%= @foreign_worker&.town&.name %> <%= @foreign_worker&.state&.name %>
+						</div>
+					</div>
+				</div>
+				-->
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :arrival_date %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"> <%= @foreign_worker.arrival_date || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :job_type_id %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.job_type.try(:name) || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :plks_number,'PLKS Number' %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"> <%= @foreign_worker.plks_number || raw('<i>N/A</i>') %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :pati, 'PATI' %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.pati ? 'Yes' : 'No' %></div>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-form-label"><%= label_tag :programme %></label>
+					<div class="col-md-5">
+						<div class="form-control-plaintext"><%= @foreign_worker.programme_indicator %></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <div class= "text-right">
+            <a class="btn btn-blue-portal" href="<%= external_agency_workers_path employer_id: @foreign_worker.employer_id %>">Back</a>
+        </div>
+    </div>
+</div>

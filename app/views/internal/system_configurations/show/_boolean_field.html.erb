@@ -1,0 +1,6 @@
+<div class="col-md-8">
+    <p class="form-control-plaintext"><%= @system_configurations[code].value.eql?("1") ? "Yes" : "No" %></p>
+    <% if @system_configurations[code].comment.present? %>
+        <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+    <% end %>
+</div>

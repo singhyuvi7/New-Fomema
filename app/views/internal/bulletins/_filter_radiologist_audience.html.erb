@@ -1,0 +1,121 @@
+<div id="filter-radiologist-audience" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Filter Radiologist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+<!-- filter card -->
+<div class="card">
+    <div class="card-body">
+        <form id="filter-radiologist-audience-form">
+            <div class="form-group row">
+                <label for="title" class="col-sm-2 col-form-label">Code</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                </div>
+                <label for="title" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="title" class="col-sm-2 col-form-label">State</label>
+                <div class="col-sm-4">
+                    <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: form_select_option_text, class: 'form-control filter-state', onchange: "audience_filter_state_change(this)" %>
+                </div>
+                <label for="title" class="col-sm-2 col-form-label">Town</label>
+                <div class="col-sm-4">
+                    <%= select_tag :town_id, options_from_collection_for_select(Town.where(state_id: params[:state_id]).order(:name).all, 'id', 'name',  params[:town_id]), include_blank: form_select_option_text, class: 'form-control filter-town' %>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <button type="button" class="btn btn-sm btn-danger" onclick="filter_radiologist_audience_clear()"><i class="icon-trash"></i> Clear</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="filter_radiologist_audience_submit()"><i class="icon-magnifier"></i> Filter</button>
+        </div>
+    </div>
+</div>
+<!-- /filter card -->
+
+<table class="table table-bordered table-striped table-sm filter-radiologist-audience-table">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>State</th>
+            <th>Town</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan="5">
+                Please input filter criteria
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+            </div>
+            <!-- /.modal-body -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="set_audience(this, '', 'All')">Select All</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+function filter_radiologist_audience_clear()
+{
+    document.getElementById('filter-radiologist-audience-form').reset();
+    $('#filter-radiologist-audience-form').find('.filter-town').html(`<option value="">Select option</option>`);
+}
+
+function filter_radiologist_audience_submit()
+{
+    let has_criteria = false;
+    $('#filter-radiologist-audience-form .form-control').each(function () {
+        if ($(this).val().length > 0) {
+            has_criteria = true;
+        }
+    });
+    if (!has_criteria) {
+        alert('Please input filter criteria');
+        return;
+    }
+
+    $.ajax({
+        url: `/radiologists.json?${$("#filter-radiologist-audience-form").serialize()}&per=999`,
+        method: 'GET',
+        success: function (response) {
+            if (response.length == 0) {
+                $('.filter-radiologist-audience-table tbody').html(`<td colspan="5">Found 0 records</td>`);
+                return;
+            }
+            $('.filter-radiologist-audience-table tbody').html('');
+            response.forEach(function (radiologist, idx) {
+                $('.filter-radiologist-audience-table tbody').append(`<tr>
+    <td>${radiologist.code}</td>
+    <td>${radiologist.name}</td>
+    <td>${radiologist&.state&.name}</td>
+    <td>${radiologist&.town&.name}</td>
+    <td><button type="button" class="btn btn-primary" onclick="set_audience(this, '${radiologist.id}', '${radiologist.name} - ${radiologist.code}')">Select</button></td>
+</tr>`);
+            });
+        },
+    })
+}
+</script>
+<% end %>

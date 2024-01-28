@@ -1,0 +1,134 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Orders</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_ORDER') and false %>
+                    <%=raw index_table_new_button(new_internal_order_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Order Code</th>
+            <th>Order Date</th>
+            <th>Customer Code</th>
+            <th>Category</th>
+            <th>Document Number</th>
+            <th>Payment No</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Paid Date</th>
+            <th>Payment Method</th>
+            <th>Branch</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @orders.blank? %>
+        <tr>
+            <td colspan="13" class="text-danger">No records found.</td>
+        </tr>
+        <% else %>
+
+            <% @orders.each.with_index((@orders.current_page - 1) * get_per + 1) do |order, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= order.code %></td>
+                    <td><%= order.date.strftime("%d/%m/%Y") %></td>
+                    <td><%= order.customerable&.code %></td>
+                    <td><%= Order::CATEGORIES[order.category] %></td>
+                    <td><%= raw Order.get_document_numbers(order.id).try(:join,'<br/>') %></td>
+                    <td><%= raw Order.get_payment_no(order.id).try(:join,'<br/>') %></td>
+                    <td><%= number_to_currency(order.amount, unit: "") %></td>
+                    <td><%= Order::STATUSES[order.status] %></td>
+                    <td><%= order.paid_at.try(:strftime,"%d/%m/%Y") %></td>
+                    <td><%= order.payment_method&.name %></td>
+                    <td><%= order.organization&.name %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_order_path(order)) %>
+
+                        <% if (["NEW","PENDING_PAYMENT"].include?(order.status) && has_permission?('EDIT_ORDER')) %>
+                            <%=raw index_table_edit_button edit_internal_order_path(order) if !['PT'].include?(order&.organization&.code) %>
+
+                            <% if ['TRANSACTION_REGISTRATION','SPECIAL_RENEWAL_TRANSACTION_REGISTRATION'].include?(order.category) %>
+                                <%= link_to raw("<i class=\"fa fa-times\"></i>"), internal_order_path(order, :submit => 'cancel'), title: 'Cancel', method: 'put', data: {confirm: "Confirm cancel?",title: "Cancel",toggle: "tooltip"},class: 'btn btn-sm btn-warning' %>
+                            <% end %>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_BRANCH_TRANSACTION", "VIEW_OWN_TRANSACTION") %>
+                            <% if (["TRANSACTION_EXTENTION", "TRANSACTION_CHANGE_DOCTOR","TRANSACTION_REGISTRATION","SPECIAL_RENEWAL_TRANSACTION_REGISTRATION"].include?(order.category) && ["PAID"].include?(order.status)) %>
+                                <%=raw index_table_primary_button(internal_transactions_path(order_code: order.code), label: '<i class="fa fa-briefcase"></i>', title: 'View Transactions') %>
+                            <% elsif ["TRANSACTION_CANCELLATION"].include?(order.category) %>
+                                <%=raw index_table_primary_button(internal_transactions_path(code: order.order_items&.first&.order_itemable&.code), label: '<i class="fa fa-briefcase"></i>', title: 'View Transactions') %>
+                            <% end %>
+                        <% end %>
+
+                        <% if (["PENDING_APPROVAL"].include?(order.status) && has_permission?('APPROVAL_ORDER')) %>
+                            <%=raw index_table_approval_button approval_internal_order_path(order) %>
+                        <% end %>
+
+                        <% if (["PENDING_PAYMENT", "FAILED"].include?(order.status) && order.amount > 0) && !['PT'].include?(order&.organization&.code) %>
+                            <%=raw index_table_primary_button payment_internal_order_path(order), label: '<i class="fa fa-credit-card"></i>', title: 'Payment' %>
+                        <% end %>
+
+                        <% if (has_permission?('DELETE_ORDER')) %>
+                            <%=raw index_table_delete_button(internal_order_path(order)) %>
+                        <% end %>
+
+                        <% if has_permission?("PRINT_INVOICE_ORDER") and order.status == "PAID" %>
+                            <a class="btn btn-sm btn-primary invoice-btn" data-toggle="tooltip" data-html="true" data-has-insurance="<%= order.order_items.get_insurance_fee.blank? ? false : true %>" data-order-code="<%= order.code %>" data-insurance-url="<%= InsuranceService.receipt_link(order.code) %>" title="Invoice" data-original-title="Invoice" href="<%= invoice_internal_order_path(order) %>" target="_blank"><i class="fa fa-print"></i></a>
+                        <% end %>
+
+                        <% if has_any_permission?("REQUERY_ORDER_PAYMENT", "VIEW_REQUERY_ORDER_PAYMENT") and order.payment_method&.code&.start_with?('PAYNET', 'BOLEH') %>
+                            <a class="btn btn-sm btn-secondary requery-btn" data-toggle="tooltip" data-html="true" data-order-code="<%= order.code %>" title="Requery" data-original-title="Requery" href="<%= requery_internal_order_path(order) %>" target="_blank"><i class="fa fa-magic"></i></a>
+                        <% end %>
+
+                        <% if has_permission?("EDIT_ORDER_STATUS") and !["PAID", "FAILED", "CANCELLED", "NEW"].include?(order.status) and order.payment_method&.code&.start_with?('IPAY_FPX', 'SWIPE_', 'PAYNET', 'BOLEH') %>
+                            <a class="btn btn-sm btn-warning edit-status-btn" data-toggle="tooltip" data-html="true" data-order-code="<%= order.code %>" title="Fail Order" data-original-title="Fail Order" href="<%= edit_status_internal_order_path(order) %>"><i class="fa fa-exclamation-triangle"></i></a>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @orders %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    has_howden_invoice_permission = '<%= has_permission?("PRINT_HOWDEN_INVOICE_ORDER") %>';
+    $(".invoice-btn").click(function(event){
+        if(has_howden_invoice_permission == 'true'){
+            event.preventDefault();
+            window.open(this.href, '_blank');
+            if($(this).data('has-insurance'))
+                window.open($(this).data('insurance-url'), '_blank');
+        }
+    });
+</script>
+<% end %>

@@ -1,0 +1,48 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Retake Reasons</strong> - Retake Reason Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="retake_reason_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @retake_reason.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_retake_reasons_path) %>
+            <% if has_permission?('EDIT_RETAKE_REASON') %>
+                <%=raw show_edit_button(edit_internal_retake_reason_path(@retake_reason)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_RETAKE_REASON") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_retake_reason_audits_path(@retake_reason) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

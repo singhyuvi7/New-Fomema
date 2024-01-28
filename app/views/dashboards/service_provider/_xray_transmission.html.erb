@@ -1,0 +1,109 @@
+<% if has_permission?('DASHBOARD_SP_XRAY_FACILITY') %>
+  <div class="row">
+    <div class="col-md-12">
+      <div id="xray-transmission" style="height: 180px;">
+        Loading...
+        <script type="text/javascript">
+            // Declare a global variable for the container
+            var chartContainer;
+
+            function updateXrayTransmission(data) {
+                google.charts.load("current", {packages: ["corechart"]});
+                google.charts.setOnLoadCallback(function () {
+                    createXrayTransmission(data);
+                    updateProgressBars(data.self_reporting, data.radiologist_reporting);
+
+                });
+            }
+
+            function updateProgressBars(selfReportingPercent, radiologistReportingPercent) {
+                // Update the Self Reporting progress bar
+                var selfReportingProgressBar = document.getElementById('selfReportingProgressBar');
+                selfReportingProgressBar.style.width = selfReportingPercent + '%';
+                selfReportingProgressBar.innerHTML = selfReportingPercent + '%';
+
+                // Update the Radiologist Reporting progress bar
+                var radiologistReportingProgressBar = document.getElementById('radiologistReportingProgressBar');
+                radiologistReportingProgressBar.style.width = radiologistReportingPercent + '%';
+                radiologistReportingProgressBar.innerHTML = radiologistReportingPercent + '%';
+            }
+
+            function createXrayTransmission(data) {
+                var selfReportData = data.self_reporting;
+                var RadiologistReportData = data.radiologist_reporting;
+                console.log('transmission', selfReportData)
+
+
+                if (selfReportData > 0 || RadiologistReportData > 0) {
+
+                    var data = google.visualization.arrayToDataTable([
+                        ['Task', 'Hours per Day'],
+                        [' ', selfReportData],
+                        ['', RadiologistReportData]
+                    ]);
+
+                    var options = {
+                        title: 'X-Ray Submit Results Within TAT',
+                        legend: 'none',
+                        colors: ['#0e7dc1', '#99bed6'],
+                        pieHole: 0.4,
+                        chartArea: {
+                            height: "218px",
+                            width: "100%"
+                        }
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('xray-transmission'));
+                    chart.draw(data, options);
+                } else {
+                    document.getElementById('xray-transmission').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+                }
+
+            }
+
+
+            // Call the function on initial page load
+            document.addEventListener("DOMContentLoaded", function () {
+                chartContainer = $('#xray-transmission');
+
+                $.ajax({
+                    url: '/dashboards/service_provider/xray_transmission',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        // Once data is loaded, update the chart
+                        updateXrayTransmission(data);
+                    },
+                    error: function () {
+                        // Handle errors here
+                        console.error('Failed to fetch certification data.');
+                    }
+                });
+            });
+        </script>
+      </div>
+
+    </div>
+    <div class="col-md-12">
+      <div class="progressbar_wrap">
+        <div class="progressbar_div">
+          <label>Self Reporting</label>
+          <div class="newprogress w-100 float-left">
+            <div id="selfReportingProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%; white-space: nowrap;">
+              0
+            </div>
+          </div>
+        </div>
+        <div class="progressbar_div">
+          <label>Radiologist Reporting</label>
+          <div class="newprogress w-100 float-left">
+            <div id="radiologistReportingProgressBar" class="progress-bar progress-bar-striped progress-bar-animated " role="progressbar" style="width: 100%; white-space: nowrap;">
+              0
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<% end %>

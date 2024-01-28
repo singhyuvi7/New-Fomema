@@ -1,0 +1,89 @@
+<pdfbody>
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="font-size: 1.3em;"><b>Digital X-Ray Summary Report for <%= current_user.code %> for period: <%= @data[:date] %></b></td>
+            <td valign="top" style="text-align: right;"><%= "Date: #{ @data[:date_today] } Time: #{ @data[:time_today] }" %> </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table id="main-table" class="w-100 collapsed-borders">
+        <thead>
+            <tr class="grey-border" style="background-color: #d3d3d3;">
+                <td valign="top"><b>No</b></td>
+                <td valign="top"><b><%= @data[:column3and4] %> Code</b></td>
+                <td valign="top"><b><%= @data[:column3and4] %> Name</b></td>
+                <td valign="top" class="text-center"><b>Total</b></td>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% @summarized_data.each.with_index(1) do |hash, index| %>
+                <tr class="grey-border">
+                    <td valign="top"><b><%= index %></b></td>
+                    <td valign="top"><b><%= hash[:facility_code] %></b></td>
+                    <td valign="top"><b><%= hash[:facility_name] %></b></td>
+                    <td valign="top" class="text-center"><b><%= hash[:count] %></b></td>
+                </tr>
+            <% end %>
+
+            <% if @summarized_data.present? %>
+                <tr class="grey-border" style="font-size: 1.2em;">
+                    <td valign="top" colspan="3" style="text-align: right; padding-right: 1.5em;"><b>Total Transactions</b></td>
+                    <td valign="top" class="text-center"><b><%= @summarized_data.map {|hash| hash[:count] }.sum %></b></td>
+                </tr>
+            <% end %>
+
+            <% if @summarized_data.blank? %>
+                <tr class="grey-border">
+                    <td colspan="8" style="text-align: center;">No records found</td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 12px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    tr.grey-border td {
+        border-bottom: 1px solid grey;
+        border-right: 1px solid grey;
+        margin: 0;
+    }
+
+    table.collapsed-borders {
+        border: 1px solid black;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+    table.collapsed-borders td {
+        padding: 5px;
+    }
+
+    table, tr, td, th, tbody, thead, tfoot {
+        page-break-inside: avoid;
+    }
+
+    tbody tr td:nth-child(1) {
+        width: 2.5em;
+    }
+
+    tbody tr td:nth-child(2) {
+        width: 9em;
+    }
+
+    tbody tr td:nth-child(4) {
+        width: 9em;
+    }
+
+    /*thead { display: table-row-group }*/
+</style>

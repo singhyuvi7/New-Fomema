@@ -1,0 +1,17 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :in_house_comment, 'In-house' %>
+        <%= form_shared.text_field :in_house_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify referred laboratory name' %>
+    </td>
+    <td class="text-right table-acceptable">
+        <div class="btn-group btn-group-toggle w-75 referred-btn" data-toggle="buttons" data-group-name="<%= tab_name %>" data-referred-by="<%= referred_by %>">
+            <label class="btn btn-outline-success">
+                <%= form_shared.radio_button :in_house, 'YES', class: "#{tab_name} part-4-btn in-house-btn" %> Yes
+            </label>
+            <label class="btn btn-outline-danger">
+                <%= form_shared.radio_button :in_house, 'NO', class: "#{tab_name} part-4-btn in-house-btn" %> No
+            </label>
+        </div>
+    </td>
+</tr>

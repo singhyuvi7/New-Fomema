@@ -1,0 +1,50 @@
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+development:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+staging:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+stagingali:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+stagingali2:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+production:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+amazon:
+  service: S3
+  access_key_id: ""
+  secret_access_key: ""
+
+aliyun:
+  service: Aliyun
+  access_key_id: "<%= ENV['ALIYUN_OSS_ACCESS_KEY_ID'] %>"
+  access_key_secret: "<%= ENV['ALIYUN_OSS_ACCESS_KEY_SECRET'] %>"
+  bucket: "<%= ENV['ALIYUN_OSS_BUCKET'] %>"
+  endpoint: "<%= ENV['ALIYUN_OSS_ENDPOINT'] %>"
+  # path prefix, default: /
+  path: "<%= ENV['ALIYUN_OSS_PATH'] %>"
+  # Bucket public: true/false, default: true, for generate public/private URL.
+  public: true
+
+azure:
+  service: AzureStorage
+  storage_account_name: "<%= ENV['AZURE_STORAGE_ACCOUNT'] %>"
+  storage_access_key: "<%= ENV['AZURE_STORAGE_ACCESS_KEY'] %>"
+  container: <%= ENV['AZURE_STORAGE_CONTAINER'] %>
+  public: true

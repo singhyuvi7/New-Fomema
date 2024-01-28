@@ -1,0 +1,21 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <tbody>
+            <tr>
+                <td class="table-items align-middle">
+                    <div class="font-weight-bold">Test Compliance</div>
+                </td>
+                <td class="text-right table-acceptable">
+                    <div class="btn-group btn-group-toggle w-75 test-compliance-btn-group" data-toggle="buttons" data-group-name="<%= tab_name %>">
+                        <label class="btn btn-outline-success">
+                            <%= form_shared.radio_button :test_compliance, 'YES', class: "#{tab_name} test-compliance" %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= form_shared.radio_button :test_compliance, 'NO', class: "#{tab_name} test-compliance" %> No
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

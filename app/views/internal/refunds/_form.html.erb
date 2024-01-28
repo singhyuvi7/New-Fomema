@@ -1,0 +1,214 @@
+<style>
+.margin-top {
+    margin-top: 10px;
+}
+.uploads-delete {
+    display: none;
+}
+</style>
+
+<%= form.hidden_field :category %>
+
+<%= render 'shared/all_validation_flash', { model_obj: @refund } %>
+<%= render "/shared/all_flash" %>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :employer, "Employer/Agency", class: 'required' %>
+            <div class="input-group">
+                <div class="form-control" id="refund_customerable_display">
+                    <%= "#{@refund.customerable.name} - #{@refund.customerable.code}" if !@refund.customerable_id.nil? %>
+                </div>
+                <span class="input-group-append">
+                    <button id="select-employer-button" type="button" class="btn btn-primary">Select employer</button>
+                </span>
+                <span class="input-group-append">
+                    <button id="select-agency-button" type="button" class="btn btn-dark">Select agency</button>
+                </span>
+                <input type="hidden" name="refund[customerable_type]" id="refund_customerable_type" value="<%= @refund.customerable_type %>">
+                <input type="hidden" name="refund[customerable_id]" id="refund_customerable_id" value="<%= @refund.customerable_id %>" required>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :amount, class: 'required' %>
+            <%= form.number_field :amount, required: true, class: "form-control", step: 0.01, min: 0.01 %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+             <% field_id = generate_field_id(form, :payment_method_id) %>
+            <%= form.label :payment_method_id, "Payment Method (Incoming)", class: 'required' %>
+            <%= form.select :payment_method_id, options_from_collection_for_select(@payment_methods.order(:name), :id, :name, form.object.payment_method_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :payment_date, @refund&.payment_method&.code == 'BANKDRAFT' ? 'Issue Date' : 'Payment Date', class: 'required' %>
+            <%= form.date_field :payment_date, class: 'form-control', required: true, max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :reference, 'Reference Number', class: 'required' %>
+            <%= form.text_field :reference, class: 'form-control', required: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :unutilised, "Unutilised Payment", class: 'required' %>
+            <%= form.select :unutilised, options_for_select(Refund::UNUTILISED, form.object.unutilised), {include_blank: false}, class: "form-control" %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment %>
+            <%= form.text_area :comment, class: "form-control" %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <label for="refund_uploads">Uploaded Documents</label>
+        <table class="table">
+            <tr>
+                <th>Documents</th>
+                <th></th>
+            </tr>
+
+            <% @refund.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames">
+                    <% upload.documents.each do |document| %>
+                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                    <% end %>
+                    </td>
+                    <td style="width: 150px;">
+                        <input class="uploads-delete" type="checkbox" name="refund[upload_deletes][]" value="<%= upload.id %>">
+                        <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>" onclick="remove_uploaded_document(this)">
+                            Remove
+                        </div>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if @refund.uploads.blank? %>
+                <tr><td colspan="2">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group" id="document-input-group">
+            <label for="refund_uploads" class="<%= " required" if form.object.category == 'MANUAL' %>">Documents</label>
+            <p id="no-input-placeholder" class="hidden">Click on "Add more documents to begin adding files"</p>
+
+            <div class="input-group custom-input-group d-flex">
+                <div class="custom-file flex-grow-1">
+                    <input type="file" name="refund[uploads][]" class="custom-file-input" multiple onchange="document_change(this)" accept="<%= @mime_extensions %>">
+                    <label class="custom-file-label">Choose file</label>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <div class="removal-button btn btn-danger font-weight-bold" onclick="remove_document(this)">Remove</div>
+                </div>
+            </div>
+        </div>
+        <% if form.object.category == 'MANUAL' %>
+            <input type="number" id="document_count" value="<%= @refund.uploads.count %>" min="1" class="hidden" data-parsley-error-message="Document is required">
+        <% end %>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#select-employer-button').click(function () {
+    $('#refund_customerable_type').val('Employer');
+    $('#search-employer-modal').modal();
+});
+
+$('#select-agency-button').click(function () {
+    $('#refund_customerable_type').val('Agency');
+    $('#search-agency-modal').modal();
+});
+
+var custom_input_group = $('.custom-input-group').clone(true, true);
+$('#add_more_documents').click(function () {
+    custom_input_group
+    .clone(true, true)
+    .addClass('margin-top')
+    .appendTo("#document-input-group");
+});
+
+function remove_document(ele)
+{
+    $(ele).closest('.custom-input-group').remove();
+    update_document_count();
+}
+
+function document_change(ele)
+{
+    let filePath = $(ele).val().split("\\")
+    let fileName = filePath[filePath.length - 1]
+    if (fileName != "") {
+        $(ele).siblings('.custom-file-label').html(fileName);
+    } else {
+        $(ele).siblings('.custom-file-label').html("Choose file");
+    }
+    update_document_count();
+}
+
+function remove_uploaded_document(ele)
+{
+    filenames = $(ele).closest('tr').find('.filenames');
+    filenames.toggleClass('text-decoration-line-through');
+    text = $(ele).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+    $(ele).text(text).toggleClass('btn-danger btn-primary');
+    $(ele).siblings('.uploads-delete').prop('checked', !$(ele).hasClass('btn-danger'));
+    update_document_count();
+}
+
+function update_document_count()
+{
+    let count = 0;
+
+    $('.uploads-delete').each(function (idx, inp) {
+        if (!inp.checked) {
+            count++;
+        }
+    });
+
+    $('.custom-file-input').each(function (idx, inp) {
+        if (inp.value.length > 0) {
+            count++;
+        }
+    })
+
+    $('#document_count').val(count)
+}
+</script>
+<% end %>

@@ -1,0 +1,87 @@
+<div class="card">
+    <div class="card-header bg-transparent border-0"><strong>Notifiable Cases</strong></div>
+
+    <div class="card-body">
+        <%
+        list = [
+            { title: "Worker Code",         field: "worker_code",           type: "text",   placeholder: "Worker Code" },
+            { title: "Worker Name",         field: "worker_name",           type: "text",   placeholder: "Worker Name" },
+            { title: "Country",             field: "country_id",            type: "select", options: Country.order(:name).pluck(:name, :id) },
+            { title: "Passport Number",     field: "passport_number",       type: "text",   placeholder: "Passport Number" },
+            { title: "Certification Date",   field: "certification_date",   type: "date-range" },
+            { title: "Amended Date",   field: "amended_date",   type: "date-range" },
+        ]
+        list << { title: "Transaction Code",    field: "transaction_code",      type: "text",   placeholder: "Transaction Code" } if ["Laboratory", "XrayFacility", "Doctor"].include?(current_user.userable_type)
+
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "external-amended-notifiable-transaction-index", filter_link: external_amended_notifiable_transactions_path, list: list } %>
+        <%= render '/shared/all_flash' %>
+
+        <form method="post" action="/transactions/bulk_action">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                <table class="table table-responsive-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Transaction Code</th>
+                            <th>Worker Code / Name</th>
+                            <th>Passport Number / Country</th>
+                            <th>Gender</th>
+                            <th>Registration Date</th>
+                            <th>Examination Date</th>
+                            <th>Certification Date</th>
+                            <th>Amended Date</th>
+                            <th>Disease</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <% @amended_transactions.each.with_index((@amended_transactions.current_page - 1) * get_per + 1) do |amended_transactions, index| %>
+                        <%
+                            transaction     = amended_transactions.transactionz
+                        %>
+                            <tr>
+                                <td><%= index %></td>
+                                <td><%= transaction.code %></td>
+                                <td>
+                                    <%= transaction.try(:fw_name) %><br>
+                                    <b><%= transaction.try(:fw_code) %></b>
+                                </td>
+                                <td>
+                                    <%= transaction.fw_passport_number %><br>
+                                    <b><%= transaction.fw_country&.name %></b>
+                                </td>
+                                <td><%= ForeignWorker::GENDERS[transaction.fw_gender] %></td>
+                                <td><%= transaction.transaction_date.strftime("%d/%m/%Y") %></td>
+                                <td><%= transaction.medical_examination_date.nil? ? (raw "<i>N/A</i>") : transaction.medical_examination_date.strftime("%d/%m/%Y") %></td>
+                                <td><%= transaction.certification_date&.strftime("%d/%m/%Y") || raw("<i>N/A</i>") %></td>
+                                <td><%= amended_transactions.created_at&.strftime("%d/%m/%Y") || raw("<i>N/A</i>") %></td>
+                                <td><%= amended_transactions.disease %></td>
+                                <td><% if transaction.doctor_transmit_date? %>
+                                        <% if current_user.userable_type == "Doctor" || (["Employer", "Agency"].include?(current_user.userable_type) && has_permission?("VIEW_EXAM_HISTORY_RESULTS_AND_BUTTON")) %>
+                                            <%= link_to examination_history_external_transaction_path(transaction.id), class: "btn btn-success" do %>
+                                                Exam History
+                                            <% end %>
+                                        <% end %>
+                                    <% end %>
+                                    <% if ["XrayFacility"].include?(current_user.userable_type) && !["NEW", "CANCEL_PENDING_PAYMENT", "CANCELLED"].include?(transaction.status) %>
+                                        <% if  transaction.xray_transmit_date? %>
+                                            <%= link_to "Transmitted Results", medical_examination_external_transactions_path(transaction.id), class: "btn btn-success" %>
+                                        <% end %>
+                                    <% end %>
+                                </td>
+                            </tr>
+                    <% end %>
+                    <% if @amended_transactions.blank? %>
+                        <tr><td colspan="12" class="text-center">No notifiable cases</td></tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+
+        <div class="row external-pagination-container">
+            <%= paginate @amended_transactions %>
+        </div>
+    </div>
+</div>

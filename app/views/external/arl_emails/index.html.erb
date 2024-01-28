@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header">Audit Radiograph Letter</div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+        <form method="post" action="/arl_emails/bulk_action">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="form-group row">    
+                <div class="col-sm-5">
+                    <i>Please press the send button only once to avoid unnecessary request.</i>
+                       <button class="btn btn-success" type="submit" name="bulk_action" value="senderarl">Send</button>
+                </div>
+            </div>
+        </form>    
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<% end %> 

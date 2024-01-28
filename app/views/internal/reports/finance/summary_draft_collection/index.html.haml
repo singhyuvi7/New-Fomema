@@ -1,0 +1,10 @@
+.card
+  .card-header
+    %strong Finance - Summary Draft Collection
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render "/internal/reports/finance/filter_daterange_branch.html.erb", filter_link: summary_draft_collection_internal_finance_reports_path
+      = render "/internal/reports/finance/summary_draft_collection/pdf_template"
+- content_for :page_end_scripts do
+  :javascript

@@ -1,0 +1,83 @@
+<script>
+$(document).ready(function(){
+    action = '<%= params[:action] %>'
+    if(action == 'show' || action.includes('approval')){
+        $("input, textarea, input:checkbox, select, input:radio").attr("disabled", true);
+        $(".btn-group.btn-group-toggle").css('pointer-events','none')
+        $('.note-editor').addClass('disabled')
+
+        if(action.includes('approval')){
+            $('.approval-decision, #approval_comment, input[type=hidden]').attr('disabled',false);
+        }
+    }
+
+    if(action.includes('warning'))
+        has_officer_signature = '<%= !@letter.warning_signature.blank? %>';
+    else{
+        has_officer_signature = '<%= !@letter.explanation_signature.blank? %>';
+    }
+
+    toggle_edit_signature(!(has_officer_signature == 'true'), 'signatureModal')
+    
+    $('.operating-hours input, .operating-hours textarea').attr('readonly', true);
+    $('.operating-hours input:checkbox, .operating-hours .flatpickr-timepicker').attr('disabled', true);
+
+    $('#signatureModal').on('shown.bs.modal', function (e) {
+        init_signature_canvas($(this).attr('id'))
+    })
+
+    $('.signature-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(true, modal_id)
+        init_signature_canvas(modal_id)
+    }); 
+
+    $('.signature-cancel-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(false, modal_id)
+    }); 
+
+    $( ".signature-clear-btn" ).click(function(e) {
+        modal_id = $(this).closest('.modal').attr('id')
+        var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    function init_signature_canvas(modal_id){
+        var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+        if(canvas){
+            var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        }
+    }
+
+    function toggle_edit_signature(allow_edit, modal_id){
+        has_signature = has_officer_signature
+
+        if(allow_edit){
+            $('#'+modal_id+' .signature-img').addClass('d-none').removeClass('d-block')
+            $('#'+modal_id+' #JohnHancock-canvas').addClass('d-block').removeClass('d-none')
+            $('#'+modal_id+' .personnel-detail-input').attr('disabled',false)
+            $('#'+modal_id+' .signature-clear-btn').show()
+            $('#'+modal_id+' .signature-save-btn').show()
+            $('#'+modal_id+' .signature-edit-btn').hide()
+        }else{
+            $('#'+modal_id+' .signature-img').addClass('d-block').removeClass('d-none')
+            $('#'+modal_id+' #JohnHancock-canvas').addClass('d-none').removeClass('d-block')
+            $('#'+modal_id+' .personnel-detail-input').attr('disabled', true)
+            $('#'+modal_id+' .signature-clear-btn').hide()
+            $('#'+modal_id+' .signature-save-btn').hide()
+            $('#'+modal_id+' .signature-edit-btn').show()
+        }
+
+        if((has_signature == 'true') && allow_edit){
+            $('#'+modal_id+' .signature-cancel-edit-btn').show()
+        }else{
+            $('#'+modal_id+' .signature-cancel-edit-btn').hide()
+        }
+    }
+});
+</script>

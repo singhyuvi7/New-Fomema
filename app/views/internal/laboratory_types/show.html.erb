@@ -1,0 +1,48 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Laboratory Types</strong> - Laboratory Type Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="laboratory_type_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @laboratory_type.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_laboratory_types_path) %>
+            <% if has_permission?('EDIT_LABORATORY_TYPE') %>
+                <%=raw show_edit_button(edit_internal_laboratory_type_path(@laboratory_type)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_LABORATORY_TYPE") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_laboratory_type_audits_path(@laboratory_type) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

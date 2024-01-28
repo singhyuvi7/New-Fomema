@@ -1,0 +1,940 @@
+<%= render "/internal/transactions/worker_information_above_the_fold" %>
+
+<%
+    if @past_exams.present?
+        examination_history = @past_exams.map do |transaction|
+            { date: transaction.transaction_date.strftime("%d/%m/%Y"), title: "Transaction ##{ transaction.code }", path: internal_transaction_path(transaction.id, history: true) }
+        end
+    end
+
+    pending_amendments = @transaction.transaction_amendments.where(approval_status: nil).present?
+
+    # Transactions Options
+        transactions_options = Array.new()
+
+        if (@transaction.approval_request \
+            and ['pending'].include?(@transaction.approval_request.state) \
+            and (
+                (@transaction.approval_request.category.eql?("TRANSACTION_CHANGE_DOCTOR") and has_permission?('APPROVAL_CHANGE_DOCTOR_TRANSACTION')) \
+                or (@transaction.approval_request.category.eql?("TRANSACTION_SPECIAL_RENEWAL") and has_permission?('APPROVAL_SPECIAL_RENEWAL_TRANSACTION'))
+            )
+        )
+            transactions_options << transaction_details_buttons("Approval", "fa fa-check", "btn btn-success btn-sm", approval_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("CANCEL_TRANSACTION") and @transaction.can_cancel?
+            transactions_options << transaction_details_buttons("Cancel Transaction", "fa fa-times", "btn btn-danger btn-sm", cancel_internal_transaction_path(@transaction))
+        end
+
+        # Do not enable this function to avoid duplicate recognition. Revenue is recognized upon transaction expired.
+        # if has_permission?("SET_IGNORE_CANCELLATION_RULE") && @transaction.expired_merts? && ["NEW"].include?(@transaction.status) && @transaction.medical_examination_date.nil?
+        #     ignore_cancellation = @transaction.ignore_cancellation_rule?
+        #     url_settings    = ["#{ ignore_cancellation ? "Reactivate" : "Ignore" } Cancellation Rule", "fas fa-#{ ignore_cancellation ? "check" : "exclamation" }-circle", "btn btn-#{ ignore_cancellation ? "success" : "warning" } btn-sm", toggle_ignore_cancellation_rule_internal_transaction_path(@transaction, type: ignore_cancellation ? "enable" : "disable")]
+        #     transactions_options << transaction_details_buttons(*url_settings)
+        # end
+
+        if has_permission?('EXTEND_TRANSACTION') and @transaction.can_extend?
+            transactions_options << transaction_details_buttons("Extend", "fa fa-clock", "btn btn-warning btn-sm", extend_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?('EDIT_TRANSACTION') && !["REVIEW", "CERTIFIED"].include?(@transaction.status) && !@transaction.doctor_id.blank? && @transaction.xray_transmit_date.blank?
+            transactions_options << transaction_details_buttons("Edit X-Ray Film Type", "fa fa-edit", "btn btn-primary btn-sm", edit_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("EDIT_BYPASS_FINGERPRINT_TRANSACTION") && (!["CERTIFIED"].include?(@transaction.status) || @transaction.xray_retake_approved?) && !@transaction.doctor_id.blank?
+            transactions_options << transaction_details_buttons("Bypass Fingerprint", "fa fa-ban", "btn btn-warning btn-sm", bypass_fingerprint_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?('DELETE_TRANSACTION') && !["REVIEW", "CERTIFIED"].include?(@transaction.status)
+            transactions_options << transaction_details_buttons("Delete", "fa fa-trash", "btn btn-danger btn-sm", internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("SET_PHYSICAL_NOT_DONE_FOR_TRANSACTION") && ["EXAMINATION", "CERTIFICATION"].include?(@transaction.status)
+            transactions_options << transaction_details_buttons("Physical Exam Not Done", "fas fa-ban", "btn btn-warning btn-sm", physical_exam_not_done_internal_transaction_path(@transaction))
+        end
+
+        # Do not enable this function to avoid duplicate recognition. Revenue is recognized upon transaction expired.
+        # if has_permission?('SET_IGNORE_MERTS_EXPIRY_FOR_TRANSACTION') && !["REVIEW", "CERTIFIED"].include?(@transaction.status) && !@transaction.doctor_id.blank? && !@transaction.has_newer_transaction
+        #     bool            = @transaction.ignore_expiry?
+        #     url_settings    = ["#{ bool ? "Reactivate" : "Ignore" } MERTS expiry rules", "fas fa-#{ bool ? "check" : "exclamation" }-circle", "btn btn-#{ bool ? "success" : "warning" } btn-sm", toggle_ignore_merts_expiry_internal_transaction_path(@transaction, type: bool ? "enable" : "disable")]
+        #     transactions_options << transaction_details_buttons(*url_settings)
+        # end
+
+        if has_permission?('SET_IGNORE_REPRINT_RULES_FOR_TRANSACTION') && !@transaction.doctor_transmit_date?
+            bool            = @transaction.ignore_reprint_rule?
+            url_settings    = ["#{ bool ? "Reactivate" : "Ignore" } reprint rules", "fas fa-#{ bool ? "check" : "exclamation" }-circle", "btn btn-#{ bool ? "success" : "warning" } btn-sm", toggle_ignore_reprint_rules_internal_transaction_path(@transaction, type: bool ? "enable" : "disable")]
+            transactions_options << transaction_details_buttons(*url_settings)
+        end
+
+        if has_permission?("ABORT_RADIOLOGIST_TRANSACTION") and @transaction.status.eql?("EXAMINATION") and @transaction.radiologist_id? and @transaction.xray_examination.radiologist_aborted_at.blank?
+            transactions_options << transaction_details_buttons("Abort Radiologist", "fas fa-ban", "btn btn-warning btn-sm", abort_radiologist_internal_transaction_path(@transaction))
+        end
+
+        if (@transaction.approval_request and ['pending'].include?(@transaction.approval_request.state))
+            if (@transaction.approval_request.category.eql?("TRANSACTION_SPECIAL_RENEWAL") and has_permission?("APPROVAL_SPECIAL_RENEWAL_TRANSACTION")) or (@transaction.approval_request.category.eql?("TRANSACTION_CHANGE_DOCTOR") and has_permission?("APPROVAL_CHANGE_DOCTOR_TRANSACTION"))
+                transactions_options << transaction_details_buttons("Approval", "fa fa-check", "btn btn-warning btn-sm", approval_internal_transaction_path(@transaction))
+            end
+        end
+
+        if has_permission?("EDIT_COUPLING_TRANSACTION") && !@transaction.doctor_id.blank? && ['NEW','EXAMINATION'].include?(@transaction.status)
+            transactions_options << transaction_details_buttons("Edit Coupling", "fa fa-edit", "btn btn-primary btn-sm", coupling_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("RESEND_UNSUITABLE_LETTER") && @transaction.status == "CERTIFIED" && @transaction.final_result == "UNSUITABLE"
+            transactions_options << transaction_details_buttons("Resend Unsuitable Email", "far fa-envelope", "btn btn-primary btn-sm", resend_unsuitable_letter_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("SET_IMM_BLOCK")
+            is_imm_blocked = @transaction.is_imm_blocked?
+            url_settings    = ["#{ is_imm_blocked ? "Unblock" : "Block" } IMM", "fas fa-#{ is_imm_blocked ? "check" : "exclamation" }-circle", "btn btn-#{ is_imm_blocked ? "success" : "warning" } btn-sm", toggle_imm_block_internal_transaction_path(@transaction, type: is_imm_blocked ? "unblock" : "block")]
+            if is_imm_blocked && @transaction.foreign_worker.is_imm_blocked?
+            else
+                transactions_options << transaction_details_buttons(*url_settings)
+            end
+        end
+
+        if has_permission?("VIEW_AUDIT_TRANSACTION")
+            transactions_options << transaction_details_buttons("Audits", "fas fa-history", "btn btn-primary btn-sm", internal_transaction_audits_path(@transaction))
+        end
+
+        if has_permission?('SET_IGNORE_RENEWAL_RULES_FOR_TRANSACTION')
+            bool            = @transaction.ignore_renewal_rule?
+            url_settings    = ["#{ bool ? "Reactivate" : "Ignore" } Renewal Rules", "fas fa-#{ bool ? "check" : "exclamation" }-circle", "btn btn-#{ bool ? "success" : "warning" } btn-sm", toggle_ignore_renewal_rule_internal_transaction_path(@transaction, type: bool ? "enable" : "disable")]
+            transactions_options << transaction_details_buttons(*url_settings)
+        end
+
+        if has_permission?('SET_IGNORE_SPECIAL_RENEWAL_RULES_FOR_TRANSACTION') && @transaction.final_result == "UNSUITABLE"
+            bool            = @transaction.ignore_special_renewal_rule?
+            url_settings    = ["#{ bool ? "Reactivate" : "Ignore" } Special Renewal Rules", "fas fa-#{ bool ? "check" : "exclamation" }-circle", "btn btn-#{ bool ? "success" : "warning" } btn-sm", toggle_ignore_special_renewal_rule_internal_transaction_path(@transaction, type: bool ? "enable" : "disable")]
+            transactions_options << transaction_details_buttons(*url_settings)
+        end
+
+        if has_permission?("APPROVAL_DOCUMENT_TRANSACTION") && @transaction.transaction_verify_docs.last&.status == "APPROVAL" && !['CANCELLED','REJECTED'].include?(@transaction.status) && (@transaction.expired_at > Time.now || @transaction.ignore_expiry = true)
+            transactions_options << transaction_details_buttons("Agency Document Approval", "fa fa-check", "btn btn-success btn-sm", agency_document_approval_internal_transaction_path(@transaction))
+        end
+
+        if has_permission?("UPDATE_PASSPORT_FOR_PREVIOUS_TRANSACTION") && @transaction.final_result? && @transaction.has_newer_transaction
+            days = SystemConfiguration.get("LAST_X_DAYS_TO_UPDATE_TRANSACTION")
+            can_update = days == '0' ? true : (@transaction.medical_examination_date >= days.to_i.days.ago)
+
+            if can_update
+                transactions_options << transaction_details_buttons("Sync Latest Passport Number", "fas fa-sync", "btn btn-warning btn-sm", sync_latest_passport_number_internal_transaction_path(@transaction))
+            end
+        end
+
+    # Amendment Options
+        amendment_options = Array.new()
+
+        unless @transaction.certification_date?
+            if has_permission?("REVERT_LAB_RESULTS_FOR_TRANSACTION") && @transaction.laboratory_transmit_date? && @transaction.expired_at > Time.now && (@transaction.transmission_expired_at > Time.now if !@transaction.transmission_expired_at.nil?)
+                amendment_options << transaction_details_buttons("Revert Transmitted Laboratory Result", "fas fa-exclamation-circle", "btn btn-warning btn-sm open-dialog-lab", "")
+            end
+
+            if has_permission?("REVERT_XRAY_RESULTS_FOR_TRANSACTION") && @transaction.xray_transmit_date? && @transaction.expired_at > Time.now && (@transaction.transmission_expired_at > Time.now if !@transaction.transmission_expired_at.nil?)
+                # Only allow to revert result for transaction before xray new flow started
+                # This function must remove as the xray screening starts after xray result transmitted
+                if @transaction.xray_transmit_date <= Time.parse(SystemConfiguration.get('XRAY_NEW_FLOW_START_DATE'))
+                    amendment_options << transaction_details_buttons("Revert Transmitted Xray Result", "fas fa-exclamation-circle", "btn btn-warning btn-sm open-dialog-xray", "")
+                end
+            end
+
+            if has_permission?("REMOVE_EXAM_DATE_FOR_TRANSACTION") && @transaction.medical_examination_date? && @transaction.expired_at > Time.now && (@transaction.transmission_expired_at > Time.now if !@transaction.transmission_expired_at.nil?)
+                amendment_options << transaction_details_buttons("Remove Examination Date", "fas fa-exclamation-circle", "btn btn-warning btn-sm open-dialog-medical", "")
+            end
+        end
+
+        if has_permission?("UPDATE_TRANSACTION_RESULT_FOR_TRANSACTION") && ["REVIEW", "CERTIFIED"].include?(@transaction.status) && !pending_amendments
+            amendment_options << transaction_details_buttons("Update Result", "fas fa-exclamation-circle", "btn btn-primary btn-sm update-result", "")
+        end
+
+        # Don't show if there is a newer transaction for this foreign worker.
+        if has_permission?("AMEND_FINAL_RESULT_FOR_TRANSACTION") && @transaction.final_result? && @transaction.status == "CERTIFIED" && !pending_amendments && !@transaction.has_newer_transaction
+            amendment_options << transaction_details_buttons("Amend Final Result", "fas fa-exclamation-circle", "btn btn-warning btn-sm amend-final-result", "")
+        end
+
+
+
+    # Download Options
+        download_options = Array.new()
+
+        if has_permission?('PRINT_MEDICAL_EXAMINATION_FORM') and @transaction.can_print_medical_examination_form?
+            download_options << transaction_details_buttons("Medical Examination Form", "fa fa-tasks", "btn btn-warning btn-sm", medical_form_print_internal_transaction_path(@transaction), target: "_BLANK")
+        end
+
+        if has_permission?("PRINT_TCUPI_AUDIT_LETTER") && @tcupi_audit_letter
+          download_options << transaction_details_buttons("TCUPI Audit Case Letter", "fa fa-list", "btn btn-info btn-sm", tcupi_audit_case_letter_internal_transaction_path(@transaction), target: "_BLANK")
+        end
+
+        if has_permission?("PRINT_TCUPI_NON_AUDIT_LETTER") && @tcupi_non_audit_letter
+          download_options << transaction_details_buttons("TCUPI Non Audit Case Letter", "fa fa-list", "btn btn-dark btn-sm", tcupi_nonaudit_case_letter_internal_transaction_path(@transaction), target: "_BLANK")
+        end
+
+    # Unsuitable Slip Options
+        unsuitable_slip_options = Array.new()
+
+        if @transaction.status == "CERTIFIED" && @transaction.final_result == "UNSUITABLE"
+            if has_permission?("PRINT_UNSUITABLE_SLIP")
+                unsuitable_slip_options << transaction_details_buttons("Download Unsuitable Slip", "fas fa-file-download", "btn btn-primary btn-sm", unsuitable_slip_internal_transaction_path(@transaction), target: "_BLANK")
+            end
+
+            if has_permission?("EDIT_UNSUITABLE_SLIP_DOWNLOAD_IN_PORTAL")
+                if @transaction.unsuitable_slip_download
+                    unsuitable_slip_options << transaction_details_buttons("Disable Slip Download (Portal)", "fas fa-ban", "btn btn-danger btn-sm", toggle_unsuitable_slip_download_internal_transaction_path(@transaction))
+                else
+                    unsuitable_slip_options << transaction_details_buttons("Enable Slip Download (Portal)", "fas fa-check", "btn btn-success btn-sm", toggle_unsuitable_slip_download_internal_transaction_path(@transaction))
+                end
+            end
+        end
+
+    # Medical Report Request Response Letter Options
+        medical_report_letter_options = Array.new()
+
+        if @transaction.status == "CERTIFIED" && !@transaction.final_result.blank? && !@transaction.is_imm_blocked
+            if has_permission?("PRINT_MEDICAL_REPORT_LETTER")
+                medical_report_letter_options << transaction_details_buttons("Download Letter", "fas fa-file-download", "btn btn-primary btn-sm", medical_report_letter_internal_transaction_path(@transaction), target: "_BLANK")
+            end
+
+            if has_permission?("EDIT_MEDICAL_REPORT_LETTER_DOWNLOAD_IN_PORTAL")
+                if @transaction.medical_report_letter_download
+                    medical_report_letter_options << transaction_details_buttons("Disable Letter Download (Portal)", "fas fa-ban", "btn btn-danger btn-sm", toggle_medical_report_letter_download_internal_transaction_path(@transaction))
+                else
+                    medical_report_letter_options << transaction_details_buttons("Enable Letter Download (Portal)", "fas fa-check", "btn btn-success btn-sm", toggle_medical_report_letter_download_internal_transaction_path(@transaction))
+                end
+            end
+        end
+
+    # XQCC & PCR Options
+        xqcc_options = Array.new()
+
+        if @transaction.xray_status == 'XQCC_PENDING_REVIEW' && @transaction.xray_pending_review_id?
+            if has_permission?("EDIT_XQCC_PENDING_REVIEW")
+                xqcc_options << transaction_details_buttons("XQCC Pending Review", "fa fa-tasks", "btn btn-warning btn-sm", edit_internal_xray_pending_review_path(@transaction.xray_pending_review_id))
+            elsif has_permission?("VIEW_XQCC_PENDING_REVIEW")
+                xqcc_options << transaction_details_buttons("XQCC Pending Review", "fa fa-tasks", "btn btn-warning btn-sm", internal_xray_pending_review_path(@transaction.xray_pending_review_id))
+            end
+        end
+
+        if @transaction.xray_status == 'XQCC_REVIEW' && @transaction.xray_review_id?
+            if has_permission?("EDIT_XQCC_REVIEW") && @transaction.xray_review.radiographer_id == current_user.id
+                xqcc_options << transaction_details_buttons("XQCC Review", "fab fa-readme", "btn btn-primary btn-sm", edit_internal_xray_review_path(@transaction.xray_review_id))
+            elsif has_permission?("VIEW_XQCC_REVIEW")
+                xqcc_options << transaction_details_buttons("XQCC Review", "fab fa-readme", "btn btn-primary btn-sm", internal_xray_review_path(@transaction.xray_review_id))
+            end
+        end
+
+        if @transaction.xray_status == 'PCR_REVIEW' && @transaction.pcr_review_id?
+            if has_permission?("EDIT_PCR_REVIEW") && @transaction.pcr_review.pcr_id == current_user.id
+                xqcc_options << transaction_details_buttons("PCR Review", "fab fa-readme", "btn btn-primary btn-sm", edit_internal_pcr_review_path(@transaction.pcr_review_id))
+            elsif has_permission?("VIEW_PCR_REVIEW")
+                xqcc_options << transaction_details_buttons("PCR Review", "fab fa-readme", "btn btn-primary btn-sm", internal_pcr_review_path(@transaction.pcr_review_id))
+            end
+        end
+
+        if (has_permission?("XRAY_XQCC_POOL_REVIEW_TRANSACTION") && @transaction.xray_status == 'XQCC_REVIEW' && @transaction.xray_review&.result == 'RETAKE' && @transaction.xray_retake.nil?)
+            xqcc_options << transaction_details_buttons("XQCC Retake Request", "fa fa-tasks", "btn btn-warning btn-sm", xray_retake_request_internal_transaction_path(@transaction, @transaction.xray_retake))
+        end
+
+        if (["XQCC_POOL", "XQCC_REVIEW", "XQCC_RETAKE","XQCC_ABORT"].include?(@transaction.xray_status) and has_permission?("REASSIGN_XQCC_POOL"))
+            xqcc_options << transaction_details_buttons("Reassign", "fa fa-tasks", "btn btn-warning btn-sm", reassign_internal_xqcc_pools_path(transaction_id: @transaction.id))
+        end
+
+        if (["PCR_POOL", "PCR_REVIEW", "PCR_RETAKE"].include?(@transaction.xray_status) and has_permission?("REASSIGN_PCR_POOL"))
+            xqcc_options << transaction_details_buttons("Reassign", "fa fa-tasks", "btn btn-warning btn-sm", reassign_internal_pcr_pools_path(transaction_id: @transaction))
+        end
+
+        if (has_permission?("EDIT_INTERNAL_XRAY_PENDING_DECISION") && (@transaction.xray_status == 'XQCC_PENDING_DECISION' || @transaction.xray_status == 'XQCC_REJECTED'))
+            xqcc_options << transaction_details_buttons("XQCC Pending Decision", "fa fa-tasks", "btn btn-warning btn-sm", edit_internal_xray_pending_decision_path(@transaction.xray_pending_decision_id))
+        end
+
+        if (has_permission?("EDIT_APPROVAL_XQCC_PENDING_DECISION") && @transaction.xray_status == 'XQCC_PENDING_DECISION_APPROVAL' && @transaction.xray_pending_decision_id?)
+            xqcc_options << transaction_details_buttons("XQCC Pending Decision Approval", "fa fa-check", "btn btn-success btn-sm", approval_internal_xray_pending_decision_path(@transaction.xray_pending_decision_id))
+        end
+
+        if (has_permission?("XQCC_RETAKE_APPROVAL_TRANSACTION") && !@transaction.xray_retake.nil? && @transaction.xray_retake.status == 'APPROVAL')
+            xqcc_options << transaction_details_buttons("X-Ray Retake Approval", "fa fa-check", "btn btn-success btn-sm", xray_retake_approval_internal_transaction_path(@transaction, @transaction.xray_retake))
+        end
+
+        if @retake_can_abort
+            xqcc_options << transaction_details_buttons("Abort Radiologist (Retake)", "fas fa-ban", "btn btn-warning btn-sm", abort_radiologist_internal_transaction_path(@transaction))
+        end
+
+    # MLE & TCUPI Options
+        mle_options = Array.new()
+
+        if has_permission?("EDIT_PENDING_REVIEWS") && @transaction.can_work_on_medical_review(current_user)
+            mle_options << transaction_details_buttons("Pending Review", "fa fa-clipboard-list", "btn btn-primary btn-sm", medical_review_internal_medical_path(@transaction.id))
+        elsif has_permission?("EDIT_PENDING_REVIEW_APPROVALS") && @transaction.can_work_on_medical_review_approval(current_user)
+            mle_options << transaction_details_buttons("Pending Review Approval", "fa fa-check", "btn btn-success btn-sm", medical_review_internal_medical_path(@transaction.id))
+        elsif has_permission?("EDIT_PENDING_REVIEWS_QA") && @transaction.can_work_on_medical_review_qa(current_user)
+            mle_options << transaction_details_buttons("Pending Review QA", "fa fa-check", "btn btn-success btn-sm", medical_pr_qa_internal_medical_path(@transaction.id))
+        elsif has_permission?("EDIT_TCUPI_REVIEWS") && @transaction.can_work_on_tcupi_review(current_user)
+            mle_options << transaction_details_buttons("TCUPI", "fa fa-clipboard-list", "btn btn-primary btn-sm", tcupi_review_internal_medical_path(@transaction.id))
+        elsif has_permission?("EDIT_TCUPI_APPROVALS") && @transaction.can_work_on_tcupi_review_approval(current_user)
+            mle_options << transaction_details_buttons("TCUPI Approval", "fa fa-check", "btn btn-success btn-sm", tcupi_review_approval_internal_medical_path(@transaction.id))
+        end
+
+        # Appeal Options
+        appeal_options = Array.new()
+
+        if @appeal.present?
+            if has_permission?("VIEW_APPEALS") && ["DOCTOR_NEW", "PENDING_TODO", "EXAMINATION", "DOCUMENT_COMPLETED", "PENDING_APPROVAL"].include?(@appeal.status)
+                appeal_options << transaction_details_buttons("#{ has_permission?("REVIEW_APPEALS") ? "Review" : "View" } Appeal", "fa fa-clipboard-list", "btn btn-success btn-sm", internal_appeal_path(@appeal.id))
+            end
+
+            if has_permission?("APPROVE_APPEALS") && ["PENDING_APPROVAL"].include?(@appeal.status) && @appeal.officer_in_charge_id != current_user.id
+                appeal_options << transaction_details_buttons("Appeal Approval", "fa fa-check", "btn btn-success btn-sm", appeal_approval_internal_appeal_path(@appeal.id))
+            end
+
+            if has_permission?("VIEW_APPEALS") && ["CLOSED"].include?(@appeal.status)
+                appeal_options << transaction_details_buttons("Appeal Results", "fa fa-history", "btn btn-success btn-sm", appeal_results_internal_appeal_path(@appeal.id))
+            end
+        end
+
+        if has_permission?("CREATE_APPEALS") && @transaction.state_of_appeal && !@transaction.physical_exam_not_done?
+            blocked_list = @transaction.blocked_appeal_list("MLE")
+            button = link_to("Submit Appeal", "", class: "appeal-button btn btn-primary btn-sm mb-1", data: { name: @transaction.fw_name, list: blocked_list.to_json, ongoing: @transaction.ongoing_appeals.present?, path: new_internal_appeal_path(transaction: @transaction.id), type: "pic" })
+            appeal_options << button
+        end
+
+        #reports options
+        reports_options = Array.new()
+
+        if has_permission?("VIEW_EXAMINATION_REPORT") && @transaction.status == "CERTIFIED" && !@transaction.final_result.blank?
+           reports_options << transaction_details_buttons("Download Examination Report", "fas fa-file-download", "btn btn-primary btn-sm", examination_report_internal_transaction_path(@transaction), target: "_BLANK")
+        end
+
+    column_count    = 0
+%>
+
+<%= render file: "/internal/transactions/examination_history" %>
+
+<% if @result_updates.present? %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Result Updates</strong>
+        </div>
+
+        <div class="card-body">
+            <% @result_updates.each_with_index do |result_update, index| %>
+                <div class="<%= "border-top pt-3" if index > 0 %>">
+                    <div class="d-flex">
+                        <b class="w-em-14">Updated By:</b> <%= result_update.user.try(:name) %>
+                    </div>
+
+                    <div class="d-flex">
+                        <b class="w-em-14">Updated At:</b> <%= result_update.created_at.strftime("%d/%m/%Y") %>
+                    </div>
+
+                    <div class="d-flex">
+                        <b class="w-em-14">Wrong Transmission For:</b> <%= result_update.wrong_transmissions %>
+                    </div>
+
+                    <b>Issues:</b>
+
+                    <div class="pl-3 pt-2 border-left">
+                        <%= simple_format(result_update.amendment_reason) %>
+                    </div>
+
+                    <% if result_update.amended_conditions.present? %>
+                        <b>Conditions:</b>
+
+                        <div class="pl-3 pt-2 border-left mb-3">
+                            <% result_update.amended_conditions.each do |condition| %>
+                                <div class="d-flex">
+                                    <b class="w-em-13"><%= DoctorExamination::certification_conditions_consolidated[condition[0].to_sym] %></b> Changed to <i class="ml-1"><b><%= condition[1] == "true" ? "YES" : "NO" %></b></i>
+                                </div>
+                            <% end %>
+                        </div>
+                    <% end %>
+
+                    <% if result_update.amended_comment.present? %>
+                        <b>Comments (for any abnormalities detected in PART IV):</b>
+
+                        <div class="pl-3 pt-2 border-left">
+                            <%= simple_format result_update.amended_comment %>
+                        </div>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+<% end %>
+
+<% if @amendments.present? %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Amendments</strong>
+        </div>
+
+        <div class="card-body">
+            <% @amendments.each_with_index do |amendment, index| %>
+                <div class="<%= "border-top pt-3" if index > 0 %> mb-3">
+                    <div class="d-flex">
+                        <b class="w-em-14">Amended By:</b> <%= amendment.user.try(:name) %>
+                    </div>
+
+                    <div class="d-flex">
+                        <b class="w-em-14">Amendment Date:</b> <%= amendment.created_at.strftime("%d/%m/%Y") %>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <b class="w-em-14">Status Change:</b> <%= amendment.original_status %> <i class="fas fa-arrow-right mx-2"></i> <%= amendment.new_status %>
+                    </div>
+
+                    <div class="d-flex">
+                        <b class="w-em-14">Wrong Transmission For:</b> <%= amendment.wrong_transmissions %>
+                    </div>
+
+                    <b>Issues:</b>
+
+                    <div class="pl-3 pt-2 border-left">
+                        <%= simple_format(amendment.amendment_reason) %>
+                    </div>
+
+                    <% if amendment.amended_conditions.present? %>
+                        <b>Conditions:</b>
+
+                        <div class="pl-3 pt-2 border-left mb-3">
+                            <% amendment.amended_conditions.each do |condition| %>
+                                <div class="d-flex">
+                                    <b class="w-em-13"><%= DoctorExamination::certification_conditions_consolidated[condition[0].to_sym] %></b> Changed to <i class="ml-1"><b><%= condition[1] == "true" ? "YES" : "NO" %></b></i>
+                                </div>
+                            <% end %>
+                        </div>
+                    <% end %>
+
+                    <% if amendment.amended_comment.present? %>
+                        <b>Comments (for any abnormalities detected in PART IV):</b>
+
+                        <div class="pl-3 pt-2 border-left">
+                            <%= simple_format amendment.amended_comment %>
+                        </div>
+                    <% end %>
+
+                    <% if amendment.approval_at? %>
+                        <div class="d-flex mt-4">
+                            <b class="w-em-14">Concurred By:</b> <%= amendment.approved_by.try(:name) %>
+                        </div>
+
+                        <div class="d-flex">
+                            <b class="w-em-14">Concurred Status:</b> <span class="<%= amendment.approval_status == "CONCURRED" ? "text-success" : "text-danger" %>"><%= amendment.approval_status %></span>
+                        </div>
+
+                        <div class="d-flex">
+                            <b class="w-em-14">Concurred Date:</b> <%= amendment.approval_at? ? amendment.approval_at.strftime("%d/%m/%Y") : nil %>
+                        </div>
+
+                        <b>Issues:</b>
+
+                        <div class="pl-3 pt-2 border-left">
+                            <%= simple_format(amendment.approval_comment) %>
+                        </div>
+                    <% else %>
+                        <div class="d-flex">
+                            <b class="w-em-14">Concur Status:</b>
+                            <b class="text-primary">Pending Concur </b>
+                        </div>
+
+                        <% if has_permission?("CONCUR_FINAL_RESULT_FOR_TRANSACTION") && amendment.created_by != current_user.id %>
+                            <div class="d-flex align-items-center mt-2">
+                                <b class="w-em-14">Concur Action:</b>
+                                <div class="amendment-concur-btn btn btn-success btn-sm" data-id="<%= amendment.id %>">Concur</div>
+                            </div>
+                        <% end %>
+
+                        <% if has_any_permission?("AMEND_FINAL_RESULT_FOR_TRANSACTION", "CONCUR_FINAL_RESULT_FOR_TRANSACTION") %>
+                            <div class="d-flex align-items-center mt-2">
+                                <b class="w-em-14">Cancel:</b>
+                                <div class="cancel-final-amendment btn btn-danger btn-sm" data-id="<%= amendment.id %>"><i class="fa fa-times pr-1"></i> Cancel</div>
+                            </div>
+                        <% end %>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+<% end %>
+
+<% if examination_history.present? %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Other Transactions</strong>
+        </div>
+
+        <div class="card-body">
+            <p>These are the other transactions that belong to this foreign worker</p>
+
+            <% examination_history.each.with_index(1) do |hash, index| %>
+                <span class="d-inline-block w-em-2"><%= index %>.</span>
+
+                <%= link_to hash[:path] do %>
+                    <b><%= hash[:date] %></b> - <%= hash[:title] %>
+                <% end %><br>
+            <% end %>
+        </div>
+    </div>
+<% end %>
+
+<% if @reversions.present? %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Reverted Examinations</strong>
+        </div>
+
+        <div class="card-body">
+            <% @reversions.each do |reversion| %>
+                <b class="text-primary"><%= reversion.exam_type.titleize %></b> - <%= reversion.created_at.strftime("%d/%m/%Y") %> by <b><%= reversion.user&.name%></b>
+
+                <div class="ml-1 pl-3 pt-2 border-left">
+                    <b>Issues</b>
+                    <%= simple_format reversion.issues %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+<% end %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Options</strong>
+    </div>
+
+    <div class="card-body">
+        <% [[transactions_options, "Transaction"], [amendment_options, "Amendment"], [download_options, "Download"], [xqcc_options, "XQCC"], [mle_options, "FOMEMA Medical Result"], [appeal_options, "Appeal"], [unsuitable_slip_options, "Unsuitable Slip"], [medical_report_letter_options, "Medical Report Letter"], [reports_options, "Reports"]].each_with_index do |array, index| %>
+            <% list, title = array %>
+
+            <% if list.present? %>
+                <div class="row <%= "mt-4" if index > 0 %>">
+                    <h6 class="font-weight-bold col-md-2"><%= title %></h6>
+
+                    <div class="col-md-8">
+                        <% list.each do |option_item| %>
+                            <% if option_item.include?("Submit Appeal") %>
+                                <%= raw option_item.gsub("Submit Appeal", "<i class=\"fa fa-clipboard-list mr-2\"></i>Submit Appeal") %>
+                            <% else %>
+                                <%= raw option_item %>
+                            <% end %>
+                        <% end %>
+                    </div>
+                </div>
+            <% end %>
+        <% end %>
+    </div>
+</div>
+
+<!--
+    BUG!! app/controllers/internal/audits_controller.rb:67:in `set_auditable'
+    undefined method `name' for #<Transaction:0x00007fb91f7bee88>
+    @module_title = "Transaction - #{@auditable.name} (#{@auditable.code || 'N/A'})"
+-->
+
+<div class="card" style="display: none !important;">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_TRANSACTION") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_transaction_audits_path(@transaction) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+<div class="card" style="display: none !important;">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_TRANSACTION") %>
+                <li class="list-group-item">
+                    <%= link_to "Unblock", internal_transaction_audits_path(@transaction) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<div id="dialog-appeal" class="hidden" title="Appeal for "></div>
+
+<!-- (Start) Physical Not Done -->
+    <div id="dialog-physical-not-done" class="hidden" title="Physical Exam Not Done">
+        <p>
+            You are about to set this transaction as <b>Physical Exam Not Done</b>.<br>
+            The foreign worker will be marked as <b>UNSUITABLE</b> and the quota will be given back to the doctor.<br>
+            Click <b>Confirm</b> to proceed.
+        </p>
+    </div>
+<!-- (End) -->
+
+<!-- (Start) Update Result -->
+    <% if has_permission?("AMEND_FINAL_RESULT_FOR_TRANSACTION") && ["REVIEW", "CERTIFIED"].include?(@transaction.status) %>
+        <%= render 'update_result', transaction: @transaction %>
+    <% end %>
+<!-- (End) -->
+
+<!-- (Start) Amend Final Result -->
+    <% if has_permission?("AMEND_FINAL_RESULT_FOR_TRANSACTION") && @transaction.final_result? && @transaction.status == "CERTIFIED" && !pending_amendments %>
+        <%= render 'amend_final_result', transaction: @transaction %>
+    <% end %>
+<!-- (End) -->
+
+<!-- (Start) Amend Final Result Concur/Approval -->
+    <% @amendments.each_with_index do |amendment, index| %>
+        <% next if amendment.approval_at? || amendment.created_by == current_user.id %>
+
+        <div class="dialog-amend-final-result-concur hidden" data-id="<%= amendment.id %>" title="Concur Amendment">
+            <p>You are about to concur MERTS Status for <b><%= @transaction.fw_code %></b> and considered as Wrong Transmission for:</p>
+
+            <%= form_tag amendment_approval_internal_transaction_path(@transaction, amendment_id: amendment.id), method: "post", class: "disable-enter-keypress", id: "transaction-amendment-concur-form" do %>
+                <% if amendment.wrong_transmission_doctor? %>
+                    <div class="d-flex justify-content-start align-items-center mb-2">
+                        <%= check_box_tag :check_box__doctor_transmission, 'true', true, disabled: true %>
+                        <label class="mb-0 ml-2" for="check_box__doctor_transmission"><%= "Doctor #{ @transaction.doctor&.code }, Certification date on #{ @transaction.certification_date? ? @transaction.certification_date.strftime("%d/%m/%Y") : nil }" %></label>
+                    </div>
+                <% end %>
+
+                <% if amendment.wrong_transmission_lab? %>
+                    <div class="d-flex justify-content-start align-items-center mb-2">
+                        <%= check_box_tag :check_box__lab_transmission, 'true', true, disabled: true %>
+                        <label class="mb-0 ml-2" for="check_box__lab_transmission"><%= "Lab #{ @transaction.laboratory&.code }, Lab submit date #{ @transaction.laboratory_transmit_date? ? @transaction.laboratory_transmit_date.strftime("%d/%m/%Y") : nil }" %></label>
+                    </div>
+                <% end %>
+
+                <% if amendment.wrong_transmission_xray? %>
+                    <div class="d-flex justify-content-start align-items-center mb-2">
+                        <%= check_box_tag :check_box__xray_transmission, 'true', true, disabled: true %>
+                        <label class="mb-0 ml-2" for="check_box__xray_transmission"><%= "X-ray #{ @transaction.xray_facility&.code }, X-ray submit date  #{ @transaction.xray_transmit_date? ? @transaction.xray_transmit_date.strftime("%d/%m/%Y") : nil }" %></label>
+                    </div>
+                <% end %>
+
+                <% if ![amendment.wrong_transmission_doctor?, amendment.wrong_transmission_lab?, amendment.wrong_transmission_xray?].include?(true) %>
+                    <p>No transmissions selected by MLE1</p>
+                <% end %>
+
+                <%= hidden_field_tag :transaction_concur_decision, "" %>
+                <%= text_area_tag :transaction_amendment_reason, "", rows: 5, placeholder: "Remarks. Example: Concurred", class: "form-control" %>
+                <p class="error-placeholder text-danger"></p>
+
+                <div class="d-flex justify-content-around">
+                    <div class="btn btn-success amendment-concur-concur">Concur</div>
+                    <div class="btn btn-danger amendment-concur-reject">Reject</div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+<!-- (End) -->
+
+<!-- (Start) X-Ray Revert Exam Results -->
+    <div id="dialog-xray-confirmation" class="hidden" title="Revert X-Ray Status">
+        <p>
+            You are about to delete Chest X-ray Result in MERTS for <b><%= @transaction.fw_code %></b>.<br>
+            Please specify whether this is to be considered as Wrong Transmission for X-Ray <b><%= @transaction.xray_facility&.code %></b>.<br>
+        </p>
+
+        <label>Issues</label>
+        <%= form_tag revert_xray_status_to_exam_internal_transaction_path(@transaction), method: "post", class: "disable-enter-keypress", id: "transaction-xray-revert-form" do %>
+            <%= text_area_tag :xray_revert_issues, "", rows: 5, placeholder: "Example: Case of wrongly transmitted X-ray as TB", class: "form-control" %>
+        <% end %>
+
+        <p class="error-placeholder text-danger"></p>
+    </div>
+
+    <% if flash[:xray_revert_success].present? %>
+        <div id="dialog-xray-success" class="hidden" title="X-Ray Status Reverted">
+            Chest X-Ray result for <b><%= @transaction.fw_code %></b> has been successfully cleared in MERTS.
+        </div>
+
+        <% content_for :page_end_scripts do %>
+            <script>
+                openDialog({target: '#dialog-xray-success', type: 'success'});
+            </script>
+        <% end %>
+    <% end %>
+<!-- (End) -->
+
+<!-- (Start) Laboratory Revert Exam Results -->
+    <div id="dialog-lab-confirmation" class="hidden" title="Revert Laboratory Status">
+        <p>
+            You are about to delete Laboratory Result in MERTS for <b><%= @transaction.fw_code %></b>.<br>
+            Please specify whether this is to be considered as Wrong Transmission Lab <b><%= @transaction.laboratory&.code %></b>.<br>
+        </p>
+
+        <label>Issues</label>
+        <%= form_tag revert_laboratory_status_to_exam_internal_transaction_path(@transaction), method: "post", class: "disable-enter-keypress", id: "transaction-lab-revert-form" do %>
+            <%= text_area_tag :lab_revert_issues, "", rows: 5, placeholder: "Example: Case of wrongly transmitted lab results as HIV positive", class: "form-control" %>
+        <% end %>
+
+        <p class="error-placeholder text-danger"></p>
+    </div>
+
+    <% if flash[:lab_revert_success].present? %>
+        <div id="dialog-lab-success" class="hidden" title="Laboratory Status Reverted">
+            Laboratory result for <b><%= @transaction.fw_code %></b> has been successfully cleared in MERTS.
+        </div>
+
+        <% content_for :page_end_scripts do %>
+            <script>
+                openDialog({target: '#dialog-lab-success', type: 'success'});
+            </script>
+        <% end %>
+    <% end %>
+<!-- (End) -->
+
+<!-- (Start) Revert Examination Date -->
+    <div id="dialog-medical-confirmation" class="hidden" title="Delete Examination Date">
+        <p>
+            You are about to delete the examination date in MERTS for <b><%= @transaction.fw_code %></b>.<br>
+            Please specify whether this is to be considered as Wrong Transmission for Doctor <b><%= @transaction.doctor&.code %></b>.<br>
+        </p>
+
+        <label>Issues</label>
+        <%= form_tag remove_transaction_examination_date_internal_transaction_path(@transaction), method: "post", class: "disable-enter-keypress", id: "transaction-medical-date-form" do %>
+            <%= text_area_tag :medical_revert_issues, "", rows: 5, placeholder: "Example: Case of wrongly transmitted examination date as 3.3.2020", class: "form-control" %>
+        <% end %>
+
+        <p class="error-placeholder text-danger"></p>
+    </div>
+
+    <% if flash[:medical_revert_success].present? %>
+        <div id="dialog-medical-success" class="hidden" title="Examination Date Deleted">
+            Examination date for <b><%= @transaction.fw_code %></b> has been successfully deleted in MERTS.
+        </div>
+
+        <% content_for :page_end_scripts do %>
+            <script>
+                openDialog({target: '#dialog-medical-success', type: 'success'});
+            </script>
+        <% end %>
+    <% end %>
+<!-- (End) -->
+
+<div id="dialog-medical-confirmation" class="hidden" title="Remove Examination Date">
+    <p>
+        Remove medical examination date of Transaction.<br>
+        This will also revert the Transaction status from <b>EXAMINATION</b> to <b>NEW</b>.<br>
+        Click <b>Confirm</b> to proceed.
+    </p>
+</div>
+
+<div id="dialog-cancel-final-result-amendment" class="hidden" title="Cancel Pending Final Result Amendment">
+    <%= form_tag cancel_amendment_internal_transaction_path(@transaction.id), method: "post", class: "disable-enter-keypress" do %>
+        <%= hidden_field_tag :amendment_id %>
+    <% end %>
+
+    <p>
+        Cancel the pending final result amendment?<br>
+        Click <b>Confirm</b> to proceed.
+    </p>
+</div>
+
+<!-- (Start) abort radiologist -->
+    <div id="abort-radiologist" class="hidden" title="Abort Radiologist">
+        <p>
+            You are about to abort radiologist.<br>
+            Click <b>Confirm</b> to proceed.
+        </p>
+    </div>
+<!-- (End) abort radiologist -->
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('a[href*="physical_exam_not_done"]').click(function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+
+            $('#dialog-physical-not-done').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Confirm: function() {
+                        window.location = url;
+                    }
+                }
+            });
+        });
+
+        $('a[href*="abort_radiologist"]').click(function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+
+            $('#abort-radiologist').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Confirm: function() {
+                        window.location = url;
+                    }
+                }
+            });
+        });
+
+        // Xray Revert Exam Results.
+        $('.open-dialog-xray').click(function(e) {
+            e.preventDefault();
+
+            $('#dialog-xray-confirmation').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Proceed: function() {
+                        submitDialogForm('#dialog-xray-confirmation', '#transaction-xray-revert-form', '#xray_revert_issues');
+                    }
+                }
+            });
+        });
+
+        // Laboratory Revert Exam Results.
+        $('.open-dialog-lab').click(function(e) {
+            e.preventDefault();
+
+            $('#dialog-lab-confirmation').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Proceed: function() {
+                        submitDialogForm('#dialog-lab-confirmation', '#transaction-lab-revert-form', '#lab_revert_issues');
+                    }
+                }
+            });
+        });
+
+        // Revert Examination Date.
+        $('.open-dialog-medical').click(function(e) {
+            e.preventDefault();
+
+            $('#dialog-medical-confirmation').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Proceed: function() {
+                        submitDialogForm('#dialog-medical-confirmation', '#transaction-medical-date-form', '#medical_revert_issues');
+                    }
+                }
+            });
+        });
+
+        function submitDialogForm(dialog, form, textArea) {
+            reason = $(textArea).val().trim().length > 0;
+
+            if (!reason) {
+                $(`${ dialog } .error-placeholder`).text('Please include a reason');
+            } else {
+                $(form).submit();
+            }
+        }
+
+        $('.update-result').click(function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+
+            $('#dialog-update-result').dialog({
+                modal: true,
+                minWidth: 800,
+                dialogClass: `dialog__title-primary shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    "Submit": function() {
+                        amendementReason = $('#dialog-update-result #transaction_amendment_reason').val().trim().length > 0;
+
+                        if (!amendementReason) {
+                            $('#dialog-update-result .error-placeholder').text('Please include a reason');
+                            $('#dialog-update-result').scrollTop(0);
+                        } else {
+                            $('#transaction-update-result-form').submit();
+                        }
+                    }
+                }
+            });
+        });
+
+        $('.amend-final-result').click(function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+
+            $('#dialog-amend-final-result').dialog({
+                modal: true,
+                minWidth: 800,
+                dialogClass: `dialog__title-warning shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    "Submit for approval": function() {
+                        amendementReason = $('#dialog-amend-final-result #transaction_amendment_reason').val().trim().length > 0;
+
+                        if (!amendementReason) {
+                            $('#dialog-amend-final-result .error-placeholder').text('Please include a reason');
+                            $('#dialog-amend-final-result').scrollTop(0);
+                        } else {
+                            $('#transaction-amendment-concur-form').submit();
+                        }
+                    }
+                }
+            });
+        });
+
+        $('.amendment-concur-btn').click(function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+            var id  = $(this).attr('data-id');
+
+            $(`.dialog-amend-final-result-concur[data-id="${ id }"]`).dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-success shadow`
+            });
+        });
+
+        $('.amendment-concur-concur, .amendment-concur-reject').click(function() {
+            dialog              = $(this).closest('.dialog-amend-final-result-concur');
+            amendementReason    = dialog.find('#transaction_amendment_reason').val().trim().length > 0;
+            status              = $(this).hasClass('amendment-concur-concur') ? 'approve' : 'reject';
+            dialog.find('#transaction_concur_decision').val(status);
+
+            if (!amendementReason) {
+                dialog.find('.error-placeholder').text('Please include a reason');
+            } else {
+                dialog.find('#transaction-amendment-concur-form').submit();
+            }
+        });
+
+        $('.cancel-final-amendment').click(function() {
+            var id  = $(this).attr('data-id');
+            var url = $(this).attr('data-url');
+            $('#dialog-cancel-final-result-amendment #amendment_id').val(id);
+
+            $('#dialog-cancel-final-result-amendment').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-danger shadow`,
+                buttons: {
+                    Close: function() {
+                       $(this).dialog('close');
+                    },
+                    Confirm: function() {
+                        $('#dialog-cancel-final-result-amendment form').submit();
+                    }
+                }
+            });
+        });
+    </script>
+<% end %>

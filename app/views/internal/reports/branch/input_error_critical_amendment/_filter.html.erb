@@ -1,0 +1,36 @@
+<div class="card">
+    <div class="card-header">
+        Filter
+    </div>
+    <%= form_tag input_error_critical_amendment_internal_branch_reports_path, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="organization_id" class="col-sm-3 col-form-label">Branch</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :organization_id, options_from_collection_for_select(Organization.where(org_type: "BRANCH").order(:name), :id, :name, params[:organization_id]), include_blank: "ALL", class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="date_from" class="col-sm-3 col-form-label required">Amendment Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" class="form-control" name="date_from" id="date_from" value="<%= params[:date_from] %>" required>
+                                <div class="input-group-append"><label class="input-group-text" for="date_to"> To </label></div>
+                                <input type="date" class="form-control" name="date_to" id="date_to" value="<%= params[:date_to] %>" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <button type="submit" class="btn btn-sm btn-secondary" formaction="<%= input_error_critical_amendment_internal_branch_reports_path(format: :pdf) %>"><i class="fa fa-download"></i> Download</button>
+            <%=raw filter_clear_button input_error_critical_amendment_internal_branch_reports_path %>
+            <%=raw filter_button %>
+        </div>
+    <% end %>
+</div>

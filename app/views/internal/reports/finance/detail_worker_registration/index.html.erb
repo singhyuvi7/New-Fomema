@@ -1,0 +1,58 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Finance - Detail Worker Registration</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "internal/reports/finance/detail_worker_registration/filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+            </div>
+        </div>
+        <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <!--<th>Order Category</th>
+            <th>Fee Code</th>-->
+            <th>Worker Code</th>
+            <th>Worker Name</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @order_items.blank? %>
+            <tr>
+                <td colspan="5" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+            <% total_amount = 0.0 %>
+            <% @order_items.each.with_index(1) do |order_item, index| %>
+                <% total_amount += order_item.final_amount.to_f %>
+                <tr>
+                    <td><%= order_item.paid_at.try(:strftime, get_standard_date_format) %></td>
+                    <!--<td><%= order_item.order_category %></td>
+                    <td><%= order_item.fee_code %></td>-->
+                    <td><%= order_item.fw_code %></td>
+                    <td><%= order_item.fw_name %></td>
+                    <td><%= order_item.final_amount %></td>
+                </tr>
+            <% end %>
+            <tr>
+                <th colspan="3">Total</th>
+                <th><%= total_amount %></th>
+            </tr>
+
+        <% end %>
+    </tbody>
+</table>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

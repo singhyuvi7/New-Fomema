@@ -1,0 +1,9 @@
+<% @transactions.each do |transaction| %>
+    <%= render 'internal/xray_pending_reviews/shared/compare_row', {transaction: transaction, show_checkbox: true, show_remove: false} %>
+<% end %>
+
+<% if @transactions.blank? %>
+<tr>
+    <td colspan="6">No Transaction found with these search options</td>
+</tr>
+<% end %>

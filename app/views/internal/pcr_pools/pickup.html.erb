@@ -1,0 +1,51 @@
+<% if @active_case %>
+    <div class="alert alert-warning">
+        You already have <%= pluralize(1, 'case') %> at hand and cannot pickup new one. <a href="<%= edit_internal_pcr_review_path(@active_case.id) %>">Click to see your case</a>
+    </div>
+<% end %>
+
+<% if @xray_retake_draft %>
+    <div class="alert alert-warning">
+        You have draft X-Ray Retake Request at hand and cannot pickup new one. <a href="<%= draft_internal_xray_retake_path(@xray_retake_draft.id) %>">Click to see your case</a>
+    </div>
+<% end %>
+
+<div class="card">
+
+    <form method="POST" action="<%= pickup_internal_pcr_pools_path %>">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="hidden" name="_method" value="PATCH">
+
+        <div class="card-header">
+            <strong>PCR Pool</strong>
+        </div>
+
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render "/shared/all_flash" %>
+
+            <div class="row">
+                <div class="col module-actions text-right">
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <% if(@pool_count > 0) %>
+                        There are <%= pluralize(@pool_count, 'case') %> waiting to be pickup
+                    <% else %>
+                        There are no case to pickup
+                    <% end %>
+                </div>
+            </div>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <button type="submit" <% if !@can_pickup %> disabled <% end %> class="btn btn-primary" data-toggle="tooltip" title="Pickup">Pickup</button>
+            </div>
+        </div>
+    </form>
+</div>

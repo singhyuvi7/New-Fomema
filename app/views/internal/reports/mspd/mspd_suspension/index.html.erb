@@ -1,0 +1,60 @@
+<div class="card">
+    <div class="card-header">
+        MSPD Suspension
+    </div>
+
+    <!-- .card-body -->
+    <div class="card-body">
+        <%=render "internal/reports/mspd/mspd_suspension/filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>SP_CODE</th>
+            <th>SP_NAME</th>
+            <th>CLINIC_NAME</th>
+            <th>CREATED_AT_DATE</th>
+            <th>STATUS</th>
+            <th>STATUS_REASON</th>
+            <th>COMMENT</th>
+            <th>STATE_NAME</th>
+            <th>TOWN_NAME</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @data.blank? %>
+            <tr>
+                <td colspan="12" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+            <% @data.each.with_index((@data.current_page - 1) * get_per + 1) do |row, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= row.status_scheduleable.code %></td>
+                    <td><%= row.status_scheduleable_type == 'XrayFacility' ? row.status_scheduleable.try(:license_holder_name) : row.status_scheduleable.name %></td>
+                    <td><%= row.status_scheduleable_type == 'XrayFacility' ? row.status_scheduleable.try(:name) : row.status_scheduleable.try(:clinic_name) %></td>
+                    <td><%= row.created_at.try(:strftime, get_standard_date_format) %></td>
+                    <td><%= row.status %></td>
+                    <td><%= Doctor::ALL_STATUS_REASONS[row.status_reason] %></td>
+                    <td><%= row.comment %></td>
+                    <td><%= row.status_scheduleable.state.try(:name) %></td>
+                    <td><%= row.status_scheduleable.town.try(:name) %></td>
+                </tr>
+            <% end %>
+        <% end %>
+    </tbody>
+</table>
+        </div>
+
+        <div class="row">
+            <%= paginate @data if @data %>
+        </div>
+
+    </div>
+    <!-- /.card-body -->
+</div>

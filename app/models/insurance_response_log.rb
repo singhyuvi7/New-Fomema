@@ -1,0 +1,2 @@
+class InsuranceResponseLog < ApplicationRecord
+end

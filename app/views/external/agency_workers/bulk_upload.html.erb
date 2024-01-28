@@ -1,0 +1,32 @@
+<form id="bulk-upload-form" method="post" action="<%= bulk_upload_preview_external_agency_workers_path employer_id: @employer.id %>" enctype="multipart/form-data">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+
+    <div class="card">
+        <div class="card-header border-0 bg-transparent text-dark">
+            <strong>Register Worker</strong> - Bulk Upload New Worker
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="required">Foreign Worker List File</label>
+                <input type="file" name="csv_file" id="csv_file" class="form-control-file" required>
+                <input type="hidden" name="page_layout" value="external/agency_workers/bulk_upload" />
+            </div>
+
+            <div class="form-group">
+                <div class="text-right">
+                    <a href="<%= bulk_upload_template_external_agency_workers_path employer_id: @employer.id %>" target="_blank" class="btn btn-blue-portal">Download template</a>
+                    <a href="<%= bulk_upload_specification_external_agency_workers_path employer_id: @employer.id %>" target="_blank" class="btn btn-blue-portal">Guideline for Bulk Upload</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent ">
+            <div class="text-right">
+                <a href="<%= external_agency_workers_path employer_id: @employer.id %>" class="btn btn-red-portal">Cancel</a>
+                <button type="submit" class="btn btn-blue-portal">Preview</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<%= render '/external/worker_lists/worker_upload_preview', { form_action_path: bulk_upload_external_agency_workers_path(employer_id: @employer.id), redirect_path: external_agency_workers_path(employer_id: @employer.id), cancel_path: external_agency_workers_path(employer_id: @employer.id)} %>

@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "MEDICAL_PR_IQA" %>"><%= @system_configurations["MEDICAL_PR_IQA"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "MEDICAL_PR_IQA", @system_configurations["MEDICAL_PR_IQA"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["MEDICAL_PR_IQA"].value %></p>
+</div>

@@ -1,0 +1,2 @@
+module Internal::XrayLicensePurposesHelper
+end

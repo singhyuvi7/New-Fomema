@@ -1,0 +1,55 @@
+<div class="card">
+    <div class="card-header">
+        <%= transaction.xray_film_type&.titlecase %> X-Ray Review Details
+    </div>
+    <table class="table table-bordered table-card table-sm">
+        <tbody>
+            <tr>
+                <td class="font-weight-bold" >Worker Name</td>
+                <td><%= transaction.fw_name %></td>
+                <td class="font-weight-bold" >X-Ray Facility</td>
+                <td><%= transaction.xray_facility.name %></td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Worker Code</td>
+                <td><%= transaction.fw_code %></td>
+                <td class="font-weight-bold" >X-Ray Code</td>
+                <td><%= transaction.xray_facility&.code %></td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Passport No.</td>
+                <td><%= transaction.fw_passport_number %></td>
+                <td class="font-weight-bold" >Transaction ID</td>
+                <td>
+                    <%= transaction.code %>
+                    <%# if has_permission?("VIEW_ALL_TRANSACTION") %>
+                        <a class="btn btn-primary btn-sm" href="<%= internal_transaction_path(transaction) %>">
+                            View <i class="fa fa-external-link-alt"></i>
+                        </a>
+                    <%# end %>
+                </td>
+            </tr>
+
+            <% xray_examination = transaction.xray_examination %>
+
+            <tr>
+                <td class="font-weight-bold">X-Ray Taken Date</td>
+                <td>
+                    <%= xray_examination&.xray_taken_date&.strftime(get_standard_date_format) || raw("<i>N/A</i>") %>
+                </td>
+                <td class="font-weight-bold">X-Ray Report Date</td>
+                <td>
+                    <%= xray_examination&.transmitted_at&.strftime(get_standard_date_format) || raw("<i>N/A</i>") %>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Doctor Certification</td>
+                <td colspan="3"><%= transaction.doctor_examination&.suitability %></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,43 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag filter_link, method: 'get' do |form| %>
+    <div class="card-body">
+        <div class="form-group row">
+            <label for="start_date" class="col-sm-2 col-form-label">Visit Date From</label>
+            <div class="col-sm-4">                
+                <%= text_field_tag "start_date", params[:start_date], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'start_date' }, max: Date.today.strftime("%F") %>
+            </div>
+            <label for="end_date" class="col-sm-2 col-form-label">Visit Date To</label>
+            <div class="col-sm-4">
+                <%= text_field_tag "end_date", params["end_date"], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'start_date' }, max: Date.today.strftime("%F") %>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="visit_report_code" class="col-sm-2 col-form-label">Visit Report Code</label>
+            <div class="col-sm-4">                
+                <%= text_field_tag "visit_report_code", params[:visit_report_code], class: "form-control flex-grow-1", placeholder: "Visit Report Code" %>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw filter_clear_button view_master_list_internal_inspectorate_reports_path(@batch) %>
+            <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, filter_link, class: "btn btn-sm btn-warning with-excel-format" %>
+            <%=raw filter_button %>
+        </div>
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function (e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

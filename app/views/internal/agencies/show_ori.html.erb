@@ -1,0 +1,152 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Agencies</strong> - Agency Detail
+    </div>
+
+    <div class="card-body">
+
+            <div class="row">
+                <label class="col-md-2 col-form-label">Code</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.code %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Agency Name</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.name %></div>
+                </div>
+            </div> 
+            <div class="row">
+                <label class="col-md-2 col-form-label">Business Registration Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @agency.business_registration_number %></div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-2 col-form-label">license Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @agency.license_number %></div>
+                </div>
+            </div> 
+            <div class="row">
+                <label class="col-md-2 col-form-label">Agency Category</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @agency.agency_license_category_id %></div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Director Name</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.director_name %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Director ICNO</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.director_ic_number %></div>
+                </div>
+            </div>  
+            <div class="row">
+                <label class="col-md-2 col-form-label">Person In Charge Name</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.pic_name %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Person In Charge Phone</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.pic_phone %></div>
+                </div>
+                <label class="col-md-2 col-form-label">ICNO Person In Charge Phone</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @agency.pic_ic_number %></div>
+                </div>
+            </div> 
+
+        <!-- address -->
+        <div class="row">
+            <label class="col-md-2 col-form-label">Address</label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @agency.address1 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @agency.address2 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @agency.address3 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @agency.address4 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label">State</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @agency&.state&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Postcode</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @agency.postcode %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label">Town</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @agency&.town&.name %></div>
+            </div>
+        </div>
+        <!-- /address -->
+
+        <!-- uploaded documents -->
+        <div class="card">
+            <div class="card-header">Uploaded Documents</div>
+            <div class="card-body">
+                <% if @agency.uploads.count > 0 %>
+                    <table class="table">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                        </tr>
+                        <% @agency.uploads.each do |upload| %>
+                            <tr>
+                                <td><%= upload.category %></td>
+                                <td>
+                                    <div class="row">
+                                    <% upload.documents.each do |document| %>
+                                        <% if false && document.content_type.in?(["image/png", "image/jpg"]) %>
+                                            <div><%= image_tag document, style: "max-width:100px; max-height: 100px" %></div>
+                                        <% end %>
+                                        <div class="col"><%= document.filename %></div>
+                                        <div class="col text-right"><%= link_to("Download", rails_blob_url(document), target: "_blank") %></div>
+                                    <% end %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% end %>
+                    </table>
+                <% else %>
+                    <p>No upload documents</p>
+                <% end %>
+            </div>
+        </div>
+        <!-- /uploaded documents -->
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_agencies_path) %>
+            <% if has_any_permission?('EDIT_NON_FINANCE_INFO_AGENCY', 'EDIT_FINANCE_INFO_AGENCY') %>
+                <%=raw show_edit_button(edit_internal_agency_path(@agency)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

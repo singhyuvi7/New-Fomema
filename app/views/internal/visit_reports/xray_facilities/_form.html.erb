@@ -1,0 +1,1503 @@
+<div class="row">
+
+    <div class="col-md-12">
+
+        <%= render "/shared/all_flash" %>
+
+        <div v-if="visit_report_data.status" class="alert alert-info" role="alert">
+            LATEST STATUS: <b><%= VisitReport::STATUSES[@visit_report.status] %></b>
+        </div>
+
+        <div v-if="visit_report_data.status === 'REJECTED'" class="alert alert-danger" role="alert">
+            COMMENT ON REJECTION: <b v-if="visit_report_data.level_1_approval_decision === 'REJECT'">{{ visit_report_data.level_1_approval_comment }}</b><b v-if="visit_report_data.level_2_approval_decision === 'REJECT'">{{ visit_report_data.level_2_approval_comment }}</b>
+        </div>
+
+        <div v-if="!canEdit" class="alert alert-warning" role="alert">
+            FORM UPDATE IS DISABLE FOR STATUS: <b><%= VisitReport::STATUSES[@visit_report.status] %></b>
+        </div>
+
+        <form ref="visit_report_form" method="POST" action="<%= form_action %>">
+
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+            <% if form_method.downcase !='post' %>
+            <input type="hidden" name="_method" value="<%= form_method %>">
+            <% end %>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-text v-model="visit_report_data.code" :field_name="'visit_report[code]'" :label="'Report ID'" :readonly="true"></v-text>
+
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="visit_report_data.visit_plan_item.visitable.code" :field_name="'visit_report_xray_facility[code]'" :label="'X-Ray Code'" :readonly="true"></v-text>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="visit_report_data.visit_plan_item.visitable.license_holder_name" :field_name="'visit_report_xray_facility[license_holder_name]'" :label="'License Holder Name'" :readonly="true"></v-text>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>X-Ray Facility Address</label>
+                        <textarea class="form-control" rows="1" id="visit_report_data.xray_address" :readonly="true">{{ xray_address.filter(function(address) { return address; }).join(',') }}
+                        </textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label class="required" for="visit_report_xray_facility[type_of_visit]">Type Of Visit</label>
+                        <select class="form-control" v-validate="categoryRule" name="visit_report_xray_facility[type_of_visit]" v-model="visit_report_data.visit_report_xray_facility.type_of_visit" id="type_of_visit" :class="{ 'is-invalid': errors.has('visit_report_xray_facility[type_of_visit]') }" :disabled="formReadOnly" data-vv-as="Type of visit">
+                            <option disabled value="">Select option</option>
+                            <option v-for="(category, index) in categories_arr" :value="category">{{ category }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[type_of_visit]') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="visit_report_data.visit_report_xray_facility.number_of_visit_checklist" :field_name="'visit_report_xray_facility[number_of_visit_checklist]'" :readonly="formReadOnly" :rules="checklistRule" :label="'Number Of Visit Checklist'" :validation_label="'Number Of Visit Checklist'"></v-text>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-12">
+                    <label class="required" for="">Inspectorate Team</label>
+                    <multiselect v-validate="inspectorateTeamRule" :data-vv-name="'selected_visitors'" :data-vv-value-path="selected_visitors" :data-vv-as="'Inspectorate Team'" v-model="selected_visitors" :disabled="formReadOnly" :options="org_users_arr" track-by="id" label="name" :multiple="true" :hide-selected="true" placeholder="Select user or type to add non-fomema officer" tag-placeholder="Please enter to add non-fomema officer" :class="{ 'is-invalid': errors.has('selected_visitors') }" :taggable="true" @tag="addTag">
+                    </multiselect>
+                    <div class="invalid-feedback">{{ errors.first('selected_visitors') }}</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="visit_report_data.visit_report_xray_facility.interacted_with" :field_name="'visit_report_xray_facility[interacted_with]'" :readonly="formReadOnly" :rules="interactedWithRule" :label="'Interacted With'" :validation_label="'Interacted With'"></v-text>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="visit_report_data.visit_report_xray_facility.radiographer_name" :field_name="'visit_report_xray_facility[radiographer_name]'" :readonly="formReadOnly" :rules="radiographerNameRule" :label="'Radiographer Name'" :validation_label="'Radiographer Name'"></v-text>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-date v-model="visit_report_data.visit_date" :field_name="'visit_report[visit_date]'" :rules="visitDateRule" :label="'Visit Date'" :readonly="formReadOnly" id="visit_date"  :max_date="visitDateMax"></v-date>
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-time v-model="visit_report_data.visit_time_from" :field_name="'visit_report[visit_time_from]'" :rules="visitTimeFromRule" :label="'Visit Begin'" :readonly="formReadOnly" id="visit_time_from"></v-time>
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-time v-model="visit_report_data.visit_time_to" :field_name="'visit_report[visit_time_to]'" :rules="visitTimeToRule" :label="'Visit End'" :readonly="formReadOnly" id="visit_time_to"></v-time>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="last_visited_date" :field_name="'last_visited_date'" :label="'Last Visit Date'" :readonly="readOnlyField" id="last_visited_date"></v-text>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <v-text v-model="allocations_last_current_year" :field_name="'year_allocation'" :label="'Allocation '+last_year+'/'+current_year" :readonly="readOnlyField" id="year_allocation"></v-text>
+                    </div>
+                </div>
+            </div>
+
+            <h4>Summary Of Findings</h4>
+
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th colspan="2"></th>
+                        <th colspan="3" class="text-center">Acceptable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.</td>
+                        <td colspan="2">
+                            Verification Of Identity Of Foreign Worker.
+
+                            <div class="form-group">
+
+                                <v-text v-model="visit_report_data.visit_report_xray_facility.foreign_worker_present" :field_name="'visit_report_xray_facility[foreign_worker_present]'" :rules="foreignWorkerPresentRule" :label="'No Of Foreign Workers Present'" :validation_label="'No Of Foreign Workers Present'" :readonly="formReadOnly"></v-text>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][no_xray_examination]" v-model="unacceptable_fields.foreign_worker.no_xray_examination" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="No verification of identity prior to x-ray examination" id="unacceptable_fields[foreign_worker][no_xray_examination]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][no_xray_examination]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][no_xray_examination]">No verification of identity prior to x-ray examination</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[foreign_worker][no_xray_examination]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.no_xray_examination_comment" :field_name="'unacceptable_fields[foreign_worker][no_xray_examination_comment]'" :id="'unacceptable_fields[foreign_worker][no_xray_examination_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.no_xray_examination)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][without_biometric_device]" v-model="unacceptable_fields.foreign_worker.without_biometric_device" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Verification without using biometric device" id="unacceptable_fields[foreign_worker][without_biometric_device]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][without_biometric_device]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][without_biometric_device]">Verification without using biometric device</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][without_biometric_device]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.without_biometric_device_comment" :field_name="'unacceptable_fields[foreign_worker][without_biometric_device_comment]'" :id="'unacceptable_fields[foreign_worker][without_biometric_device_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.without_biometric_device)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][without_original_passport]" v-model="unacceptable_fields.foreign_worker.without_original_passport" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Verification without using original passport" id="unacceptable_fields[foreign_worker][without_original_passport]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][without_original_passport]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][without_original_passport]">Verification without using original passport</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][without_original_passport]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.without_original_passport_comment" :field_name="'unacceptable_fields[foreign_worker][without_original_passport_comment]'" :id="'unacceptable_fields[foreign_worker][without_original_passport_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.without_original_passport)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][using_photocopy_passport]" v-model="unacceptable_fields.foreign_worker.using_photocopy_passport" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Verification using photocopy passport" id="unacceptable_fields[foreign_worker][using_photocopy_passport]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][using_photocopy_passport]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][using_photocopy_passport]">Verification using photocopy passport</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][using_photocopy_passport]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.using_photocopy_passport_comment" :field_name="'unacceptable_fields[foreign_worker][using_photocopy_passport_comment]'" :id="'unacceptable_fields[foreign_worker][using_photocopy_passport_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.using_photocopy_passport)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][using_id_card]" v-model="unacceptable_fields.foreign_worker.using_id_card" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Verification using ID card/name tag" id="unacceptable_fields[foreign_worker][using_id_card]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][using_id_card]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][using_id_card]">Verification using ID card/name tag</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][using_id_card]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.using_id_card_comment" :field_name="'unacceptable_fields[foreign_worker][using_id_card_comment]'" :id="'unacceptable_fields[foreign_worker][using_id_card_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.using_id_card)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][using_fake_passport]" v-model="unacceptable_fields.foreign_worker.using_fake_passport" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Verification using fake passport" id="unacceptable_fields[foreign_worker][using_fake_passport]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][using_fake_passport]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][using_fake_passport]">Verification using fake passport</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][using_fake_passport]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.using_fake_passport_comment" :field_name="'unacceptable_fields[foreign_worker][using_fake_passport_comment]'" :id="'unacceptable_fields[foreign_worker][using_fake_passport_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.using_fake_passport)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[foreign_worker][others]" v-model="unacceptable_fields.foreign_worker.others" value="1" v-validate="foreignWorkerUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[foreign_worker][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[foreign_worker][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[foreign_worker][others]">Others</label>
+                                        <div class="invalid-feedback">{{ errors.first('unacceptable_fields[foreign_worker][others]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.foreign_worker.others_comment" :field_name="'unacceptable_fields[foreign_worker][others_comment]'" :id="'unacceptable_fields[foreign_worker][others_comment]'" :rules="{'required':(unacceptable_fields.foreign_worker.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.foreign_worker_present_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[foreign_worker_present_acceptable]'" :rules="foreignWorkerPresentAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[foreign_worker_present_acceptable][yes]'"></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[foreign_worker_present_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.foreign_worker_present_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[foreign_worker_present_acceptable]'" :rules="foreignWorkerPresentAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[foreign_worker_present_acceptable][no]'"></v-radio>
+
+
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.foreign_worker_present_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[foreign_worker_present_acceptable]'" :rules="foreignWorkerPresentAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[foreign_worker_present_acceptable][na]'"></v-radio>
+
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">2.</td>
+                        <td colspan="2">
+                            Valid annual practicing certificate(APC)
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <v-text v-model="visit_report_data.visit_report_xray_facility.apc_number" :field_name="'visit_report_xray_facility[apc_number]'" :rules="apcNoRule" :label="'APC No.'" :validation_label="'APC No.'" :readonly="formReadOnly"></v-text>
+                                    </div>
+                                    <div class="form-group col-sm-6" v-if="formReadOnly">
+                                        <v-text v-model="visit_report_data.visit_report_xray_facility.apc_year" :field_name="'visit_report_xray_facility[apc_year]'" :label="'Year'" :rules="apcYearRule" :validation_label="'APC Year'" :readonly="formReadOnly"></v-text>
+                                    </div>
+                                    <div class="form-group col-sm-6" v-if="!formReadOnly">
+                                        <label for="visit_report_xray_facility[apc_year]" class="required">Year</label>
+                                        <select class="form-control" v-validate="apcYearRule" name="visit_report_xray_facility[apc_year]" data-vv-as="APC Year" v-model="visit_report_data.visit_report_xray_facility.apc_year" id="apc_year" :class="{ 'is-invalid': errors.has('visit_report_xray_facility[apc_year]') }" :disabled="formReadOnly">
+                                            <option disabled value="">Select option</option>
+                                            <option v-for="year in years" :value="year">{{ year }}</option>
+                                        </select>
+                                        <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[apc_year]') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[apc][not_available_current_year]" v-model="unacceptable_fields.apc.not_available_current_year" value="1" v-validate="apcUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="APC not available for current year" id="unacceptable_fields[apc][not_available_current_year]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[apc][not_available_current_year]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[apc][not_available_current_year]">APC not available for current year</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[apc][not_available_current_year]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.apc.not_available_current_year_comment" :field_name="'unacceptable_fields[apc][not_available_current_year_comment]'" :rules="{'required':(unacceptable_fields.apc.not_available_current_year)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[apc][not_stated_in_place]" v-model="unacceptable_fields.apc.not_stated_in_place" value="1" v-validate="apcUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Registered facility with FOMEMA not stated in Place of practice the APC" id="unacceptable_fields[apc][not_stated_in_place]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[apc][not_stated_in_place]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[apc][not_stated_in_place]">Registered facility with FOMEMA not stated in Place of practice the APC</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[apc][not_stated_in_place]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.apc.not_stated_in_place_comment" :field_name="'unacceptable_fields[apc][not_stated_in_place_comment]'" :rules="{'required':(unacceptable_fields.apc.not_stated_in_place)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[apc][different_name]" v-model="unacceptable_fields.apc.different_name" value="1" v-validate="apcUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different name" id="unacceptable_fields[apc][different_name]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[apc][different_name]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[apc][different_name]">Different name</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[apc][different_name]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.apc.different_name_comment" :field_name="'unacceptable_fields[apc][different_name_comment]'" :rules="{'required':(unacceptable_fields.apc.different_name)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[apc][different_address]" v-model="unacceptable_fields.apc.different_address" value="1" v-validate="apcUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different address in place of practice" id="unacceptable_fields[apc][different_address]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[apc][different_address]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[apc][different_address]">Different address in place of practice</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[apc][different_address]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.apc.different_address_comment" :field_name="'unacceptable_fields[apc][different_address_comment]'" :rules="{'required':(unacceptable_fields.apc.different_address)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[apc][others]" v-model="unacceptable_fields.apc.others" value="1" v-validate="apcUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[apc][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[apc][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[apc][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[apc][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.apc.others_comment" :field_name="'unacceptable_fields[apc][others_comment]'" :rules="{'required':(unacceptable_fields.apc.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.apc_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[apc_acceptable]'" :rules="apcAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[apc_acceptable][yes]'"></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[apc_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.apc_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[apc_acceptable]'" :rules="apcAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[apc_acceptable][no]'"></v-radio>
+
+
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.apc_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[apc_acceptable]'" :rules="apcAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[apc_acceptable][na]'"></v-radio>
+
+
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- reg number -->
+                    <tr>
+                        <td colspan="2">
+                            Registration Under Private Healthcare Facilities And Service Act 1998
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <v-text v-model="visit_report_data.visit_report_xray_facility.private_healthcare_registration_number" :field_name="'visit_report_xray_facility[private_healthcare_registration_number]'" :rules="regNoRule" :label="'Registration No: '" :validation_label="'Registration No.'" :readonly="formReadOnly"></v-text>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[registration_number][registration_not_available]" v-model="unacceptable_fields.registration_number.registration_not_available" value="1" v-validate="registrationNumberUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="The Registration under Private Healthcare Facilities and Service Act 1998 form is not available" id="unacceptable_fields[registration_number][registration_not_available]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[registration_number][registration_not_available]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[registration_number][registration_not_available]">The Registration under Private Healthcare Facilities and Service Act 1998 form is not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[registration_number][registration_not_available]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.registration_number.registration_not_available_comment" :field_name="'unacceptable_fields[registration_number][registration_not_available_comment]'" :rules="{'required':(unacceptable_fields.registration_number.registration_not_available)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[registration_number][different_name]" v-model="unacceptable_fields.registration_number.different_name" value="1" v-validate="registrationNumberUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different name" id="unacceptable_fields[registration_number][different_name]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[registration_number][different_name]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[registration_number][different_name]">Different name</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[registration_number][different_name]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.registration_number.different_name_comment" :field_name="'unacceptable_fields[registration_number][different_name_comment]'" :rules="{'required':(unacceptable_fields.registration_number.different_name)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[registration_number][different_address]" v-model="unacceptable_fields.registration_number.different_address" value="1" v-validate="registrationNumberUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different address" id="unacceptable_fields[registration_number][different_address]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[registration_number][different_address]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[registration_number][different_address]">Different address</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[registration_number][different_address]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.registration_number.different_address_comment" :field_name="'unacceptable_fields[registration_number][different_address_comment]'" :rules="{'required':(unacceptable_fields.registration_number.different_address)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[registration_number][others]" v-model="unacceptable_fields.registration_number.others" value="1" v-validate="registrationNumberUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[registration_number][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[registration_number][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[registration_number][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[registration_number][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.registration_number.others_comment" :field_name="'unacceptable_fields[registration_number][others_comment]'" :rules="{'required':(unacceptable_fields.registration_number.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.private_healthcare_registration_number_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[private_healthcare_registration_number_acceptable]'" :rules="regNoAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[private_healthcare_registration_number_acceptable][yes]'"></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[private_healthcare_registration_number_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.private_healthcare_registration_number_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[private_healthcare_registration_number_acceptable]'" :rules="regNoAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[private_healthcare_registration_number_acceptable][no]'"></v-radio>
+
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.private_healthcare_registration_number_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[private_healthcare_registration_number_acceptable]'" :rules="regNoAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[private_healthcare_registration_number_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end reg -->
+
+                    <!-- consent -->
+                    <tr>
+                        <td rowspan="2">3.</td>
+                        <td rowspan="2">
+                            X-ray Centre License.
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <v-text v-model="visit_report_data.visit_report_xray_facility.license_serial_number" :field_name="'visit_report_xray_facility[license_serial_number]'" :rules="licenseSerialNumberRule" :label="'License Serial Number'" :validation_label="'License Serial Number'" :readonly="formReadOnly"></v-text>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <v-date v-model="visit_report_data.visit_report_xray_facility.license_expiry_date" :field_name="'visit_report_xray_facility[license_expiry_date]'" :rules="licenseExpiryDateRule" :validation_label="'License Expiry Date'" :label="'License Expiry Date'" :readonly="formReadOnly" id="license_expiry_date"></v-date>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[xray_centre_license][license_not_available]" v-model="unacceptable_fields.xray_centre_license.license_not_available" value="1" v-validate="xrayCentreLicenseUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="The x-ray license is not available" id="unacceptable_fields[xray_centre_license][license_not_available]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[xray_centre_license][license_not_available]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[xray_centre_license][license_not_available]">The x-ray license is not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[xray_centre_license][license_not_available]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.xray_centre_license.license_not_available_comment" :field_name="'unacceptable_fields[xray_centre_license][license_not_available_comment]'" :rules="{'required':(unacceptable_fields.xray_centre_license.license_not_available)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[xray_centre_license][license_expired]" v-model="unacceptable_fields.xray_centre_license.license_expired" value="1" v-validate="xrayCentreLicenseUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="The x-ray license is expired" id="unacceptable_fields[xray_centre_license][license_expired]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[xray_centre_license][license_expired]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[xray_centre_license][license_expired]">The x-ray license is expired</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[xray_centre_license][license_expired]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.xray_centre_license.license_expired_comment" :field_name="'unacceptable_fields[xray_centre_license][license_expired_comment]'" :rules="{'required':(unacceptable_fields.xray_centre_license.license_expired)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[xray_centre_license][different_name]" v-model="unacceptable_fields.xray_centre_license.different_name" value="1" v-validate="xrayCentreLicenseUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different name" id="unacceptable_fields[xray_centre_license][different_name]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[xray_centre_license][different_name]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[xray_centre_license][different_name]">Different name</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[xray_centre_license][different_name]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.xray_centre_license.different_name_comment" :field_name="'unacceptable_fields[xray_centre_license][different_name_comment]'" :rules="{'required':(unacceptable_fields.xray_centre_license.different_name)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[xray_centre_license][different_address]" v-model="unacceptable_fields.xray_centre_license.different_address" value="1" v-validate="xrayCentreLicenseUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Different address" id="unacceptable_fields[xray_centre_license][different_address]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[xray_centre_license][different_address]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[xray_centre_license][different_address]">Different address</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[xray_centre_license][different_address]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.xray_centre_license.different_address_comment" :field_name="'unacceptable_fields[xray_centre_license][different_address_comment]'" :rules="{'required':(unacceptable_fields.xray_centre_license.different_address)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[xray_centre_license][others]" v-model="unacceptable_fields.xray_centre_license.others" value="1" v-validate="xrayCentreLicenseUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[xray_centre_license][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[xray_centre_license][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[xray_centre_license][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[xray_centre_license][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.xray_centre_license.others_comment" :field_name="'unacceptable_fields[xray_centre_license][others_comment]'" :rules="{'required':(unacceptable_fields.xray_centre_license.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">Menstor</td>
+
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_menstor_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[xray_license_menstor_acceptable]'" :rules="menstorAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_menstor_acceptable][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[xray_license_menstor_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_menstor_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[xray_license_menstor_acceptable]'" :rules="menstorAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_menstor_acceptable][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_menstor_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[xray_license_menstor_acceptable]'" :rules="menstorAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_menstor_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">Mengguna</td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_mengguna_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[xray_license_mengguna_acceptable]'" :rules="menggunaAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_mengguna_acceptable][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[xray_license_mengguna_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_mengguna_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[xray_license_mengguna_acceptable]'" :rules="menggunaAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_mengguna_acceptable][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.xray_license_mengguna_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[xray_license_mengguna_acceptable]'" :rules="menggunaAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[xray_license_mengguna_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end consent -->
+
+                    <!-- maintenance -->
+                    <tr>
+                        <td>4.</td>
+                        <td colspan="2">
+                            Maintenance Of Medical Records Of Examined Foreign Workers.
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[medical_records][not_available]" v-model="unacceptable_fields.medical_records.not_available" value="1" v-validate="medicalRecordsUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Not available" id="unacceptable_fields[medical_records][not_available]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[medical_records][not_available]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[medical_records][not_available]">Not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[medical_records][not_available]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.medical_records.not_available_comment" :field_name="'unacceptable_fields[medical_records][not_available_comment]'" :rules="{'required':(unacceptable_fields.medical_records.not_available)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[medical_records][kept_other_premise]" v-model="unacceptable_fields.medical_records.kept_other_premise" value="1" v-validate="medicalRecordsUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Kept at other premise" id="unacceptable_fields[medical_records][kept_other_premise]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[medical_records][kept_other_premise]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[medical_records][kept_other_premise]">Kept at other premise</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[medical_records][kept_other_premise]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.medical_records.kept_other_premise_comment" :field_name="'unacceptable_fields[medical_records][kept_other_premise_comment]'" :rules="{'required':(unacceptable_fields.medical_records.kept_other_premise)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[medical_records][not_maintained]" v-model="unacceptable_fields.medical_records.not_maintained" value="1" v-validate="medicalRecordsUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Not maintained" id="unacceptable_fields[medical_records][not_maintained]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[medical_records][not_maintained]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[medical_records][not_maintained]">Not maintained</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[medical_records][not_maintained]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.medical_records.not_maintained_comment" :field_name="'unacceptable_fields[medical_records][not_maintained_comment]'" :rules="{'required':(unacceptable_fields.medical_records.not_maintained)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[medical_records][others]" v-model="unacceptable_fields.medical_records.others" value="1" v-validate="medicalRecordsUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[medical_records][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[medical_records][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[medical_records][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[medical_records][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.medical_records.others_comment" :field_name="'unacceptable_fields[medical_records][others_comment]'" :rules="{'required':(unacceptable_fields.medical_records.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.medical_record_maintenance_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[medical_record_maintenance_acceptable]'" :rules="maintenanceAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[medical_record_maintenance_acceptable][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[medical_record_maintenance_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.medical_record_maintenance_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[medical_record_maintenance_acceptable]'" :rules="maintenanceAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[medical_record_maintenance_acceptable][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.medical_record_maintenance_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[medical_record_maintenance_acceptable]'" :rules="maintenanceAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[medical_record_maintenance_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end maintenance -->
+
+                    <!-- facilities -->
+                    <tr>
+                        <td>5.</td>
+                        <td colspan="2">
+                            Adequate Facilities.
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[adequate_facilities][device_not_available]" v-model="unacceptable_fields.adequate_facilities.device_not_available" value="1" v-validate="adequateFacilitiesUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="X-ray machine/device is not available" id="unacceptable_fields[adequate_facilities][device_not_available]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[adequate_facilities][device_not_available]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[adequate_facilities][device_not_available]">X-ray machine/device is not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[adequate_facilities][device_not_available]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.adequate_facilities.device_not_available_comment" :field_name="'unacceptable_fields[adequate_facilities][device_not_available_comment]'" :rules="{'required':(unacceptable_fields.adequate_facilities.device_not_available)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[adequate_facilities][device_not_functioning]" v-model="unacceptable_fields.adequate_facilities.device_not_functioning" value="1" v-validate="adequateFacilitiesUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="X-ray machine/device is not functioning" id="unacceptable_fields[adequate_facilities][device_not_functioning]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[adequate_facilities][device_not_functioning]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[adequate_facilities][device_not_functioning]">X-ray machine/device is not functioning</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[adequate_facilities][device_not_functioning]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.adequate_facilities.device_not_functioning_comment" :field_name="'unacceptable_fields[adequate_facilities][device_not_functioning_comment]'" :rules="{'required':(unacceptable_fields.adequate_facilities.device_not_functioning)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[adequate_facilities][biometric_device]" v-model="unacceptable_fields.adequate_facilities.biometric_device" value="1" v-validate="adequateFacilitiesUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Biometric device not available" id="unacceptable_fields[adequate_facilities][biometric_device]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[adequate_facilities][biometric_device]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[adequate_facilities][biometric_device]">Biometric device not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[adequate_facilities][biometric_device]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.adequate_facilities.biometric_device_comment" :field_name="'unacceptable_fields[adequate_facilities][biometric_device_comment]'" :rules="{'required':(unacceptable_fields.adequate_facilities.biometric_device)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[adequate_facilities][others]" v-model="unacceptable_fields.adequate_facilities.others" value="1" v-validate="adequateFacilitiesUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[adequate_facilities][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[adequate_facilities][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[adequate_facilities][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[adequate_facilities][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.adequate_facilities.others_comment" :field_name="'unacceptable_fields[adequate_facilities][others_comment]'" :rules="{'required':(unacceptable_fields.adequate_facilities.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.adequate_facility_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[adequate_facility_acceptable]'" :rules="facilitiesAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[adequate_facility_comment][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[adequate_facility_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.adequate_facility_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[adequate_facility_acceptable]'" :rules="facilitiesAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[adequate_facility_comment][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.adequate_facility_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[adequate_facility_acceptable]'" :rules="facilitiesAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[adequate_facility_comment][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end facilities -->
+
+                    <!-- films dispatch -->
+                    <tr>
+                        <td>6.</td>
+                        <td colspan="2">
+                            X-ray Films Dispatch Record To XQCC
+                            <div class="form-group">
+                                <label>If Unacceptable, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[dispatch][not_available]" v-model="unacceptable_fields.dispatch.not_available" value="1" v-validate="dispatchUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Not available" id="unacceptable_fields[dispatch][not_available]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[dispatch][not_available]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[dispatch][not_available]">Not available</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[dispatch][not_available]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.dispatch.not_available_comment" :field_name="'unacceptable_fields[dispatch][not_available_comment]'" :rules="{'required':(unacceptable_fields.dispatch.not_available)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[dispatch][kept_other_premise]" v-model="unacceptable_fields.dispatch.kept_other_premise" value="1" v-validate="dispatchUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Kept at other premise" id="unacceptable_fields[dispatch][kept_other_premise]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[dispatch][kept_other_premise]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[dispatch][kept_other_premise]">Kept at other premise</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[dispatch][kept_other_premise]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.dispatch.kept_other_premise_comment" :field_name="'unacceptable_fields[dispatch][kept_other_premise_comment]'" :rules="{'required':(unacceptable_fields.dispatch.kept_other_premise)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[dispatch][not_maintained]" v-model="unacceptable_fields.dispatch.not_maintained" value="1" v-validate="dispatchUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Not maintained" id="unacceptable_fields[dispatch][not_maintained]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[dispatch][not_maintained]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[dispatch][not_maintained]">Not maintained</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[dispatch][not_maintained]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.dispatch.not_maintained_comment" :field_name="'unacceptable_fields[dispatch][not_maintained_comment]'" :rules="{'required':(unacceptable_fields.dispatch.not_maintained)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[dispatch][details_not_complete]" v-model="unacceptable_fields.dispatch.details_not_complete" value="1" v-validate="dispatchUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Details not complete" id="unacceptable_fields[dispatch][details_not_complete]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[dispatch][details_not_complete]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[dispatch][details_not_complete]">Details not complete</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[dispatch][details_not_complete]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.dispatch.details_not_complete_comment" :field_name="'unacceptable_fields[dispatch][details_not_complete_comment]'" :rules="{'required':(unacceptable_fields.dispatch.details_not_complete)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[dispatch][others]" v-model="unacceptable_fields.dispatch.others" value="1" v-validate="dispatchUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[dispatch][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[dispatch][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[dispatch][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[dispatch][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.dispatch.others_comment" :field_name="'unacceptable_fields[dispatch][others_comment]'" :rules="{'required':(unacceptable_fields.dispatch.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.dispatch_record_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[dispatch_record_acceptable]'" :rules="dispatchRecordAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[dispatch_record_acceptable][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[dispatch_record_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.dispatch_record_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[dispatch_record_acceptable]'" :rules="dispatchRecordAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[dispatch_record_acceptable][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.dispatch_record_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[dispatch_record_acceptable]'" :rules="dispatchRecordAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[dispatch_record_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end films dispatch -->
+
+                    <!-- operation hour -->
+                    <tr>
+                        <td rowspan="2">7.</td>
+                        <td colspan="2">
+                            Operation Hour In FOMEMA System:
+                            <div class="form-group form-row">
+                                <div class="col-1 text-center">Weekday</div>
+                                <div class="col-1 text-center">Closed</div>
+                                <div class="col-1 text-center">Open 24Hrs</div>
+                                <div class="col-6 text-center">Operation Hours (24hour clock)</div>
+                                <div class="col-3 text-center text-nowrap">Break Hour (Please Specify)</div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- monday -->
+                                <div class="col-1 text-center">Mon</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[monday_is_close]" v-model="operating_hour.monday_is_close" :disabled="operationHourDisabled" data-vv-as="Mon" class="form-check-input" id="mon_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[monday_is_24_hour]" v-model="operating_hour.monday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="Mon" class="form-check-input" id="mon_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.monday_start" :field_name="'operating_hour[monday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="monday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.monday_end" :field_name="'operating_hour[monday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="monday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.monday_break" :field_name="'operating_hour[monday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <!-- end mon -->
+                            <div class="form-row pb-2">
+                                <!-- tues -->
+                                <div class="col-1 text-center">Tues</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[tuesday_is_close]" v-model="operating_hour.tuesday_is_close" :disabled="operationHourDisabled" data-vv-as="tues" class="form-check-input" id="tues_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[tuesday_is_24_hour]" v-model="operating_hour.tuesday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="tues" class="form-check-input" id="tues_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.tuesday_start" :field_name="'operating_hour[tuesday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="tuesday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.tuesday_end" :field_name="'operating_hour[tuesday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="tuesday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.tuesday_break" :field_name="'operating_hour[tuesday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- wed -->
+                                <div class="col-1 text-center">Wed</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[wednesday_is_close]" v-model="operating_hour.wednesday_is_close" :disabled="operationHourDisabled" data-vv-as="wed" class="form-check-input" id="wed_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[wednesday_is_24_hour]" v-model="operating_hour.wednesday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="wed" class="form-check-input" id="wed_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.wednesday_start" :field_name="'operating_hour[wednesday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="wednesday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.wednesday_end" :field_name="'operating_hour[wednesday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="wednesday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.wednesday_break" :field_name="'operating_hour[wednesday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- thurs -->
+                                <div class="col-1 text-center">Thurs</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[thursday_is_close]" v-model="operating_hour.thursday_is_close" :disabled="operationHourDisabled" data-vv-as="thurs" class="form-check-input" id="thurs_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[thursday_is_24_hour]" v-model="operating_hour.thursday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="thurs" class="form-check-input" id="thurs_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.thursday_start" :field_name="'operating_hour[thursday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="thursday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.thursday_end" :field_name="'operating_hour[thursday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="thursday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.thursday_break" :field_name="'operating_hour[thursday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- fri -->
+                                <div class="col-1 text-center">Fri</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[friday_is_close]" v-model="operating_hour.friday_is_close" :disabled="operationHourDisabled" data-vv-as="fri" class="form-check-input" id="fri_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[friday_is_24_hour]" v-model="operating_hour.friday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="fri" class="form-check-input" id="fri_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.friday_start" :field_name="'operating_hour[friday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="friday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.friday_end" :field_name="'operating_hour[friday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="friday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.friday_break" :field_name="'operating_hour[friday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- sat -->
+                                <div class="col-1 text-center">Sat</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[saturday_is_close]" v-model="operating_hour.saturday_is_close" :disabled="operationHourDisabled" data-vv-as="sat" class="form-check-input" id="sat_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[saturday_is_24_hour]" v-model="operating_hour.saturday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="sat" class="form-check-input" id="sat_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.saturday_start" :field_name="'operating_hour[saturday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="saturday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.saturday_end" :field_name="'operating_hour[saturday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="saturday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.saturday_break" :field_name="'operating_hour[saturday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- sun -->
+                                <div class="col-1 text-center">Sun</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[sunday_is_close]" v-model="operating_hour.sunday_is_close" :disabled="operationHourDisabled" data-vv-as="sun" class="form-check-input" id="sun_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[sunday_is_24_hour]" v-model="operating_hour.sunday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="sun" class="form-check-input" id="sun_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.sunday_start" :field_name="'operating_hour[sunday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="sunday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.sunday_end" :field_name="'operating_hour[sunday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="sunday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.sunday_break" :field_name="'operating_hour[sunday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled">
+                                    </v-textarea>
+                                </div>
+                            </div>
+                            <div class="form-row pb-2">
+                                <!-- public_holiday -->
+                                <div class="col-1 text-center">Public Holidays</div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[public_holiday_is_close]" v-model="operating_hour.public_holiday_is_close" :disabled="operationHourDisabled" data-vv-as="public_holiday" class="form-check-input" id="public_holiday_closed">
+                                </div>
+                                <div class="col-1 text-center form-check">
+                                    <input type="checkbox" name="operating_hour[public_holiday_is_24_hour]" v-model="operating_hour.public_holiday_is_24_hour" :disabled="operationHourDisabled" data-vv-as="public_holiday" class="form-check-input" id="public_holiday_24hours">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.public_holiday_start" :field_name="'operating_hour[public_holiday_start]'" :label="''" :readonly="operationHourDisabled" :validation_label="'Start Time'" id="public_holiday_start"></v-time>
+                                        </div>
+                                        <div class="col-6">
+                                            <v-time v-model="operating_hour.public_holiday_end" :field_name="'operating_hour[public_holiday_end]'" :label="''" :readonly="operationHourDisabled" :validation_label="'End Time'" id="public_holiday_end"></v-time>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <v-textarea v-model="operating_hour.public_holiday_break" :field_name="'operating_hour[public_holiday_break]'" :label="''" :validation_label="'Break Hour'" :readonly="operationHourDisabled"></v-textarea>
+                                </div>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Does The Facility’s Operation Hours Fulfil 8 Hours A Day, 5 Days A Week ?
+                            <div class="form-group">
+                                <label>If Unacceptable/Remark, Please Specify :</label>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[operation_hours][differ_from_system]" v-model="unacceptable_fields.operation_hours.differ_from_system" value="1" v-validate="operationHoursUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Operation hours stated in clinic differ with operation hour in FOMEMA system" id="unacceptable_fields[operation_hours][differ_from_system]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[operation_hours][differ_from_system]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[operation_hours][differ_from_system]">Operation hours stated in clinic differ with operation hour in FOMEMA system</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[operation_hours][differ_from_system]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.operation_hours.differ_from_system_comment" :field_name="'unacceptable_fields[operation_hours][differ_from_system_comment]'" :rules="{'required':(unacceptable_fields.operation_hours.differ_from_system)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[operation_hours][did_not_fulfil_8h5d]" v-model="unacceptable_fields.operation_hours.did_not_fulfil_8h5d" value="1" v-validate="operationHoursUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Facility’s operation hours did not fulfil 8 hours a day, 5 days a week" id="unacceptable_fields[operation_hours][did_not_fulfil_8h5d]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[operation_hours][did_not_fulfil_8h5d]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[operation_hours][did_not_fulfil_8h5d]">Facility’s operation hours did not fulfil 8 hours a day, 5 days a week</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[operation_hours][did_not_fulfil_8h5d]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.operation_hours.did_not_fulfil_8h5d_comment" :field_name="'unacceptable_fields[operation_hours][did_not_fulfil_8h5d_comment]'" :rules="{'required':(unacceptable_fields.operation_hours.did_not_fulfil_8h5d)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <input type="checkbox" name="unacceptable_fields[operation_hours][others]" v-model="unacceptable_fields.operation_hours.others" value="1" v-validate="operationHoursUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[operation_hours][others]">
+                                        <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[operation_hours][others]') }" />
+                                        <label class="form-check-label" for="unacceptable_fields[operation_hours][others]">Others</label>
+                                        <div class="invalid-feedback">
+                                            {{ errors.first('unacceptable_fields[operation_hours][others]') }}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-6 col-md-6">
+                                        <v-textarea v-model="unacceptable_fields.operation_hours.others_comment" :field_name="'unacceptable_fields[operation_hours][others_comment]'" :rules="{'required':(unacceptable_fields.operation_hours.others)}" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.operating_hour_acceptable" :radio_value="'Y'" :field_name="'visit_report_xray_facility[operating_hour_acceptable]'" :rules="operatingHourAcceptableRule" :label="'Yes'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[operating_hour_acceptable][yes]'"></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[operating_hour_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.operating_hour_acceptable" :radio_value="'N'" :field_name="'visit_report_xray_facility[operating_hour_acceptable]'" :rules="operatingHourAcceptableRule" :label="'No'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[operating_hour_acceptable][no]'"></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio v-model="visit_report_data.visit_report_xray_facility.operating_hour_acceptable" :radio_value="'NA'" :field_name="'visit_report_xray_facility[operating_hour_acceptable]'" :rules="operatingHourAcceptableRule" :label="'N/A'" :validation_label="'Acceptable'" :disabled="formDisabled" :id="'visit_report_xray_facility[operating_hour_acceptable][na]'"></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end operation hour -->
+
+                    <tr>
+                        <td>8.</td>
+                        <td colspan="5">
+                            <div class="form-group" style="width: 78%;">
+                                
+                                    <label>Others, Please Specify :</label>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][closed_during_visit]" v-model="unacceptable_fields.others.closed_during_visit" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="X-ray facility closed during inspectorate visit" id="unacceptable_fields[others][closed_during_visit]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][closed_during_visit]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][closed_during_visit]">X-ray facility closed during inspectorate visit</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][closed_during_visit]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.closed_during_visit_comment" :field_name="'unacceptable_fields[others][closed_during_visit_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][shifted_location]" v-model="unacceptable_fields.others.shifted_location" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Clinic shifted to another location" id="unacceptable_fields[others][shifted_location]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][shifted_location]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][shifted_location]">Clinic shifted to another location</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][shifted_location]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.shifted_location_comment" :field_name="'unacceptable_fields[others][shifted_location_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][does_not_exist]" v-model="unacceptable_fields.others.does_not_exist" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Clinic does not exist at the registered premise" id="unacceptable_fields[others][does_not_exist]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][does_not_exist]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][does_not_exist]">Clinic does not exist at the registered premise</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][does_not_exist]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.does_not_exist_comment" :field_name="'unacceptable_fields[others][does_not_exist_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][differ_from_registration]" v-model="unacceptable_fields.others.differ_from_registration" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Clinic name differs with 'FOMEMA' registration" id="unacceptable_fields[others][differ_from_registration]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][differ_from_registration]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][differ_from_registration]">Clinic name differs with 'FOMEMA' registration</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][differ_from_registration]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.differ_from_registration_comment" :field_name="'unacceptable_fields[others][differ_from_registration_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][license_resigned]" v-model="unacceptable_fields.others.license_resigned" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Registered x-ray license resigned" id="unacceptable_fields[others][license_resigned]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][license_resigned]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][license_resigned]">Registered x-ray license resigned</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][license_resigned]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.license_resigned_comment" :field_name="'unacceptable_fields[others][license_resigned_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][license_pass_away]" v-model="unacceptable_fields.others.license_pass_away" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Registered x-ray license passed away" id="unacceptable_fields[others][license_pass_away]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][license_pass_away]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][license_pass_away]">Registered x-ray license passed away</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][license_pass_away]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.license_pass_away_comment" :field_name="'unacceptable_fields[others][license_pass_away_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][license_withdraw]" v-model="unacceptable_fields.others.license_withdraw" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Registered x-ray license wants to withdraw as FOMEMA panel" id="unacceptable_fields[others][license_withdraw]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][license_withdraw]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][license_withdraw]">Registered x-ray license wants to withdraw as FOMEMA panel</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][license_withdraw]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.license_withdraw_comment" :field_name="'unacceptable_fields[others][license_withdraw_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][interrelated_facilities]" v-model="unacceptable_fields.others.interrelated_facilities" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Interrelated facilities" id="unacceptable_fields[others][interrelated_facilities]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][interrelated_facilities]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][interrelated_facilities]">Interrelated facilities</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][interrelated_facilities]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.interrelated_facilities_comment" :field_name="'unacceptable_fields[others][interrelated_facilities_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][refuse_to_cooperate]" v-model="unacceptable_fields.others.refuse_to_cooperate" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Doctor/staff refuse to cooperate" id="unacceptable_fields[others][refuse_to_cooperate]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][refuse_to_cooperate]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][refuse_to_cooperate]">Doctor/staff refuse to cooperate</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][refuse_to_cooperate]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.refuse_to_cooperate_comment" :field_name="'unacceptable_fields[others][refuse_to_cooperate_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][xray_examination_not_done]" v-model="unacceptable_fields.others.xray_examination_not_done" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="All x-ray examination  were not done at registered facilities" id="unacceptable_fields[others][xray_examination_not_done]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][xray_examination_not_done]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][xray_examination_not_done]">All x-ray examination were not done at registered facilities</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][xray_examination_not_done]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.xray_examination_not_done_comment" :field_name="'unacceptable_fields[others][xray_examination_not_done_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][inhouse_facility]" v-model="unacceptable_fields.others.inhouse_facility" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="In-house x-ray facility" id="unacceptable_fields[others][inhouse_facility]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][inhouse_facility]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][inhouse_facility]">In-house x-ray facility</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][inhouse_facility]') }}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <v-textarea v-model="unacceptable_fields.others.inhouse_facility_comment" :field_name="'unacceptable_fields[others][inhouse_facility_comment]'" :label="''" :validation_label="'Comment'" :readonly="formReadOnly"></v-textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6 col-md-6">
+                                            <input type="checkbox" name="unacceptable_fields[others][others]" v-model="unacceptable_fields.others.others" value="1" v-validate="othersUnacceptableRule" data-vv-as="'Unacceptable(s)/Others'" :disabled="formDisabled" data-vv-as="Others" id="unacceptable_fields[others][others]">
+                                            <input class="form-control" type="hidden" :class="{ 'is-invalid': errors.has('unacceptable_fields[others][others]') }" />
+                                            <label class="form-check-label" for="unacceptable_fields[others][others]">Others</label>
+                                            <div class="invalid-feedback">
+                                                {{ errors.first('unacceptable_fields[others][others]') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- remarks -->
+                    <tr>
+                        <td>9.</td>
+                        <td colspan="5">
+                            <div class="form-group form-row">
+                                <div class="col-sm-8">
+                                    <v-textarea v-model="visit_report_data.follow_up" :field_name="'visit_report[follow_up]'" :label="'Remarks/Follow Up'" :readonly="formReadOnly"></v-textarea>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end remarks -->
+
+                    <!-- satisfactory -->
+                    <tr>
+                        <td>10.</td>
+                        <td colspan="5">
+                            <div class="form-group form-check">
+
+                                <input type="checkbox" name="visit_report_xray_facility[satisfactory]" v-model="visit_report_data.visit_report_xray_facility.satisfactory" :disabled="satisfactoryDisabled" v-validate="satisfactoryRule" data-vv-as="Satisfactory" class="form-check-input" id="visit_report_xray_facility[satisfactory]" @input="satisfactoryChange">
+                                <label class="form-check-label" for="visit_report_xray_facility[satisfactory]">Satisfactory(S)</label>
+
+                            </div>
+                            <div class="form-group">SOP Non-Compliance</div>
+
+                            <div class="form-row">
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[non_verify_original_passport_fw_present]" v-model="visit_report_data.visit_report_xray_facility.non_verify_original_passport_fw_present" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Non Verification Of Original Passport - FW Present (Y)" class="form-check-input" id="visit_report_xray_facility[non_verify_original_passport_fw_present]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[non_verify_original_passport_fw_present]">Non Verification Of Original Passport - FW Present (Y)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[no_xray_license_for_mengguna]" v-model="visit_report_data.visit_report_xray_facility.no_xray_license_for_mengguna" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="No X-Ray License For 'Mengguna' (M)" class="form-check-input" id="visit_report_xray_facility[no_xray_license_for_mengguna]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[no_xray_license_for_mengguna]">No X-Ray License For 'Mengguna' (M)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[non_verify_original_passport_fw_not_present]" v-model="visit_report_data.visit_report_xray_facility.non_verify_original_passport_fw_not_present" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Non Verification Of Original Passport - FW Not Present (N)" class="form-check-input" id="visit_report_xray_facility[non_verify_original_passport_fw_not_present]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[non_verify_original_passport_fw_not_present]">Non Verification Of Original Passport - FW Not Present (N)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[inadequate_equipment]" v-model="visit_report_data.visit_report_xray_facility.inadequate_equipment" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Inadequate Facility (I)" class="form-check-input" id="visit_report_xray_facility[inadequate_equipment]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[inadequate_equipment]">Inadequate Facility (I)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[dispatch_record_to_xqcc]" v-model="visit_report_data.visit_report_xray_facility.dispatch_record_to_xqcc" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="X-Ray Films Dispatch Record to XQCC (X)" class="form-check-input" id="visit_report_xray_facility[dispatch_record_to_xqcc]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[dispatch_record_to_xqcc]">X-Ray Films Dispatch Record to XQCC (X)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[unable_to_produce_apc]" v-model="visit_report_data.visit_report_xray_facility.unable_to_produce_apc" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Unable To Produce APC (A)" class="form-check-input" id="visit_report_xray_facility[unable_to_produce_apc]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[unable_to_produce_apc]">Unable To Produce APC (A)</label>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[no_produce_medical_record]" v-model="visit_report_data.visit_report_xray_facility.no_produce_medical_record" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Unable To Produce Medical Records (R)" class="form-check-input" id="visit_report_xray_facility[no_produce_medical_record]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[no_produce_medical_record]">Unable To Produce Medical Records (R)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[expired_license_menstor_mengguna]" v-model="visit_report_data.visit_report_xray_facility.expired_license_menstor_mengguna" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Expired License For 'Menstor' And 'Mengguna' (E)" class="form-check-input" id="visit_report_xray_facility[expired_license_menstor_mengguna]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[expired_license_menstor_mengguna]">Expired License For 'Menstor' And 'Mengguna' (E)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[closed]" v-model="visit_report_data.visit_report_xray_facility.closed" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Clinic Closed (P)" class="form-check-input" id="visit_report_xray_facility[closed]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[closed]">Clinic Closed (P)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[insufficient_operation_hour]" v-model="visit_report_data.visit_report_xray_facility.insufficient_operation_hour" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Insufficient Operation Hours (Less Than 8 Hours) (H)" class="form-check-input" id="visit_report_xray_facility[insufficient_operation_hour]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[insufficient_operation_hour]">Insufficient Operation Hours (Less Than 8 Hours) (H)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[no_produce_borang_b]" v-model="visit_report_data.visit_report_xray_facility.no_produce_borang_b" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Unable To Produce Borang B(B)" class="form-check-input" id="visit_report_xray_facility[no_produce_borang_b]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[no_produce_borang_b]">Unable To Produce Borang B(B)</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" name="visit_report_xray_facility[other]" v-model="visit_report_data.visit_report_xray_facility.other" :disabled="sopNonComplianceDisabled" v-validate="sopNonComplianceRule" data-vv-as="Others (K)" class="form-check-input" id="visit_report_xray_facility[other]" @input="nonComplianceChange">
+                                        <label class="form-check-label" for="visit_report_xray_facility[other]">Others (K)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group form-row">
+                                <div class="col-sm-8">
+                                    <v-textarea v-model="visit_report_data.visit_report_xray_facility.other_comment" :field_name="'visit_report_xray_facility[other_comment]'" :rules="otherCommentRule" :label="'Others, Please Specify'" :validation_label="'Others'" :readonly="sopNonComplianceReadOnly" :id="'other_comment'"></v-textarea>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end satisfactory -->
+
+                    <!-- recommendations -->
+                    <tr>
+                        <td>11.</td>
+                        <td colspan="5">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <label class="required" for="visit_report_xray_facility[recommendation]">Recommendations</label>
+                                        <select class="form-control" v-validate="recommendationsRule" name="visit_report_xray_facility[recommendation]" data-vv-as="Recommendation" v-model="visit_report_data.visit_report_xray_facility.recommendation" id="recommendations" :class="{ 'is-invalid': errors.has('visit_report_xray_facility[recommendation]') }" :disabled="formReadOnly">
+                                            <option disabled value="">Select option</option>
+                                            <option v-for="(value, key) in recommendations" :value="key">{{ value }}</option>
+                                        </select>
+                                        <div class="invalid-feedback">{{ errors.first('visit_report_xray_facility[recommendation]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6" v-if="visit_report_data.visit_report_xray_facility.recommendation && visit_report_data.visit_report_xray_facility.recommendation != 'SATISFACTORY'">
+                                        <v-date v-model="visit_report_data.visit_report_xray_facility.recommendation_date" :field_name="'visit_report_xray_facility[recommendation_date]'" :label="'Date'" :rules="recommendationDateRule" :readonly="formReadOnly" validation_label="'Recommendation Date'" id="recommendation_date" :min_date="recommendationDateMin"></v-date>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end recommendations -->
+
+                    <!-- prepared by -->
+                    <tr>
+                        <td>12.</td>
+                        <td colspan="5">
+                            Prepared
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <label class="form-label required" for="visit_report[prepare_by]">By</label>
+                                        <select class="form-control" v-validate="preparedByRule" name="visit_report[prepare_by]" data-vv-as="Prepare By" v-model="visit_report_data.prepare_by" id="prepare_by" :disabled="formDisabled" :class="{ 'is-invalid': errors.has('visit_report[prepare_by]') }">
+                                            <option v-for="(visitor, index) in org_users" :value="visitor.id" :class="{ 'is-invalid': errors.has('visit_report[prepare_by]') }">{{ visitor.name }}</option>
+                                        </select>
+                                        <div class="invalid-feedback">{{ errors.first('visit_report[prepare_by]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <v-date v-model="visit_report_data.prepare_at" :field_name="'visit_report[prepare_at]'" :label="'Date'" :rules="preparedDateRule" :readonly="formReadOnly" validation_label="'Prepared Date'" id="prepare_at"></v-date>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end prepared by -->
+                </tbody>
+            </table>
+
+            <!-- hidden fields -->
+
+            <input type="hidden" name="visit_report[visit_plan_id]" v-model="visit_report_data.visit_plan_id" value="">
+            <input type="hidden" name="visit_report[visit_plan_item_id]" v-model="visit_report_data.visit_plan_item_id" value="">
+            <input type="hidden" name="visit_report[visitable_type]" v-model="visit_report_data.visitable_type" value="">
+            <input type="hidden" name="visit_report[visitable_id]" v-model="visit_report_data.visitable_id" value="">
+            <input type="hidden" name="visit_report_xray_facility[xray_facility_id]" v-model="visit_report_data.visit_plan_item.visitable.id" value="">
+
+            <!-- to update db boolean col (boolean column wont update with checkbox) -->
+
+            <input type="hidden" name="visit_report_xray_facility[satisfactory]" v-model="visit_report_data.visit_report_xray_facility.satisfactory" value="">
+            <input type="hidden" name="visit_report_xray_facility[non_verify_original_passport_fw_present]" v-model="visit_report_data.visit_report_xray_facility.non_verify_original_passport_fw_present" value="">
+            <input type="hidden" name="visit_report_xray_facility[non_verify_original_passport_fw_not_present]" v-model="visit_report_data.visit_report_xray_facility.non_verify_original_passport_fw_not_present" value="">
+            <input type="hidden" name="visit_report_xray_facility[unable_to_produce_apc]" v-model="visit_report_data.visit_report_xray_facility.unable_to_produce_apc" value="">
+            <input type="hidden" name="visit_report_xray_facility[no_xray_license_for_mengguna]" v-model="visit_report_data.visit_report_xray_facility.no_xray_license_for_mengguna" value="">
+            <input type="hidden" name="visit_report_xray_facility[inadequate_equipment]" v-model="visit_report_data.visit_report_xray_facility.inadequate_equipment" value="">
+            <input type="hidden" name="visit_report_xray_facility[dispatch_record_to_xqcc]" v-model="visit_report_data.visit_report_xray_facility.dispatch_record_to_xqcc" value="">
+            <input type="hidden" name="visit_report_xray_facility[insufficient_operation_hour]" v-model="visit_report_data.visit_report_xray_facility.insufficient_operation_hour" value="">
+            <input type="hidden" name="visit_report_xray_facility[expired_license_menstor_mengguna]" v-model="visit_report_data.visit_report_xray_facility.expired_license_menstor_mengguna" value="">
+            <input type="hidden" name="visit_report_xray_facility[no_produce_medical_record]" v-model="visit_report_data.visit_report_xray_facility.no_produce_medical_record" value="">
+            <input type="hidden" name="visit_report_xray_facility[closed]" v-model="visit_report_data.visit_report_xray_facility.closed" value="">
+            <input type="hidden" name="visit_report_xray_facility[no_produce_borang_b]" v-model="visit_report_data.visit_report_xray_facility.no_produce_borang_b" value="">
+            <input type="hidden" name="visit_report_xray_facility[other]" v-model="visit_report_data.visit_report_xray_facility.other" value="">
+
+            <select multiple name="visit_report_visitors[]" id="hidden_visit_report_visitors" class="hidden">
+                <option selected="selected" v-for="(visitor, index) in selected_visitors" :value="JSON.stringify(visitor)">{{ visitor.name }}</option>
+            </select>
+
+            <input type="hidden" name="visit_report_xray_facility[unacceptable_fields]" id="hidden_unacceptable_fields" v-model="unacceptable_fields_string">
+
+            <input type="hidden" name="submit_action" v-model="submit_action" />
+
+            <!-- end hidden fields -->
+
+            <!-- on approve -->
+            <%= render 'internal/visit_reports/shared/card_approval' %>
+            <!-- end on approve -->
+
+        </form>
+
+    </div>
+
+</div>
+
+<%= render 'internal/visit_reports/xray_facilities/personnel_modal' %>
+<%= render 'internal/visit_reports/xray_facilities/fomema_officer_modal' %>
+<%= render 'internal/visit_reports/shared/submit_to_clinic' %>
+
+<%= stylesheet_link_tag "inspectorate/inspectorate" %>
+
+<% content_for :page_end_scripts do %>
+    <!-- [NOTE]*** custom signature script due to library canvas only has 1 id resulting in multiple signature canvas not working -->
+    <%= render "internal/visit_reports/shared/doctor_xray_signature_script" %>
+    <%= render "internal/visit_reports/shared/doctor_xray_script" %>
+<% end %>

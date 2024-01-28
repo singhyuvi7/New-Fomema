@@ -1,0 +1,61 @@
+<div class="card">
+    <div class="card-header">
+        <strong>IT - Insurance Reports</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+
+        <div class="row-fluid">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active nav-item">
+                    <a class="nav-link active show" href="#insurance_purchased" data-target="#insurance_purchased" data-toggle="tab">Insurance Purchased</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#insurance_purchased_summary" data-target="#insurance_purchased_summary" data-toggle="tab">Summary of Insurance Purchased</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#insurance_purchased_daily" data-target="#insurance_purchased_daily" data-toggle="tab">Insurance Purchased Daily</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active fade in active show" id="insurance_purchased">
+                    <%=render "/internal/reports/it/insurances/filter", filter_link: insurance_purchase_internal_it_reports_path, report_id: 'insurance_purchased' %>
+                    <%=render "/internal/reports/it/insurances/preview_table" %>
+                </div>
+                <div class="tab-pane" id="insurance_purchased_summary">
+                    <%=render "/internal/reports/it/insurances/filter", filter_link: summary_insurance_purchase_internal_it_reports_path, report_id: 'insurance_purchased_summary' %>
+                    <%=render "/internal/reports/it/insurances/preview_table" %>
+                </div>
+                <div class="tab-pane" id="insurance_purchased_daily">
+                    <%=render "/internal/reports/it/insurances/filter", filter_link: insurance_purchased_daily_internal_it_reports_path, report_id: 'insurance_purchased_daily' %>
+                    <%=render "/internal/reports/it/insurances/preview_table" %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+    $(document).ready(function() {
+        if (param('report_id')) {
+            $("a[href='#" + param('report_id') + "']").tab("show");
+        }
+        $(document.body).on("click", "a[data-toggle='tab']", function(event) {
+            location.hash = this.getAttribute("href");
+            $('form'+$(event.target).data("target")).submit()
+        });
+    });
+    $(window).on("popstate", function() {
+        var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+        $("a[href='" + anchor + "']").tab("show");
+    });
+    function param(name) {
+        return (location.search.split(name + '=')[1] || '').split('&')[0];
+    }
+    </script>
+<% end %>

@@ -1,0 +1,176 @@
+<!-- for debug -->
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css' %>
+<!-- end debug -->
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/visit_report_explanation_letter" %>
+
+<%
+    visit_report_details = @visit_report.visit_report_xray_facility
+    service_provider = @visit_report&.visitable
+    unacceptable_fields = JSON.parse(visit_report_details&.unacceptable_fields || {})
+    finding_number = 1
+    finding_arr = [].each_with_object(Hash.new(0)) { |name, hash| hash[name] += 1 }
+    is_more_than_1_nc_selected = (finding_arr['N'] > 1)
+%>
+
+<div class="explanation-letter page-container">
+    <div class="header">
+        <div><span class="label">Our Ref.</span>: <%= @visit_report.explanation_letter_reference %></div>
+        <div><span class="label">Date</span>: <%= Date.today.strftime('%d.%m.%Y') %></div>
+    </div>   
+    <br>
+    <br>
+    <div class="letter-to">
+        <div class="sp-name-code bold">DR. <%= visit_report_details&.license_holder_name %> (<%= service_provider&.code %>)</div>
+        <div class="sp-facility-name bold"><%= service_provider&.name %></div>
+        <div class="address"><%= service_provider&.address1 if !service_provider&.address1.blank? %></div>
+        <div class="address"><%= service_provider&.address2 if !service_provider&.address2.blank? %></div>
+        <div class="address"><%= service_provider&.address3 if !service_provider&.address3.blank? %></div>
+        <div class="address"><%= service_provider&.address4 if !service_provider&.address4.blank? %></div>
+        <div class="address"> <%= "#{service_provider&.postcode} #{service_provider&.town&.name}," %></div>
+        <div class="address"><%= service_provider&.state&.name %>.</div>
+    </div>
+
+    <div class="content">
+        <div>Dear Doctor,</div>
+        <br>
+        <p class="letter-title bold">INSPECTORATE VISIT FINDING(S)</p>
+        <p>
+            We would like to refer to the Inspectorate visit to your clinic on <%= @visit_report.visit_date.try(:strftime,'%d.%m.%Y') %>.<br>
+            We wish to express our appreciation for the hospitality extended to the Inspectorate Team during the visit.
+        </p>
+        <p>The following <%= is_more_than_1_nc_selected ? 'findings have been' : 'finding has been' %> discovered during our inspectorate visit:</p>
+
+        <!-- findings -->
+        <div class="findings">
+            <% if visit_report_details&.foreign_worker_present_acceptable == 'N' %>
+                <ol class="finding-list" start="<%= finding_number %>">
+                    <% finding_number += 1 %>
+                    <li class="bold">Verification of identity of foreign worker</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['foreign_worker'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::FIELD_FOREIGN_WORKER[key] %><%= " - #{unacceptable_fields['foreign_worker']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                </ol>
+            <% end %>
+
+            <ol class="finding-list" start="<%= finding_number %>">
+                <% if visit_report_details&.apc_acceptable == 'N' %>
+                    <% finding_number += 1 %>
+                    <li class="bold">a. Valid Annual Practicing Certificate (APC)</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['apc'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::APC[key] %><%= " - #{unacceptable_fields['apc']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                <% end %>
+
+                <% if visit_report_details&.private_healthcare_registration_number_acceptable == 'N' %>
+                    <% 
+                        finding_number = finding_number+1 if visit_report_details&.apc_acceptable != 'N' 
+                        title = "Registration under Private Healthcare Facilities and Service Act 1998"
+                    %>
+                    <% if visit_report_details&.apc_acceptable != 'N' %>
+                        <li class="bold">a. <%= title %></li>
+                    <% else %>
+                        <div class="bold sub-finding">b. <%= title %></div>
+                    <% end %>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['registration_number'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::REGISTRATION_NUMBER[key] %><%= " - #{unacceptable_fields['registration_number']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                <% end %>
+            </ol>
+
+            <% if [visit_report_details&.xray_license_menstor_acceptable, visit_report_details&.xray_license_mengguna_acceptable].include?('N') %>
+                <ol class="finding-list" start="<%= finding_number %>">
+                    <% finding_number += 1 %>
+                    <li class="bold">X-ray Centre License</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['xray_centre_license'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::FIELD_XRAY_CENTRE_LICENSE[key] %><%= " - #{unacceptable_fields['xray_centre_license']["#{key}_comment"]&.downcase}" %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                </ol>
+            <% end %>
+
+            <% if visit_report_details&.medical_record_maintenance_acceptable == 'N' %>
+                <ol class="finding-list" start="<%= finding_number %>">
+                    <% finding_number += 1 %>
+                    <li class="bold">Maintenance Of Medical Records Of Examined Foreign Workers.</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['medical_records'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::MEDICAL_RECORDS[key] %><%= " - #{unacceptable_fields['medical_records']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                </ol>
+            <% end %>
+
+            <% if visit_report_details&.adequate_facility_acceptable == 'N' %>
+                <ol class="finding-list" start="<%= finding_number %>">
+                    <% finding_number += 1 %>
+                    <li class="bold">Adequate facilities</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['adequate_facilities'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::FIELD_ADEQUATE_FACILITIES[key] %><%= " - #{unacceptable_fields['adequate_facilities']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                </ol>
+            <% end %>
+
+            <% if visit_report_details&.dispatch_record_acceptable == 'N' %>
+                <ol class="finding-list" start="<%= finding_number %>">
+                    <% finding_number += 1 %>
+                    <li class="bold">X-ray Films Dispatch Record To XQCC</li>
+                    <ol class="finding-items">
+                        <% unacceptable_fields['dispatch'].each do |key, value| %>
+                            <% if value == true %>
+                                <li><%= VisitReportXrayFacility::FIELD_DISPATCH[key] %><%= " - #{unacceptable_fields['dispatch']['others_comment']&.downcase}" if ['others'].include?(key) %></li>
+                            <% end %>
+                        <% end %>
+                    </ol>
+                </ol>
+            <% end %>
+
+        </div>
+    </div>
+    
+    <!-- closings -->
+    <div class="closings">
+        <% if visit_report_details.other %>
+            <p class="raw-overflow"><%= raw visit_report_details&.other_comment.gsub(/\n/, '<br>').html_safe %></p>
+        <% end %>
+
+        <p>
+        Please provide us with a <b>written explanation</b> as regards to the above matter and the measures that you have taken to remedy the above short-comings within <b>fourteen (14) days</b> from the date of this letter. We hope that we can work together to ensure that the medical examination being carried out on foreign workers' is of the highest standard.
+        </p>
+
+        <p>Thank you.</p>
+
+        <div class="signature">
+            <div>Yours faithfully,</div>
+            <div class="bold"><%= @company_name %></div>
+            <div class="signature-space"></div>
+            <div><%= TemplateVariable.find_by_code('INSPECTORATE_LETTER_SIGNEE_NAME')&.value %></div>
+            <div><%= TemplateVariable.find_by_code('INSPECTORATE_LETTER_SIGNEE_POSITION')&.value %></div>
+            <div>Inspectorate, LQCC and KMC Department</div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+</div>

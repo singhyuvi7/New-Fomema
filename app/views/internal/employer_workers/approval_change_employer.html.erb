@@ -1,0 +1,30 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Change Employer</strong> - Approval
+    </div>
+    <%= form_for @foreign_worker, url: approval_change_employer_internal_employer_employer_workers_path, html: {class: "#{params[:action]}_foreign_worker foreign_worker-form"} do |form| %>
+        <div class="card-body">
+            <%= render 'form_change_employer_readonly', { form: form } %>
+            <div class="card">
+                <div class="card-body">
+                    <div>
+                        <input type="hidden" id="fw_change_employer_id" name="fw_change_employer_id" value=<%= @fw_change_employer.id %>>
+                    </div>
+                    <div>
+                        Requested By: <%= "#{@fw_change_employer&.request_user&.name} - #{@fw_change_employer&.request_user&.username}" %>
+                    </div>
+                    <div>
+                        Assigned To: <%= "#{@fw_change_employer&.assigned_to_user&.name}" %>
+                    </div>
+                    <p>
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(internal_employer_employer_workers_path) %>
+            <%=raw approval_submit_decision_button %>
+        </div>
+    <% end %>
+</div>

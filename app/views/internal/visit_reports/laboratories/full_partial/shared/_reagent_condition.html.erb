@@ -1,0 +1,18 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <div class="font-weight-bold">Reagent Condition</div>
+        <%= form_shared.label :reagent_condition_expiry_date, 'Expiry Date' %>
+        <%= form_shared.date_field :reagent_condition_expiry_date, class: 'form-control expiry-date-field' %>
+    </td>
+    <td class="text-right table-acceptable">
+        <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="<%= tab_name %>">
+            <label class="btn btn-outline-success">
+                <%= form_shared.radio_button :reagent_condition, 'YES', class: "#{tab_name}" %> Acceptable
+            </label>
+            <label class="btn btn-outline-danger">
+                <%= form_shared.radio_button :reagent_condition, 'NO', class: "#{tab_name}" %> Not Acceptable
+            </label>
+        </div>
+    </td>
+</tr>

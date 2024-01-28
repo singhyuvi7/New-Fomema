@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<script>
+    function number_pages() {
+        var vars = {};
+        var x = document.location.search.substring(1).split('&');
+        for (var i in x) {
+            var z = x[i].split('=', 2);
+            vars[z[0]] = unescape(z[1]);
+        }
+        var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+        for (var i in x) {
+            var y = document.getElementsByClassName(x[i]);
+            for (var j = 0; j < y.length; ++j) y[j].textContent = vars[x[i]];
+        }
+    }
+</script>
+
+<body onload="number_pages()" class="header-body">
+    <div class="header">
+        <div class="title">
+            <span class="float-left">MyIMMS Error Alert</span>
+            <span class="page-counter float-right bold">Page: <span class="page"></span>/<span class="topage"></span>
+        </div>
+        <div class="email-from"><%= @company_name.to_s.upcase %> <%= '<'+@email_from+'>' %>
+        </div>
+        <div class="cron-datetime"><%= @date %> <%= @time %></div>
+        <div class="email-to">To: <%= @email_to_name %> <%= '<'+@email_to+'>' %>
+        </div>
+        <div class="table-title">
+            Transaction(s) with MyIMMS Error
+        </div>
+    </div>
+</body>
+
+<style>
+    .header-body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .header {
+        font-weight: bold;
+    }
+
+    .title {
+        font-size: 16px;
+        color: #808080;
+        padding-bottom: 1rem;
+    }
+
+    .float-right {
+        float: right;
+    }
+
+    .email-from {
+        font-size: 14px;
+        padding-bottom: 5px;
+    }
+
+    .cron-datetime {
+        font-size: 12px;
+        color: #808080;
+        padding-bottom: 5px;
+    }
+
+    .email-to {
+        font-size: 12px;
+        padding-bottom: 1rem;
+    }
+
+    .header-banner {
+        border: 2px solid black;
+        padding: 5px;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-title {
+        font-size: 18px;
+        color: #808080;
+        padding-bottom: 1rem;
+    }
+</style>
+
+</html>

@@ -1,0 +1,121 @@
+<%= wicked_pdf_stylesheet_link_tag "internal/pdf/registration_invoice" %>
+
+<div class="invoice page-container">
+
+    <div class="row">
+        <div class="col-6">
+            <%= @debug ? image_tag(image_path('logo/fomema-logo.png'), style: "width: 150px") : wicked_pdf_image_tag('logo/fomema-logo.png', style: "width: 150px") %>
+        </div>
+        <div class="col-6">
+            <table align="right">
+                <tr>
+                    <td colspan="2" nowrap>
+                        <b><%=raw SystemConfiguration.get("COMPANY_NAME_INVOICE") %><%=raw " (#{SystemConfiguration.get("COMPANY_REGNO_GLOBAL")})" if !SystemConfiguration.get("COMPANY_REGNO_GLOBAL").blank? %></b>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right">
+                        <%=raw SystemConfiguration.get("COMPANY_ADDR") %>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap>Tel : <%=raw SystemConfiguration.get("COMPANY_PHONE") %></td>
+                    <td nowrap>Fax : <%=raw SystemConfiguration.get("COMPANY_FAX") %></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center invoice-title" style="margin-top: 50px"><b><%= @title || "CREDIT NOTE" %></b></div>
+
+    <div class="row">
+        <div class="col-1">
+            <p>To :</p>
+        </div>
+        <div class="col-5">
+            <p>
+                <%= @refund.customerable&.name %>
+                <%=raw "<br>#{@refund.customerable&.address1}" if !@refund.customerable&.address1.blank? %>
+                <%=raw "<br>#{@refund.customerable&.address2}" if !@refund.customerable&.address2.blank? %>
+                <%=raw "<br>#{@refund.customerable&.address3}" if !@refund.customerable&.address3.blank? %>
+                <%=raw "<br>#{@refund.customerable&.address4}" if !@refund.customerable&.address4.blank? %>
+                <div class="row">
+                    <div class="col-6">
+                        <%= @refund.customerable&.postcode %>
+                    </div>
+                    <div class="col-6">
+                        <%= @refund.customerable&.state&.name %>
+                    </div>
+                </div>
+            </p>
+        </div>
+        <div class="col-2">
+        </div>
+        <div class="col-4">
+            <p>CN No. : &nbsp; &nbsp; &nbsp; <%= @refund.code %></p>
+            <p>Date &nbsp; &nbsp; : &nbsp; &nbsp; &nbsp; <%= @refund.date&.strftime(get_standard_date_format) %></p>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 100px;">
+        <div class="col-4">
+        </div>
+        <div class="col-8">
+            <table class="invoice-table table-sm">
+                <thead>
+                    <tr>
+                        <th class="col-3"><%= @refund.customerable.class.name %> Code</th>
+                        <th class="col-3">Order No.</th>
+                        <th class="col-3">Date of Order</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center"><%= @refund.customerable&.code %></td>
+                        <td class="text-center"><%= @invoice.code if @invoice %></td>
+                        <td class="text-center"><%= @invoice.date.strftime(get_standard_date_format) if @invoice %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <table class="invoice-table table-sm">
+        <thead>
+            <tr>
+                <th style="width: 80%">Description</th>
+                <th style="width: 20%">Total (RM)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><%= @description || Refund::CATEGORIES[@refund.category] %></td>
+                <td class="text-right"><%= number_with_precision(@refund.amount, precision: 2) %></td>
+            </tr>
+            <tr>
+                <td class="text-right">Total</td>
+                <td class="text-right"><%= number_with_precision(@refund.amount, precision: 2) %></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <p>REASON FOR REFUND : <%= @refund_reason %></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-12 text-right">
+            Authorised Signatory
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 100px;">
+        <div class="col-12 text-right">
+            <div style="border-top: 1px solid black;padding-top: 10px;display: inline-block">
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <%=raw SystemConfiguration.get("COMPANY_NAME_INVOICE") %><%=raw " (#{SystemConfiguration.get("COMPANY_REGNO_GLOBAL")})" if !SystemConfiguration.get("COMPANY_REGNO_GLOBAL").blank? %>
+            </div>
+        </div>
+    </div>
+
+</div>

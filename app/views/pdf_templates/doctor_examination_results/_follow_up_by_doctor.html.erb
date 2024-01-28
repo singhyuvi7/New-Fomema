@@ -1,0 +1,83 @@
+<%
+    follow_up_index = 1
+
+    follow_up = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'YES',
+            no: 'NO',
+            date: 'DATE (DD/MM/YYYY)'
+        },{
+            number: '',
+            name: 'Health Office has been notified.',
+            yes: @doctor_exam.try(:notified_health_office),
+            no: !@doctor_exam.try(:notified_health_office),
+            date: @doctor_exam.try(:notified_health_office_date).present? ? @doctor_exam.try(:notified_health_office_date).strftime("%d/%m/%Y") : ""
+        },{
+            number: '',
+            name: 'Case referred to Government Hospital',
+            yes: @doctor_exam.try(:referred_to_government_hospital),
+            no: !@doctor_exam.try(:referred_to_government_hospital),
+            date: @doctor_exam.try(:referred_to_government_hospital_date).present? ? @doctor_exam.try(:referred_to_government_hospital_date).strftime("%d/%m/%Y") : ""
+        },{
+            number: '',
+            name: 'Case referred to a Private Hospital.',
+            yes: @doctor_exam.try(:referred_to_private_hospital),
+            no: !@doctor_exam.try(:referred_to_private_hospital),
+            date: @doctor_exam.try(:referred_to_private_hospital_date).present? ? @doctor_exam.try(:referred_to_private_hospital_date).strftime("%d/%m/%Y") : ""
+        },{
+            number: '',
+            name: 'I am treating the patient',
+            yes: @doctor_exam.try(:treating_patient),
+            no: !@doctor_exam.try(:treating_patient),
+            date: @doctor_exam.try(:treating_patient_date).present? ? @doctor_exam.try(:treating_patient_date).strftime("%d/%m/%Y") : ""
+        },{
+            number: '',
+            name: 'The patient is still undergoing treatment in another clinic/hospital',
+            yes: @doctor_exam.try(:undergoing_treatment),
+            no: !@doctor_exam.try(:undergoing_treatment),
+            date: @doctor_exam.try(:undergoing_treatment_date).present? ? @doctor_exam.try(:undergoing_treatment_date).strftime("%d/%m/%Y") : ""
+        }
+
+    ]
+%>
+
+<div class="medical-results-content">
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART V: FOLLOW UP BY THE DOCTOR:</b>
+    </div>
+
+    <table class="follow-up-tbl">
+        <tbody class="with-date">
+            <% follow_up.each do |disease| %>
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <th class="text-left bold head-index"></th>
+                        <th class="text-left bold head-title underline"><% disease[:name] %></th>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                        <th class="head-date text-center bold"><%= disease[:date] %></th>
+                    </tr>
+                <% else %>
+                    <tr class="checkbox-input">
+                        <td><%= disease[:number].present? ? disease[:number] : "#{follow_up_index.to_s}." %></td>
+                        <td><%= disease[:name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:date] %></td>
+                    </tr>
+                <% end %>
+
+                <% if disease[:number].blank? && disease[:type].blank?
+                    follow_up_index += 1
+                    end
+                %>
+            <% end %>
+        </tbody>
+    </table>
+
+    <div class="certification-doctor-note bold">UNDER THE PREVENTION AND CONTROL OF INFECTIOUS DISEASES ACT 1988. IT IS MANDATORY TO NOTIFY<br>
+    THE OCCURANCE OF INFECTIOUS DISEASES TO THE NEAREST MEDICAL OFFICER OF HEALTH.</div>
+</div>

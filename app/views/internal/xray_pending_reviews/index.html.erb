@@ -1,0 +1,101 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Review</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "internal/xray_pending_reviews/filter" %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Transaction ID</th>
+            <th>Worker Code</th>
+            <th>Doctor Code</th>
+            <th>Certify Date</th>
+            <th>X-Ray Code</th>
+            <th>X-Ray Date</th>
+            <th>Maid Online</th>
+            <th>Indicator</th>
+            <th>Source</th>
+            <th>Status</th>
+            <th>Radiographer</th>
+            <th>PCR</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @xray_pending_reviews.each.with_index((@xray_pending_reviews.current_page - 1) * get_per + 1) do |xray_pending_review, index| %>
+            <tr>
+                <td class="module-row-numbers"><label><%= index %></label></td>
+                <td>
+                    <% if xray_pending_review.status == "XQCC_PENDING_REVIEW" && has_permission?("EDIT_XQCC_PENDING_REVIEW") %>
+                        <a href="<%= edit_internal_xray_pending_review_path(xray_pending_review.id) %>"><%= xray_pending_review.transactionz.code %></a>
+                    <% elsif xray_pending_review.status ==  "TRANSMITTED" && has_permission?("VIEW_XQCC_PENDING_REVIEW") %>
+                        <a href="<%= internal_xray_pending_review_path(xray_pending_review.id) %>"><%= xray_pending_review.transactionz.code %></a>
+                    <% end %>
+                </td>
+                <td><%= xray_pending_review.transactionz.fw_code %></td>
+                <td><%= xray_pending_review.transactionz.doctor&.code %></td>
+                <td><%= xray_pending_review.transactionz.doctor_transmit_date.strftime(get_standard_date_format) if xray_pending_review.transactionz.doctor_transmit_date? %></td>
+                <td><%= xray_pending_review.transactionz.xray_facility&.code %></td>
+                <td><%= xray_pending_review.transactionz.xray_examination&.xray_taken_date&.strftime(get_standard_date_format) %></td>
+                <td>
+                    <%= xray_pending_review.transactionz.is_maid_online? ? "YES" : "NO" %>
+                </td>
+                <td>
+                    <%= xray_pending_review.case_indicator %>
+                </td>
+                <td>MERTS</td>
+                <td>
+                    <%= xray_pending_review.case_review_status %>
+                </td>
+                <td title="<%= xray_pending_review.xray_review_status %>">
+                    <%= case xray_pending_review.xray_review_status
+                    when "XQCC_REVIEW", "XQCC_RETAKE"
+                        "REQUESTED"
+                    when "TRANSMITTED"
+                        "REVIEWED"
+                    end %>
+                </td>
+                <td>
+                    <%= case xray_pending_review.pcr_review_status
+                    when "PCR_REVIEW", "PCR_RETAKE"
+                        "REQUESTED"
+                    when "TRANSMITTED"
+                        "AUDITED"
+                    end %>
+                </td>
+
+                <td>
+                    <% if xray_pending_review.status == "XQCC_PENDING_REVIEW" && has_permission?("EDIT_XQCC_PENDING_REVIEW") %>
+                        <%=raw index_table_edit_button(edit_internal_xray_pending_review_path(xray_pending_review.id)) %>
+                    <% elsif xray_pending_review.status ==  "TRANSMITTED" && has_permission?("VIEW_XQCC_PENDING_REVIEW") %>
+                        <%=raw index_table_show_button(internal_xray_pending_review_path(xray_pending_review.id)) %>
+                    <% end %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% if @xray_pending_reviews.blank? %>
+            <tr>
+                <td colspan="14" class="text-danger">No records found.</td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @xray_pending_reviews %>
+        </div>
+    </div>
+</div>

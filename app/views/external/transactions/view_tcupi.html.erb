@@ -1,0 +1,64 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Transaction</strong> - <%= @transaction.id %>
+    </div>
+
+    <div class="px-4 py-4 border-bottom no-selected-placeholder">
+        <h3><u>TCUPI</u></h3>
+        <label>Worker Information</label>
+            <div class="row">
+                <div class="col">
+                    <p><b>Worker Code : </b><%= @transaction&.fw_code %> <br>
+                    <b>Worker Name : </b><%= @transaction&.fw_name %> <br>
+                    <b>Country : </b><%= @transaction&.fw_country&.name %></p>
+                </div>
+                <div class="col">
+                    <p><b>Passport Number : </b><%= @transaction&.fw_passport_number %> <br>
+                    <b>Date of Birth : </b><%= @transaction&.fw_date_of_birth&.strftime(get_standard_date_format) %> <br>
+                    <b>Gender : </b><%= ForeignWorker::GENDERS[@transaction&.fw_gender] %> </p>
+                </div>
+            </div>
+    </div>
+    <div class="px-4 pt-4 border-bottom parent-todos">
+        <label class="mt-3">TCUPI To Do Results</label>
+
+        <% @tcupi_review.transaction_tcupi_todos.includes(:tcupi_todo).order(:tcupi_todo_id).each_with_index do |transaction_tcupi, index| %>
+            <%
+                tcupi_todo = transaction_tcupi.tcupi_todo
+
+                tcupi_todo_description =
+                if transaction_tcupi.tcupi_todo_id == 7
+                    "#{ transaction_tcupi.tcupi_todo&.description } - #{ transaction_tcupi.description_other }"
+                else
+                    transaction_tcupi.tcupi_todo&.description
+                end
+            %>
+
+            <div class="px-4 py-2 border border-secondary bg-white my-3">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="mb-0 flex-grow-1"><%= index + 1 %>. <%= tcupi_todo_description %></p>
+                </div>
+                <p class="mb-0"><b>Date Completed:</b> <%= transaction_tcupi.completed_date? ? transaction_tcupi.completed_date.strftime(get_standard_date_format) : "No completed" %></p>
+                <br>
+                <label>Comments</label>
+                <%= simple_format transaction_tcupi.comment.present? ? transaction_tcupi.comment : "None" %>
+            </div>
+        <% end %>
+        <div>
+            <% if has_permission?("PRINT_TCUPI_AUDIT_LETTER") && @tcupi_audit_letter %>
+                <%= link_to tcupi_audit_case_letter_internal_transaction_path(@transaction), class: "btn btn-blue-portal", target: :_blank do %>
+                    TCUPI Audit Case Letter
+                <% end %>
+            <% end %>
+            <% if has_permission?("PRINT_TCUPI_NON_AUDIT_LETTER") && @tcupi_non_audit_letter %>
+                <%= link_to tcupi_nonaudit_case_letter_internal_transaction_path(@transaction), class: "btn btn-blue-portal", target: :_blank do %>
+                    TCUPI Non Audit Case Letter
+                <% end %>
+            <% end %>
+        </div>
+        <br>
+    </div>
+    <div class="card-footer text-right">
+        <a class="btn btn-blue-portal" href="<%= external_transactions_path %>">Back</a>
+    </div>
+</div>

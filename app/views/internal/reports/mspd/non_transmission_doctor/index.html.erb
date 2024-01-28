@@ -1,0 +1,75 @@
+<div class="card">
+    <div class="card-header">
+        Non Transmission
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+        <%= render "/internal/reports/mspd/non_transmission_doctor/filter", formaction: non_transmission_doctor_internal_mspd_reports_path %>
+        <%= render "/shared/all_flash" %>
+        
+        <% if !@transactions.blank? %>
+            <div class="row">
+                <div class="col">
+                    <%= @paginator.total_count %> non transmissions found.
+                </div>
+                <div class="col mb-2">
+                    <div>Non Transmission (<%= params[:startdate].to_date.strftime(get_standard_date_format) %> to <%= params[:enddate].to_date.strftime(get_standard_date_format) %>)</div>
+                </div>
+                <div class="col text-right">
+                    <%= "Page #{@paginator.current_page} of #{@paginator.total_pages}" %>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers">#</th>
+                        <th>Doc. Code</th>
+                        <th>Doc. Name</th>
+                        <th>Clinic Name</th>
+                        <th>Phone</th>
+                        <th>State</th>
+                        <th>No. of Cases Count by Duration (<%= params[:duration] %> days)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @transactions.blank? %>
+                        <tr>
+                            <td colspan="7" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+                        <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                            <tr>
+                                <td class="module-row-numbers"><%= index %></td>
+                                <td><%= transaction.d_code %></td>
+                                <td><%= transaction.d_name %></td>
+                                <td><%= transaction.d_clinic_name %></td>
+                                <td><%= transaction.phone %></td>
+                                <td><%= transaction.state_name %></td>
+                                <td><a href="<%= non_transmission_doctor_items_internal_mspd_reports_path({
+                                    code: transaction.d_code, 
+                                    name: transaction.d_name, 
+                                    postcode: params[:postcode], 
+                                    state_id: params[:state_id], 
+                                    startdate: params[:startdate], 
+                                    enddate: params[:enddate], 
+                                    duration: params[:duration]
+                                }) %>"><%= transaction.transaction_count %></a></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <%= paginate @paginator if !@transactions.blank? %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

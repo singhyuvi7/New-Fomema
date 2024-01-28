@@ -1,0 +1,160 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_foreign_workers_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Worker Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Worker Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="gender" class="col-sm-3 col-form-label">Gender</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :gender, options_for_select({"Male" => "M", "Female" => "F"}, params[:gender]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="passport_number" class="col-sm-3 col-form-label">Passport No.</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="passport_number" id="passport_number" value="<%= params[:passport_number] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="country" class="col-sm-3 col-form-label">Country</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :country, options_from_collection_for_select(Country.order(:name).all, :id, :name, params[:country]), include_blank: form_select_option_text, class: 'form-control' do %>
+                                State
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="date_of_birth" class="col-sm-3 col-form-label">Date of Birth</label>
+                        <div class="col-sm-9">
+                            <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" value="<%= params[:date_of_birth] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Employer Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="employer_code" id="employer_code" value="<%= params[:employer_code] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="employer_state_id" class="col-sm-3 col-form-label">Employer State</label>
+                        <div class="col-sm-9">
+                        <%= select_tag :employer_state_id, options_for_select(State.order(:name).pluck(:name, :id), params[:employer_state_id]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Block</label>
+                        <div class="col-sm-9">
+                        <%= select_tag :blocked, options_for_select({
+                                "Yes" => 'true',
+                                "No" => 'false'
+                            }, params[:blocked]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Status</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status, options_for_select({
+                                "Amendment Pending for Approval" => "UPDATE_PENDING_APPROVAL",
+                                "Amendment Approved" => "UPDATE_APPROVED",
+                                "Amendment Rejected" => "UPDATE_REJECTED",
+                                # "Amendment Reverted" => "UPDATE_REVERTED",
+                                "Change Employer Pending for Approval" => "CHANGE_EMPLOYER_PENDING_APPROVAL",
+                                "Change Employer Approved" => "CHANGE_EMPLOYER_APPROVED",
+                                "Change Employer Rejected" => "CHANGE_EMPLOYER_REJECTED",
+                                # "Change Employer Reverted" => "CHANGE_EMPLOYER_REVERTED",
+                            }, params[:status]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Requested Date From</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="request_start_date" id="request_start_date" value="<%= params[:request_start_date] %>" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Requested Date To</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="request_end_date" id="request_end_date" value="<%= params[:request_end_date] %>" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="branch_id" class="col-sm-3 col-form-label">Branch</label>
+                        <div class="col-sm-9">
+                        <%= select_tag :branch_id, options_for_select(Organization.where(:org_type => 'BRANCH').active.order(:name).pluck(:name, :id), params[:branch_id]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="assigned_to" class="col-sm-3 col-form-label">Assigned To</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :assigned_to, options_for_select(ApprovalApprover.active_and_recently_inactive.where(:category => ['FOREIGN_WORKER_AMENDMENT', 'CHANGE_OF_EMPLOYER']).joins(:approval_approver_user).order(:name).pluck(:name, :user_id).uniq, params[:assigned_to]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_foreign_workers_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

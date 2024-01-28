@@ -1,0 +1,10 @@
+.card
+  .card-header
+    %strong Foreign Worker Health Screening Statistics
+  .card-body
+    = render '/shared/all_flash'
+    .row
+      .col-md-12
+        = link_to health_screening_statistics_internal_operation_reports_path(format: :xlsx), class: 'btn btn-sm btn-primary' do
+          %i.fas.fa-file-excel
+          Download

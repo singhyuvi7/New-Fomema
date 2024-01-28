@@ -1,0 +1,82 @@
+<div class="card">
+  <div class="card-header">
+    <strong>Customer Satisfaction</strong>
+  </div>
+  <!-- card-body -->
+  <div class="card-body">
+    <div class="card">
+      <div class="card-header">
+        <strong>Settings</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group row">
+              <label for="code" class="col-sm-4 col-form-label">Customer Survey File Upload</label>
+              <div class="col-sm-8">
+                <%= form_tag internal_dashboards_settings_customer_survey_upload_path, multipart: true do %>
+                  <%= file_field_tag :file %>
+                  <%= submit_tag "Import", class: 'btn btn-sm btn-primary' %>
+                  <%= link_to 'Clear', '#', class: 'btn btn-sm btn-danger', id: 'clearButton', data: { toggle: 'tooltip', html: 'true', title: 'Clear' } %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="text-right">
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive" style="height:100%; overflow-y:auto;">
+          <table class="table table-bordered table-data">
+            <thead>
+            <tr>
+              <th style="width: 5%;">No</th>
+              <th>File Name</th>
+              <th>Created at</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <% @department_info = SurveyMonkeyCustomer.all %>
+              <% unique_file_names = {} %>
+              <% counter = 0 %>
+              <% @department_info.each_with_index do |record| %>
+                <% unless unique_file_names[record.file_name] %>
+                <tr>
+                  <td><%= counter += 1 %></td>
+                  <td><%= record.file_name %></td>
+                  <td><%= record.created_at.strftime('%Y-%m-%d') %></td>
+                </tr>
+                <% unique_file_names[record.file_name] = true %>
+              <% end %>
+            <% end %>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- /card-body -->
+  </div>
+</div>
+<footer class="app-footer">
+</footer>
+<!-- CoreUI and necessary plugins-->
+<script>
+    $(document).ready(function () {
+        $('#clearButton').click(function (event) {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+
+            // Find the file input field and reset it
+            $('input[type="file"]').val('');
+        });
+    });
+</script>
+

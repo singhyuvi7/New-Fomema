@@ -1,0 +1,670 @@
+<!--
+Orange/yellow if item not complete fill
+Green if all item is “Yes”
+Red if any of the item is “No”
+-->
+
+<script>
+  $(document).ready(function(){
+
+    has_personnel_signature = '<%= !@visit_report.visit_report_laboratory.lab_personnel_signature.blank? %>'
+    has_officer_signature = '<%= !@visit_report.visit_report_laboratory.fomema_officer_signature.blank? %>'
+    toggle_edit_signature(!(has_personnel_signature == 'true'), 'labPersonnelModal')
+    toggle_edit_signature(!(has_officer_signature == 'true'), 'fomemaOfficerModal')
+    //
+    checked_acceptable_field();
+
+    $('.iso-status').each(function() {
+        if($(this).is(':checked') && $(this).val() == 'NO')
+            toggle_iso($(this));
+    });
+
+    tabs = '<%=raw @tabs.to_json %>'
+    referred_tabs = JSON.parse('<%=raw referred_tabs.to_json %>')
+
+    operation_closed($(".operation-hour-close-btn").is(':checked'));
+
+    check_pathologist_name_required($('.pathologist-btn:checked').val());
+
+    $.each(JSON.parse(tabs), function (key, val) {
+        toggle_tab_color(key, true);
+        if(!$(".operation-hour-close-btn").is(':checked')){
+            if(referred_tabs[key]){
+                toggle_referred_section(key,referred_tabs[key]);
+            }
+        }
+    });
+
+    action = '<%= params[:action] %>'
+    if(action == 'show' || action == 'approval'){
+        operation_hour_readonly_fields();
+        $("input, textarea, input:checkbox, select, input:radio").attr("disabled", true);
+        $(".btn-group.btn-group-toggle").css('pointer-events','none')
+
+        if( action == 'approval'){
+            $('.approval-decision, #approval_comment, input[type=hidden]').attr('disabled',false);
+        }
+    }else if(action == 'visit_summary'){
+        operation_hour_readonly_fields();
+        $('.non-summary').attr("disabled", true);
+        $('.non-summary').addClass("disabled");
+    }
+
+    $('.flatpickr-timepicker').flatpickr({
+        locale: null,
+        altInput: true,
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i"
+    });
+
+    $( "#approval_submit" ).click(function(e) {
+        e.preventDefault();
+        $('#currentSubmitBtn').val('approval')
+        $('.lqcc-form').parsley().validate();
+    });
+
+    $( "#draft_submit" ).click(function(e) {
+        //  e.preventDefault();
+        // clear all disabled tabs/fields
+        clear_disabled_fields(null)
+    });
+
+    $('#summary_submit').click(function(e) {
+        e.preventDefault();
+        $('#currentSubmitBtn').val('summary')
+        $('.lqcc-form').parsley().validate();
+    })
+
+    $('#summarySubmitBtn').click(function(e){
+        if(action != 'show'){
+            $('form').attr('target', '_self');
+            $('#draft_submit').click();
+        }
+    })
+
+    $('.lqcc-form').parsley().on('form:validated', function (formInstance) {
+
+        if ($('.lqcc-form')[0].checkValidity()){
+            // check if acceptable not yet filled up
+            if ($(".bg-warning").not(".dot")[0]){
+                tab = $(".bg-warning:first").closest('.nav-link')
+                tab.trigger('click')
+                scrollToElement(tab, 500);
+                alert('Please complete the form before submit')
+            }else{
+                clear_disabled_fields(null);
+                current_submit_btn = $('#currentSubmitBtn').val()
+                console.log(current_submit_btn)
+
+                if($('.nav-link:not(.disabled) .bg-warning').length){
+                    // if theres yellow - disallow submit 
+                    alert('Incomplete section detected. Please complete the form before submit for approval or submit summary.')
+                }else{
+                    if(current_submit_btn == 'approval'){
+                        $('#submitBtn').click();
+                    }else if (current_submit_btn == 'summary'){
+                        $('form').attr('target', '_blank');
+                        $('#summarySubmitBtn').click();
+                    }
+                }
+            }
+        }else{
+            failed_field = formInstance._focusedField
+            closest_tab = failed_field.closest('.tab-pane')
+            if(closest_tab){
+                $('#'+closest_tab.attr('aria-labelledby')).trigger('click');
+                setTimeout(function (){
+                    // scroll after tab active
+                    scrollToElement(failed_field, 500);
+                }, 1000);
+            }else
+                scrollToElement(failed_field, 500);
+        }
+    });
+
+    // delay 100ms
+    setTimeout(function () {
+        $('#fomemaOfficers').select2({
+            theme: 'bootstrap',
+            tags: "true",
+            placeholder: "Select or type to add new",
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') {
+                    return null;
+                }
+                return {
+                    id: JSON.stringify({
+                        id: '',
+                        name: term
+                    }),
+                    text: term,
+                    newTag: true // add additional parameters
+                }
+            },
+            insertTag: function (data, tag) {
+                // Insert the tag at the end of the results
+                data.push(tag);
+            }
+        })
+
+        visitors = JSON.parse('<%=raw @visit_report_visitors.to_json %>')
+        if(visitors){
+            selected_visitors = []
+            $.each( visitors, function(index,visitor) {
+                value = JSON.stringify(visitor)
+                selected_visitors.push(value)
+                if ($("#fomemaOfficers").find("option[value='" + value + "']").length == 0) {
+                    // Create the DOM option that is pre-selected by default
+                    var newState = new Option(visitor.name, value, true, true);
+                    // Append it to the select
+                    $("#fomemaOfficers").append(newState)
+                }
+            });
+            $("#fomemaOfficers").val(selected_visitors).trigger('change');
+        }
+
+        $('.custom-select').select2({
+            theme: 'bootstrap',
+            tags: "true",
+            placeholder: "Select or type to add new",
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') {
+                    return null;
+                }
+                slug = term.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+                return {
+                    id: JSON.stringify({
+                        code: slug,
+                        name: term
+                    }),
+                    text: term,
+                    newTag: true // add additional parameters
+                }
+            },
+            insertTag: function (data, tag) {
+                // Insert the tag at the end of the results
+                data.push(tag);
+            }
+        })
+
+        // opposite of fomemaOfficer for datee and value
+        $("[id$='_reagentName'], [id$='_controlCellName']").each(function() {
+            targeted_field = $(this)
+            data = JSON.parse(targeted_field.val())
+            if(data){
+                select_field = targeted_field.siblings().closest('.custom-select')
+                selected_data = []
+                $.each(data, function(index,value) {
+                    if(value){
+                        datee = JSON.parse(value)
+                        selected_data.push(value)
+                        is_exist = false
+                        // using find option with value doesnt work if value contains unicode
+                        select_field.find("option").each(function(){
+                            if($(this).val() == value){
+                                is_exist = true;
+                                return false;
+                            }
+                        })
+                        if (!is_exist) {
+                            // Create the DOM option that is pre-selected by default
+                            var newState = new Option(datee.name, value, true, true);
+                            // Append it to the select
+                            select_field.append(newState)
+                        }
+                    }
+                })
+                select_field.val(selected_data).trigger('change');
+            }
+        });
+
+        $('.same-as-screening').each(function() {
+            if($(this).is(':checked')){
+                btn_group = $(this).closest('.same-as-btn')
+                $('#'+btn_group.data('mirror-tab')).addClass('mirror-tab')
+                readonly_fields = get_mirrored_fields(btn_group.data('group-name'))
+                readonly_fields.addClass('disabled')
+            }
+        });
+    }, 100);
+
+    // change required validation on comment depending on yes/no/na selection
+    $("[id$='_yes'],[id$='_no'],[id$='_na']").change(function() {
+        add_required_validation($(this))
+
+        if($(this).hasClass('iso-status')){
+            toggle_iso($(this))
+        }
+    });
+
+    $(".pathologist-btn").change(function (){
+        check_pathologist_name_required($(this).val())
+    });
+
+    $(".btn-group-toggle").not('.test-compliance-btn-group').change(function() {
+        class_name = $(this).data('group-name')
+        toggle_tab_color(class_name, false)
+    });
+
+    $(".referred-btn").change(function() {
+        class_name = $(this).data('group-name')
+        referred_by = $(this).data('referred-by')
+        toggle_referred_section(class_name,referred_by)
+    });
+
+    $(".same-as-btn").change(function() {
+        class_name = $(this).data('group-name')
+        mirror_tab = $(this).data('mirror-tab')
+        same_screening_field = $(this).find(".same-as-screening")
+        toggle_mirror_section(class_name,mirror_tab, same_screening_field)
+    });
+
+    $(".operation-hour-group-btn").change(function() {
+        is_closed = $(this).find(".operation-hour-close-btn")
+
+        operation_closed(is_closed.is(':checked'));
+    });
+
+    // change on textarea, input text
+    $(document).on('change', '.mirror-tab textarea, .mirror-tab input:text, .mirror-tab input[type=number]', function() {
+        mirror_tab = $(this).closest('.tab-pane').attr('id')
+        id = $(this).closest('.tab-pane').data('mirror-tab')
+
+        field_default_prefix = get_field_default_prefix(mirror_tab)
+        mirror_default_prefix = get_mirror_default_prefix(id)
+      
+        mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+        $('#'+mirror_id).val($(this).val())
+    });
+
+    // change on dates
+    $(document).on('change', '.mirror-tab .expiry-date-field*[id]', function() {
+        mirror_tab = $(this).closest('.tab-pane').attr('id')
+        id = $(this).closest('.tab-pane').data('mirror-tab')
+
+        field_default_prefix = get_field_default_prefix(mirror_tab)
+        mirror_default_prefix = get_mirror_default_prefix(id)
+
+        mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+        $('#'+mirror_id)[0]._flatpickr.setDate($(this).val(),true,'Y/m/d')
+    });
+
+    //changes on checkbox
+    $(document).on('change', '.mirror-tab input:checkbox', function() {
+        mirror_tab = $(this).closest('.tab-pane').attr('id')
+        id = $(this).closest('.tab-pane').data('mirror-tab')
+
+        field_default_prefix = get_field_default_prefix(mirror_tab)
+        mirror_default_prefix = get_mirror_default_prefix(id)
+
+        mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+        $('#'+mirror_id).attr('checked',$(this).is(':checked'))
+    });
+
+    //changes on radiobox
+    $(document).on('change', '.mirror-tab input:radio', function() {
+        mirror_tab = $(this).closest('.tab-pane').attr('id')
+        id = $(this).closest('.tab-pane').data('mirror-tab')
+
+        field_default_prefix = get_field_default_prefix(mirror_tab)
+        mirror_default_prefix = get_mirror_default_prefix(id)
+
+        $('#'+mirror_tab+' input:radio').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            is_checked = $(this).is(':checked')
+            $('#'+mirror_id).prop('checked',is_checked)
+            is_checked ? $('#'+mirror_id).closest('.btn').addClass('active') : $('#'+mirror_id).closest('.btn').removeClass('active')
+        });
+        toggle_iso($('#'+id).find(".iso-status:checked"))
+        toggle_tab_color(id, true)
+    });
+
+    //changes on select
+    $(document).on('change', '.mirror-tab select', function() {
+        mirror_tab = $(this).closest('.tab-pane').attr('id')
+        id = $(this).closest('.tab-pane').data('mirror-tab')
+
+        field_default_prefix = get_field_default_prefix(mirror_tab)
+        mirror_default_prefix = get_mirror_default_prefix(id)
+
+        mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+        select_field = $('#'+mirror_id)
+        selected_data = []
+        $.each($(this).val(), function(index,value) {
+            if(value){
+                datee = JSON.parse(value)
+                selected_data.push(value)
+                if (select_field.find("option[value='" + value + "']").length == 0) {
+                    // Create the DOM option that is pre-selected by default
+                    var newState = new Option(datee.name, value, true, true);
+                    // Append it to the select
+                    select_field.append(newState)
+                }
+            }
+        })
+        select_field.val(selected_data).trigger('change');
+    });
+
+    $('#labPersonnelModal, #fomemaOfficerModal').on('shown.bs.modal', function (e) {
+        init_signature_canvas($(this).attr('id'))
+    })
+
+    $( ".signature-clear-btn" ).click(function(e) {
+        modal_id = $(this).closest('.modal').attr('id')
+        var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    $( "#submitToLabBtn" ).click(function(e) {
+        $('#submitToLabForm').submit();
+    });
+
+    $('.signature-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(true, modal_id)
+        init_signature_canvas(modal_id)
+    }); 
+
+    $('.signature-cancel-edit-btn').click(function(){
+        modal_id = $(this).closest('.modal').attr('id')
+        toggle_edit_signature(false, modal_id)
+    }); 
+
+    $("[id$='_is_close']").change(function() {
+        if(this.checked) {
+            twentyfour_hour_id = $(this).attr('id').replace('_is_close', '_is_24_hour');
+            $('#'+twentyfour_hour_id+':checked').prop('checked', false);
+        }      
+    });
+
+    $("[id$='_is_24_hour']").change(function() {
+        if(this.checked) {
+            is_close_id = $(this).attr('id').replace('_is_24_hour', '_is_close');
+            $('#'+is_close_id+':checked').prop('checked', false);
+        }      
+    });
+
+    $( ".clear-input-time" ).click(function() {
+        $(this).closest('.input-group').find('.flatpickr-input')[0]._flatpickr.clear();
+    });
+  });
+
+// functions
+function init_signature_canvas(modal_id){
+    var canvas = $('#'+modal_id+' #JohnHancock-canvas')[0]
+    if(canvas){
+        var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+    }
+}
+
+function toggle_iso(current){
+    id = current.closest('.tab-pane').attr('id')
+
+    if(current.val() == 'NO'){
+        disabled = true
+        collapse = 'hide'
+    }else{
+        disabled = false
+        collapse = 'show'
+    }
+    $('#'+id+' .card:not(.last-part) input, #'+id+' .card:not(.last-part) textarea, #'+id+' .card:not(.last-part) input:checkbox, #'+id+' .card:not(.last-part) select, #'+id+' .card:not(.last-part) input:radio, #'+id+' .card:not(.last-part) .card-header button').not('#'+id+' input[type=hidden]').attr("disabled", disabled);
+    $('#'+id+' .card:not(.last-part) .collapse').collapse(collapse);
+}
+
+function checked_acceptable_field(){
+    $("[id$='_yes'],[id$='_no'],[id$='_na']").each(function() {
+        if($(this).is(':checked')){
+            $(this).closest( "label.btn" ).addClass('active');
+
+            if($(this).val() == 'NO'){
+                add_required_validation($(this))
+            }
+        }
+    });
+}
+
+function operation_hour_readonly_fields(){
+    $('.operating-hours input, .operating-hours textarea').attr('readonly', true);
+    $('.operating-hours input:checkbox, .operating-hours .flatpickr-timepicker').attr('disabled', true);
+    $('.operating-hours .btn').attr('disabled', true);
+    $('.operating-hours .btn-group').addClass('disabled');
+}
+
+function operation_closed(is_closed){
+    $('.operating-hours input, .operating-hours textarea').not('.operation-hour-comment').attr('readonly', is_closed);
+    $('.operating-hours .btn').not('.operation-hour').attr('disabled', is_closed);
+    tabs_exclude_conclusion = $("[id$='tab']").not('#conclusion-tab');
+    operating_hours_checkbox_time_input = $('.operating-hours input:checkbox, .operating-hours .flatpickr-timepicker')
+
+    if(is_closed){
+        $('a[href="#conclusion"]').click();
+        tabs_exclude_conclusion.addClass('disabled');
+        operating_hours_checkbox_time_input.addClass('disabled');
+    }else{
+        tabs_exclude_conclusion.removeClass('disabled');
+        operating_hours_checkbox_time_input.removeClass('disabled');
+    }
+}
+
+function add_required_validation(current){
+    current_id = current.attr('id')
+    attribute = current_id.substring(0, current_id.lastIndexOf("_"));
+    label_field = $("[for="+attribute+"_comment], [for="+attribute+"_expiry_date]")
+    disable = current.val() == 'NO' ? true : false
+
+    $("#"+attribute+"_comment, #"+attribute+"_expiry_date").prop('required',disable);
+    $("#"+attribute+"_expiry_date").closest('.expiry-date-field').next().prop('required',disable);
+    disable == true ? label_field.addClass("required") : label_field.removeClass("required")
+}
+
+function toggle_tab_color(class_name, exclude_test_compliance){
+    is_completed = true
+    is_positive = false
+    is_negative = false
+
+    $("."+class_name).each(function() {
+        check_target = $("[name='"+$(this).attr('name')+"']:not(:disabled)")
+        if(!check_target.hasClass('test-compliance') && !check_target.is(":checked") && check_target.length > 0){
+            is_completed = false
+        }
+    });
+
+    $("."+class_name+"[id$='_no']:not(:disabled)").not('.test-compliance').not('.same-as-screening-btn').not('.part-4-btn').each(function() {
+        if($(this).is(':checked')){
+            is_negative = true
+        }
+    });
+
+    // inhouse and traceability refer to [NF-1979]
+    $("."+class_name+"[id$='_no']:not(:disabled).in-house-btn").each(function() {
+        if($(this).is(':checked')){
+            // if in-house checked as no and traceability no/na, test_compliance will be no
+            if($("."+class_name+"[id$='_no']:not(:disabled).traceability-btn").is(':checked') || $("."+class_name+"[id$='_na']:not(:disabled).traceability-btn").is(':checked')){
+                is_negative = true
+            }
+        }
+    });
+
+    if(is_completed){
+        status_class = is_negative ? 'bg-danger' : 'bg-success'
+
+        // toggle test compliance
+        if (!exclude_test_compliance){
+            is_checked = is_negative ? true : false
+            if(is_negative){
+                test_compliance_value = 'NO'
+                is_checked = true
+            }else{
+                test_compliance_value = 'YES'
+                is_checked = false
+            }
+
+            // need to refactor
+            $('#'+class_name).find('.test-compliance[value="NO"]').closest('.btn').removeClass('active')
+            $('#'+class_name).find('.test-compliance[value="YES"]').closest('.btn').removeClass('active')
+            $('#'+class_name).find('.test-compliance[value="NO"]').prop('checked', is_checked);
+            $('#'+class_name).find('.test-compliance[value="YES"]').prop('checked', !is_checked);
+
+            $('#'+class_name).find('.test-compliance[value="'+test_compliance_value+'"]').closest('.btn').addClass('active');
+            // end test compliance toggle
+        }
+    }else{
+        status_class = 'bg-warning'
+    }
+
+    $('#'+class_name+'-tab > .dot').removeClass("bg-warning bg-success bg-danger").addClass(status_class)
+}
+
+function toggle_referred_section(class_name,referred_by){
+    referred_is_negative = false
+    $("."+class_name+".in-house-btn[id$='_no']:not(:disabled)").each(function() {
+        if($(this).is(':checked')){
+            referred_is_negative = true
+        }
+    });
+
+    if(referred_is_negative){
+        $('#'+referred_by+'-tab').addClass('disabled')
+    }else{
+        $('#'+referred_by+'-tab').removeClass('disabled')
+    }
+}
+function clear_disabled_fields(tab_name){
+    id = tab_name ? tab_name : $('.nav-link.disabled').data('tab-name')
+    // id = $('.nav-link.disabled').data('tab-name')
+    $('#'+id+' input:text, #'+id+' textarea, #'+id+' button').not('#'+id+' input[type=hidden]').val('');
+    $('#'+id+' input:checkbox').attr('checked', false);
+    if(tab_name){
+        $('#'+id+' input:radio:checked').attr('checked',false)
+    }else{
+        $('#'+id+' input:radio:checked').each(function(){
+            $(this).val('')
+        })
+    }
+    $('#'+id+' input:radio').closest('.btn').removeClass('active')
+    $('#'+id+' select').val(null).trigger('change');
+}
+
+function get_mirrored_fields(id){
+    return $('#'+id+' input, #'+id+' textarea, #'+id+' select, #'+id+' input:checkbox, #'+id+' input:radio, #'+id+' .select2,#'+id+' .btn-group,#'+id+' .form-check-label').not('#'+id+' input[type=hidden]').not('.mirror-radio, .same-as-btn')
+}
+
+function get_field_default_prefix(id){
+    return 'visit_report_visit_report_laboratory_attributes_'+id+'_attributes_'
+}
+
+function get_mirror_default_prefix(id){
+    return 'visit_report_visit_report_laboratory_attributes_'+id+'_attributes_'
+}
+
+function toggle_mirror_section(id, mirror_tab, same_screening_field){
+    field_default_prefix = 'visit_report_visit_report_laboratory_attributes_'+mirror_tab+'_attributes_'
+    mirror_default_prefix = 'visit_report_visit_report_laboratory_attributes_'+id+'_attributes_'
+
+    readonly_fields = get_mirrored_fields(id)
+    is_same = false
+    if(same_screening_field.is(':checked')){
+        is_same = true
+    };
+
+    if(is_same){
+        $('#'+mirror_tab).addClass('mirror-tab')
+        readonly_fields.addClass('disabled')
+
+        // texarea and normal text input
+        $('#'+mirror_tab+' textarea, #'+mirror_tab+' input:text, #'+mirror_tab+' input[type=number]').not('#'+mirror_tab+' input[type=hidden], #'+mirror_tab+' input.expiry-date-field').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            $('#'+mirror_id).val($(this).val())
+        });
+
+        //checkbox
+        $('#'+mirror_tab+' input:checkbox').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            $('#'+mirror_id).attr('checked',$(this).is(':checked'))
+        });
+
+        //dates
+        $('#'+mirror_tab+' .expiry-date-field*[id]').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            $('#'+mirror_id)[0]._flatpickr.setDate($(this).val(),true,'Y/m/d')
+        });
+
+        //radiobox
+        $('#'+mirror_tab+' input:radio').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            is_checked = $(this).is(':checked')
+            $('#'+mirror_id).prop('checked',is_checked)
+            is_checked ? $('#'+mirror_id).closest('.btn').addClass('active') : $('#'+mirror_id).closest('.btn').removeClass('active')
+        });
+
+        //selects
+        $('#'+mirror_tab+' select').each(function(){
+            mirror_id = $(this).attr('id').replace(field_default_prefix, mirror_default_prefix);
+            select_field = $('#'+mirror_id)
+            selected_data = []
+            $.each($(this).val(), function(index,value) {
+                if(value){
+                    datee = JSON.parse(value)
+                    selected_data.push(value)
+                    if (select_field.find("option[value='" + value + "']").length == 0) {
+                        // Create the DOM option that is pre-selected by default
+                        var newState = new Option(datee.name, value, true, true);
+                        // Append it to the select
+                        select_field.append(newState)
+                    }
+                }
+            })
+            select_field.val(selected_data).trigger('change');
+        });
+    }else{
+        $('#'+mirror_tab).removeClass('mirror-tab')
+        readonly_fields.removeClass('disabled')
+        //clear mirrored form
+        clear_disabled_fields(id)
+    }
+    toggle_iso($('#'+id).find(".iso-status:checked"))
+    toggle_tab_color(id, true)
+}
+
+function toggle_edit_signature(allow_edit, modal_id){
+    has_signature = modal_id == 'labPersonnelModal' ? has_personnel_signature : has_officer_signature
+
+    if(allow_edit){
+        $('#'+modal_id+' .signature-img').addClass('d-none').removeClass('d-block')
+        $('#'+modal_id+' #JohnHancock-canvas').addClass('d-block').removeClass('d-none')
+        $('#'+modal_id+' .personnel-detail-input').attr('disabled',false)
+        $('#'+modal_id+' .signature-clear-btn').show()
+        $('#'+modal_id+' .signature-save-btn').show()
+        $('#'+modal_id+' .signature-edit-btn').hide()
+    }else{
+        $('#'+modal_id+' .signature-img').addClass('d-block').removeClass('d-none')
+        $('#'+modal_id+' #JohnHancock-canvas').addClass('d-none').removeClass('d-block')
+        $('#'+modal_id+' .personnel-detail-input').attr('disabled', true)
+        $('#'+modal_id+' .signature-clear-btn').hide()
+        $('#'+modal_id+' .signature-save-btn').hide()
+        $('#'+modal_id+' .signature-edit-btn').show()
+    }
+
+    if((has_signature == 'true') && allow_edit){
+        $('#'+modal_id+' .signature-cancel-edit-btn').show()
+    }else{
+        $('#'+modal_id+' .signature-cancel-edit-btn').hide()
+    }
+}
+
+function check_pathologist_name_required(patho_name_value){
+    is_pathologist_name_required = patho_name_value == 'YES'
+    pathologist_name_label = $('[for=visit_report_visit_report_laboratory_attributes_pathologist_name]')
+
+    $('#visit_report_visit_report_laboratory_attributes_pathologist_name').prop('required',is_pathologist_name_required);
+    is_pathologist_name_required == true ? pathologist_name_label.addClass("required") : pathologist_name_label.removeClass("required");
+}
+
+</script>

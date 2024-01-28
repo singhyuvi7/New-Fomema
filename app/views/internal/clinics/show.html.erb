@@ -1,0 +1,45 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Clinics</strong> - Clinic Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="clinic_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @clinic.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="clinic_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @clinic.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_clinics_path) %>
+            <% if has_permission?('EDIT_CLINIC') %>
+                <%=raw show_edit_button(edit_internal_clinic_path(@clinic)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

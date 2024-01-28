@@ -1,0 +1,44 @@
+<p>
+    <b>Dear Doctor/ Office on duty</b>, <br>
+</p>
+<p>
+    Kindly be informed that your biometric verification bypass request for <%= @transaction.foreign_worker.code %> has been <%= @decision %><% if @decision == "REJECTED" %> due to <%= @approval_comment %><% end %>.
+</p>
+<p>
+    <% if @decision == "APPROVED" %>
+        You may proceed for physical verification and save the examination date for the said worker now.
+    <% else %>
+        Please re-upload the required document and ensure the document is sufficient, clear and readable.
+    <% end %>
+</p>
+<p>
+    Thank you.<br>
+</p>
+
+<br>
+
+<i>
+    <p>
+        <b>Kepada Doktor/ Pegawai bertugas</b>, <br>
+    </p>
+    <p>
+        Merujuk kepada perkara diatas, pengesahan biometrik untuk pekerja <%= @transaction.foreign_worker.code %> telah <%= @decision_bm %><% if @decision == "REJECTED" %> due to <%= @approval_comment %><% end %>.
+    </p>
+    <p>
+        <% if @decision == "APPROVED" %>
+            Pihak klinik boleh mengesahkan pekerja secara fizikal dan "save" tarikh pemeriksaan untuk pekerja tersebut sekarang.
+        <% else %>
+            Sila muat naik semula dokumen yang diperlukan dan pastikan dokumen itu mencukupi, jelas dan boleh dibaca.
+        <% end %>
+    </p>
+    <p>
+        Terima kasih.<br>
+    </p>
+</i>
+
+<br>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

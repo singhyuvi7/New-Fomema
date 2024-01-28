@@ -1,0 +1,33 @@
+.w-100{:style => "margin-top: 2rem;"}
+  %h1= branch
+  %table.table.w-100.text-center.mb-0
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - total_female = 0
+      - total_male = 0
+      - expired_transactions.each do |expired_transaction|
+        - transmission_expired_at, _, gender, count, gender_code, organization_id = expired_transaction
+        - if gender == 'Male'
+          - total_male += count
+        - if gender == 'Female'
+          - total_female += count
+        - unless count.zero?
+          %tr
+            %td{ width: '30%' }= transmission_expired_at
+            %td{ width: '30%' }= gender
+            %td{ width: '40%' }= link_to count, detail_transaction_transmission_expired_internal_finance_reports_path(organization_id: organization_id, gender: gender_code, transmission_expired_at: transmission_expired_at.to_date.strftime('%Y-%m-%d'))
+      %tr.bold
+        %td Total
+        %td
+          - unless total_female.zero?
+            %div
+              Female : #{total_female}
+          - unless total_male.zero?
+            %div
+              Male : #{total_male}
+        %td
+          - unless total_male.zero? && total_female.zero?
+            Expired : #{total_female + total_male}

@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%%= form_tag internal_<%= plural_route_name %>_path, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="row">
+
+<% attributes.each do |attribute| -%>
+
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="<%= attribute.column_name %>" class="col-sm-3 col-form-label"><%= attribute.column_name.humanize.titleize %></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="<%= attribute.column_name %>" id="<%= attribute.column_name %>" value="<%%= params[:<%= attribute.column_name %>] %>">
+                        </div>
+                    </div>
+                </div>
+                
+<% end -%>
+
+            <%%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%%= raw filter_clear_button internal_<%= plural_route_name %>_path %>
+                <%%= raw filter_button %>
+            </div>
+        </div>
+    <%% end %>
+</div>

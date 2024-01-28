@@ -1,0 +1,61 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Foreign Worker</strong> - Approval
+    </div>
+    <%= form_for @foreign_worker, url: approval_update_internal_employer_employer_workers_path(@employer, @foreign_worker), html: {class: "#{params[:action]}_foreign_worker foreign_worker-form with-parsley"} do |form| %>
+
+        <div class="card-body">
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-header">
+                    Amendment Reasons
+                </div>
+                <div class="card-body">
+                    <% if !@foreign_worker.amendment_reasons.blank? %>
+                        <% @foreign_worker.amendment_reasons.each do |ar_id| %>
+                            <% if !ar_id.blank? %>
+                                <% ar = AmendmentReason.find(ar_id) %>
+                                <div><%= ar.name %></div>
+                                <% if ar.code.eql? "OTHER" %>
+                                    <div class="alert alert-dark"><%= @foreign_worker.amendment_reason_comment %></div>
+                                <% end %>
+                            <% end %>
+                        <% end %>
+                    <% else %>
+                        <p>No Amendment Reasons Entered!</p>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label for="amendment_history">Amendment History</label>
+                    <%=render "fw_amendment_logs", { show_partial: true } %>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div>
+                        Requested By: <%= "#{@foreign_worker.approval_request&.request_user&.name} - #{@foreign_worker.approval_request&.request_user&.username}" %>
+                    </div>
+                    <div>
+                        Assigned To: <%= "#{@foreign_worker.approval_request&.assigned_to_user&.name}" %>
+                    </div>
+                    <p>
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,256 @@
+<%
+    indexing = 0
+    doctor              = appeal.doctor
+    laboratory          = appeal.laboratory
+    xray_facility       = appeal.xray_facility
+    doctor_todos        = appeal.medical_appeal_todos.to_a.select {|todo| !todo.secondary_type?}
+    laboratory_todos    = appeal.medical_appeal_todos.to_a.select {|todo| todo.secondary_type == "Laboratory"}
+    xray_todos          = appeal.medical_appeal_todos.to_a.select {|todo| todo.secondary_type == "Xray"}
+    approval            = appeal.latest_medical_appeal_approval
+
+    if xray_todos.present?
+        pcr_review      = appeal.pcr_reviews.order(id: :desc).limit(1).first
+        retake          = appeal.current_xray_retake
+
+        if pcr_review.present?
+            xray_results           = appeal.pcr_result
+            xray_completed_date    = pcr_review.transmitted_at.strftime("%d/%m/%Y") if pcr_review.transmitted_at?
+        elsif retake.present?
+            xray_results           = appeal.xray_result
+            xray_completed_date    = retake.completed_at.strftime("%d/%m/%Y") if retake.completed_at?
+        end
+    end
+%>
+
+<div class="p-4 border-bottom d-flex justify-content-between">
+    <h3><u>Appeal Details</u></h3>
+    <% if !appeal.employer_consented_at.nil? %>
+        <%= link_to appeal_pdpa_form_internal_transaction_path(id: @transaction.id, appeal_id: @appeal.id), target: "_BLANK", class: "mr-2" do %>
+                <div class="btn btn-primary"><i class="fa fa-list mr-2"></i><%= appeal.registered_by_type %> Consent Form</div>
+        <% end %>
+    <% end %>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <% if appeal.is_amendment? %>
+        <div class="d-flex justify-content-end mt-2 mb-3">
+            <div class="btn btn-warning font-weight-bold ml-2 d-flex align-items-center" data-toggle="tooltip" title="Transaction was amended from SUITABLE to UNSUITABLE">
+                <i class="fas fa-exclamation-circle font-size-8 mr-2"></i>Transaction amended
+            </div>
+        </div>
+    <% end %>
+
+    <table id="appeal-details" class="table-borders w-100" style="table-layout: fixed;">
+        <tbody>
+            <tr>
+                <th valign="top">Registration Date</th>
+                <td><%= raw appeal.created_at? ? appeal.created_at.strftime("%d/%m/%Y") : "<i>N/A</i>" %></td>
+                <th valign="top">Registered By</th>
+                <td><%= appeal.registered_by.try(:name) %> (<%= appeal.registered_by_type %>)</td>
+            </tr>
+
+            <tr>
+                <th valign="top">Officer Assigned Date</th>
+                <td><%= raw appeal.officer_assigned_at? ? appeal.officer_assigned_at.strftime("%d/%m/%Y") : "<i>N/A</i>" %></td>
+                <th valign="top">Assigned Officer</th>
+                <td><%= raw appeal.officer_in_charge.try(:name) || "<i>N/A</i>" %></td>
+            </tr>
+
+            <tr>
+                <th colspan="4">Assigned Service Providers</th>
+            </tr>
+
+            <% if doctor.present? %>
+                <tr>
+                    <th valign="top">Assigned Doctor</th>
+
+                    <td colspan="3">
+                        <%= doctor&.code %><br>
+                        <%= doctor&.name %><br>
+                        <%= doctor&.email %><br>
+                        <%= doctor&.phone %><br>
+                        <%= doctor&.clinic_name %><br>
+                        <%= doctor&.doctor_address %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if laboratory.present? %>
+                <tr>
+                    <th valign="top">Assigned Laboratory</th>
+
+                    <td colspan="3">
+                        <%= laboratory&.code %><br>
+                        <%= laboratory&.name %><br>
+                        <%= laboratory&.email %><br>
+                        <%= laboratory&.phone %><br>
+                        <%= laboratory&.company_name %><br>
+                        <%= laboratory&.displayed_address %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if xray_facility.present? %>
+                <tr>
+                    <th valign="top">Assigned X-Ray Facility</th>
+
+                    <td colspan="3">
+                        <%= xray_facility&.code %><br>
+                        <%= xray_facility&.name %><br>
+                        <%= xray_facility&.email %><br>
+                        <%= xray_facility&.phone %><br>
+                        <%= xray_facility&.license_holder_name %><br>
+                        <%= xray_facility&.displayed_address %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <tr><td colspan="4">&nbsp;</td></tr> <!-- Spacing -->
+
+            <% if appeal.doctor_reason? %>
+                <tr>
+                    <th valign="top"><%= "Appeal Reason(s) (by #{appeal.registered_by_type})" %></th>
+                    <td colspan="3"><%= simple_format(appeal.doctor_reason) %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <th valign="top">Appeal Reason(s) (by PIC)</th>
+                <td colspan="3"><%= raw appeal.appeal_reason? ? simple_format(appeal.appeal_reason) : "<i>N/A</i>" %></td>
+            </tr>
+
+            <tr>
+                <th valign="top">MOH Appeal</th>
+                <td colspan="3"><%= appeal.is_moh ? "YES" : "NO" %></td>
+            </tr>
+
+            <tr>
+                <th valign="top">Is Specialist</th>
+                <td colspan="3"><%= appeal.is_specialist ? "YES" : "NO" %></td>
+            </tr>
+
+            <tr>
+                <th valign="top">Comments</th>
+
+                <td colspan="3">
+                    <% appeal.medical_appeal_comments.each.with_index(1) do |comment, index| %>
+                        <b class="d-inline-block" style="width: 1.5em;"><%= index %>.</b><b class="text-primary mr-2"><%= comment.user.name %></b> (<%= comment.created_at.strftime("%d/%m/%Y") %>)
+                        <%= simple_format comment.comment %>
+                    <% end %>
+
+                    <% if appeal.medical_appeal_comments.blank? %>
+                        There are no comments
+                    <% end %>
+                </td>
+            </tr>
+
+            <tr><td colspan="4">&nbsp;</td></tr> <!-- Spacing -->
+
+            <tr>
+                <th colspan="4">Appeal To Do List</th>
+            </tr>
+
+            <% appeal.medical_appeal_todos.each.with_index(1) do |todo, index| %>
+                <tr>
+                    <th colspan="2" valign="top"><b class="d-inline-block" style="width: 1.5em;"><%= index %>.</b><%= todo.appeal_todo.try(:description) %></th>
+
+                    <td colspan="2" valign="top">
+                        <% if todo.secondary_type == "Xray" && xray_results.present? && xray_completed_date.present? %>
+                            <p class="text-primary font-weight-bold"><%= xray_completed_date %></p>
+                            <%= xray_results %>
+                        <% else %>
+                            <p class="text-primary font-weight-bold"><%= todo.completed_at? ? "#{ todo.completed_at.strftime("%d/%m/%Y") }" : "Not Done" %></p>
+                            <%= simple_format todo.comment %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td colspan="4" valign="top">
+                    <p class="font-weight-bold">Uploaded Document(s)</p>
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                            <th>Date Uploaded</th>
+                            <th>Uploaded By</th>
+                        </tr>
+
+                        <% @appeal.uploads.order(created_at: :asc).each do |upload| %>
+                            <tr>
+                                <td class="filenames" width="30%" name="uploadedfilecategory">
+                                    <%
+                                        category_description = upload.category
+                                        MedicalAppeal::ALL_DOCUMENT_TYPES.each do |document_code, document_desc|
+                                            if document_code == upload.category
+                                                category_description =  document_desc
+                                            end
+                                        end
+                                    %>
+                                    <%= category_description %>
+                                </td>
+                                <td class="filenames" width="30%" name="uploadedfilename">
+                                    <% upload.documents.each do |document| %>
+                                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                    <% end %>
+                                </td>
+                                <td class="filenames" width="15%"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                <td class="filenames" width="25%"><%= "#{upload.creator.name} (#{upload.creator.code})" %></td>
+                            </tr>
+                        <% end %>
+
+                        <% if @appeal.uploads.blank? %>
+                            <tr><td colspan="4">There are no uploaded documents</td></tr>
+                        <% end %>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <th valign="top"><%= appeal.status == "CLOSED" ? "Appeal Decision" : "Appeal Status" %></th>
+
+                <td colspan="3" valign="top">
+                    <%= appeal.displayed_status %>
+                </td>
+            </tr>
+
+            <tr>
+                <th valign="top">MLE1 Decision Date (Officer Name)</th>
+
+                <td valign="top">
+                    <% if approval&.medical_mle1_decision_at? %>
+                        <%= approval.medical_mle1_decision_at.strftime("%d/%m/%Y") %> (<%= approval.medical_mle1.try(:name) %>)
+                    <% else %>
+                        <%= raw "<i>N/A</i>" %>
+                    <% end %>
+                </td>
+
+                <th valign="top">Appeal Remarks from Officer (MLE1)</th>
+                <td valign="top"><%= raw approval&.medical_mle1_comment? ? simple_format(approval.medical_mle1_comment) : "<i>N/A</i>" %></td>
+            </tr>
+
+            <tr>
+                <th valign="top">MLE2 Decision Date (Officer Name)</th>
+
+                <td valign="top">
+                    <% if approval&.medical_mle2_decision_at? %>
+                        <%= approval.medical_mle2_decision_at.strftime("%d/%m/%Y") %> (<%= approval.medical_mle2.try(:name) %>)
+                    <% else %>
+                        <%= raw "<i>N/A</i>" %>
+                    <% end %>
+                </td>
+
+                <th valign="top">Appeal Remarks from Officer (MLE2)</th>
+                <td valign="top"><%= raw approval&.medical_mle2_comment? ? simple_format(approval.medical_mle2_comment) : "<i>N/A</i>" %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    table#appeal-details td,
+    table#appeal-details th {
+        padding: 0.5em;
+    }
+</style>

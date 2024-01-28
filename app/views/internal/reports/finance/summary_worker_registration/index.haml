@@ -1,0 +1,8 @@
+.card
+  .card-header
+    %strong Finance - Summary Worker Registration
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render '/internal/reports/finance/filter_daterange_branch', filter_link: summary_worker_registration_internal_finance_reports_path
+      = render '/internal/reports/finance/summary_worker_registration/pdf_template'

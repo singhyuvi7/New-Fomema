@@ -1,0 +1,71 @@
+<div class="operating-hours">
+    <table class="w-100">
+        <thead>
+            <tr>
+                <th class="text-left">Weekday</th>
+                <th>Closed</th>
+                <th>Open 24Hrs</th>
+                <th>Operation Hours</th>
+                <th>Break Hour</th>
+            </tr>
+        </thead>
+        <tbody> 
+            <tr>
+                <td>Mon</td>
+                <td class="text-center"><%= operating_hour[:monday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:monday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.monday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.monday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.monday_break %></td>
+            </tr>
+            <tr>
+                <td>Tues</td>
+                <td class="text-center"><%= operating_hour[:tuesday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:tuesday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.tuesday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.tuesday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.tuesday_break %></td>
+            </tr>
+            <tr>
+                <td>Wed</td>
+                <td class="text-center"><%= operating_hour[:wednesday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:wednesday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.wednesday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.wednesday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.wednesday_break %></td>
+            </tr>
+            <tr>
+                <td>Thurs</td>
+                <td class="text-center"><%= operating_hour[:thursday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:thursday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.thursday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.thursday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.thursday_break %></td>
+            </tr>
+            <tr>
+                <td>Fri</td>
+                <td class="text-center"><%= operating_hour[:friday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:friday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.friday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.friday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.friday_break %></td>
+            </tr>
+            <tr>
+                <td>Sat</td>
+                <td class="text-center"><%= operating_hour[:saturday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:saturday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.saturday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.saturday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.saturday_break %></td>
+            </tr>
+            <tr>
+                <td>Sun</td>
+                <td class="text-center"><%= operating_hour[:sunday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:sunday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.sunday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.sunday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.sunday_break %></td>
+            </tr>
+            <tr>
+                <td>Public Holiday</td>
+                <td class="text-center"><%= operating_hour[:public_holiday_is_close] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour[:public_holiday_is_24_hour] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= operating_hour&.public_holiday_start.try(:strftime,"%I:%M%p") %> to <%= operating_hour&.public_holiday_end.try(:strftime,"%I:%M%p") %> </td>
+                <td class="text-center"><%= operating_hour&.public_holiday_break %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

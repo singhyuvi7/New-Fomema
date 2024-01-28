@@ -1,0 +1,18 @@
+wb = xlsx_package.workbook
+wb.styles do |style|
+  # worksheet styles
+    header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+    data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+    headers = ["No","STATE", "DISTRICT", "#OF CLINIC (ACTIVE)", "BALANCE QUOTA (ACTIVE)", "#OF CLINIC (INACTIVE)", "BALANCE QUOTA (INACTIVE) ","TOTAL WORKER ALLOCATED", "BALANCE QUOTA"]
+
+wb.add_worksheet(name: 'Doctors') do |sheet|
+    sheet.merge_cells("A1:I1")
+    sheet.add_row ["DAILY FULL QUOTA GPs (UP TO #{@current.strftime(get_standard_date_format)})"]
+    sheet.add_row headers, style: header_style
+    if @doctors.present?
+        @doctors.each.with_index do |row,index|
+          sheet.add_row  [index+1 ,row.values[0], row.values[1],row.values[2],row.values[3],row.values[4],row.values[5],row.values[6],row.values[7]], style: data_style
+        end
+    end
+end
+end

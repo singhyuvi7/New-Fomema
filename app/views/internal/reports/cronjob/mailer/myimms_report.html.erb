@@ -1,0 +1,40 @@
+<body class="header-body">
+    <div class="header">
+        <div class="table-title">
+            Transaction(s) with MyIMMS Error - <%= @current_datetime %>
+        </div>
+    </div>
+</body>
+
+<table class="errors-table w-100" style="margin-top: 2rem;">
+    <thead>
+        <tr>
+            <% @headers.each do |header| %>
+            	<th><%= header %></th>
+            <% end %>
+        </tr>
+    </thead>
+
+    <% if @myimms_errors.present? %>
+	    <tbody>
+	        <% @myimms_errors.each do |myimms_error| %>
+	            <tr>
+	                <td><%= myimms_error.txn_id %></td>
+	                <td><%= myimms_error.doc_no %></td>
+	                <td><%= myimms_error.nat %></td>
+	                <td><%= myimms_error.med_sts %></td>
+	                <td><%= myimms_error.created_at.strftime("%d-%m-%Y %l:%M:%S") %></td>
+	                <td><%= myimms_error.sts_ind %></td>
+	                <td><%= myimms_error.res_status %></td>
+	                <td>Error: <%= myimms_error.response %></td>
+	            </tr>
+	        <% end %>
+	    </tbody>
+    <% end %>
+</table>
+
+<div class="footer">
+    <div>Thanks.</div>
+    <div class="auto-msg">***This is an auto generated email. Do not reply to this email.***</div>
+    <div class="ref">[Ref:ijm/myimms_error]</div>
+</div>

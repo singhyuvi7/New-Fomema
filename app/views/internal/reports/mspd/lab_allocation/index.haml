@@ -1,0 +1,56 @@
+.card
+  .card-header
+    %strong Laboratory Allocation
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: lab_allocation_internal_mspd_reports_path, method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :laboratory_code, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :laboratory_code, class: 'form-control', value: params[:laboratory_code]
+              .col-md-6
+                .row.form-group
+                  = form.label :laboratory_name, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :laboratory_name, class: 'form-control', value: params[:laboratory_name]
+              .col-md-6
+                .form-group.row
+                  %label.col-sm-3.col-form-label{:for => "state_id"} State
+                  .col-sm-9
+                    = select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: form_select_option_text, class: 'form-control select2'
+              .col-md-6
+                .form-group.row
+                  = form.label :status, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = select_tag :status, options_from_collection_for_select(Laboratory::STATUSES, :first, :last, params[:status]), include_blank: form_select_option_text, class: 'form-control select2'
+              .col-md-6
+                .form-group.row
+                  = label_tag :allocated, 'Allocated Only', class: 'col-sm-3 col-form-label'
+                  .col-sm-9.py-2
+                    .d-flex.align-items-center
+                      = check_box_tag :allocated, true, !!ActiveModel::Type::Boolean.new.cast(params[:allocated])
+
+          .card-footer
+            - if has_permission?("MSPD_REPORTS")
+              .text-right
+                = link_to lab_allocation_internal_mspd_reports_path, class: 'btn btn-sm btn-danger mx-1' do
+                  %i.icon-trash
+                  Clear
+                = link_to lab_allocation_internal_mspd_reports_path(format: :pdf, params: params.permit!), class: 'btn btn-sm btn-secondary mx-1' do
+                  %i.fa.fa-download
+                  PDF Download
+                = link_to lab_allocation_internal_mspd_reports_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-secondary' do
+                  %i.fa.fa-download
+                  Export
+                = form.button :filter, class: 'btn btn-primary btn-sm mx-1' do
+                  %i.icon-magnifier
+                  Filter
+    .table-responsive
+      = render 'internal/reports/mspd/lab_allocation/pdf_template'

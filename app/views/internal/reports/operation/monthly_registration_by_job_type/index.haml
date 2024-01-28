@@ -1,0 +1,23 @@
+.card
+  .card-header
+    %strong Monthly Registration by Job Type
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: monthly_registration_by_job_type_internal_operation_reports_path(format: :xlsx), method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :month, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.select :month, options_for_select(@months), { prompt: true }, class: 'form-control', required: true
+          .card-footer
+            - if has_permission?("OPERATION_REPORTS")
+              .text-right
+                = form.button :export, class: 'btn btn-primary btn-sm' do
+                  %i.fa.fa-download
+                  Download

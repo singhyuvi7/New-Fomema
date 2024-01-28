@@ -1,0 +1,10 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :control_cell_name, "Control#{' Cell' if ['blood_grouping'].include?(tab_name.to_s)} Name & Manufacturer" %>
+        <%= form_shared.select 'control_cell_name', options_for_select(options.collect{ |u| [u['name'], u.to_json] }), {}, {:multiple => true, :class => 'form-control custom-select'} %>  
+        <input type="hidden" id="<%= tab_name %>_controlCellName" value="<%= @visit_report.visit_report_laboratory.try(tab_name).try(:control_cell_name).to_json %>"/> 
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

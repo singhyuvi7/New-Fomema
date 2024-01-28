@@ -1,0 +1,46 @@
+<div>
+<div class="row">
+    <%= form.label :state_id, class: 'col-md-2 form-label required'%>
+    <div class="col-sm-2">
+        <%= form.select :state_id, options_from_collection_for_select(State.order(:name).all, 'id', 'name', form.object.state_id), {include_blank: form_select_option_text}, required: true, class: 'form-control', onchange: "state_changed(this)"%>
+    </div>
+    <%= form.label :town_id, class: 'form-poscode required' %>
+    <div class="col-sm-2">
+        <%= form.select :town_id, options_from_collection_for_select(Town.where(state_id: form.object.state_id).order(:name).all, 'id', 'name', form.object.town_id), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+    </div>
+    <%= form.label :postcode,style:'padding-left:2px;', class: 'form-poscode required'%>
+    <div class="col-sm-2">
+        <%= form.text_field :postcode, class: 'form-control',pattern: "[0-9]*", maxlength: "5", required: true %>
+    </div>
+</div>
+</div> 
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // when change state, ajax fetch towns
+
+    $('#<%= form.object.class.to_s.underscore.downcase %>_state_id').change(function () {
+        
+        // empty town and postcode
+
+        $('#<%= form.object.class.to_s.underscore.downcase %>_town_id').html('<option value><%= form_select_option_text %></option>');
+        $('#<%= form.object.class.to_s.underscore.downcase %>_postcode').val('');
+
+        if (this.value) {
+            
+            $.ajax({
+                url: '/states/' + this.value + '/towns.json',
+                method: "GET",
+            }).done(function (data) {
+                $.each(data, function (idx, town) {
+                    $('#<%= form.object.class.to_s.underscore.downcase %>_town_id').append('<option value="'+town.id+'" data-postcode_id="'+town.postcode_id+'" data-postcode_code="'+town.postcode_code+'">'+town.name+'</option>');
+                });
+            });
+
+        }
+
+    });
+
+</script>
+<% end %>

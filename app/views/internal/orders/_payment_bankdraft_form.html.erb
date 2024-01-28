@@ -1,0 +1,57 @@
+<%= render 'shared/all_validation_flash', { model_obj: @bank_draft } %>
+<%=render "/shared/all_flash" %>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :number, "Bank Draft Number", class: 'required' %>
+            <%= form.text_field :number, class: 'form-control', required: true, data: { parsley_pattern: "^[a-zA-Z0-9]*$", parsley_pattern_message: "Alphanumeric only" }, readonly: !@bank_draft&.sync_date.blank? %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <% field_id = generate_field_id(form, :bank_id) %>
+            <%= form.label :bank_id, class: 'required' %>
+            <%= form.select :bank_id, options_from_collection_for_select(Bank.order(:name).all, 'id', 'name', form.object.bank_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, disabled: !@bank_draft&.sync_date.blank?, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :issue_date, "Date of Issue", class: 'required' %>
+            <%= form.date_field :issue_date, class: 'form-control', required: true, max: Date.today.strftime("%F"), disabled: !@bank_draft&.sync_date.blank? %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :issue_place, "Place of Issue", class: 'required' %>
+            <%= form.text_field :issue_place, class: 'form-control', required: true, data: { parsley_pattern: "^[a-zA-Z\s]*$", parsley_pattern_message: "Alphabetical only" }, readonly: !@bank_draft&.sync_date.blank? %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <% field_id = generate_field_id(form, :zone_id) %>
+            <%= form.label :zone_id, "Place of Issue (Zone)", class: 'required' %>
+            <%= form.select :zone_id, options_from_collection_for_select(Zone.order(:name).all, 'id', 'name', form.object.zone_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, disabled: !@bank_draft&.sync_date.blank?, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :amount, class: 'required' %>
+            <%= form.number_field :amount, class: 'form-control', required: true, min: 0.01, step: 0.01, readonly: !@bank_draft&.sync_date.blank? %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= label_tag :amount_allocate, "Amount Allocate", class: 'required' %>
+            <%= number_field_tag :amount_allocate, @amount_allocate, class: 'form-control', required: true, min: 0.01, step: 0.01 %>
+        </div>
+    </div>
+</div>

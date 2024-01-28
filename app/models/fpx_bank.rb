@@ -1,0 +1,2 @@
+class FpxBank < ApplicationRecord
+end

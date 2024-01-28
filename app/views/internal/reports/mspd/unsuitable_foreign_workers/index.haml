@@ -1,0 +1,32 @@
+.card
+  .card-header
+    %strong MSPD - Unsuitable Foreign Workers
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: unsuitable_foreign_workers_internal_mspd_reports_path(format: :xlsx), method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :date_from, 'Date From', class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :date_from, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"}, required: true
+              .col-md-6
+                .row.form-group
+                  = form.label :date_to, 'Date To', class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :date_to, class: 'form-control datepicker datepicker-range-filter', data: { type: "to", target: "from"}, required: true
+              .col-md-6
+                .form-group
+                  = form.collection_radio_buttons :date_source, [[:transaction_date, 'Transaction Date'], [:certification_date, 'Certification Date']], :first, :last, { checked: :transaction_date } do |builder|
+                    = builder.label(class: 'd-inline-flex align-items-center p-1') { builder.radio_button + content_tag(:span, builder.text, class: 'p-1') }
+          .card-footer
+            - if has_permission?("MSPD_REPORTS")
+              .text-right
+                = form.button :export, class: 'btn btn-primary btn-sm' do
+                  %i.fa.fa-download
+                  Download

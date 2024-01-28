@@ -1,0 +1,76 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Doctors</strong> - Concur
+    </div>
+    <%= form_for @doctor, url: concur_update_internal_doctors_path(@doctor), html: {class: "#{params[:action]}_doctor doctor-form"} do |form| %>
+
+        <div class="card-body">
+
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <%=render "shared/approval_comments", { comments: @doctor.approval_request.comments } if @doctor.approval_request %>
+
+                    <% if @doctor.xray_facility_id.blank? or @doctor.laboratory_id.blank? %>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <%= form.label :xray_facility_id, "X-Ray Facility", class: "required" %>
+                                    <%= select_tag "doctor[xray_facility_id]", options_from_collection_for_select(XrayFacility.select("id, name || ' (' || code || ')' as label").all, :id, :label, @doctor.xray_facility_id), include_blank: form_select_option_text, class: 'form-control select2', required: true, data: { parsley_errors_container: "#select2_parsley_error__doctor_xray_facility_id", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-doctor_xray_facility_id-container\"]", parsley_group: "doctor_xray_facility_id" } %>
+                                <div id="select2_parsley_error__doctor_xray_facility_id"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <%= form.label :laboratory_id, class: "required" %>
+                                    <%= select_tag "doctor[laboratory_id]", options_from_collection_for_select(Laboratory.select("id, name || ' (' || code || ')' as label").all, :id, :label, @doctor.laboratory_id), include_blank: form_select_option_text, class: 'form-control select2', required: true, data: { parsley_errors_container: "#select2_parsley_error__doctor_laboratory_id", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-doctor_laboratory_id-container\"]", parsley_group: "doctor_laboratory_id" } %>
+                                    <div id="select2_parsley_error__doctor_laboratory_id"></div>
+                                </div>
+                            </div>
+                        </div>
+                    <% else %>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <%= form.label :xray_facility_id, "X-Ray Facility", class: "required" %>
+                                    <p class="form-control-plaintext">
+                                        <%= "#{@doctor.xray_facility.name} (#{@doctor.xray_facility.code})" %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <%= form.label :laboratory_id, "Laboratory", class: "required" %>
+                                    <p class="form-control-plaintext">
+                                        <%= "#{@doctor.laboratory.name} (#{@doctor.laboratory.code})" %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <%= form.label :comment, "Concur Comment", for: 'concur_comment' %>
+                                <%= text_area_tag "concur[comment]", nil, class: "form-control" %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_doctors_path) %>
+                <%=raw approval_submit_concur_button %>
+            </div>
+        
+        </div>
+    <% end %>
+</div>

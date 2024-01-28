@@ -1,0 +1,19 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :method_comment, 'Method' %>
+        <div class="py-2 pl-1">
+            <%= form_shared.collection_check_boxes(:method,  options, :code, :name) do |b| %>
+                <div class="form-check form-check-inline">
+                    <%= b.check_box class: 'form-check-input' %>
+                    <%= b.label class: 'form-check-label' %>
+                </div>
+            <% end %>
+        </div>
+        <% if allow_others == true %>
+            <%= form_shared.text_area :method_comment, class: 'form-control comment-field', placeholder: 'If Others, please specify' %>
+        <% end %>
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

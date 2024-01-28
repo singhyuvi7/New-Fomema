@@ -1,0 +1,5 @@
+<%
+fw = ForeignWorker.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{fw.name} (#{fw.code})" if !value.blank? && fw %></td>

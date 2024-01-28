@@ -1,0 +1,29 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @zone } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" }  %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_zones_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

@@ -1,0 +1,186 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Register Worker</strong> - Amendment
+    </div>
+    <%= form_for @foreign_worker, url: edit_address_external_agency_worker_path(@foreign_worker, employer_id: @employer.id), method: 'patch' do |form| %>
+<div class="card-body">
+ <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker} %>        
+<div class="row disableable-fields" data-type="name">
+    <label class="col-md-2 col-form-label"> <%= form.label :name %> </label>
+              <div class="col-md-7">
+                  <div class="form-control-plaintext">
+                    <%= form.text_field :name, class: 'form-control critical-field', required: true, placeholder: '', id: 'name',readonly: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "[a-zA-Z0-9@&.'()-_/\s]+", parsley_pattern_message: "Only alphabets, numbers, underscore(_), hypens (-), fullstops (.), alias (@), ampersand (&), apostrophe('), brackets and slashes (/) are allowed" } %>
+                </div>
+                </div>
+               
+                <div class="col-md-1">
+                    <button type="button"
+                    data-toggle="popover"
+                    data-placement="right"
+                    data-html="true"
+
+                    data-content='
+                    <%= image_tag("forms/callingvisacompany1.png", :style => "width: 300px;")%>
+
+                    <h6>Or</h6>
+
+                    <%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>
+
+                    ' title="" class="btn btn-primary btn-sm"><i
+                            class="fa fa-info-circle"></i></button>
+                </div>
+            </div>
+
+<input type="hidden" id="employer_id" name="employer_id" value="<%=@employer.id%>">
+<div class="row disableable-fields" data-type="gender">
+            <label class="col-md-2  col-form-label ">Gender</label>
+            <div class="col-md-5 col-form-label">
+                <div class="form-check form-check-inline mr-5">
+                    <%= form.radio_button(:gender, "M", class: "form-check-input", required: true, disabled: @foreign_worker[:code] ? true : false) %>
+                    <label class="form-check-label" for="foreign_worker_gender_m">Male</label>
+                    &emsp;
+                    <%= form.radio_button(:gender, "F", class: "form-check-input", required: true, disabled: @foreign_worker[:code] ? true : false) %>
+                    <label class="form-check-label" for="foreign_worker_gender_f">Female</label>
+               
+        </div>
+    </div>
+</div>
+
+<div class="row disableable-fields" data-type="dob">
+   <label class="col-md-2  col-form-label">
+            <%= form.label :date_of_birth, "Date Of Birth" %>
+    </label>
+        <div class="col-md-2 col-form-label">
+            <%= form.date_field :date_of_birth, class: 'form-control critical-date critical-field', id: 'date_of_birth', disabled: true, required: true, min: Date.today - 70.year, max: Date.today - 18.year %>
+        </div>    
+</div>
+<div class="row disableable-fields" data-type="passport">
+    <label class="col-md-2  col-form-label">
+            <%= form.label :passport_number, "Passport Number" %>
+    </label>
+      <div class="col-md-2 col-form-label">
+            <%= form.text_field :passport_number, class: 'form-control critical-field', required: true, placeholder: 'A123456', id: 'passport_number',readonly: true, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9\-]+", parsley_pattern_message: "No special characters allowed" } %>
+      </div>
+</div>
+
+
+<div class="row disableable-fields" data-type="country">
+    <label class="col-md-2  col-form-label">
+            <% field_id = generate_field_id(form, :country_id) %>
+            <%= form.label :country_id %>
+     </label>
+      <div class="col-md-2">
+            <%= form.select :country_id, options_from_collection_for_select(Country.where("code != ?", Country::MALAYSIA_CODE).order(:name).all, 'id', 'name', form.object.country_id), {include_blank: form_select_option_text}, required: true, class: 'form-control critical-field',disabled: true, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+  </div>
+
+<div class="row">
+    <label class="col-md-2  col-form-label">
+         <%= form.label :address1, 'Address (Accommodation of foreign worker)',class: 'required' %>
+    </label>     
+    <div class="col-sm-5">
+        <%= form.text_field :address1, class: 'form-control', required: true, maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address2,  class: 'form-label' do %>
+        <% end %>
+    </label>      
+    <div class="col-sm-5">
+        <%= form.text_field :address2,  class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address3, class: 'form-label' do %>
+        <% end %>
+    </label> 
+    <div class="col-sm-5">
+        <%= form.text_field :address3, class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address4, class: 'form-label' do %>
+        <% end %>
+    </label> 
+    <div class="col-sm-5">
+        <%= form.text_field :address4, class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+
+    <%= render 'external/shared/worker_form_state_postcode_town', {form: form} %>
+
+
+
+<div class="row disableable-fields" data-type="arrival">
+    <label class="col-md-2  col-form-label">
+            <%= form.label :arrival_date, "Arrival Date" %>
+    </label>
+       <div class="col-md-2  col-form-label">
+            <%= form.date_field :arrival_date, class: 'form-control critical-date',disabled: true, id: 'arrival_date', max: Date.today %>
+        </div>
+</div>
+    <div class="row">
+        <label class="col-md-2  col-form-label">
+                <%= form.label :plks_number, "PLKS Number" %>
+        </label>
+                <div class="col-md-2">
+                        <%= form.text_field :plks_number, class: 'form-control', required: true, readonly:true, maxlength: "2", data: { parsley_maxlength: "2", parsley_maxlength_message: "Maximum length of 2 characters", parsley_pattern: "^[0-9]*", parsley_pattern_message: "PLKS Number can only contain numbers" } %>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" data-toggle="popover" data-placement="auto" data-html="true"
+                            data-content='<%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>' title="" class="btn btn-primary btn-sm"><i class="fa fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
+
+</div>
+<div class="card-footer border-0 bg-transparent text-dark">
+    <div class="text-right">
+        <a href="<%= external_agency_workers_path employer_id: @employer.id %>" class="btn btn-red-portal">Cancel</a>
+        <button type="submit" class="btn btn-blue-portal">Save</button>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    function maid_online_changed(cb){
+        $('select[name="foreign_worker[job_type_id]"] > option').each(function (idx, opt) {
+            //if (cb.is(':checked')) {
+            if (cb.val() == "PRAON") {
+                if (opt.getAttribute('data-name') == 'DOMESTIC') {
+                    opt.selected = true;
+                } else {
+                    opt.selected = false;
+                    opt.setAttribute('disabled', true);
+                }
+                $('#foreign_worker_pati_false').prop("checked", true);
+                $('#foreign_worker_pati_true').prop("disabled", true);
+            } else if (cb.val() == "RTK") {
+                if (opt.getAttribute('data-name') == 'DOMESTIC') {
+                    opt.disabled = true;
+                    opt.selected = false;
+                } else {
+                    opt.disabled = false;
+                }
+            }
+            else {
+                opt.removeAttribute('disabled');
+                $('#foreign_worker_pati_true').prop("disabled", false);
+            }
+
+        });
+        $('select[name="foreign_worker[job_type_id]"]').select2();
+    }
+
+    $('input[type="checkbox"]').on('change', function () {
+        $('input[name="programme[]"]').not(this).prop('checked', false);
+        maid_online_changed($('input[name="programme[]"]:checked'));
+    });
+</script>
+<% end %>
+    <% end %>
+</div>

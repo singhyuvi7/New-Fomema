@@ -1,0 +1,271 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @bulletin } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :title, class: 'required' %>
+                <%= form.text_field :title, class: 'form-control', required: true, value: @bulletin.title.try(:html_safe) %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :content, class: 'required' %>
+                <%= form.text_area :content, class: 'wysiwyg', required: true, value: @bulletin.content.try(:html_safe), data: { parsley_errors_container: "#select2_parsley_error__wysiwyg_box", parsley_class_handler: ".note-editor.note-frame", parsley_group: "#bulletin_content" } %>
+
+
+                <div id="select2_parsley_error__wysiwyg_box"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :publish_from, "Publish From", class: 'required' %>
+                <%= form.text_field :publish_from, class: 'form-control datepicker datepicker-range-filter', required: true, data: { type: "start", target: "publish_from"} %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :publish_to, "Publish To", class: 'required' %>
+                <%= form.text_field :publish_to, class: 'form-control datepicker datepicker-range-filter', required: true, data: { type: "end", target: "publish_from"} %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :require_acknowledge, "Require Acknowledge", class: 'required' %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :require_acknowledge, true, required: true, class: "form-check-input" %>
+                        <label class="form-check-label" for="bulletin_require_acknowledge_true">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :require_acknowledge, false, required: true, class: "form-check-input" %>
+                        <label class="form-check-label" for="bulletin_require_acknowledge_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <%= form.label :is_pop_up, "Pop-Up" %><br>
+            <%= form.check_box :is_pop_up %>
+        </div>
+    </div>
+
+    <%=render 'form_audiences', form: form %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <label for="bulletin_uploads">Uploaded Documents</label>
+            <%= hidden_field_tag :remove_uploaded_file, "" %>
+
+            <table class="table">
+                <tr>
+                    <th>Documents</th>
+                    <th></th>
+                </tr>
+
+                <% @bulletin.uploads.each do |upload| %>
+                    <tr>
+
+                    <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+
+                    <td style="width: 150px;">
+                        <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                    </td>
+                    </tr>
+                <% end %>
+
+                <% if @bulletin.uploads.blank? %>
+                    <tr><td colspan="2">There are no uploaded documents</td></tr>
+                <% end %>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group" id="document-input-group">
+                <label for="bulletin_uploads">Upload New Documents</label>
+                <p id="no-input-placeholder" class="hidden">Click on "Add more documents to begin adding files"</p>
+
+                <div class="input-group custom-input-group d-flex">
+
+                    <div class="custom-file flex-grow-1">
+                        <input type="file" name="bulletin[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple >
+                        <label class="custom-file-label">Choose file</label>
+                    </div>
+
+                    <div class="flex-shrink-0">
+                        <div class="removal-button btn btn-danger font-weight-bold">Remove</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_bulletins_path) %>
+        <button class="btn btn-sm btn-primary save-btn" type="submit"><i class="icon-pencil"></i> Save</button>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$(document).ready(function() {
+ pop_up_exist = `<%= @is_pop_up_exist %>`
+ $(".save-btn").on('click', function(e){
+    e.preventDefault();
+    form = $('form')[0]
+
+    if(pop_up_exist == 'true' && $("#bulletin_is_pop_up:checked").val()){
+        alert('A pop-up bulletin has already exist.');
+    }
+    else{
+        validity = form.checkValidity();
+        $('#'+form.id).parsley().validate();
+        if(validity){
+            var rowCount = $('.form-audience-row').length;
+            if (rowCount == 0) {
+                $("#warning-text").html("At least 1 audience is needed to be submitted!");
+                return false;
+            } else {
+                $("#warning-text").html("");
+                form.submit();
+            }
+        }
+    }
+  })
+});
+
+// uploader
+function validateFiles(inputFile) {
+
+    var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+    var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+    var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+    var extName;
+    var maxFileSize = 10485760; // 10.megabytes
+    var sizeExceeded = false;
+    var extError = false;
+
+    $.each(inputFile.files, function () {
+        if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+        extName = this.name.split('.').pop();
+        if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+    });
+
+    if (sizeExceeded) {
+        window.alert(maxExceededMessage);
+        $(inputFile).val('');
+    };
+
+    if (extError) {
+        window.alert(extErrorMessage);
+        $(inputFile).val('');
+    };
+}
+
+/**
+* Function to duplicate document fields
+**/
+
+var clonedAttachmentInput = $('.custom-input-group').clone(true, true);
+
+$('#add_more_documents').click(() => {
+    clonedAttachmentInput
+    .clone(true, true)
+    .appendTo("#document-input-group")
+    .addClass('top-margin')
+    .find(".custom-file-input")
+    .val("");
+
+    $('.custom-input-group:last')
+    .find(".custom-file-label").html("Choose file");
+
+    bindLastDocumentTypeSelectorAndFileSelector();
+    removeAttachmentField('.removal-button:last');
+    $('#no-input-placeholder').hide();
+});
+
+removeAttachmentField('.removal-button:last');
+
+function removeAttachmentField(field) {
+    $(field).click(function () {
+        $(this).closest('.custom-input-group').remove();
+
+        if ($('.custom-input-group').length === 0) {
+            $('#no-input-placeholder').show();
+        }
+    });
+}
+
+bindLastDocumentTypeSelectorAndFileSelector();
+
+// Function to re-enable form input after selecting dom type & to set file name after selecting in input
+function bindLastDocumentTypeSelectorAndFileSelector() {
+    $('.custom-file-input:last').change(function () {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "") {
+            $(this).siblings('.custom-file-label').html(fileName)
+        } else {
+            $(this).siblings('.custom-file-label').html("Choose file")
+        }
+    });
+
+    $('.document-type-selector:last').change(function() {
+        let selectedValue = $("option:selected", this).val();
+        inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+        if (selectedValue.length > 0) {
+            inputField.removeAttr('disabled');
+        } else {
+            inputField.attr("disabled", "disabled")
+        }
+    });
+}
+
+$('#bulletin_publish_from').change(function() {
+    $('#bulletin_publish_to').attr("data-start-date", $('#bulletin_publish_from').val());
+});
+
+$('.set-deletion').click(function() {
+    filenames = $(this).closest('tr').find('.filenames');
+    filenames.toggleClass('text-decoration-line-through');
+    text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+    $(this).text(text).toggleClass('btn-danger btn-primary');
+
+    ids = $('.set-deletion.btn-primary').map(function() {
+        return $(this).attr('data-id');
+    }).get().join(',');
+
+    $('#remove_uploaded_file').val(ids);
+});
+// /uploader
+</script>
+<% end %>

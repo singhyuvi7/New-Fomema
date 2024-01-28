@@ -1,0 +1,48 @@
+- if @data.present?
+  - @data.each do |branch, incomes|
+    = render 'internal/reports/finance/summary_misc_income/income_table', branch: branch, incomes: incomes
+  %table.table.w-100
+    %tbody
+      %tr.pdf-border-bottom.bold
+        %td{ width: '20%' } Grand Total
+        %td
+        %td.text-right{ width: '20%' }= @stats.dig(:grand_total, :total_amount)
+        %td.text-right{ width: '20%' }= @stats.dig(:grand_total, :total_count)
+
+:css
+  th { text-align: left }
+
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: none;
+  }
+
+  .bold {
+      font-weight: bold;
+  }
+
+  .pdf-border-top {
+    border-top: 2px solid #d0d0d0;
+  }
+
+  .pdf-border-bottom {
+    border-bottom: 2px solid #d0d0d0;
+  }

@@ -1,0 +1,981 @@
+<% @transactions.each do |transaction, index| %>
+  <% @barcode = get_barcode(transaction) %>
+
+  <%= render 'external/transactions/medical_form_notice' %>
+
+  <!--page break-->
+
+  <div style="page-break-after: always;"></div>
+
+  <div class="page-container">
+
+    <div class="fomema-logo">
+      <%= wicked_pdf_image_tag "forms/logo_fomema.png" %>
+    </div>
+
+    <div class="borang-title">
+
+      <div class="form-title">
+        BORANG PEMERIKSAAN PERUBATAN
+      </div>
+
+      <div class="form-subtitle">
+        Medical Examination Form
+      </div>
+
+      <div class="header-page-number">
+        Page: 2/2
+      </div>
+
+      <div class="header-cancellation-refund-date">
+        Cancellation/ Refund before <%= transaction.valid_until.strftime("%d/%m/%Y") %>
+      </div>
+
+    </div>
+
+    <div class="form-signature">
+
+      <div class="examination-date">
+        Tarikh Pemeriksaan<span class="float-right">:</span>
+        <div class="form-label-eng">Examination Date</div>
+      </div>
+
+      <div class="doctor-signature">
+        Tandatangan Doktor<span class="float-right">:</span>
+        <div class="form-label-eng">Doctor's Signature</div>
+      </div>
+
+      <div class="clinic-stamp">
+        Cop Klinik<span class="float-right">:</span>
+        <div class="form-label-eng">Clinic's Stamp</div>
+      </div>
+
+    </div>
+
+    <!--    employer section-->
+
+    <div class="section-header employer-section-header">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/EmployerSection.png" %>
+      <% else %>
+        <%= image_tag "forms/EmployerSection.png" %>
+      <% end %>
+
+    </div>
+
+    <!--    employer section worker data-->
+
+<!--    left side-->
+    <div class="employer_left_form_label employer_worker_code_label">
+      Kod Pekerja:
+      <div class="form-label-eng">
+        Worker's Code
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_worker_code_data form-value">
+      <%= transaction.fw_code %>
+    </div>
+
+    <div class="employer_left_form_label employer_worker_name_label">
+      Nama Pekerja:
+      <div class="form-label-eng">
+        Worker's Name
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_worker_name_data form-value">
+      <%= transaction.fw_name %>
+    </div>
+
+    <div class="employer_left_form_label employer_gender_label">
+      Jantina:
+      <div class="form-label-eng">
+        Gender
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_gender_data form-value">
+      <%= transaction.fw_gender_name %>
+    </div>
+
+    <div class="employer_left_form_label employer_date_of_birth_label">
+      Tarikh Lahir:
+      <div class="form-label-eng">
+        Date of Birth
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_date_of_birth_data form-value">
+      <%= transaction.fw_date_of_birth.strftime("%d-%m-%Y") %>
+    </div>
+
+    <div class="employer_left_form_label employer_employer_phone_label">
+      Telefon Majikan:
+      <div class="form-label-eng">
+        Employer Contact No.
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_employer_phone_data form-value">
+      <%= transaction.employer.phone %>
+    </div>
+
+    <div class="employer_left_form_label employer_doctor_phone_label">
+      No. Telefon Doktor:
+      <div class="form-label-eng">
+        Doctor Telephone No.
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_doctor_phone_data form-value">
+      <%= transaction.doctor.phone %>
+    </div>
+
+    <div class="employer_left_form_label employer_valid_until_label">
+      Sah Sehingga:
+      <div class="form-label-eng">
+        Valid Until
+      </div>
+    </div>
+
+    <div class="employer_left_form_data employer_valid_until_data form-value">
+      <%= transaction.valid_until.strftime("%d/%m/%Y") %>
+    </div>
+
+    <!--  end of left side-->
+
+<!--    right side-->
+
+    <% if transaction.is_maid_online? || transaction.is_recalibration? %>
+      <div class="maid-online employer-maid-online">
+        <%= transaction.programme_indicator %>
+      </div>
+    <% end %>
+
+    <div class="employer_right_form_label employer_passport_no_label">
+      No. Passport:
+      <div class="form-label-eng">
+        Passport No.
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_passport_no_data form-value">
+      <%= transaction.fw_passport_number %>
+    </div>
+
+    <div class="employer_right_form_label employer_country_label">
+      Negara Asal:
+      <div class="form-label-eng">
+        Country of Origin
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_country_data form-value">
+      <%= transaction.fw_country.name %>
+    </div>
+
+    <div class="employer_right_form_label employer_date_of_registration_label">
+      Tarikh Pendaftaran:
+      <div class="form-label-eng">
+        Date of Registration
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_date_of_registration_data form-value">
+      <%= transaction.transaction_date.strftime("%d-%m-%Y") %>
+    </div>
+
+    <div class="employer_right_form_label employer_employer_name_label">
+      Majikan:
+      <div class="form-label-eng">
+        Employer
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_employer_name_data form-value">
+      <%= transaction.employer.name %>
+    </div>
+
+    <div class="employer_right_form_label employer_xray_phone_label">
+      No. Telefon X-Ray:
+      <div class="form-label-eng">
+        X-Ray Telephone No.
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_xray_phone_data form-value">
+      <%= transaction.xray_facility.phone %>
+    </div>
+
+    <div class="employer_right_form_label employer_employer_code_label">
+      Kod Majikan:
+      <div class="form-label-eng">
+        Employer's Code
+      </div>
+    </div>
+
+    <div class="employer_right_form_data employer_employer_code_data form-value">
+      <%= transaction.employer.code %>
+    </div>
+
+<!--    end of right side-->
+
+    <!--    end of employer section worker data-->
+
+    <div class="section-divider employer-section-divider">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/cutline.png" %>
+      <% else %>
+        <%= image_tag "forms/cutline.png" %>
+      <% end %>
+
+    </div>
+
+    <!--   end of employer section-->
+
+    <div class="section-header doctor-section-header">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/DoctorSection.png" %>
+      <% else %>
+        <%= image_tag "forms/DoctorSection.png" %>
+      <% end %>
+
+    </div>
+
+    <div class="fomema-logo-left doctor-fomema-logo-left">
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "logo/logo_left.png" %>
+      <% else %>
+        <%= image_tag "logo/logo_left.png" %>
+      <% end %>
+    </div>
+
+    <!--    left side-->
+    <div class="doctor_left_form_label doctor_doctor_code_label">
+      Kod Doktor:
+      <div class="form-label-eng">
+        Doctor's Code
+      </div>
+    </div>
+
+    <div class="doctor_left_form_data doctor_doctor_code_data form-value">
+      <%= transaction.doctor.code %>
+    </div>
+
+    <div class="doctor_left_form_label doctor_doctor_name_label">
+      Nama Doktor:
+      <div class="form-label-eng">
+        Doctor's Name
+      </div>
+    </div>
+
+    <div class="doctor_left_form_data doctor_doctor_name_data form-value">
+      <%= transaction.doctor.name %>
+    </div>
+
+    <div class="doctor_left_form_label doctor_clinic_name_label">
+      Nama Klinik & Alamat:
+      <div class="form-label-eng">
+        Clinic Name & Address
+      </div>
+    </div>
+
+    <div class="doctor_left_form_data doctor_clinic_name_data form-value">
+      <%= transaction.doctor&.clinic_name %><br>
+
+      <% unless transaction.doctor.address1.blank? %>
+        <%= transaction.doctor.address1 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address2.blank? %>
+        <%= transaction.doctor.address2 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address3.blank? %>
+        <%= transaction.doctor.address3 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address4.blank? %>
+        <%= transaction.doctor.address4 %><br>
+      <% end %>
+
+      <%= transaction.doctor.postcode %> <%= transaction.doctor&.town&.name %> <%= transaction.doctor&.state&.name %>
+    </div>
+
+    <!--    end of left side-->
+
+    <!--    right side-->
+
+    <div class="doctor_right_form_label doctor_examination_date_label">
+      ID Trans:
+      <div class="form-label-eng">
+        Trans ID
+      </div>
+    </div>
+
+    <div class="doctor_right_form_data doctor_worker_trans_code_data form-value">
+      <%= transaction.code %>
+    </div>
+
+    <div class="doctor_right_form_label doctor_worker_code_label">
+      Kod Pekerja:
+      <div class="form-label-eng">
+        Worker's Code
+      </div>
+    </div>
+
+    <div class="doctor_right_form_data doctor_worker_code_data form-value">
+      <%= transaction.fw_code %>
+    </div>
+
+    <div class="doctor_right_form_label doctor_passport_no_label">
+      No. Passport:
+      <div class="form-label-eng">
+        Passport No.
+      </div>
+    </div>
+
+    <div class="doctor_right_form_data doctor_passport_no_data form-value">
+      <%= transaction.fw_passport_number %>
+    </div>
+
+    <div class="doctor_right_form_label doctor_worker_name_label">
+      Nama Pekerja:
+      <div class="form-label-eng">
+        Worker's Name
+      </div>
+    </div>
+
+    <div class="doctor_right_form_data doctor_worker_name_data form-value">
+      <%= transaction.fw_name %>
+    </div>
+
+    <div class="doctor_right_form_label doctor_valid_until_label">
+      Sah Sehingga:
+      <div class="form-label-eng">
+        Valid Until
+      </div>
+    </div>
+
+    <div class="doctor_right_form_data doctor_valid_until_data form-value">
+      <%= transaction.valid_until.strftime("%d/%m/%Y") %>
+    </div>
+
+    <!--    end of right side-->
+
+<!--    extra right side-->
+
+    <div class="doctor_extra_right_form_label doctor_examination_date_label">
+      Tarikh Pemeriksaan:
+      <div class="form-label-eng">
+        Examination Date
+      </div>
+    </div>
+
+    <div class="doctor_extra_right_form_data doctor_examination_date_data form-value">
+
+    </div>
+
+    <div class="doctor_extra_right_form_label doctor_worker_gender_label">
+      Jantina:
+      <div class="form-label-eng">
+        Gender
+      </div>
+    </div>
+
+    <div class="doctor_extra_right_form_data doctor_worker_gender_data form-value">
+      <%= transaction.fw_gender_name %>
+    </div>
+
+<!--    end of extra right side-->
+
+<!--    bottom row -->
+
+    <div class="doctor_bottom_form_label doctor_doctor_phone_no_label">
+      No. Telefon :
+      <div class="form-label-eng">
+        Telephone No.
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_doctor_phone_no_data form-value">
+      <%= transaction.doctor.phone %>
+    </div>
+
+    <div class="doctor_bottom_form_label doctor_employer_phone_label">
+      No. Telefon Majikan :
+      <div class="form-label-eng">
+        Employer Contact No.
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_employer_phone_data form-value">
+      <%= transaction.employer.phone %>
+    </div>
+
+    <div class="doctor_bottom_form_label doctor_doctor_signature_label">
+      Tandatangan Doktor :
+      <div class="form-label-eng">
+        Doctor's Signature
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_doctor_signature_data form-value">
+
+    </div>
+
+    <div class="doctor_bottom_form_label doctor_clinic_stamp_label">
+      Cop Klinik :
+      <div class="form-label-eng">
+        Clinic's Stamp
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_clinic_stamp_data form-value">
+
+    </div>
+
+<!--    end of bottom row -->
+
+    <% if transaction.is_maid_online? || transaction.is_recalibration? %>
+      <div class="maid-online doctor-maid-online">
+        <%= transaction.programme_indicator %> <!--MAID ONLINE -->
+      </div>
+    <% end %>
+
+    <div class="section-divider doctor-section-divider">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/cutline.png" %>
+      <% else %>
+        <%= image_tag "forms/cutline.png" %>
+      <% end %>
+
+    </div>
+
+    <div class="section-header laboratory-section-header">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/LaboratorySection.png" %>
+      <% else %>
+        <%= image_tag "forms/LaboratorySection.png" %>
+      <% end %>
+
+    </div>
+
+    <div class="fomema-logo-left laboratory-fomema-logo-left">
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "logo/logo_left.png" %>
+      <% else %>
+        <%= image_tag "logo/logo_left.png" %>
+      <% end %>
+    </div>
+
+    <!--    left side-->
+    <div class="laboratory_left_form_label laboratory_doctor_code_label">
+      Kod Doktor:
+      <div class="form-label-eng">
+        Doctor's Code
+      </div>
+    </div>
+
+    <div class="laboratory_left_form_data laboratory_doctor_code_data form-value">
+      <%= transaction.doctor.code %>
+    </div>
+
+    <div class="laboratory_left_form_label laboratory_laboratory_code_label">
+      Kod Makmal:
+      <div class="form-label-eng">
+        Laboratory's Code
+      </div>
+    </div>
+
+    <div class="laboratory_left_form_data laboratory_laboratory_code_data form-value">
+      <%= transaction.laboratory.code %>
+    </div>
+
+    <div class="laboratory_left_form_label laboratory_laboratory_name_label">
+      Nama Makmal & Alamat:
+      <div class="form-label-eng">
+        Laboratory's Name & Address
+      </div>
+    </div>
+
+    <div class="laboratory_left_form_data laboratory_laboratory_name_data form-value">
+      <%= transaction.laboratory&.name %><br>
+
+      <% unless transaction.laboratory.address1.blank? %>
+        <%= transaction.laboratory.address1 %><br>
+      <% end %>
+
+      <% unless transaction.laboratory.address2.blank? %>
+        <%= transaction.laboratory.address2 %><br>
+      <% end %>
+
+      <% unless transaction.laboratory.address3.blank? %>
+        <%= transaction.laboratory.address3 %><br>
+      <% end %>
+
+      <% unless transaction.laboratory.address4.blank? %>
+        <%= transaction.laboratory.address4 %><br>
+      <% end %>
+
+      <%= transaction.laboratory.postcode %> <%= transaction.laboratory.town.name %> <%= transaction.laboratory.state.name %>
+    </div>
+
+    <!--    end of left side-->
+
+    <!--    right side-->
+    <div class="laboratory_right_form_label laboratory_worker_name_label">
+      Nama Pekerja:
+      <div class="form-label-eng">
+        Worker's Name
+      </div>
+    </div>
+
+    <div class="laboratory_right_form_data laboratory_worker_name_data form-value">
+      <%= transaction.fw_name %>
+    </div>
+
+    <div class="laboratory_right_form_label laboratory_passport_no_label">
+      No. Passport:
+      <div class="form-label-eng">
+        Passport No.
+      </div>
+    </div>
+
+    <div class="laboratory_right_form_data laboratory_passport_no_data form-value">
+      <%= transaction.fw_passport_number %>
+    </div>
+
+    <div class="laboratory_right_form_label laboratory_worker_code_label">
+      Kod Perkerja:
+      <div class="form-label-eng">
+        Worker's Code
+      </div>
+    </div>
+
+    <div class="laboratory_right_form_data laboratory_worker_code_data form-value">
+      <%= transaction.fw_code %>
+    </div>
+
+    <div class="laboratory_right_form_label laboratory_clinic_name_label">
+      Nama Klinik & Alamat:
+      <div class="form-label-eng">
+        Clinic Name & Address
+      </div>
+    </div>
+
+    <div class="laboratory_right_form_data laboratory_clinic_name_data form-value">
+      <%= transaction.doctor&.clinic_name %><br>
+
+      <% unless transaction.doctor.address1.blank? %>
+        <%= transaction.doctor.address1 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address2.blank? %>
+        <%= transaction.doctor.address2 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address3.blank? %>
+        <%= transaction.doctor.address3 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address4.blank? %>
+        <%= transaction.doctor.address4 %><br>
+      <% end %>
+
+      <%= transaction.doctor.postcode %> <%= transaction.doctor&.town&.name %> <%= transaction.doctor&.state&.name %>
+    </div>
+
+    <!--    end of right side-->
+
+    <!--    extra right side-->
+
+    <div class="laboratory_extra_right_form_label laboratory_worker_gender_label">
+      Jantina:
+      <div class="form-label-eng">
+        Gender
+      </div>
+    </div>
+
+    <div class="laboratory_extra_right_form_data laboratory_worker_gender_data form-value">
+      <%= transaction.fw_gender_name %>
+    </div>
+
+    <!--    end of extra right side-->
+
+    <!--    bottom row -->
+
+    <div class="laboratory_bottom_form_label laboratory_laboratory_phone_no_label">
+      No. Telefon:
+      <div class="form-label-eng">
+        Telephone No.
+      </div>
+    </div>
+
+    <div class="laboratory_bottom_form_data laboratory_laboratory_phone_no_data form-value">
+      <%= transaction.laboratory.phone %>
+    </div>
+
+    <div class="laboratory_bottom_form_next_label laboratory_examination_date_label">
+      Tarikh Pemeriksaan:
+      <div class="form-label-eng">
+        Examination Date
+      </div>
+    </div>
+
+    <div class="laboratory_bottom_form_next_data laboratory_examination_date_data form-value">
+      <%= transaction.medical_examination_date %>
+    </div>
+
+    <div class="laboratory_bottom_form_label laboratory_valid_until_label">
+      Sah Sehingga:
+      <div class="form-label-eng">
+        Valid Until
+      </div>
+    </div>
+
+    <div class="laboratory_bottom_form_data laboratory_valid_until_data form-value">
+      <%= transaction.valid_until.strftime("%d/%m/%Y") %>
+    </div>
+
+    <div class="laboratory_bottom_form_next_label laboratory_doctor_signature_label">
+      Tandatangan Doktor :
+      <div class="form-label-eng">
+        Doctor's Signature
+      </div>
+    </div>
+
+    <div class="laboratory_bottom_form_next_data laboratory_doctor_signature_data form-value">
+
+    </div>
+
+    <div class="laboratory_bottom_form_label laboratory_employer_phone_no_label">
+      No. Telefon Majikan:
+      <div class="form-label-eng">
+        Employer Contact No.
+      </div>
+    </div>
+
+    <div class="laboratory_bottom_form_data laboratory_employer_phone_no_data form-value">
+      <%= transaction.employer.phone %>
+    </div>
+
+    <div class="laboratory_bottom_form_next_label laboratory_clinic_stamp_label">
+      Cop Klinik :
+      <div class="form-label-eng">
+        Clinic's Stamp
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_clinic_stamp_data form-value">
+
+    </div>
+
+    <!--    end of bottom row -->
+
+    <% if transaction.is_maid_online? || transaction.is_recalibration? %>
+      <div class="maid-online laboratory-maid-online">
+        <%= transaction.programme_indicator %>
+      </div>
+    <% end %>
+
+    <div class="barcode-divider laboratory-barcode-divider"></div>
+
+    <div class="barcode-info laboratory-barcode-info">
+
+      <div class="barcode-transaction-code">
+        <span class="label">Trans ID : </span><%= transaction.code %>
+      </div>
+
+      <div class="barcode-worker-code">
+        <span class="label">Workers Code : </span><%= transaction.fw_code %>
+      </div>
+
+      <div class="barcode-worker-name">
+        <span class="label">Workers Name : </span><%= transaction.fw_name %>
+      </div>
+
+    </div>
+
+    <div class="section-barcode laboratory-section-barcode">
+      <img src="<%= @barcode %>" alt="barcode" />
+    </div>
+
+    <div class="fomema-logo-right laboratory-fomema-logo-right">
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "logo/logo_right.png" %>
+      <% else %>
+        <%= image_tag "logo/logo_right.png" %>
+      <% end %>
+    </div>
+
+    <div class="section-divider laboratory-section-divider">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/cutline.png" %>
+      <% else %>
+        <%= image_tag "forms/cutline.png" %>
+      <% end %>
+
+    </div>
+
+    <!--    left side-->
+    <div class="xray_left_form_label xray_xray_code_label">
+      Kod X-Ray:
+      <div class="form-label-eng">
+        X-Ray's Code
+      </div>
+    </div>
+
+    <div class="xray_left_form_data xray_xray_code_data form-value">
+      <%= transaction.xray_facility.code %>
+    </div>
+
+    <div class="xray_left_form_label xray_xray_name_label">
+      Nama Fasiliti
+    </div>
+    <div class="xray_left_form_label xray_xray_name_label2">
+      X-Ray & Alamat:
+      <div class="form-label-eng">
+      X-Ray's Facility Name & Address
+      </div>
+    </div>
+
+    <div class="xray_left_form_data xray_xray_name_data form-value">
+      <%= transaction.xray_facility&.name %><br>
+
+      <% unless transaction.xray_facility.address1.blank? %>
+        <%= transaction.xray_facility.address1 %><br>
+      <% end %>
+
+      <% unless transaction.xray_facility.address2.blank? %>
+        <%= transaction.xray_facility.address2 %><br>
+      <% end %>
+
+      <% unless transaction.xray_facility.address3.blank? %>
+        <%= transaction.xray_facility.address3 %><br>
+      <% end %>
+
+      <% unless transaction.xray_facility.address4.blank? %>
+        <%= transaction.xray_facility.address4 %><br>
+      <% end %>
+
+      <%= transaction.xray_facility.postcode %> <%= transaction.xray_facility.town.name %> <%= transaction.xray_facility.state.name %>
+    </div>
+
+    <!--    end of left side-->
+
+    <!--    right side-->
+    <div class="xray_right_form_label xray_worker_name_label">
+      Nama Pekerja:
+      <div class="form-label-eng">
+        Worker's Name
+      </div>
+    </div>
+
+    <div class="xray_right_form_data xray_worker_name_data form-value">
+      <%= transaction.fw_name %>
+    </div>
+
+    <div class="xray_right_form_label xray_worker_code_label">
+      Kod Pekerja:
+      <div class="form-label-eng">
+        Worker's Code
+      </div>
+    </div>
+
+    <div class="xray_right_form_data xray_worker_code_data form-value">
+      <%= transaction.fw_code %>
+    </div>
+
+    <div class="xray_right_form_label xray_passport_no_label">
+      No. Pasport
+      <div class="form-label-eng">
+        Passport No.
+      </div>
+    </div>
+
+    <div class="xray_right_form_data xray_passport_no_data form-value">
+      <%= transaction.fw_passport_number %>
+    </div>
+
+    <div class="xray_right_form_label xray_clinic_name_label">
+      Nama Klinik & Alamat:
+      <div class="form-label-eng">
+        Clinic Name & Address
+      </div>
+    </div>
+
+    <div class="xray_right_form_data xray_clinic_name_data form-value">
+      <%= transaction.doctor&.clinic_name %><br>
+
+      <% unless transaction.doctor.address1.blank? %>
+        <%= transaction.doctor.address1 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address2.blank? %>
+        <%= transaction.doctor.address2 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address3.blank? %>
+        <%= transaction.doctor.address3 %><br>
+      <% end %>
+
+      <% unless transaction.doctor.address4.blank? %>
+        <%= transaction.doctor.address4 %><br>
+      <% end %>
+
+      <%= transaction.doctor.postcode %> <%= transaction.doctor&.town&.name %> <%= transaction.doctor&.state&.name %>
+    </div>
+
+    <!--    end of right side-->
+
+    <!--    extra right side-->
+
+    <div class="xray_extra_right_form_label xray_worker_gender_label">
+      Jantina:
+      <div class="form-label-eng">
+        Gender
+      </div>
+    </div>
+
+    <div class="xray_extra_right_form_data xray_worker_gender_data form-value">
+      <%= transaction.fw_gender_name %>
+    </div>
+
+    <!--    end of extra right side-->
+
+    <!--    bottom row -->
+
+    <div class="xray_bottom_form_label xray_xray_phone_no_label">
+      No. Telefon:
+      <div class="form-label-eng">
+        Telephone No.
+      </div>
+    </div>
+
+    <div class="xray_bottom_form_data xray_xray_phone_no_data form-value">
+      <%= transaction.xray_facility.phone %>
+    </div>
+
+    <div class="xray_bottom_form_next_label xray_examination_date_label">
+      Tarikh Pemeriksaan:
+      <div class="form-label-eng">
+        Examination Date
+      </div>
+    </div>
+
+    <div class="xray_bottom_form_next_data xray_examination_date_data form-value">
+      <%= transaction.medical_examination_date %>
+    </div>
+
+    <div class="xray_bottom_form_label xray_valid_until_label">
+      Sah Sehingga:
+      <div class="form-label-eng">
+        Valid Until
+      </div>
+    </div>
+
+    <div class="xray_bottom_form_data xray_valid_until_data form-value">
+      <%= transaction.valid_until.strftime("%d/%m/%Y") %>
+    </div>
+
+    <div class="xray_bottom_form_next_label xray_doctor_signature_label">
+      Tandatangan Doktor :
+      <div class="form-label-eng">
+        Doctor's Signature
+      </div>
+    </div>
+
+    <div class="xray_bottom_form_next_data xray_doctor_signature_data form-value">
+
+    </div>
+
+    <div class="xray_bottom_form_label xray_employer_phone_no_label">
+      No. Telefon Majikan:
+      <div class="form-label-eng">
+        Employer Contact No.
+      </div>
+    </div>
+
+    <div class="xray_bottom_form_data xray_employer_phone_no_data form-value">
+      <%= transaction.employer.phone %>
+    </div>
+
+    <div class="xray_bottom_form_next_label xray_clinic_stamp_label">
+      Cop Klinik :
+      <div class="form-label-eng">
+        Clinic's Stamp
+      </div>
+    </div>
+
+    <div class="doctor_bottom_form_data doctor_clinic_stamp_data form-value">
+
+    </div>
+
+    <!--    end of bottom row -->
+
+    <% if transaction.is_maid_online? || transaction.is_recalibration? %>
+      <div class="maid-online xray-maid-online">
+        <%= transaction.programme_indicator %>
+      </div>
+    <% end %>
+
+    <div class="section-header xray-section-header">
+
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "forms/XraySection.png" %>
+      <% else %>
+        <%= image_tag "forms/XraySection.png" %>
+      <% end %>
+
+    </div>
+
+    <div class="fomema-logo-left xray-fomema-logo-left">
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "logo/logo_left.png" %>
+      <% else %>
+        <%= image_tag "logo/logo_left.png" %>
+      <% end %>
+    </div>
+
+    <div class="barcode-divider xray-barcode-divider"></div>
+
+    <div class="barcode-info xray-barcode-info">
+
+      <div class="barcode-transaction-code">
+        <span class="label">Trans ID : </span><%= transaction.code %>
+      </div>
+
+      <div class="barcode-worker-code">
+        <span class="label">Workers Code : </span><%= transaction.fw_code %>
+      </div>
+
+      <div class="barcode-worker-name">
+        <span class="label">Workers Name : </span><%= transaction.fw_name %>
+      </div>
+
+    </div>
+
+    <div class="section-barcode xray-section-barcode">
+      <img src="<%= @barcode %>" alt="barcode" />
+    </div>
+
+    <div class="fomema-logo-right xray-fomema-logo-right">
+      <% if !@debug %>
+        <%= wicked_pdf_image_tag "logo/logo_right.png" %>
+      <% else %>
+        <%= image_tag "logo/logo_right.png" %>
+      <% end %>
+    </div>
+
+  </div>
+
+  <div style="page-break-after: always;"></div>
+<% end %>

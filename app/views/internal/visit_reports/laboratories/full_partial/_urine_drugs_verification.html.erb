@@ -1,0 +1,104 @@
+<%= visit_report_laboratory.fields_for :urine_drugs_verification do |urine_drugs_verification| %>
+    <% 
+        card_1 = "#{report_category}_reagentDetails"
+        card_2 = "#{report_category}_qualityAssurance"
+        card_3 = "#{report_category}_others"
+    %>
+
+    <%= urine_drugs_verification.hidden_field :report_category, value: report_category %>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <tbody>
+                <%=render "#{shared_path}/same_as_screening", { form_shared: urine_drugs_verification, tab_name: report_category, same_as: mirror_tabs.as_json.invert[report_category.to_s]} %>
+                <%=render "#{shared_path}/iso_status", { form_shared: urine_drugs_verification, tab_name: report_category} %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="dropdown-toggle-bar btn header-collapse-btn" data-toggle="collapse" type="button" data-target="#<%= card_1 %>" aria-expanded="false" aria-controls="<%= card_1 %>">
+                <div>Part 1: Reagent Details</div>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="card-body collapse show" id="<%= card_1 %>">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <tbody>
+                        <%=render "#{shared_path}/method", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 1, options: VisitReportLabOption.get_data(report_category, 'method'), allow_others: true} %>
+                        <%=render "#{shared_path}/instrumentation", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 2, options: VisitReportLabOption.get_data(report_category, 'instrumentation')} %>
+                        <%=render "#{shared_path}/reagent_name", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 3, options: VisitReportLabOption.get_data(report_category, 'reagent').exclude_id } %>
+                        <%=render "#{shared_path}/drug_level_opiates", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 4} %>
+                        <%=render "#{shared_path}/drug_level_cannabinoids", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 5} %>
+                        <%=render "#{shared_path}/reagent_condition", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 6 } %>
+                        <%=render "#{shared_path}/control_cell_name", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 7, options: VisitReportLabOption.get_data(report_category, 'control_cell').exclude_id } %>
+                        <%=render "#{shared_path}/control_cell_condition", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 8 } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="dropdown-toggle-bar btn header-collapse-btn" data-toggle="collapse" type="button" data-target="#qualityAssurance" aria-expanded="false" aria-controls="qualityAssurance">
+                <div>Part II: Quality Assurance</div>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="card-body collapse show" id="qualityAssurance">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <tbody>
+                        <%=render "#{shared_path}/iqa", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 1 } %>
+                        <%=render "#{shared_path}/eqa", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 2 } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="dropdown-toggle-bar btn header-collapse-btn" data-toggle="collapse" type="button" data-target="#others" aria-expanded="false" aria-controls="others">
+                <div>Part III: Others</div>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="card-body collapse show" id="others">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <tbody>
+                        <%=render "#{shared_path}/test_worksheet", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 1 } %>
+                        <%=render "#{shared_path}/tpm", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 2 } %>
+                        <%=render "#{shared_path}/instrument_maintenance_record", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 3 } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer text-muted test-compliance-footer">
+        <%=render "#{shared_path}/test_compliance", { form_shared: urine_drugs_verification, tab_name: report_category } %>
+    </div>
+
+    <div class="card last-part">
+        <div class="card-header">
+            <button class="dropdown-toggle-bar btn header-collapse-btn" data-toggle="collapse" type="button" data-target="#verificationTest" aria-expanded="false" aria-controls="verificationTest">
+                <div>Part IV: Test for Appeal Case</div>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="card-body collapse show" id="verificationTest">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <tbody>
+                        <%=render "#{shared_path}/in_house", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 1, referred_by: '' } %>
+                        <%=render "#{shared_path}/traceability", { form_shared: urine_drugs_verification, tab_name: report_category, row_no: 2 } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<% end %>

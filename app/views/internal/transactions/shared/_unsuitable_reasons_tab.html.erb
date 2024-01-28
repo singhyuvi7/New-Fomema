@@ -1,0 +1,70 @@
+<div class="p-4 border-bottom">
+    <h3><u>Unsuitable Reasons</u></h3>
+    <p class="mb-0">You are <%= "not " if readonly %>allowed to modify system mapped reason(s).</p>
+</div>
+
+<%
+    if ["xray_pending_decisions", "xqccs"].include?(controller_name)
+        unsuitable_reason_constructor   = UnsuitableReason.xqcc_reasons
+        unsuitable_reasons_readonly     = UnsuitableReason.other_reasons.order(:priority).pluck(:reason_en, :id)
+    else
+        unsuitable_reason_constructor   = UnsuitableReason.all
+        unsuitable_reasons_readonly     = []
+    end
+
+    reason_ids                          = @transaction.transaction_unsuitable_reasons.pluck(:unsuitable_reason_id)
+    unsuitable_reason_list              = unsuitable_reason_constructor.order(:priority).pluck(:reason_en, :id)
+    hide_save_button                    ||= nil
+%>
+
+<data id="current-unsuitable-reason-ids" data-ids="<%= reason_ids.map(&:to_s).sort.join(",") %>"></data>
+
+<% unsuitable_reasons_readonly.each do |reason, id| %>
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+        <%= check_box_tag "readonly_values[]", id, reason_ids.include?(id), disabled: true %>
+        <label class="flex-grow-1 mb-0 ml-3"><%= reason %></label>
+    </div>
+<% end %>
+
+<% unsuitable_reason_list.each do |reason, id| %>
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+        <%= check_box_tag "unsuitable_reason_ids[]", id, reason_ids.include?(id), id: "unsuitable_reasons_checkbox_#{ id }", disabled: readonly, class: "clickable" %>
+        <label class="flex-grow-1 mb-0 ml-3 clickable" for="<%= "unsuitable_reasons_checkbox_#{ id }" %>"><%= reason %></label>
+    </div>
+<% end %>
+
+<% unless readonly || hide_save_button %>
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <div id="save-unsuitable-reasons" class="btn btn-sm btn-secondary" data-path="<%= update_unsuitable_reasons_internal_transaction_path(@transaction.id) %>">Update Unsuitable Reasons</div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#save-unsuitable-reasons').click(function(e) {
+            var url         = $(this).attr('data-path');
+            var transId     = $(this).attr('data-id');
+            var currentIds  = $('#current-unsuitable-reason-ids').attr('data-ids');
+
+            var selectedIds = $('[name="unsuitable_reason_ids[]"]').map(function() {
+                if ($(this).prop('checked')) { return $(this).val() }
+            }).get().sort().join(',');
+
+            if (currentIds === selectedIds) {
+                alert('Saving cancelled because no changes were made.');
+                e.preventDefault();
+            } else {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { selected: selectedIds },
+                })
+                .done(function(response) {
+                    $('#current-unsuitable-reason-ids').attr('data-ids', response.reason_ids);
+                    alert('Unsuitable Reasons have been updated');
+                    $('#save-unsuitable-reasons').addClass('btn-secondary').removeClass('btn-success');
+                });
+            }
+        });
+    </script>
+<% end %>

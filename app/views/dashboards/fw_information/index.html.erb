@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Fomema Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdn2.hubspot.net/hubfs/476360/Chart.js"></script>
+  <script src="https://cdn2.hubspot.net/hubfs/476360/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- Date Range Picker -->
+  <!-- Make sure to include your custom scripts here if needed -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+  <%= stylesheet_link_tag 'dashboards/stylenew' %>
+  <%= javascript_include_tag 'dashboards/bootstrap' %>
+  <%= javascript_include_tag 'dashboards/common' %>
+</head>
+<body>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header py-0">
+        <strong style="line-height: 40px;">Foreign Workers Information</strong>
+        <span class="float-right card-headermenu">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <div class="filter-content mx-0 px-0">
+                <div class="filter-li">
+                <span id="sidebarCollapse">
+                  <b>
+                    <i class="fa fa-filter"></i>
+                  </b> &nbsp;Filter By </span>
+                </div>
+              </div>
+            </li>
+            <% if has_permission?('DASHBOARD_FW_EXPORT') %>
+              <li class="nav-item dropdown">
+                <div class="filter-content mx-0 px-0 no-arrow" href="#" onclick="exportexcelclick()" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <div class="filter-li">
+                  <span>
+                    <b>
+                      <i class="fa fa-download" aria-hidden="true"></i>
+                    </b> &nbsp;Export </span>
+                    <div id="exportopen" class="dropdown-menu dropdown-menu-right shadow animated--grow-in m-0 p-0" aria-labelledby="userDropdown">
+                      <ul class="li-profile">
+                        <li style="border-bottom: dotted 1px #c2c2c2; font-size: 12px;">
+                          <a onclick="excel_generate()" class="dropdown-item">
+                            <i class="fa fa-file-pdf-o"></i>Excel </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            <% if has_permission?('DASHBOARD_FW_REFRESH') %>
+              <!-- Dropdown - User Information -->
+              <li class="nav-item dropdown">
+                <div class="filter-content mx-0 px-0" onclick="refreshClick()" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <div class="filter-li">
+                <span class="float-left" style="width: 91px;">
+                  <b>
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                  </b> &nbsp;Refresh </span>
+                    <div style="clear: both"></div>
+                    <div id="refreshopen" class="dropdown-menu dropdown-menu-right shadow animated--grow-in m-0 p-0" aria-labelledby="userDropdown" style="width: 50px ">
+                      <ul class="li-profile">
+                        <li style="border-bottom: dotted 1px #c2c2c2; font-size: 12px;">
+                          <a class="dropdown-item" id="div5min" onclick="handleRefreshInterval(300000)"> 5 Min </a>
+                        </li>
+                        <li style="border-bottom: dotted 1px #c2c2c2; font-size: 12px;">
+                          <a class="dropdown-item" id="div10min" onclick="handleRefreshInterval(600000)">10 Min</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            <li class="nav-item dropdown">
+              <div class="filter-content mx-0 px-0">
+                <i class="fas fa-expand full-screen fullscreen-icon" onclick="toggleFullScreen()"></i>
+                <i class="fas fa-compress full-screen fullscreen-icon" style="display: none;" onclick="exitFullScreen()"></i>
+              </div>
+            </li>
+          </ul>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="dashboard-body">
+          <div class="chard-box">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12">
+                  <div class="tags collapse" id="tag_demo">
+                    <span><div id="timeperiodselected"></div></span>
+                    <span id="spansector"><div id="selectedsectors"></div></span>
+                    <span id="spanstate"><div id="selectedstates"></div></span>
+                    <span id="spancountry"><div id="selectedcountries"></div></span>
+                    <span id="spanage"><div id="ageselected"></div> </span>
+                    <span id="spangender"><div id="genderselected"></div> </span>
+                    <span id="spanreg"><div id="regselected"></div> </span>
+                    <span id="spanfw"><div id="fwselected"></div> </span>
+                    <a class="close" data-toggle="collapse" data-target="#tag_demo" style="font-size: 18px;">&times;</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="wrapper">
+                <!-- Sidebar  --><%= render 'side_bar' %>
+                <!-- Page Content  -->
+                <div id="dash_board_1" class="pt-2"><%= render 'dash_board_1_body' %> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+    var checkedValues = {};
+    var selectedFilters = {};
+    $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+        });
+
+        // All Countries Filter selection change
+        $('#countrycheckall').on("click", function () {
+            $('input[name="otherCountriesCheck"]').prop('checked', false);
+            $('input[name="otherCountriesCheck"]').prop('checked', this.checked);
+        });
+
+        // Filters selection change handlers
+        ['sectorcheck', 'statecheck', 'agecheck', 'countrycheck',
+            'gendercheck', 'registrationcheck', 'foreignworkercheck'].forEach(
+            (propName) => {
+                $(`#${propName}all`).on("click", function () {
+                    $(`input[name="${propName}"]`).prop('checked', false);
+                    $(`input[name="${propName}"]`).prop('checked', this.checked);
+                });
+
+                $(`input[name="${propName}"]`).on("click", function () {
+                    if (!this.checked && $(`#${propName}all`).prop('checked')) {
+                        $(`#${propName}all`).prop('checked', false);
+                    }
+                });
+            });
+    });
+
+    function clear_filter() {
+        location.reload();
+    }
+
+    function apply_filter() {
+        selectedFilters = getSelectedFilterValues();
+
+        var selectedVals = getCheckedValues();
+
+
+        var selectedValues = JSON.stringify(getCheckedValues());
+
+        console.log(selectedValues)
+
+        $('#timeperiodselected')[0].innerHTML = JSON.parse(selectedValues).DateRange;
+
+        // if (JSON.parse(selectedValues).Sector != "") {
+        //     $('#spansector').css("display", "block")
+        //     $('#sectorselected')[0].innerHTML = JSON.parse(selectedValues).Sector;
+        // } else {
+        //     $('#spansector').css("display", "none")
+        // }
+
+        // if (JSON.parse(selectedValues).State != "") {
+        //     $('#spanstate').css("display", "block")
+        //     $('#stateselected')[0].innerHTML = JSON.parse(selectedValues).State;
+        // } else {
+        //     $('#spanstate').css("display", "none")
+        // }
+
+        // if (JSON.parse(selectedValues).Country != "") {
+        //     $('#spancountry').css("display", "block")
+        //     $('#countryselected')[0].innerHTML = JSON.parse(selectedValues).Country;
+        // } else {
+        //     $('#spancountry').css("display", "none")
+        // }
+
+        if (JSON.parse(selectedValues).age != "") {
+            $('#spanage').css("display", "block")
+            $('#ageselected')[0].innerHTML = JSON.parse(selectedValues).age;
+        } else {
+            $('#spanage').css("display", "none")
+        }
+
+        if (JSON.parse(selectedValues).Gender != "") {
+            $('#spangender').css("display", "block")
+            $('#genderselected')[0].innerHTML = JSON.parse(selectedValues).Gender;
+        } else {
+            $('#spangender').css("display", "none")
+        }
+
+        if (JSON.parse(selectedValues).Registration != "") {
+            $('#spanreg').css("display", "block")
+            $('#regselected')[0].innerHTML = JSON.parse(selectedValues).Registration;
+        } else {
+            $('#spanreg').css("display", "none")
+        }
+
+        if (JSON.parse(selectedValues).ForeginWorker != "") {
+            $('#spanfw').css("display", "block")
+            $('#fwselected')[0].innerHTML = JSON.parse(selectedValues).ForeginWorker;
+        } else {
+            $('#spanfw').css("display", "none")
+        }
+
+        loadFwData();
+    }
+
+    function saveRefreshInterval(interval) {
+        const formData = {
+            dashboard_interval: interval,
+            dashboard_name: "fw_information"
+        };
+        $.ajax({
+            url: '/dashboards/refresh_dashboards',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (data) {
+                startAutoRefresh(interval);
+            },
+            error: function (error) {
+                console.error('Error saving refresh interval:', error);
+            }
+        });
+    }
+
+    function getRefreshInterval() {
+        $.ajax({
+            url: '/dashboards/refresh_dashboards',
+            type: 'GET',
+            contentType: 'application/json',
+            data: {dashboard_name: 'fw_information'},
+            success: function (data) {
+                startAutoRefresh(data.interval);
+                setDropdownItemByInterval(data.interval)
+            },
+            error: function (error) {
+                console.error('Error getting refresh interval:', error);
+            }
+        });
+    }
+
+    function startAutoRefresh(interval) {
+        clearInterval(window.refreshInterval);
+
+        window.refreshInterval = setInterval(function () {
+            location.reload();
+        }, interval);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const savedInterval = getRefreshInterval()
+        if (savedInterval) {
+            handleRefreshInterval(parseInt(savedInterval, 10));
+        }
+    });
+
+    function handleRefreshInterval(interval) {
+        saveRefreshInterval(interval);
+        var dropdownItems = document.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(function (item) {
+            item.classList.remove('selected');
+        });
+
+        event.target.classList.add('selected');
+        setDropdownItemByInterval(interval);
+    }
+
+    function setDropdownItemByInterval(interval) {
+        var dropdownItems = document.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(function (item) {
+            item.classList.remove('selected');
+        });
+
+        var selectedDropdownItem = document.querySelector(`#div${interval / 60000}min`);
+        if (selectedDropdownItem) {
+            selectedDropdownItem.classList.add('selected');
+        }
+    }
+
+    function excel_generate() {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        var form = $('<form action="/dashboards/fw_information/excel_generate" method="post"></form>');
+        $('body').append(form);
+        form.append('<input type="hidden" name="authenticity_token" value="' + csrfToken + '">');
+        form.submit();
+        form.remove();
+    }
+
+    function exportexcelclick() {
+        if ($('#exportopen').hasClass("show")) {
+            $('#exportopen').removeClass("show")
+        } else {
+            $("#exportopen").addClass("show");
+        }
+    }
+</script>
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<% if @data.present? %>
+				<tbody>
+					<% @data.each do |radiographer_id, xray_reviews| %>
+						<% xray_reviews.each_with_index do |xr, index| %>
+							<tr>
+								<td><%= index + 1 %></td>
+								<td><%= xr.xray_facility_code %></td>
+								<td><%= xr.xray_facility_name %></td>
+								<td><%= xr.batch_id %></td>
+								<td><%= xr.created_at.strftime("%d/%m/%Y") %></td>
+								<td><%= xr.transactionz.xray_transmit_date.try(:strftime, "%d/%m/%Y") %></td>
+								<td><%= xr.radiographer.name %></td>
+								<td>1</td>
+							</tr>
+						<% end %>
+
+						<tr>
+							<td colspan="7" class="text-right">SUBTOTAL</td>
+							<td><%= xray_reviews.size %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			<% end %>
+
+		</table>
+	</div>
+</div> 
+
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

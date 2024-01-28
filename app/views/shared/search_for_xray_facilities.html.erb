@@ -1,0 +1,23 @@
+<% @xray_facilities.each.with_index((@xray_facilities.current_page - 1) * get_per + 1) do |xray_facility| %>
+	<tr class="filter-table-search-results">
+        <td><%= xray_facility.code %></td>
+        <td><%= xray_facility.name %></td>
+        <td><%= xray_facility.state.name %></td>
+        <td><%= xray_facility.town.name %></td>
+        <td><%= xray_facility.postcode %></td>
+
+        <td>
+            <div class="select-xray-facility btn btn-success" data-id="<%= xray_facility.id %>" data-code="<%= xray_facility.code %>" data-name="<%= xray_facility.name %>" data-email="<%= xray_facility.email %>" data-phone="<%= xray_facility.phone %>" data-license_holder_name="<%= xray_facility.license_holder_name %>" data-address="<%= xray_facility.displayed_address %>">Select</div>
+        </td>
+    </tr>
+<% end %>
+
+<% if @xray_facilities.blank? %>
+    <tr>
+        <td colspan="6">No laboratories found with these search options</td>
+    </tr>
+<% end %>
+
+<div id="pagination-response" class="row">
+    <%= paginate @xray_facilities %>
+</div>

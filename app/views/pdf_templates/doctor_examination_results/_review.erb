@@ -1,0 +1,72 @@
+<% if @medical_review.present? %>
+    <div class="medical-results-content">
+        <div class="sub-title text-center subtitle-top-margin">
+            <b>FOMEMA RESULT REVIEW</b>
+        </div>
+
+        <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+            <div class="row">
+                <b class="w-em-8">Released as</b>
+                <span class="colon">: </span><span class="value"><%= @medical_review.medical_mle1_decision %></span>
+            </div>
+
+            <div class="row">
+                <b class="w-em-8">Released date</b>
+                <span class="colon">: </span><span class="value"><%= @medical_review.medical_mle2_decision_at? ? @medical_review.medical_mle2_decision_at.strftime("%d/%m/%Y") : nil %></span>
+            </div>
+
+            <div class="row">
+                <b class="w-em-8">Justifications</b>
+                <span class="colon">:</span><span class="value"><%= simple_format @medical_review.medical_mle1_comment %></span>
+            </div>
+        </div>
+    </div>
+<% end %>
+<% if @xray_pending_decisions.present?%>
+    <div class="medical-results-content">
+        <div class="sub-title text-center subtitle-top-margin">
+            <b>XRAY PENDING REVIEW</b>
+        </div>
+
+        <% @xray_pending_decisions.sort.each do |xp_decision| %>
+            <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+                <div class="row">
+                    <b class="w-em-8">Released as</b>
+                    <span class="colon">: </span><span class="value"><%= xp_decision.decision %></span>
+                </div>
+
+                <div class="row">
+                    <b class="w-em-8">Released date</b>
+                    <span class="colon">: </span><span class="value"><%= xp_decision.reviewed_at.strftime(get_standard_date_format) if xp_decision.reviewed_at? %></span>
+                </div>
+
+                <div class="row">
+                    <b class="w-em-8">Justifications</b>
+                    <span class="colon">:</span><span class="value"><%= simple_format xp_decision.comment %></span>
+                </div>
+            </div>
+        <% end %>
+    </div>
+<% elsif @pcr_comments.present? %>
+    <div class="medical-results-content">
+        <div class="sub-title text-center subtitle-top-margin">
+            <b>PCR Comment</b>
+        </div>
+    <% @pcr_comments.sort.each do |pcr_comment| %>
+         <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+                <div class="row">
+                    <b class="w-em-8">Released as</b>
+                    <p class="mb-0"><%= pcr_comment.result %></p>
+                </div>
+                <div class="row">
+                    <b class="w-em-8">Released date</b>
+                    <p class="mb-0"><%= pcr_comment.transmitted_at.strftime("%d/%m/%Y") if pcr_comment.transmitted_at? %></p>
+                </div>
+                <div class="row">
+                    <b class="w-em-8">Comment</b>
+                    <span class="colon">:</span><span class="value"><%= simple_format pcr_comment.comment %></span>
+                </div>
+        </div>
+    <% end %>
+    </div>
+<% end %>

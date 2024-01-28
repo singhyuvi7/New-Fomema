@@ -1,0 +1,85 @@
+<div class="modal fade" id="quota-assignment-modal" tabindex="-1" role="dialog" aria-labelledby="quota-assignment" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Quota</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <%= form_tag assign_quota_internal_doctors_path, method: :post, id: "quota-allocation-form", class: "with-parsley" do %>
+                <%= hidden_field_tag :quota_doctor_ids %>
+                <%= hidden_field_tag :confirm_quota_allocation %>
+
+                <div class="modal-body">
+                    <table id="quota-assignment-table" class="table">
+                        <thead>
+                            <tr>
+                                <th>Doctor Code</th>
+                                <th>Doctor Name</th>
+                                <th>Doctor Quota</th>
+                                <th>Available Quota</th>
+                            </tr>
+                        </thead>
+
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="border-top border-secondary pt-3">
+                        <div class="d-flex align-items-center">
+                            <label for="allocated_quota" class="mb-0">Allocated Quota</label>
+                            <p class="mb-0 flex-grow-1 text-muted ml-2">negative values will reduce quota</p>
+
+                            <div class="w-em-20">
+                                <%= number_field_tag :allocated_quota, @amount_allocate, required: true, step: 1, placeholder: "Quota", class: "form-control w-100", data: { parsley_pattern: "^[-1-9][0-9]*$", parsley_pattern_message: "Quota cannot be 0" } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <%= submit_tag "Update Quota", class: "btn btn-success" %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div id="dialog-allocate-quota-confirm" class="hidden" title="Please select a doctor" style="">
+    <p><span id="allocation-type"></span></p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#quota-allocation-form').submit(function(e) {
+            if ($('#confirm_quota_allocation').val() !== 'true') {
+                e.preventDefault();
+                quota   = parseInt($('#allocated_quota').val());
+                message = quota < 0 ? `Reduce ${ quota } quota from these doctors?` : `Allocate ${ quota } quota to these doctors?`;
+                $('#allocation-type').text(message);
+
+                setTimeout(function() {
+                    $('input[type="submit"]').removeAttr('disabled');
+                }, 200);
+
+                $('#dialog-allocate-quota-confirm').dialog({
+                    modal: true,
+                    minWidth: 600,
+                    dialogClass: `dialog__title-success shadow z-index-1060`,
+                    buttons: {
+                        Close: function() {
+                           $(this).dialog('close');
+                        },
+                        Confirm: function() {
+                            $('#confirm_quota_allocation').val('true');
+                            $('#quota-allocation-form').submit();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+<% end %>

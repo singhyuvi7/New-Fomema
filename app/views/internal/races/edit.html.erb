@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Races</strong> - Edit Race
+    </div>
+    <%= form_for @race, url: internal_race_path(@race), html: {class: "#{params[:action]}_race race-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

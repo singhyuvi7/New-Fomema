@@ -1,0 +1,73 @@
+%table.table.w-100.text-center
+  %thead
+    %tr
+      - @headers.each do |header|
+        %th= header
+  %tbody
+    - if @doctors.present?
+      - @doctors.each.with_index(1) do |doctor|
+        %tr
+          %td= doctor.code
+          %td= doctor.name
+          %td= doctor.email
+          %td= doctor.clinic_name
+          %td= doctor.address1
+          %td= doctor.address2
+          %td= doctor.address3
+          %td= doctor.address4
+          %td= doctor.town_name
+          %td= doctor.postcode
+          %td= doctor.state_name
+          %td= doctor.xray_facility_code
+          %td= doctor.laboratory_code
+          %td= doctor.xray_facility_name
+          %td= doctor.xray_facility_email
+          %td= doctor.xray_facility_address1
+          %td= doctor.xray_facility_address2
+          %td= doctor.xray_facility_address3
+          %td= doctor.xray_facility_address4
+          %td= doctor.xray_facility_town_name
+          %td= doctor.xray_facility_postcode
+          %td= doctor.xray_facility_state_name
+          %td= doctor.xray_facility_phone
+          %td= doctor.xray_facility_fax
+          %td= doctor.laboratory_name
+          %td= doctor.laboratory_email
+          %td= doctor.laboratory_address1
+          %td= doctor.laboratory_address2
+          %td= doctor.laboratory_address3
+          %td= doctor.laboratory_address4
+          %td= doctor.laboratory_town_name
+          %td= doctor.laboratory_postcode
+          %td= doctor.laboratory_state_name
+          %td= doctor.laboratory_phone
+          %td= doctor.laboratory_fax
+
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

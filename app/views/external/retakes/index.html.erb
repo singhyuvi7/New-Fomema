@@ -1,0 +1,138 @@
+<div class="card">
+    <div class="card-header">X-Ray Retake</div>
+
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+
+        <form method="post" action="/transactions/bulk_action">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <% empty_colspan = 8 %>
+
+            <table class="table table-responsive-sm table-striped">
+                <thead>
+                    <tr>
+                        <% if current_user.userable_type == "Employer" %>
+                            <th><%= check_box_tag "toggle_all_checkboxes", "", false %></th>
+                            <% empty_colspan += 1 %>
+                        <% end %>
+
+                        <th>Transaction Code</th>
+                        <th>Worker Code / Name</th>
+                        <th>Passport Number / Country</th>
+                        <th>Gender</th>
+
+                        <% if ["Radiologist"].include?(current_user.userable_type) %>
+                            <th>Xray Code / Facility</th>
+                            <% empty_colspan += 1 %>
+                        <% else %>
+                            <th>Clinic / Doctor</th>
+                            <% empty_colspan += 1 %>
+                        <% end %>
+
+                        <th>Registration Date</th>
+                        <th>Examination Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% @xray_retakes.each.with_index((@xray_retakes.current_page - 1) * get_per + 1) do |xray_retake, index| %>
+                        <tr data-medical-examination_date="<%= xray_retake.transactionz.medical_examination_date %>" data-expired-at="<%= xray_retake.transactionz.expired_at %>" data-doctor-changed-at="<%= xray_retake.transactionz.transaction_change_sps.where(status: "APPROVED").order(approval_at: :desc).first&.approval_at %>" data-transaction-code="<%= xray_retake.transactionz.code %>" data-status="<%= xray_retake.transactionz.status %>">
+                            <% if current_user.userable_type == "Employer" %>
+                                <td>
+                                    <input type="checkbox" name="transaction_ids[]" value="<%= xray_retake.transactionz.id %>" class="child-checkbox" data-doctor="<%= xray_retake.transactionz.doctor_id %>">
+                                </td>
+                            <% end %>
+
+                            <td>
+                                <data class="select-doctor-table-data" data-text="<%= xray_retake.transactionz.code %>"></data>
+                                <data class="select-doctor-table-data" data-text="<%= xray_retake.transactionz.foreign_worker.code %>"></data>
+                                <data class="select-doctor-table-data" data-text="<%= xray_retake.transactionz.foreign_worker.name %>"></data>
+                                <data class="select-doctor-table-data" data-text="<%= ForeignWorker::GENDERS[xray_retake.transactionz.foreign_worker.gender] %>"></data>
+                                <data class="select-doctor-table-data" data-text="<%= xray_retake.transactionz.doctor.try(:name) %>" data-type="doctor"></data>
+                                <%= xray_retake.transactionz.code %>
+                            </td>
+
+                            <td>
+                                <%= xray_retake.transactionz.foreign_worker.code %><br>
+                                <b><%= xray_retake.transactionz.foreign_worker.name %></b>
+                            </td>
+
+                            <td>
+                                <%= xray_retake.transactionz.foreign_worker.passport_number %><br>
+                                <b><%= xray_retake.transactionz.foreign_worker.country.name %></b>
+                            </td>
+
+                            <td><%= ForeignWorker::GENDERS[xray_retake.transactionz.foreign_worker.gender] %></td>
+
+
+                            <% if ["Radiologist"].include?(current_user.userable_type) %>
+                                <% facility = xray_retake.xray_facility %>
+
+                                <td>
+                                    <% if facility.present? %>
+                                        <%= facility.try(:code) %><br>
+                                        <b><%= facility.try(:name) %></b>
+                                    <% else %>
+                                        <i>N/A</i>
+                                    <% end %>
+                                </td>
+                            <% else %>
+                                <% doctor = xray_retake.transactionz.doctor %>
+
+                                <td>
+                                    <% if doctor.present? %>
+                                        <%= doctor.try(:clinic_name) %><br>
+                                        <b><%= doctor.try(:name) %></b>
+                                    <% else %>
+                                        <i>N/A</i>
+                                    <% end %>
+                                </td>
+                            <% end %>
+
+                            <td><%= xray_retake.transactionz.transaction_date.strftime(get_standard_date_format) %></td>
+                            <td><%= xray_retake.transactionz.medical_examination_date.nil? ? (raw "<i>N/A</i>") : xray_retake.transactionz.medical_examination_date.strftime(get_standard_date_format) %></td>
+                            <td>
+                                <%= xray_retake.displayed_status(current_user.userable_type) %><br>
+                                <%
+                                    xray_bypass_request = TransactionVerifyDoc.where(category: "XRAY_TRANSACTION_BYPASS_FINGERPRINT", sourceable: xray_retake).last
+                                %>
+                                <% if current_user.userable_type == "XrayFacility" && !xray_bypass_request.blank? %>
+                                    <small><i><%= xray_bypass_request&.status == "APPROVAL" ? "Bypass pending for approval" : "Bypass #{xray_bypass_request&.status}" %></i></small>
+                                <% end %>
+                            </td>
+
+                            <td class="module-row-actions">
+                                <% if ["APPROVED", "IN_PROGRESS"].include?(xray_retake.status) %>
+                                    <%= link_to "Retake X-Ray Examination", edit_external_retake_path(xray_retake.id), class: "btn btn-primary" %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+
+                    <% if @xray_retakes.blank? %>
+                        <tr>
+                            <td colspan="<%= empty_colspan %>" class="text-center">No transactions found</td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+
+        <div class="row external-pagination-container">
+            <%= paginate @xray_retakes %>
+        </div>
+    </div>
+</div>
+
+<style>
+    td.stacked-actions a,
+    td.stacked-actions div {
+        display: block;
+        margin-bottom: 0.25em;
+        float: left;
+        clear: left;
+    }
+</style>

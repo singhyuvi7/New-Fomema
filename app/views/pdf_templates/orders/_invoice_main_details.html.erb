@@ -1,0 +1,37 @@
+<div class="fomema-logo">
+    <%= wicked_pdf_image_tag "forms/logo_fomema_global.png" %>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <p><b>
+        <% if (@order.date < Date.new(2020, 11, 1)) %>
+            FOMEMA SDN. BHD. (404653-V)
+        <% else %>
+            <%=raw SystemConfiguration.get("COMPANY_NAME_INVOICE") %><%=raw " (#{SystemConfiguration.get("COMPANY_REGNO_GLOBAL")})" if !SystemConfiguration.get("COMPANY_REGNO_GLOBAL").blank? %>
+            <div><small><%=raw SystemConfiguration.get("REMARK_INVOICE") if !SystemConfiguration.get("REMARK_INVOICE").blank? %></small></div>
+        <% end %>
+        </b></p>
+        <p><%=raw SystemConfiguration.get("COMPANY_ADDR") %></p>
+        <p>Tel : <%=raw SystemConfiguration.get("COMPANY_PHONE") %></p>
+       <!--portal revampp remove fax <p>Fax : <%=raw SystemConfiguration.get("COMPANY_FAX") %></p> -->
+    </div>
+    <div class="col-6">
+        <p>Invoice No : <%= @order.code %></p>
+        <p>Date : <%= @order.paid_at.strftime('%d/%m/%Y') %></p>
+        <% if @order.creator.userable_type.eql?("Organization") %>
+        <p>Branch Code : <%= @order.creator.userable.code %></p>
+        <p>User ID : <%= @order.creator.username %></p>
+        <% end %>
+        <div class="employer-box">
+            <p><b><%= @order.customerable_type.constantize.model_name.human.titlecase %></b></p>
+            <p><%= @order.customerable&.code %></p>
+            <p><%= @order.customerable_type == 'XrayFacility' ? @order.customerable&.license_holder_name : @order.customerable&.name %></p>
+            <% if ['Doctor', 'XrayFacility'].include?(@order.customerable_type) %>
+                <p><%= @order.customerable_type == 'Doctor' ? @order.customerable&.clinic_name : @order.customerable_type == 'XrayFacility' ? @order.customerable&.name : '' %></p>
+            <% end %>
+            <p><%= [@order.customerable&.address1,@order.customerable&.address2,@order.customerable&.address3,@order.customerable&.address4,@order.customerable&.town&.name,@order.customerable&.postcode,@order.customerable&.state&.name].reject(&:blank?).join(',') %></p>
+            <p>Tel : <%= @order.customerable&.phone.present? ? @order.customerable&.phone : '*' %></p>
+        </div>
+    </div>
+</div>

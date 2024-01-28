@@ -1,0 +1,45 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Insurance Payment Batch</strong> - Batch Details
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-12">
+                    <label for="batch_code">Batch Code :  <%= "#{@batch.code} ( #{@batch.start_date&.strftime("%d/%m/%Y")} - #{@batch.end_date&.strftime("%d/%m/%Y")})" %> </label>
+                    <p class="text-danger"><small><i><%= @error&.remark %></i></small></p>
+            </div>
+        </div>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row-fluid">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active nav-item"> <a class="nav-link active show" href="#invoices" data-target="#invoices" data-toggle="tab">Invoices</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#calculations" data-target="#calculations" data-toggle="tab">Calculations</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active fade in active show" id="invoices">
+                    <%=render "invoices" %>
+                </div>
+                <div class="tab-pane" id="calculations">
+                    <%=render "calculations" %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_insurance_payments_path) %>
+            <% if has_permission?('PROCESS_INSURANCE_PAYMENT') && !(['NOT_PROCESS','PROCESS_FAILED'] & @batch.ip_invoices.pluck('DISTINCT status')).empty? %>
+                <%= link_to '<i class="fas fa-arrow-right"></i> Process Payment'.html_safe, process_internal_insurance_payment_path(@batch), method: :post, class: "btn btn-sm btn-warning process-payment-btn"%>
+            <% end %>
+            <a href="<%= export_internal_insurance_payment_path + '.xlsx' %>" class="btn btn-sm btn-primary" id="download_payment_csv"><i class="fas fa-download"></i> Download</a>
+        </div>
+    </div>
+</div>

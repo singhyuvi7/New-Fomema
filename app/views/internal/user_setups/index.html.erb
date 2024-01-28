@@ -1,0 +1,97 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Users</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+<form method="post" action="<%= bulk_action_internal_user_setups_path %>">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+
+    <div class="row">
+        <div class="col module-actions text-left">
+            <% if has_permission?('EXPORT_USER_ROLE_PERMISSION') %>
+                <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-download\"></i> Export", title: "Export", value: "export", formtarget: "_blank") %>
+            <% end %>
+        </div>
+
+        <div class="col module-actions text-right">
+            <% if has_permission?('CREATE_USER') %>
+                <%=raw index_table_new_button(new_internal_user_setup_path) %>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">
+                <label><input type="checkbox" class="master-checkbox"> &nbsp; #</label>
+            </th>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Userable Type</th>
+            <th>Userable</th>
+            <th>User Link</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @users.blank? %>
+            <tr>
+                <td colspan="11" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @users.each.with_index((@users.current_page - 1) * get_per + 1) do |user, index| %>
+                <tr>
+                    <td class="module-row-numbers">
+                        <label><input type="checkbox" class="child-checkbox" name="ids[]" value="<%= user.id %>"> &nbsp; <%= index %></label>
+                    </td>
+                    <td><%= user.id %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.userable_type%></td>
+                    <td><%= user.userable&.name %></td>
+                    <td><a href="/<%=user.userable_type.tableize%>/<%=user.userable_id%>" target="_blank">User Link</a></td>
+                    <td><%= user.name %></td>
+                    <td><%= link_to user.role&.name, internal_role_path(user.role) if user.role %></td>
+                    <td><%= User::STATUSES[user.status] %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_user_setup_path(user)) %>
+                        <% if has_permission?('EDIT_USER') %>
+                            <%=raw index_table_edit_button edit_internal_user_setup_path(user) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_USER') %>
+                            <%=raw index_table_delete_button(internal_user_setup_path(user)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+            </div>
+        </div>
+    </div>
+</form>
+
+        <div class="row">
+            <%= paginate @users %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

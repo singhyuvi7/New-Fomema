@@ -1,0 +1,94 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Refund Batches</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <%= render "/shared/all_flash" %>
+
+        <form method="post" action="<%= bulk_internal_refunds_path %>">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="row">
+                <div class="col module-actions text-right">
+                    <% if has_permission?('CREATE_REFUND_BATCH') %>
+                        <%= raw index_table_new_button(new_internal_refund_batch_path) %>
+                    <% end %>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="<%= index_table_class %>">
+
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>Code</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th class="module-row-actions">Action(s)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% if @batches.blank? %>
+                                    <tr>
+                                        <td colspan="9" class="text-danger">No records found.</td>
+                                    </tr>
+                                <% else %>
+
+                                    <% @batches.each.with_index((@batches.current_page - 1) * get_per + 1) do
+                                        |batch, index| %>
+                                        <% statuses = batch.refunds.pluck(:status).uniq %>
+                                        <tr>
+                                            <td class="text-center"><%= index %></td>
+                                            <td><%= batch.code %></td>
+                                            <td><%= batch.start_date&.strftime("%d/%m/%Y") %></td>
+                                            <td><%= batch.end_date&.strftime("%d/%m/%Y") %></td>
+                                            <td><%=
+                                                if statuses.include? 'FAILED'
+                                                    Refund::STATUSES['FAILED']
+                                                else
+                                                    raw statuses.map { |_status| Refund::STATUSES[_status] }.join('<br>')
+                                                end
+                                                %>
+                                            </td>
+                                            <td class="module-row-actions">
+
+                                                <!-- show -->
+                                                <%= raw index_table_show_button(internal_refund_batch_path(batch)) %>
+
+                                                <!-- delete -->
+                                                <% if has_permission?('DELETE_REFUND_BATCH') %>
+                                                    <%= raw index_table_delete_button(internal_refund_batch_path(batch)) %>
+                                                <% end %>
+
+                                            </td>
+                                        </tr>
+
+                                    <% end %>
+
+                                <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <%= paginate @batches %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

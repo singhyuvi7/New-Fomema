@@ -1,0 +1,16 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Body>
+        <ns:SubmitLabTransactionResponse xmlns:ns="http://fomema.dbixelabs.com">
+            <ns:return>
+                <fomema_labws_response>
+                    <labws_result><%= @response[:labws_result] %></labws_result>
+                    <labws_message><%= @response[:labws_message] %></labws_message>
+
+                    <% if @response[:labws_remarks].present? %>
+                        <labws_remarks><%= @response[:labws_remarks] %></labws_remarks>
+                    <% end %>
+                </fomema_labws_response>
+            </ns:return>
+        </ns:SubmitLabTransactionResponse>
+    </soapenv:Body>
+</soapenv:Envelope>

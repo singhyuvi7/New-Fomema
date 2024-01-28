@@ -1,0 +1,20 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>X-Ray Dispatches</strong> - X-Ray Dispatch Detail
+    </div>
+
+    <%= nested_form_for @xray_dispatch, url: internal_xray_dispatch_path(@xray_dispatch) do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_xray_dispatches_path) %>
+            <% if has_permission?('EDIT_XRAY_DISPATCH') %>
+                <%=raw show_edit_button(edit_internal_xray_dispatch_path(@xray_dispatch)) %>
+            <% end %>
+        </div>
+    </div>
+
+</div>

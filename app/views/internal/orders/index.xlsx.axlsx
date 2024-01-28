@@ -1,0 +1,83 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+
+    wb.add_worksheet(name: 'Orders') do |sheet|
+        sheet.merge_cells "A1:K1"
+        sheet.merge_cells "A2:K2"
+        sheet.merge_cells "A3:K3"
+        sheet.add_row([@company_name], style: [title_style])
+        sheet.add_row(["Payment Date: #{@paid_start_date.try(:to_date).try(:strftime, get_standard_date_format) || '-'} to #{@paid_end_date.try(:to_date).try(:strftime, get_standard_date_format) || '-'}. Generated Date: #{@now.strftime(get_standard_date_format)}"], style: [title_style])
+        sheet.add_row([""])
+        sheet.add_row([
+            "Order Code", 
+            "Order Date", 
+            "Customer Code", 
+            "Category", 
+            "Document Number", 
+            "Payment No", 
+            "Amount", 
+            "Status", 
+            "Paid Date", 
+            "Payment Method", 
+            "Branch"
+        ])
+        total_amount = 0
+        types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string
+        ]
+        @orders.find_each do |order|
+            total_amount += order.amount if !order.amount.nil?
+            sheet.add_row([
+                order.code,
+                order.date.try(:strftime, get_standard_date_format),
+                order.customerable.try(:code),
+                order.category,
+                Order.get_document_numbers(order.id).try(:join,'<br/>'),
+                Order.get_payment_no(order.id).try(:join,'<br/>'),
+                number_to_currency(order.amount, unit: ""),
+                order.status,
+                order.paid_at.try(:strftime, get_standard_date_format),
+                order.payment_method.try(:name),
+                order.organization.try(:name)
+            ], types: types)
+        end
+        sheet.add_row([
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Total",
+            number_to_currency(total_amount, unit: ""),
+            "",
+            "",
+            "",
+            ""
+        ], types: types, style: [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            title_style,
+            title_style,
+            nil,
+            nil,
+            nil,
+            nil
+        ])
+    end
+end

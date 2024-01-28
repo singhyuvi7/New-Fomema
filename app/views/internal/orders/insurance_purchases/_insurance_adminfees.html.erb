@@ -1,0 +1,7 @@
+<% if order_item.amount > 0 %>
+<tr>
+    <td colspan="2"><%= "#{order_item.fee.name}" %></td>
+    <td class="currency"><%= number_to_currency(order_item.amount, unit: "") %></td>
+    <td>&nbsp;</td>
+</tr>
+<% end %>

@@ -1,0 +1,115 @@
+<style>
+.margin-top {
+    margin-top: 10px;
+}
+.uploads-delete {
+    display: none;
+}
+</style>
+
+<%#= render 'shared/all_validation_flash', { model_obj: @refund } %>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :employer, class: 'required' %>
+            <div class="input-group">
+                <input type="hidden" name="refund[customerable_type]" id="refund_customerable_type" value="<%= @refund.customerable_type %>">
+                <input type="hidden" name="refund[customerable_id]" id="refund_customerable_id" value="<%= @refund.customerable_id %>"></input>
+                <div class="form-control" id="refund_customerable_display">
+                    <% if !@refund.customerable_id.nil? %>
+                        <%= "#{@refund.customerable.name} - #{@refund.customerable.code}" %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :category, class: 'required' %>
+            <%= form.select :category, options_for_select(Refund::CATEGORIES.invert, form.object.category), {include_blank: "Select Option"}, {class: "form-control", disabled: true} %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :payment_method_id, "Payment Method (Incoming)", class: 'required' %>
+            <%= form.select :payment_method_id, options_from_collection_for_select(@payment_methods, :id, :name, form.object.payment_method_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, disabled: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :amount, class: 'required' %>
+            <%= form.number_field :amount, required: true, class: "form-control", step: 0.01, min: 0.01, disabled: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :payment_date,@refund&.payment_method&.code == 'BANKDRAFT' ? 'Issue Date' : 'Payment Date', class: 'required' %>
+            <%= form.date_field :payment_date, class: 'form-control', max: Time.now.strftime('%Y-%m-%d'), disabled: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :reference, 'Reference Number', class: 'required' %>
+            <%= form.text_field :reference, class: 'form-control', disabled: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :unutilised, "Unutilised Payment", class: 'required' %>
+            <%= form.select :unutilised, options_for_select(Refund::UNUTILISED, form.object.unutilised), {include_blank: form_select_option_text}, class: "form-control", disabled: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment %>
+            <%= form.text_area :comment, class: "form-control", disabled: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <label for="refund_uploads">Uploaded Documents</label>
+        <table class="table">
+            <tr>
+                <th>Documents</th>
+            </tr>
+
+            <% @refund.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if @refund.uploads.blank? %>
+                <tr><td colspan="2">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>
+
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

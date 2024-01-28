@@ -1,0 +1,17 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :tpm_comment, 'TPM' %>
+        <%= form_shared.text_area :tpm_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+    </td>
+    <td class="text-right table-acceptable">
+        <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="<%= tab_name %>">
+            <label class="btn btn-outline-success">
+                <%= form_shared.radio_button :tpm, 'YES', class: "#{tab_name}" %> Yes
+            </label>
+            <label class="btn btn-outline-danger">
+                <%= form_shared.radio_button :tpm, 'NO', class: "#{tab_name}" %> No
+            </label>
+        </div>
+    </td>
+</tr>

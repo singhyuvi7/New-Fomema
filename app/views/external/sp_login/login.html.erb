@@ -1,0 +1,94 @@
+<div class="container text-center" style="padding-top:50px">
+    <img src="<%= image_path('external_bg_logo.png')%>" class="img-responsive" style="max-height: 180px">
+</div>
+
+<div class="container" style="padding-top:35px;">
+    <div class="container">
+        <h2 class="text-center text-white">
+            Medical Examination Results Transmission System (MERTS v3.0)
+        </h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <hr class="navbar-sep-1">
+        <hr class="navbar-sep-2">
+    </div>
+
+    <div class="row">
+
+       <div class="container">
+            <%= form_for(@user, url: new_external_user_session_path()) do |f| %>
+            <input type="hidden" name="login_user" value="service_provider">
+            <input type="hidden" name="external_user[login_from]" value="ext_sp_login">
+            <input type="hidden" name="external_user[login_user_type]" value="merts">
+                <div class="p-4">
+                    <div id="alert" class="text-danger"><%= flash[:alert] %></div>
+                    <div class="d-flex align-items-center my-2 text-white text-merts">
+                        <%= f.label :login_type, "Login Type", class: "mb-0", style: "width: 120px;" %>
+                        <%= f.text_field :code, { class: "form-control form-field no-uppercase username-field", value: "Code", name: "external_user[login_type]", id: "external_user_login_type", readonly: true } %>
+                    </div>
+                    <div class="d-flex align-items-center my-2 text-white text-merts">
+                        <%= f.label :username, "User Code", class: "mb-0", style: "width: 120px;" %>
+                        <%#= f.text_field :login, class: 'form-control form-field no-uppercase username-field', placeholder: "Username", autofocus: true, autocomplete: false %>
+                        <input type="text" name="external_user[login]" id="external_user_login" class="form-control form-field no-uppercase username-field" placeholder="Username">
+                    </div>
+
+                    <div class="d-flex align-items-center my-2 text-white text-merts">
+                        <%= f.label :password, class: "mb-0", style: "width: 120px;" %>
+                        <%#= f.password_field :password, class: 'form-control form-field', placeholder: "Password", autocomplete: false %>
+                        <input type="password" name="external_user[password]" class="form-control form-field no-uppercase username-field" placeholder="Password">
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <%= f.submit "Login",class: 'btn btn-fomema btn-blue margin-left-10 text-merts' %>
+                    <%= submit_tag("Clear", { :name => 'reset', :id => 'reset', :type => 'reset', :class => 'btn btn-fomema btn-white margin-right-10 text-merts'}) %>
+                </div>
+            <% end %>
+
+            <p class="forgot-password text-center">
+                <%= link_to "Forgot your password?", new_password_path(@user), class: "forgot-password text-bold text-white text-merts" %><br />
+            </p>
+
+            <% if flash[:notice] %>
+                <p class="text-center"><%= flash[:notice] %></p>
+            <% end %>
+            <% if flash[:error] %>
+                <p class="text-center text-danger"><%= flash[:error] %></p>
+            <% end %>
+       </div>
+
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6">
+            <div class="margin-top-30">
+                <h3 class="text-left text-white">Notice:</h3>
+                <p class="text-left margin-top-30 text-white">
+                In order to access MERTS, you will need to login using your respective codes e.g.
+                Doctors=Doctor's code, Laboratories=Laboratory's code, X-Ray facilities=X-Ray's code.
+                Please note that by logging in, you are agreeing to the terms and conditions set by
+                FOMEMA Sdn Bhd governing the usage of this application.
+                </p>
+                <p class="text-left text-white">
+                The FOMEMA Internet System will be <span class="text-danger">unavailable daily between 04:00AM to 06:00AM for
+                maintenance purposes.</span> Please do not access the system during this time.</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+        </div>
+    </div>
+</div>
+<%# render "devise/shared/links" %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#external_user_login_type').change(function() {
+    type = $(this).val();
+    setLoginUsernameEmailPlaceholder(type);
+});
+
+function setLoginUsernameEmailPlaceholder(type) {
+	placeholder = type === 'Code' ? 'Username' : 'Email';
+	$('#external_user_login').attr('placeholder', placeholder);
+}
+</script>
+<% end %>

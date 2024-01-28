@@ -1,0 +1,228 @@
+<% if has_permission?('DASHBOARD_FW_REGISTRATION_TREND') %>
+<div class="row">
+  <div class="col-12 col-sm-10 pr-0">
+    <div class="chartjs-size-monitor">
+      <div class="chartjs-size-monitor-expand">
+        <div class=""></div>
+      </div>
+      <div class="chartjs-size-monitor-shrink">
+        <div class=""></div>
+      </div>
+    </div>
+    <canvas id="canvas" style="display: block; width: 100%; height: 198px;" class="chartjs-render-monitor"></canvas>
+  </div>
+  <div class="col-12 col-sm-2">
+    <div class="row no-gutters bg-gray">
+      <% @sums_by_year.each do |year, sum| %>
+        <div class="col col-sm-12">
+          <div class="d-flex align-items-baseline">
+            <h4 class="tx-numeric">
+              <b>
+                <a href="javascript:void(0);" onclick="showChart('<%= year %>')">
+                  <%= sum.nil? ? 'N/A' : sum %>
+                </a>
+              </b>
+              <span>Year <%= year %></span>
+            </h4>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <!-- row -->
+  </div>
+</div>
+<%end%>
+<script src="https://cdn2.hubspot.net/hubfs/476360/Chart.js"></script>
+<script src="https://cdn2.hubspot.net/hubfs/476360/utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- <button id="randomizeData">Randomize Data</button> -->
+<script>
+    var yearLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var fixedColors = ['#FF5733', '#33FF57', '#5733FF', '#33FFFF', '#FFFF33'];
+
+    var yearData = {};
+
+    <% @transaction_line_chart.each do |year, data| %>
+    yearData[<%= year %>] = <%= data.to_json.html_safe %>;
+    <% end %>
+
+    var myLine;
+
+    function initializeChart() {
+        var datasets = Object.keys(yearData).map(function (year, index) {
+            return {
+                label: 'Year ' + year,
+                backgroundColor: fixedColors[index % fixedColors.length],
+                borderColor: fixedColors[index % fixedColors.length],
+                fill: false,
+                data: yearData[year]
+            };
+        });
+
+        var config = {
+            type: 'line',
+            data: {
+                labels: yearLabels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: false,
+                    text: 'Chart.js Line Chart - Logarithmic'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Date'
+                        },
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Index Returns'
+                        },
+                    }]
+                }
+            }
+        };
+
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+    }
+
+    // Call the initialization function
+    initializeChart();
+
+    function updateChartByYearRange(selectedDateRange) {
+        // Destroy the existing chart only if it exists
+        if (window.myLine) {
+            window.myLine.destroy();
+        }
+
+        // Parse selected date range
+        let [startDate, endDate] = selectedDateRange.split(' - ');
+        let startYear = parseInt(startDate.split('-')[0]);
+        let endYear = parseInt(endDate.split('-')[0]);
+
+        // Filter data based on selected year range
+        var datasets = Object.keys(yearData).map(function (year, index) {
+            if (year >= startYear && year <= endYear) {
+                var dataForYear = yearData[year];
+                return {
+                    label: 'Year ' + year,
+                    backgroundColor: fixedColors[index % fixedColors.length],
+                    borderColor: fixedColors[index % fixedColors.length],
+                    fill: false,
+                    data: dataForYear
+                };
+            }
+        }).filter(Boolean);
+
+        var chartConfig = {
+            type: 'line',
+            data: {
+                labels: yearLabels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: false,
+                    text: 'Chart.js Line Chart - Logarithmic'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Date'
+                        },
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Index Returns'
+                        },
+                        ticks: {
+                            min: 0,
+                            max: 1000,
+                            stepSize: 100
+                        }
+                    }]
+                }
+            }
+        };
+
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = new Chart(ctx, chartConfig);
+    }
+
+
+    function showChart(selectedYear) {
+        if (window.myLine) {
+            window.myLine.destroy();
+        }
+
+        // Create or re-create the chart for the selected year
+        var selectedYearData = yearData[selectedYear];
+        var colorIndex = Object.keys(yearData).indexOf(selectedYear) % fixedColors.length;
+
+        // Use the original color combination
+        var datasets = [{
+            label: 'Year ' + selectedYear,
+            backgroundColor: fixedColors[colorIndex],
+            borderColor: fixedColors[colorIndex],
+            fill: false,
+            data: selectedYearData
+        }];
+
+
+        var config = {
+            type: 'line',
+            data: {
+                labels: yearLabels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: false,
+                    text: 'Chart.js Line Chart - Logarithmic'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Date'
+                        },
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'Index Returns'
+                        },
+                        ticks: {
+                            min: 0,
+                            max: 1000,
+                            stepSize: 100
+                        }
+                    }]
+                }
+            }
+        };
+
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+    }
+</script>

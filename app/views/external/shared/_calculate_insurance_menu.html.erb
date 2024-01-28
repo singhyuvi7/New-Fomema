@@ -1,0 +1,17 @@
+<%
+    order = local_assigns[:order]
+    button_class = local_assigns[:button_class]
+%>
+
+<div class="dropdown show d-inline">
+    <a class="<%= button_class %>" href="#" role="button" id="insuranceMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Calculate Insurance Premium
+    </a>
+    <div class="dropdown-menu" aria-labelledby="insuranceMenuLink">
+        <% InsuranceServiceProvider.where(active: true).each do |provider| %>
+            <a class="dropdown-item"  href="<%= submit_calculator_external_insurances_path(order.id, provider_code: provider.code) %>">
+                <%= image_tag "insurances/#{provider.code.downcase}.png" %>
+            </a>
+        <% end %>
+    </div>
+</div>

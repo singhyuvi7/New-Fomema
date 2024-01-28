@@ -1,0 +1,55 @@
+<div>
+    <p>Tuan/Puan,</p>
+
+    <p style="border-bottom: 2px solid black;"><b>
+        KEPUTUSAN PEMERIKSAAN KESIHATAN FOMEMA DAN PERINGATAN UNTUK MENGHANTAR PEKERJA ASING YANG DIDAPATI TIDAK SESUAI UNTUK BEKERJA DI MALAYSIA KE NEGARA ASALNYA<br>
+    </b></p>
+    NAMA: <%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">
+        Dengan hormatnya kami merujuk kepada perkara di atas.<br><br>
+        2. Dukacita dimaklumkan bahawa keputusan pemeriksaan kesihatan FOMEMA untuk pekerja asing yang dinyatakan di atas didapati "TIDAK SESUAI" untuk bekerja di Malaysia atas sebab-sebab berikut<br>
+
+        <% @data[:failed_reasons_bm].each do |reason| %>
+            <p><b><%= reason %></b></p>
+        <% end %>
+
+        3. Harap maklum bahawa rayuan tidak dibenarkan untuk pekerja asing ini. Jika penjelasan lanjut diperlukan, mohon tuan/puan untuk menghubungi doktor asal yang memeriksa pekerja asing ini.<br><br>
+        4. Majikan dinasihatkan untuk membuat persediaan untuk menghantar pulang pekerja asing ini ke negara asalnya dan mengemukakan tiket penerbangan/kapal terbang/feri untuk tujuan pengeluaran Memo Periksa Keluar (COM) sama ada secara dalam
+        talian melalui <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> atau di mana-mana Pejabat Imigresen terdekat bagi tujuan penghantaran pulang secara teratur.<br>
+        5. Kerjasama tuan/puan dalam perkara ini amat dihargai. <br><br><br>
+        Sekian, terima kasih.<br><br><br>
+    </p>
+
+    <%= image_tag attachments["fomema-logo.png"].url, width: 70, height: 30 %>
+    <br><br>
+    <p>***This is an auto generated email. Do not reply to this email.***</p>
+</div>
+<hr>
+<div>
+    <p>Dear Sir/Madam,</p>
+
+    <p style="border-bottom: 2px solid black;"><b>
+        FOMEMA MEDICAL EXAMINATION RESULT AND A REMINDER TO SEND FOREIGN WORKER FOUND TO BE UNSUITABLE TO WORK IN MALAYSIA TO HIS/HER ORIGINAL COUNTRY<br>
+    </b></p>
+    NAME: <%= @data[:worker_name] %> / <%= @data[:worker_gender_bi] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">
+        The above subject is referred.<br><br>
+        Regretfully, we would like to inform that the result of FOMEMA medical examination for the above-mentioned foreign worker was found to be "UNSUITABLE" to work in Malaysia due to the following reason(s):<br>
+
+        <% @data[:failed_reasons_bi].each do |reason| %>
+            <p><b><%= reason %></b></p>
+        <% end %>
+
+        Please be informed that appeal is not allowed for this foreign worker. If further clarification is needed, you may contact the examining doctor accordingly.<br>
+        Employer is advised to make necessary arrangement to send the above foreign worker to his/her original country and submit the flight/ferry ticket for
+        the issuance of the Check-Out Memo (COM) either by online via <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> or at any nearest Immigration Office for a proper repatriation of the said worker.<br>
+        Your cooperation in this matter is greatly appreciated. <br><br><br>
+        Thank you.<br><br><br>
+    </p>
+
+    <%= image_tag attachments["fomema-logo.png"].url, width: 70, height: 30 %>
+    <br><br>
+    <p>***This is an auto generated email. Do not reply to this email.***</p>
+</div>

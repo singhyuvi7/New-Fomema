@@ -1,0 +1,30 @@
+<%
+    transaction_code ||= nil
+%>
+
+<div class="card">
+    <div class="card-header">
+        <%= label %> Info
+    </div>
+
+    <table class="table table-bordered table-card table-sm">
+        <tbody>
+            <% if transaction_code.present? %>
+                <tr>
+                    <td class="font-weight-bold">Transaction Code</td>
+                    <td><%= transaction_code %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td class="font-weight-bold">Name</td>
+                <td><%= name&.upcase %></td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold">Code</td>
+                <td><%= code %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

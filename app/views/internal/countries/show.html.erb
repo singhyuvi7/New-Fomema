@@ -1,0 +1,58 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Countries</strong> - Country Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="country_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @country.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="country_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @country.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_countries_path) %>
+            <% if has_permission?('edit_country') %>
+                <%=raw show_edit_button(edit_internal_country_path(@country)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_COUNTRY") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_country_audits_path(@country) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

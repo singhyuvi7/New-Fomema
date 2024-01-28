@@ -1,0 +1,50 @@
+<% readonly = readonly.present? %>
+
+<div class="category-switchable" data-type="worker">
+    <div class="p-4 border-bottom">
+        <h3><u>PART I. FOREIGN WORKER INFORMATION</u></h3>
+    </div>
+
+    <div class="border-bottom">
+        <div class="row pt-3">
+            <%
+                info_fields = {
+                    "Worker Name"               => @transaction.foreign_worker.name,
+                    "Worker Code"               => @transaction.foreign_worker.code,
+                    "Gender"                    => ForeignWorker::GENDERS[@transaction.fw_gender],
+                    "Date of Birth"             => @transaction.foreign_worker.date_of_birth.strftime('%d/%m/%Y'),
+                    "Passport Number"           => @transaction.foreign_worker.passport_number,
+                    "Country of Origin"         => @transaction.foreign_worker.country.name,
+                    "Arrival Date"              => @transaction.foreign_worker.arrival_date? ? @transaction.foreign_worker.arrival_date.strftime('%d/%m/%Y') : "N/A",
+                    "PLKS Number"               => @transaction.foreign_worker.plks_number || "N/A",
+                    "Job Type"                  => @transaction.foreign_worker.job_type.name,
+                    "PATI / Rehiring Programme" => @transaction.foreign_worker.pati ? "Yes" : "No",
+                    #"MAID Online"               => @transaction.is_maid_online? ? "Yes" : "No"
+                    "Programme"                 => @transaction.programme_indicator
+                }
+            %>
+
+            <% info_fields.each do |label, value| %>
+                <div class="row col-md-6">
+                    <div class="col-md-6">
+                        <label class="px-4"><%= label %></label>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p class="px-4"><%= value %></p>
+                    </div>
+                </div>
+            <% end %>
+
+            <div class="row col-md-6">
+                <div class="col-md-6">
+                    <label class="px-4">Medical Examination Date</label>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="px-4"><%= @transaction.medical_examination_date? ? @transaction.medical_examination_date.strftime("%d/%m/%Y") : "N/A" %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

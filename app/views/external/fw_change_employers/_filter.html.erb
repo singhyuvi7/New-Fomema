@@ -1,0 +1,44 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <strong></strong>
+    </div>
+
+    <%= form_tag external_fw_change_employers_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Worker Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="worker_name" id="worker_name" value="<%= params[:worker_name] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="passport_number" class="col-sm-3 col-form-label">Passport No.</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="passport_number" id="passport_number" value="<%= params[:passport_number] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Status</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status, options_for_select(FwChangeEmployer::STATUSES.invert, params[:status]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right  border-0 bg-transparent text-dark">
+            <a href="<%= external_fw_change_employers_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+            <button type="submit" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+        </div>
+    <% end %>
+</div>

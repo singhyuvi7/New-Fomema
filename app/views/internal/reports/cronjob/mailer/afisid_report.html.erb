@@ -1,0 +1,48 @@
+<head>
+    <style type="text/css">
+    .w-100 {
+        width: 100%;
+    }
+
+    table {
+        border-collapse: collapse;
+        text-align: center
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    .workers-table {
+        padding: 1rem 0px;
+    }
+
+    thead {
+        background-color: #c8ced3;
+    }
+
+    thead th {
+        padding: 3px;
+    }
+
+    tbody td {
+        padding: 1px 2px;
+        vertical-align: center;
+        height: 18px;
+    }
+    </style>
+</head>
+
+<body>
+    <h2 class="mt-2">Daily Get AFIS ID Report As Of <%= @now.strftime("%d-%b-%Y %H:%M") %></h2>
+    <p style="color:red"><i>**Note: All the figures in this report are accurate as of the report date and time</i></p>
+
+    <%=render "/internal/reports/it/daily_afisid_report/afisid_by_month_current_year" %>
+    <%=render "/internal/reports/it/daily_afisid_report/afisid_by_month_last_year" %>
+    <%=render "/internal/reports/it/daily_afisid_report/afisid_by_state_current_year" %>
+    <%=render "/internal/reports/it/daily_afisid_report/afisid_by_state_last_year" %> 
+
+    <p><i><b>**This is an auto generated email. Please do not reply to this email. **</b></i></p>
+</body>

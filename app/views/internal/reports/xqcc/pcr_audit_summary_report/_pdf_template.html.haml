@@ -1,0 +1,60 @@
+%h1 PCR Audit Summary Report
+%p Date searched from #{params[:date_from]} to #{params[:date_to]}
+%table.table.w-100.mt-3.text-center
+  %thead
+    %tr
+      - if @data.present?
+        %th Date
+        - @data.each.with_index do |row_data, index|
+          %th= row_data.pcr_name
+        %th Total
+  %tbody
+    - if @data_two.present?
+      - grand_total = 0
+      - total = 0
+      - @data_two.each.with_index do |row_dataone, index|
+        - grand_total += row_dataone.total
+        %tr
+          - total_all = 0
+          - a = 0
+          %td= row_dataone.transmit_date.try(:strftime, get_standard_date_format)
+          - if @data_three.present?
+            -@data.each.with_index do |row_data, index|
+              - @data_three.each.with_index do |row_datatwo, index|
+                -if row_datatwo.transmit_date == row_dataone.transmit_date
+                -p row_dataone.transmit_date
+                  -if row_datatwo.pcr_name == row_data.pcr_name
+                    - total_all = row_datatwo.total + row_datatwo.total
+                    -a = row_datatwo.total
+                    %td= a
+      %tr
+        %td
+        %td= grand_total
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

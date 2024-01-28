@@ -1,0 +1,93 @@
+<div class="card">
+    <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+        <div class="card-header border-0 bg-transparent text-dark"><strong>Payment</strong></div>
+    <% else %>
+        <div class="card-header">Orders</div>
+    <% end %>
+    <div class="card-body">
+        <%=render "filter" %>
+        <%=render "/shared/all_flash" %>
+
+        <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+            <table class="table table-responsive-sm table_circle">
+                <thead>
+                    <tr>
+                        <th>Payment Code</th>
+                        <th>Date Created</th>
+                        <th>Payment Date</th>
+                        <th>Category</th>
+                        <th>Amount(RM)</th>
+                        <th>Payment Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+        <% else %>
+            <table class="table table-responsive-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Order Code</th>
+                        <th>Order Date</th>
+                        <th>Category</th>
+                        <th>Amount(RM)</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+        <% end %>
+            <tbody>
+                <% @orders.each do |order| %>
+                    <tr>
+                        <td><%= order.code %></td>
+                        <td><%= order.date.strftime("%d/%m/%Y") %></td>
+                        <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                            <td><%= order.paid_at.try(:strftime,"%d/%m/%Y") %></td>
+                        <% end %>
+                        <td><%= Order::CATEGORIES[order.category] %></td>
+                        <td><%= number_to_currency(order.amount, unit: "") %></td>
+                        <td><%= Order::STATUSES[order.status] %></td>
+                        <td class="module-row-actions">
+                            <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                                <a href="<%= external_order_path order %>" class="btn btn-blue-portal">Show</a>
+                            <% else %>
+                                <a href="<%= external_order_path order %>" class="btn btn-primary">Show</a>
+                            <% end %>
+
+                            <% if (["TRANSACTION_REGISTRATION", "SPECIAL_RENEWAL_TRANSACTION_REGISTRATION", "AGENCY_REGISTRATION", "AGENCY_RENEWAL"].include?(order.category)) %>
+                                <% if (["PAID"].include?(order.status)) %>
+
+                                <% elsif (["NEW"].include?(order.status) && order&.organization&.code == 'PT') %>
+                                    <% if order.category == "TRANSACTION_REGISTRATION" && !order.payment_method_id.blank? && order.payment_method&.code != 'IPAY88' && !InsuranceService.order_need_recalculate?(order: order) && !order.order_need_update? %>
+                                        <a href="<%= payment_external_order_path order %>" class="btn btn-blue-portal">Pay now</a>
+                                    <% end %>
+                                <% elsif (["PENDING_PAYMENT"].include?(order.status)) && order&.organization&.code == 'PT' && order.payment_method&.code != 'IPAY88' && !order.order_need_update? %>
+                                    <a href="<%= payment_external_order_path order %>" class="btn btn-blue-portal">Pay now</a>
+                                <% end %>
+                            <% else %>
+                                <% if (["NEW", "PENDING_PAYMENT", "FAILED"].include?(order.status) && (order.amount || 0) > 0 && order&.organization&.code == 'PT') %>
+                                    <% if (["NEW"].include?(order.status)) %>
+                                        <a href="<%= edit_external_order_path order %>" class="btn btn-blue-portal">Edit</a>
+                                    <% end %>
+                                    <% if !order.payment_method_id.blank? && order.payment_method&.code != 'IPAY88' && !InsuranceService.order_need_recalculate?(order: order) && !order.order_need_update? %>
+                                        <a href="<%= payment_external_order_path order %>" class="btn btn-blue-portal">Pay now</a>
+                                    <% end %>
+                                <% end %>
+                            <% end %>
+
+                            <% if order.status == "PAID" %>
+                                <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                                    <a href="<%= invoice_external_order_path order %>" class="btn btn-blue-portal invoice-btn" target="_blank" data-has-insurance="<%= order.order_items.get_insurance_fee.blank? ? false : true %>" data-order-code="<%= order.code %>">Invoice</a>
+                                <% else %>
+                                    <a href="<%= invoice_external_order_path order %>" class="btn btn-primary invoice-btn" target="_blank" data-has-insurance="<%= order.order_items.get_insurance_fee.blank? ? false : true %>" data-order-code="<%= order.code %>">Invoice</a>
+                                <% end %>
+                            <% end %>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="row external-pagination-container">
+            <%= paginate @orders %>
+        </div>
+    </div>
+</div>

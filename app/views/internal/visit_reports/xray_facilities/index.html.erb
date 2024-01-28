@@ -1,0 +1,143 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Report X-Ray Facility</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/internal/visit_reports/shared/filter", {
+            form_action: internal_visit_report_xray_facilities_path,
+            filter_type: false,
+            filter_status: VisitPlan::STATUSES,
+            filter_facility_status: XrayFacility::STATUSES,
+            sp_type: XrayFacility.to_s
+        } %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_XRAY_FACILITY_VISIT_REPORT') %>
+
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Report ID</th>
+                                <th>Xray Name</th>
+                                <th>License Holder Name</th>
+                                <th>Xray Code</th>
+                                <th>Facility Status</th>
+                                <th>Visit Date</th>
+                                <th>Status</th>
+                                <th>Draft By</th>
+                                <th>1st Approved By</th>
+                                <th>2nd Approved By</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @visit_reports.blank? %>
+                                <tr>
+                                    <td colspan="12" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                            <% @visit_reports.each.with_index((@visit_reports.current_page - 1) * get_per + 1) do
+                                |visit_report, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td>
+                                        <%= visit_report.code %>
+                                    </td>
+                                    <td><%= visit_report.visit_report_xray_facility&.xray_facility&.name %></td>
+                                    <td>
+                                        <% if visit_report.visitable_id.present? %>
+                                            <a class="" href="<%= edit_internal_xray_facility_path(visit_report.visitable_id) %>"><%= visit_report.visit_plan_item.visitable.license_holder_name %></a>
+                                        <% else %>
+                                            -
+                                        <% end %>
+                                    </td>
+                                    <td><%= visit_report.visit_report_xray_facility&.xray_facility&.code %></td>
+                                    <td><%= XrayFacility::STATUSES[visit_report.visit_report_xray_facility&.xray_facility&.status] %></td>
+                                    <td>
+                                        <%= visit_report.visit_date.nil? ? "N/A" : visit_report.visit_date.strftime("%d/%m/%Y") %>
+                                    </td>
+                                    <td>
+                                        <%= VisitPlan::STATUSES[visit_report.status] %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.draft_by&.username %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.level1_approval_user.nil? ? "" : visit_report.level1_approval_user.username %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.level2_approval_user.nil? ? "" : visit_report.level2_approval_user.username %>
+                                    </td>
+
+                                    <td class="module-row-actions">
+
+                                        <% if visit_report.visitable_id.present? %>
+                                            <a class="btn btn-sm btn-secondary" title="View Visit Plan" data-toggle="tooltip" href="<%= internal_visit_plan_xray_facility_edit_path(visit_report.visit_plan_id) %>"><i class="fa fa-file"></i></a>
+                                        <% end %>
+
+                                        <% if has_permission?('VIEW_XRAY_FACILITY_VISIT_REPORT') && visit_report.status != 'DRAFT' && visit_report.status != 'REJECTED' %>
+                                            <%= raw index_table_show_button internal_visit_report_xray_facility_show_path(visit_report) %>
+                                        <% end %>
+
+                                        <!-- edit -->
+                                        <% if has_permission?('EDIT_XRAY_FACILITY_VISIT_REPORT') && (visit_report.status === 'DRAFT' || visit_report.status === 'REJECTED') %>
+                                            <%= raw index_table_edit_button internal_visit_report_xray_facility_edit_path(visit_report) %>
+                                        <% end %>
+
+                                        <!-- delete -->
+                                        <% if has_permission?('DELETE_XRAY_FACILITY_VISIT_REPORT') && (visit_report.status === 'DRAFT' || visit_report.status === 'REJECTED') %>
+                                            <%= raw index_table_delete_button(internal_visit_report_xray_facility_delete_path(visit_report)) %>
+                                        <% end %>
+
+                                        <!-- 1st approval -->
+                                        <% if has_permission?('APPROVAL_LEVEL_1_XRAY_FACILITY_VISIT_REPORT') && visit_report.status === 'LEVEL_1_APPROVAL' && current_user[:id] != visit_report.created_by %>
+                                            <%= raw index_table_approval_lvl1_button internal_visit_report_xray_facility_approval_path(visit_report) %>
+                                        <% end %>
+
+                                        <!-- 2nd approval -->
+                                        <% if has_permission?('APPROVAL_LEVEL_2_XRAY_FACILITY_VISIT_REPORT') && visit_report.status === 'LEVEL_1_APPROVED' && current_user[:id] != visit_report.level_1_approval_by %>
+                                        <%= raw index_table_approval_lvl2_button internal_visit_report_xray_facility_approval_path(visit_report) %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+
+                            <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_reports %>
+        </div>
+
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<% end %>

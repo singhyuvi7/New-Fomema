@@ -1,0 +1,121 @@
+<div class="card-body">
+
+    <%=render "/shared/all_flash" %>
+    <%= render 'shared/all_validation_flash', { model_obj: @role } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true, disabled: params[:action] == 'edit' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :category, class: 'required' %>
+                <%= form.select :category, options_for_select(Role::CATEGORIES.invert, form.object.category), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status, class: 'required' %>
+                <%= form.select :status, options_for_select(Role::STATUSES, form.object.status), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :site, class: 'required' %>
+                <%= form.select :site, options_for_select([ENV["SUBDOMAIN_NIOS"], ENV["SUBDOMAIN_PORTAL"], ENV["SUBDOMAIN_MERTS"]], form.object.site), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :password_policy_id, class: 'required' %>
+                <%= form.select :password_policy_id, options_from_collection_for_select(PasswordPolicy.order(:name).all, :id, :name, form.object.password_policy_id), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <label class="col-md-9 col-sm-6">Permissions</label>
+                <input type="text" class="form-control col-md-3 col-sm-6" placeholder="Filter permission" id="role-permission-filter">
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <% Role::MODULE_PERMISSIONS.each.with_index do |perm, idx| %>
+                    <div class="col-lg-6 col-md-6 permission-filterable" data-keywords=" <%= perm[1].join(' ').gsub('_', ' ') %> ">
+                        <div class="card">
+                            <div class="card-header">
+                                <label><input type="checkbox" class="permission-module-title"<%= ' checked' if @role.has_all_permission? perm[1] %>> <%= perm[0].upcase %></label>
+                            </div>
+                            <div class="card-body">
+                                <% perm[1].each do |permission| %>
+                                    <div class="permission-filterable" data-keywords=" <%= permission.gsub('_', ' ') %> ">
+                                        <div class="form-check checkbox">
+                                            <input type="checkbox" class="form-check-label" name="role[permissions][]" id="role_permissions_<%= permission.downcase %>" value="<%= permission %>"<%= ' checked' if @role.current_permissions.include? permission %>>
+                                            <label class="form-check-label" for="role_permissions_<%= permission.downcase %>"><%= permission %></label>
+                                        </div>
+                                    </div>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_roles_path) %>
+        <%=raw edit_save_button() %>
+        <%=raw edit_save_continue_button() %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#role-permission-filter').keyup(function () {
+        var keywords = this.value;
+        if (keywords.length == 0) {
+            $('.permission-filterable').show();
+            return;
+        }
+        $('.permission-filterable').hide();
+        var selector = '.permission-filterable';
+        var vals = this.value.toUpperCase().split(/[\s_]/);
+        $.each(vals, function (index, keyword) {
+            if (keyword.length > 0) {
+                selector += "[data-keywords*='" + keyword + "']";
+            }
+        });
+        $(selector).show();
+    });
+
+    $('.permission-module-title').change(function () {
+        var toggle = this;
+        $(this).parent().parent().siblings('.card-body').find(':input').each(function (idx, inp) {
+            $(this).prop('checked', toggle.checked);
+        });
+    });
+</script>
+<% end %>

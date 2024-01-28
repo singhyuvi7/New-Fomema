@@ -1,0 +1,8 @@
+<div class="alert alert-danger">
+    <h5><%= pcr_review.case_type_label %> <% if @transaction.xray_pending_review_id? && @transaction.xray_pending_review&.is_audit_comparison == "YES" %> (Audit & Comparison) <% end %> <% if pcr_review.is_retake? %> - RETAKE<% end %></h5>
+    <% if is_xqcc_pending_review_case(pcr_review.case_type) %>
+        <p>Review Comment: <%= pcr_review.pending_review_comment %></p>
+    <% elsif pcr_review.medical_appeal_id? %>
+        <h5>Appeal X-ray Retake</h5>
+    <% end %>
+</div>

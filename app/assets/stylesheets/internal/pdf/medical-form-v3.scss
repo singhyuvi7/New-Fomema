@@ -1,0 +1,1062 @@
+body {
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  color: #010101;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.page-container {
+  position: relative;
+  min-height: 1px; /* we set height to make it next page absolute position works */
+}
+
+// page header
+
+.fomema-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.fomema-logo img {
+  width: 199px;
+}
+
+.borang-title {
+  position: absolute;
+  top: 20px;
+  left: 335px;
+}
+
+.form-title {
+  position: absolute;
+  font-size: 16.5px;
+  font-weight: bold;
+  width: 320px;
+}
+
+.form-subtitle {
+  position: absolute;
+  top: 25px;
+  left: 57px;
+  font-size: 16px;
+  font-style: italic;
+  width: 220px;
+}
+
+.header-page-number {
+  position: absolute;
+  top: 55px;
+  left: 128px;
+  width: 100px;
+}
+
+.header-cancellation-refund-date {
+  position: absolute;
+  top: 94px;
+  left: 17px;
+  font-size: 15px;
+  font-style: italic;
+  width: 300px;
+}
+
+.form-signature {
+  position: absolute;
+  top: 17px;
+  left: 680px;
+  border: 1px solid black;
+  width: 280px;
+  min-height: 132px;
+}
+
+.form-signature .form-label-eng {
+  font-size: 10px;
+}
+
+.examination-date {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 133px;
+}
+
+.doctor-signature {
+  position: absolute;
+  top: 35px;
+  left: 5px;
+  width: 133px;
+}
+
+.clinic-stamp {
+  position: absolute;
+  top: 65px;
+  left: 5px;
+  width: 133px;
+  white-space: pre-line;
+}
+.float-right {
+  float: right;
+}
+
+// end of page header
+
+// section header
+
+.section-header {
+  position: absolute;
+  left: 22px;
+}
+
+.section-header img {
+  width: 245px;
+}
+
+.employer-section-header {
+  top: 100px;
+}
+
+.doctor-section-header {
+  top: 395px;
+}
+
+.doctor-section-header img {
+  width: 230px;
+}
+
+.laboratory-section-header {
+  top: 640px;
+}
+
+.laboratory-section-header img {
+  width: 230px;
+}
+
+.xray-section-header {
+  top: 992px;
+}
+
+.xray-section-header img {
+  width: 230px;
+}
+
+// end of section header
+
+// section divider
+
+.section-divider {
+  position: absolute;
+  left: 20px;
+}
+
+.section-divider img {
+  width: 940px;
+}
+
+.employer-section-divider {
+  top: 360px;
+}
+
+.doctor-section-divider {
+  top: 602px;
+}
+
+.laboratory-section-divider {
+  top: 962px;
+}
+
+.xray-section-divider {
+  top: 1000px;
+}
+
+// end of section divider
+
+// barcode
+
+.section-barcode {
+  position: absolute;
+  right: 33px;
+}
+
+.laboratory-section-barcode {
+  top: 650px;
+}
+
+.xray-section-barcode {
+  top: 1011px;
+}
+
+// end of barcode
+
+// employer_form_label section
+
+.employer_left_form_label {
+  position: absolute;
+  left: 47px;
+}
+
+.employer_right_form_label {
+  position: absolute;
+  left: 495px;
+}
+
+// end of employer_form_label section
+
+// employer form data section
+
+.employer_left_form_data {
+  position: absolute;
+  left: 164px;
+}
+
+.employer_right_form_data {
+  position: absolute;
+  left: 637px;
+}
+
+// end of employer form data section
+
+// employer fields section
+
+.employer_worker_code_label {
+  top: 145px;
+}
+
+.employer_worker_code_data {
+  top: 145px;
+}
+
+.employer_worker_name_label {
+  top: 178px;
+  width: 100px;
+}
+
+.employer_worker_name_data {
+  top: 178px;
+  width: 200px;
+}
+
+.employer_gender_label {
+  top: 210px;
+}
+
+.employer_gender_data {
+  top: 210px;
+}
+
+.employer_date_of_birth_label {
+  top: 242px;
+  width: 100px;
+}
+
+.employer_date_of_birth_data {
+  top: 242px;
+}
+
+.employer_employer_phone_label {
+  top: 274px;
+  width: 200px;
+}
+
+.employer_employer_phone_data {
+  top: 274px;
+}
+
+.employer_doctor_phone_label {
+  top: 306px;
+  width: 200px;
+}
+
+.employer_doctor_phone_data {
+  top: 306px;
+  left: 177px;
+}
+
+.employer_valid_until_label {
+  top: 338px;
+}
+
+.employer_valid_until_data {
+  top: 338px;
+}
+
+.employer_passport_no_label {
+  top: 178px;
+}
+
+.employer_passport_no_data {
+  top: 178px;
+}
+
+.employer_country_label {
+  top: 210px;
+  width: 150px;
+}
+
+.employer_country_data {
+  top: 210px;
+}
+
+.employer_date_of_registration_label {
+  top: 242px;
+}
+
+.employer_date_of_registration_data {
+  top: 242px;
+}
+
+.employer_employer_name_label {
+  top: 274px;
+}
+
+.employer_employer_name_data {
+  top: 274px;
+  width: 220px;
+}
+
+.employer_xray_phone_label {
+  top: 306px;
+  width: 200px;
+}
+
+.employer_xray_phone_data {
+  top: 306px;
+}
+
+.employer_employer_code_label {
+  top: 338px;
+}
+
+.employer_employer_code_data {
+  top: 338px;
+}
+
+// employer fields section
+
+// doctor form label section
+
+.doctor_left_form_label {
+  position: absolute;
+  left: 47px;
+}
+
+.doctor_right_form_label {
+  position: absolute;
+  left: 495px;
+}
+
+.doctor_extra_right_form_label {
+  position: absolute;
+  left: 718px;
+}
+
+.doctor_bottom_form_label {
+  position: absolute;
+  top: 580px;
+}
+
+// end of doctor form label section
+
+// doctor form data section
+
+.doctor_left_form_data {
+  position: absolute;
+  left: 164px;
+  width: 250px;
+}
+
+.doctor_right_form_data {
+  position: absolute;
+  left: 600px;
+}
+
+.doctor_extra_right_form_data {
+  position: absolute;
+  left: 860px;
+}
+
+.doctor_bottom_form_data {
+  position: absolute;
+  top: 580px;
+}
+
+// end of doctor form data section
+
+// doctor fields section
+
+.doctor_doctor_code_label {
+  top: 428px;
+}
+
+.doctor_doctor_code_data {
+  top: 428px;
+}
+
+.doctor_doctor_name_label {
+  top: 460px;
+  width: 100px;
+}
+
+.doctor_doctor_name_data {
+  top: 460px;
+}
+
+.doctor_clinic_name_label {
+  top: 490px;
+  width: 100px;
+}
+
+.doctor_clinic_name_data {
+  top: 490px;
+}
+
+.doctor_worker_trans_code_label {
+  top: 395px;
+}
+
+.doctor_worker_code_label {
+  top: 428px;
+}
+
+.doctor_worker_code_data {
+  top: 428px;
+  width: 100px;
+}
+
+.doctor_examination_date_label, .doctor_worker_trans_code_data, .doctor_examination_date_data {
+  @extend .doctor_worker_trans_code_label;
+}
+
+.doctor_worker_gender_label {
+  top: 428px;
+}
+
+.doctor_worker_gender_data {
+  top: 428px;
+}
+
+.doctor_passport_no_label {
+  top: 460px;
+}
+
+.doctor_passport_no_data {
+  top: 460px;
+}
+
+.doctor_worker_name_label {
+  top: 490px;
+  width: 150px;
+}
+
+.doctor_worker_name_data {
+  top: 490px;
+  width: 250px;
+}
+
+.doctor_valid_until_label {
+  top: 525px;
+}
+
+.doctor_valid_until_data {
+  top: 525px;
+}
+
+.doctor_doctor_phone_no_label {
+  left: 47px;
+  width: 150px;
+}
+
+.doctor_doctor_phone_no_data {
+  left: 164px;
+}
+
+.doctor_employer_phone_label {
+  left: 308px;
+  width: 150px;
+}
+
+.doctor_employer_phone_data {
+  left: 445px;
+}
+
+.doctor_doctor_signature_label {
+  left: 555px;
+}
+
+.doctor_clinic_stamp_label {
+  left: 797px;
+
+  .form-label-eng {
+    position: absolute;
+    left: -10px;
+    white-space: nowrap;
+  }
+}
+
+// end of doctor fields section
+
+// laboratory form label section
+
+.laboratory_left_form_label {
+  position: absolute;
+  left: 47px;
+}
+
+.laboratory_right_form_label {
+  position: absolute;
+  left: 395px;
+}
+
+.laboratory_extra_right_form_label {
+  position: absolute;
+  left: 619px;
+}
+
+.laboratory_bottom_form_label {
+  position: absolute;
+  top: 900px;
+}
+
+.laboratory_bottom_form_next_label {
+  position: absolute;
+  top: 940px;
+}
+// end of laboratory form label section
+
+// laboratory form data section
+
+.laboratory_left_form_data {
+  position: absolute;
+  left: 164px;
+  width: 200px;
+}
+
+.laboratory_right_form_data {
+  position: absolute;
+  left: 505px;
+  width: 200px;
+}
+
+.laboratory_extra_right_form_data {
+  position: absolute;
+  left: 711px;
+}
+
+.laboratory_bottom_form_data {
+  position: absolute;
+  top: 900px;
+}
+
+.laboratory_bottom_form_next_data {
+  position: absolute;
+  top: 940px;
+}
+// end of laboratory form data section
+
+// laboratory fields section
+
+.laboratory_doctor_code_label {
+  top: 679px;
+}
+
+.laboratory_doctor_code_data {
+  top: 679px;
+}
+
+.laboratory_laboratory_code_label {
+  top: 711px;
+}
+
+.laboratory_laboratory_code_data {
+  top: 711px;
+}
+
+.laboratory_laboratory_name_label {
+  top: 743px;
+  width: 107px;
+}
+
+.laboratory_laboratory_name_data {
+  top: 743px;
+}
+
+.laboratory_worker_name_label {
+  top: 647px;
+  width: 150px;
+}
+
+.laboratory_worker_name_data {
+  top: 647px;
+  width: 250px;
+}
+
+.laboratory_passport_no_label {
+  top: 679px;
+}
+
+.laboratory_passport_no_data {
+  top: 679px;
+}
+
+.laboratory_worker_code_label {
+  top: 711px;
+}
+
+.laboratory_worker_code_data {
+  top: 711px;
+}
+
+.laboratory_clinic_name_label {
+  top: 743px;
+  width: 105px;
+}
+
+.laboratory_clinic_name_data {
+  top: 743px;
+}
+
+.laboratory_worker_gender_label {
+  top: 711px;
+}
+
+.laboratory_worker_gender_data {
+  top: 711px;
+}
+
+.laboratory_laboratory_phone_no_label {
+  left: 47px;
+  width: 150px;
+}
+
+.laboratory_laboratory_phone_no_data {
+  left: 164px;
+}
+
+.laboratory_examination_date_label {
+  left: 47px;
+}
+
+.laboratory_examination_date_data {
+  left: 164px;
+}
+
+.laboratory_valid_until_label {
+  left: 301px;
+}
+
+.laboratory_valid_until_data {
+  left: 418px;
+}
+
+.laboratory_doctor_signature_label {
+  left: 301px;
+}
+
+.laboratory_doctor_signature_data {
+  left: 418px;
+}
+
+.laboratory_employer_phone_no_label {
+  left: 509px;
+  width: 150px;
+}
+
+.laboratory_employer_phone_no_data {
+  left: 651px;
+}
+
+.laboratory_clinic_stamp_label {
+  left: 509px;
+}
+
+.laboratory_clinic_stamp_data {
+  left: 651px;
+}
+
+// end of laboratory fields section
+
+// xray form label section
+
+.xray_left_form_label {
+  position: absolute;
+  left: 47px;
+}
+
+.xray_right_form_label {
+  position: absolute;
+  left: 395px;
+}
+
+.xray_extra_right_form_label {
+  position: absolute;
+  left: 619px;
+}
+
+.xray_bottom_form_label {
+  position: absolute;
+  top: 1258px;
+}
+
+.xray_bottom_form_next_label {
+  position: absolute;
+  top: 1298px;
+}
+
+// end of xray form label section
+
+// xray form data section
+
+.xray_left_form_data {
+  position: absolute;
+  left: 164px;
+}
+
+.xray_right_form_data {
+  position: absolute;
+  left: 505px;
+}
+
+.xray_extra_right_form_data {
+  position: absolute;
+  left: 711px;
+}
+
+.xray_bottom_form_data {
+  position: absolute;
+  top: 1258px;
+}
+
+.xray_bottom_form_next_data {
+  position: absolute;
+  top: 1298px;
+}
+
+// end of xray form data section
+
+// xray fields section
+
+.xray_xray_code_label {
+  top: 1035px;
+}
+
+.xray_xray_code_data {
+  top: 1035px;
+}
+
+.xray_xray_name_label {
+  top: 1099px;
+  width: 105px;
+}
+
+.xray_xray_name_label2 {
+  top: 1115px;
+  width: 107px;
+}
+
+.xray_xray_name_data {
+  top: 1099px;
+}
+
+.xray_worker_name_label {
+  top: 1003px;
+  width: 100px;
+}
+
+.xray_worker_name_data {
+  top: 1003px;
+  width: 250px;
+}
+
+.xray_worker_code_label {
+  top: 1035px;
+}
+
+.xray_worker_code_data {
+  top: 1035px;
+}
+
+.xray_passport_no_label {
+  top: 1067px;
+  width: 100px;
+}
+
+.xray_passport_no_data {
+  top: 1067px;
+}
+
+.xray_clinic_name_label {
+  top: 1099px;
+  width: 85px;
+}
+
+.xray_clinic_name_data {
+  top: 1099px;
+  width: 210px;
+}
+
+.xray_worker_gender_label {
+  top: 1035px;
+}
+
+.xray_worker_gender_data {
+  top: 1035px;
+}
+
+.xray_xray_phone_no_label {
+  left: 47px;
+  width: 100px;
+}
+
+.xray_xray_phone_no_data {
+  left: 164px;
+}
+
+.xray_examination_date_label {
+  left: 47px;
+}
+
+.xray_examination_date_data {
+  left: 164px;
+}
+
+.xray_valid_until_label {
+  left: 301px;
+}
+
+.xray_valid_until_data {
+  left: 418px;
+}
+
+.xray_doctor_signature_label {
+  left: 301px;
+}
+
+.xray_doctor_signature_data {
+  left: 418px;
+}
+
+.xray_employer_phone_no_label {
+  left: 509px;
+  width: 150px;
+}
+
+.xray_employer_phone_no_data {
+  left: 651px;
+}
+
+.xray_clinic_stamp_label {
+  left: 509px;
+}
+
+.xray_clinic_stamp_data {
+  left: 651px;
+}
+// end of xray fields section
+
+// left logo style
+
+.fomema-logo-left {
+  position: absolute;
+  left: 16px;
+}
+
+.fomema-logo-left img, .fomema-logo-right img {
+  width: 23px;
+}
+
+.doctor-fomema-logo-left {
+  top: 458px;
+}
+
+.laboratory-fomema-logo-left {
+  top: 731px;
+}
+
+.xray-fomema-logo-left {
+  top: 1098px;
+}
+
+// end of left logo style
+
+// right logo style
+
+.fomema-logo-right {
+  position: absolute;
+  right: 12px;
+}
+
+.laboratory-fomema-logo-right {
+  top: 731px;
+}
+
+.xray-fomema-logo-right {
+  top: 1098px;
+}
+
+// end of right logo style
+
+// general style
+
+.form-label-eng {
+  font-style: italic;
+}
+
+.form-value {
+  color: #646464;
+  font-size: 13px;
+}
+
+.maid-online {
+  border: 1px solid black;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  position: absolute;
+}
+
+.employer-maid-online {
+  right: 10px;
+  top: 170px;
+}
+
+.doctor-maid-online {
+  right: 10px;
+  top: 485px;
+}
+
+.laboratory-maid-online {
+  right: 188px;
+  top: 635px;
+}
+
+.xray-maid-online {
+  right: 188px;
+  top: 1000px;
+}
+
+// end of general style
+
+.second-page {
+  position: relative;
+}
+
+// barcode divider style
+
+.barcode-divider {
+  position: absolute;
+  right: 183px;
+  top: 1000px;
+  border-left: 1px solid black;
+  width: 1px;
+  min-height: 350px;
+}
+
+.laboratory-barcode-divider {
+  top: 640px;
+  min-height: 335px;
+}
+
+.xray-barcode-divider {
+  top: 1000px;
+}
+
+// end of barcode divider style
+
+// barcode info style
+
+.barcode-info {
+  position: absolute;
+  writing-mode: vertical-rl;
+  right: 95px;
+  font-size: 13px;
+  z-index: 1;
+  height: 320px;
+}
+
+.laboratory-barcode-info {
+  top: 645px;
+}
+
+.xray-barcode-info {
+  top: 1002px;
+}
+
+.barcode-transaction-code {
+  color: #646464;
+  margin-right: 3px;
+}
+
+.barcode-transaction-code .label {
+  color: #010101;
+}
+
+.barcode-worker-code {
+  color: #646464;
+  margin-right: 3px;
+}
+
+.barcode-worker-code .label {
+  color: #010101;
+}
+
+.barcode-worker-name {
+  color: #646464;
+  margin-right: 3px;
+}
+
+.barcode-worker-name .label {
+  color: #010101;
+}
+
+// end of barcode info style
+
+//page 2 field styles
+
+.procedure {
+  position: absolute;
+  top: 93px;
+  left: 45px;
+  font-size: 15.5px;
+  width: 880px;
+}
+
+p.important-header {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+ul.important-note li {
+  margin-bottom: 3px;
+  line-height: 17px;
+}
+
+div.procedure-header-section {
+  width: 400px;
+  margin: 0 auto;
+}
+
+p.procedure-header {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.text-center {
+  text-align: center;
+}
+
+ol.procedure-list li {
+  margin-bottom: 10px;
+}
+
+ol.procedure-list.english-list {
+  font-style: italic;
+}
+
+ul.procedure-nested-list {
+  list-style-type: disc;
+}
+
+ul.procedure-nested-list li {
+  margin-bottom: 0px;
+}

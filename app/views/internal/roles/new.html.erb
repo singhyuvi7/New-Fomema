@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Roles</strong> - New Role
+    </div>
+    <%= form_for @role, url: internal_roles_path, html: {class: "#{params[:action]}_service_provider_group service_provider_group-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

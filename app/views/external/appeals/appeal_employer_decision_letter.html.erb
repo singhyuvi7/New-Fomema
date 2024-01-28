@@ -1,0 +1,126 @@
+<pdfbody>
+    <div>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png", style: "float:left; height: 110px; padding-bottom: 20px;"%>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png", style: "float:right; height: 110px; padding-bottom: 20px;"%>
+        <%#= wicked_pdf_image_tag "letters/fomema_letterhead_25.png", style: "float:right; height: 110px; max-width:100%; padding-bottom: 20px;"%>
+    </div>
+
+    <div style="height: 2.2cm;">
+        &nbsp;
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Our Ref</td>
+            <td>: <%= @data[:letter_ref_no] %></td>
+            <td style="text-align: right;"><b>CONFIDENTIAL</b></td>
+        </tr>
+
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:letter_date] %></td>
+            <td></td>
+        </tr>
+    </table><br>
+
+    <table>
+        <% @data[:employer_address].each do |address| %>
+            <tr><td><%= address %></td></tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">Dear Sir/Madam,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+        <%= "Re-" if @data[:reappeal] %>Appeal on Your Employee's Medical Examination Results<br>
+        Name: <%= @data[:worker_name] %>, Passport No: <%= @data[:worker_passport_no] %>
+    </b></p>
+
+    <p class="paragraph-spacing" style="text-align: justify;">
+        We refer to the matter above.<br><br>
+
+        <% if @data[:reappeal] %>
+            FOMEMA's Appeal Committee has considered your re-appeal.&nbsp;
+        <% end %>
+
+        <% case @data[:letter_type] %>
+        <% when "UNSUCCESSFUL" %>
+            We regret to inform you that your appeal to the FOMEMA Appeal Committee is unsuccessful. The medical status of this worker shall remain as "<b>UNSUITABLE</b>" for employment in Malaysia.
+        <% when "SUCCESSFUL" %>
+            Please be informed that after review and due consideration, your appeal to the FOMEMA Appeal Committee on the medical status of tour employee is successful. The medical status of this worker has now been changed to "<b>SUITABLE</b>" for employment in Malaysia.
+        <% when "CANCEL/CLOSE" %>
+            In response to the appeal process of the above named person, we have performed all necessary measures to obtain relevant documents and investigation results (chest x-ray films/ laboratory results/ assessment reports) for the completion of the appeal process. However, with much difficulty we are still unable to attain a response pertaining to the matter above.<br><br>
+            As the time period given for the appeal process is 4 weeks and within this time we failed to obtain the adequate documents and results to complete this appeal, we are therefore notifying that we have now closed your appeal case as <b>UNSUCCESSFUL</b> and thus the medical status of the worker named above shall remain as <b>UNSUITABLE</b> for employment in Malaysia.
+        <% end %>
+    </p>
+
+    <p class="paragraph-spacing">
+        Thank you.<br><br>
+        Yours sincerely,<br>
+        <b>FOMEMA SDN BHD</b>
+    </p>
+
+    <p class="paragraph-spacing" style="font-size: 0.85em; margin-bottom: 2em;">This letter is computer generated and no signature is required.</p>
+
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="width: 4em;">Cc:</td>
+
+            <td>
+                <% if @data[:letter_type] == "CANCEL/CLOSE" && @data[:doctor_address].present? %>
+                    <%= raw @data[:doctor_address].join("<br>") %><br><br>
+                <% end %>
+
+                Pengarah<br>
+                Bahagian Pekerja Asing<br>
+                Jabatan Imigresen Malaysia<br>
+                Tingkat 2 (Podium), Blok 2 G4, Precint 2<br>
+                Pusat Pentadbiran Kerajaan Persekutuan<br>
+                62550 Putrajaya.
+            </td>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .paragraph-triple-spacing {
+        padding-top: 1.5em;
+    }
+
+    .paragraph-quad-spacing {
+        padding-top: 2em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    br {
+        font-size: 1.2em;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td, tr {
+        padding: 0;
+        margin: 0;
+    }
+</style>

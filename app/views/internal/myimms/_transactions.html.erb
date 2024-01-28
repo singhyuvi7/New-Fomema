@@ -1,0 +1,93 @@
+<div class="row">
+    <div class="col module-actions text-right">
+        <% if has_permission?('SUBMIT_TO_JIM') %>
+        <button id="submit_to_jim" type="button" class="btn btn-primary btn-sm">Submit To JIM</button>
+        <% end %>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th>
+                        <th rowspan="2">No.</th>
+                        <th>Transaction Code</th>
+                        <th>Passport No.</th>
+                        <th>Nationality</th>
+                        <th>Date of Birth</th>
+                        <th>Worker Name</th>
+                        <th>Gender</th>
+                        <th>Exam Date</th>
+                        <th>Medical Status</th>
+                        <th>Status</th>
+                        <th>Send Date</th>
+                        <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @myimms_transactions.blank? %>
+                    <tr>
+                        <td colspan="13" class="text-danger">No records found.</td>
+                    </tr>
+                    <% else %>
+
+                    <% @myimms_transactions.each.with_index((@myimms_transactions.current_page - 1) * get_per + 1) do |myimms_transaction, index| %>
+                    <tr>
+                        <td class="module-row-numbers">
+                            <label>
+                                <input type="checkbox" class="child-checkbox" name="ids[]" value="<%= myimms_transaction.transaction_id %>">
+                            </label>
+                        </td>
+
+                        <% 
+                            transaction = myimms_transaction.try(:transactionz)
+                            foreign_worker = transaction.try(:foreign_worker)
+                            myimms_status = MyimmsTransaction::RESPONSE_STATUS[myimms_transaction.status]
+                        %>
+
+                        <td class="module-row-numbers"><%= index %></td>
+                        <% if transaction.present? %>
+                            <td><%= transaction.code %></td>
+                            <td><%= transaction.fw_passport_number.present? ? transaction.fw_passport_number : foreign_worker.passport_number %></td>
+                            <td><%= foreign_worker.country.name %></td>
+                            <td><%= transaction.fw_date_of_birth.present? ? transaction.fw_date_of_birth.strftime('%d/%m/%Y') : foreign_worker.date_of_birth.strftime('%d/%m/%Y') %></td>
+                            <td><%= transaction.fw_name.present? ? transaction.fw_name : foreign_worker.name %></td>
+                            <td><%= transaction.fw_gender.present? ? transaction.fw_gender : foreign_worker.gender %></td>
+                            <td><%= transaction.medical_examination_date.present? ? transaction.medical_examination_date.strftime("%d/%m/%Y") : '-' %></td>
+                            <td><%= Transaction::FINAL_RESULTS[transaction.final_result] %></td>
+                            <td><%= myimms_status ? myimms_status : 'FAILED' %></td>
+                            <td><%= myimms_transaction.updated_at.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                            <td class="module-row-actions">
+                                <%=raw index_table_show_button(internal_transaction_path(transaction)) %>
+                            </td>
+                        <% else %>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><%= myimms_status ? myimms_status : 'FAILED' %></td>
+                            <td><%= myimms_transaction.updated_at.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                            <td></td>
+                        <% end %>
+
+                        
+                    </tr>
+                    <% end %>
+
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <%= paginate @myimms_transactions %>
+</div>

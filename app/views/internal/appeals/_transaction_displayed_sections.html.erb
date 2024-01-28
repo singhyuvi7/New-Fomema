@@ -1,0 +1,129 @@
+<%= nested_form_for @transaction, url: "", method: :post, html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+    <%
+        if current_user.userable_type == "Organization" && @transaction.medical_examination.present?
+            doctor_examination  = @transaction.medical_examination
+            key                 = :medical_examination
+        else
+            doctor_examination  = @transaction.doctor_examination
+            key                 = :doctor_examination
+        end
+    %>
+
+    <%= render partial: "internal/medical/worker_information", locals: { transaction: @transaction } %>
+
+    <!-- If Doctor Exam has not begun -->
+    <% if @transaction.try(key).blank? %>
+        <% ["category_1", "category_2", "physical", "system_1", "system_2"].each do |type| %>
+            <div class="category-switchable" data-type="<%= type %>">
+                <div class="p-4 border-bottom">
+
+                    <p class="font-size-8 mb-0">
+                        Examination has yet to begin.
+                    </p>
+                </div>
+            </div>
+        <% end %>
+    <% end %>
+
+    <% if @displayed_sections.include?("Medical History") %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+    <% end %>
+
+    <% if @displayed_sections.include?("Physical Examination") %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { doctor_examination: doctor_examination, readonly: true } %>
+    <% end %>
+
+    <% if @displayed_sections.include?("System Exam") %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+    <% end %>
+
+    <% if @displayed_sections.include?("Laboratory") && @transaction.laboratory_examination.try(:transmitted_at?) %>
+        <div class="category-switchable hidden" data-type="laboratory">
+            <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true, doctor_examination: doctor_examination } %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("X-Ray") && @transaction.xray_examination.try(:transmitted_at?) %>
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true, doctor_examination: doctor_examination } %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("Certification") %>
+        <div class="category-switchable hidden" data-type="condition">
+            <%= render partial: "external/transactions/doctor_examinations/certification_condition_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="certification">
+            <%= render partial: "external/transactions/doctor_examinations/certification_certification_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="follow_up">
+            <%= render partial: "external/transactions/doctor_examinations/certification_follow_up_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("Pending Reviews") %>
+        <div class="category-switchable hidden" data-type="decision">
+            <%= form.fields_for :latest_medical_review do |review_form| %>
+                <%= render partial: "internal/medical/review_decision_approval", locals: { form: review_form, doctor_examination: doctor_examination, readonly: true } %>
+            <% end %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("TCUPI Reviews") %>
+        <div class="category-switchable hidden" data-type="tcupi_decision">
+            <%= form.fields_for :latest_tcupi_review do |tcupi_review_approval_form| %>
+                <%= render partial: "internal/medical/tcupi_review_approval", locals: { tcupi_review_approval_form: tcupi_review_approval_form, readonly: true } %>
+            <% end %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("XQCC") && @pcr_comments.present? %>
+        <div class="category-switchable hidden" data-type="pcr_comments">
+            <%= render partial: "internal/transactions/pcr_comments" %>
+        </div>
+    <% end %>
+
+    <!-- For NIOS. -->
+    <% if @displayed_sections.include?("Pending Decision") %>
+        <div class="category-switchable hidden" data-type="xqcc_p_decision">
+            <%= render partial: "internal/transactions/pending_decision" %>
+        </div>
+    <% end %>
+
+    <!-- Only for Doctor -->
+    <% if @displayed_sections.include?("Xray Pending Review") %>
+        <div class="category-switchable hidden" data-type="xray_pr">
+            <%= render partial: "internal/transactions/pending_decision", locals: { merts: true } %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("MLE Comments") %>
+        <div class="category-switchable hidden" data-type="mle_comments">
+            <%= render partial: "internal/transactions/xray_mle_comments" %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("Update Result") && @result_updates.present? %>
+        <div class="category-switchable hidden" data-type="update_result_details">
+            <%= render partial: "internal/transactions/nios_update_results_details" %>
+        </div>
+    <% end %>
+
+    <% if @displayed_sections.include?("Amendment Final Result") && @amendments.present? %>
+        <div class="category-switchable hidden" data-type="final_result_details">
+            <%= render partial: "internal/transactions/nios_final_results_update_details" %>
+        </div>
+    <% end %>
+<% end %>
+
+<% if @displayed_sections.include?("Unsuitable Reasons") %>
+
+    <div class="category-switchable hidden" data-type="unsuitable_reasons">
+        <% readonly_showpage = controller_action_name == "transactions__show" && @transaction.status != "CERTIFIED" %>
+        <%= render partial: "internal/transactions/shared/unsuitable_reasons_tab", locals: { readonly: !has_permission?("EDIT_UNSUITABLE_REASONS_FOR_TRANSACTION") || readonly_showpage } %>
+    </div>
+<% end %>

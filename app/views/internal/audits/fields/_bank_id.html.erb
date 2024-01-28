@@ -1,0 +1,5 @@
+<%
+b = Bank.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{b.name} (#{b.code})" if !value.blank? && b %></td>

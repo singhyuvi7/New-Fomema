@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Agencies</strong> - New Agency
+    </div>
+    <%= form_for @agency, {url: internal_agencies_path, html: { multipart: true, class: "with-parsley agency-form" }} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,52 @@
+%h1 PCR Audit Report
+%p for Registered Radiologist #{@user&.name}, #{@radiologist&.code || @user&.code} from #{params[:date_from].to_time.try(:strftime, get_standard_date_format)} to #{params[:date_to].to_time.try(:strftime, get_standard_date_format)}
+%table.table.w-100.mt-3.text-center
+  %thead
+    %tr
+      - @headers.each do |name|
+        %th= name
+  %tbody
+    - if @data.present?
+      - grand_total = 0
+      - @data.each.with_index(1) do |row_data, index|
+        - grand_total += row_data.pcr_review_count
+        %tr
+          %td= index
+          %td= row_data.transmit_date.try(:strftime, get_standard_date_format)
+          %td= row_data.xray_facility_code
+          %td= row_data.xray_facility_name
+          %td= row_data.pcr_review_count
+      %tr
+        %td
+        %td
+        %td
+        %td Total
+        %td= grand_total
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

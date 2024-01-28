@@ -1,0 +1,27 @@
+<%= stylesheet_link_tag "inspectorate/lqcc" %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Letters</strong> - Edit Warning Letter (<%= LqccLetter::EXPLANATION_TYPES[@letter.explanation_type] %>)
+    </div>
+    <%= form_for @letter, url: update_warning_letter_internal_lqcc_letter_path(@letter), html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+        <div class="card-body">
+            <%= render 'shared/all_validation_flash', { model_obj: @letter } %>
+            <%= render "/shared/all_flash" %>
+
+            <% if ['REJECTED'].include?@letter.warning_status %>
+                <div class="alert alert-danger" role="alert">
+                    COMMENT ON REJECTION: <b><%= @letter.warning_approval_comment %></b>
+                </div>
+            <% end %>
+
+            <%= render "internal/lqcc_letters/warning_letter/default_info", { form: form } %>
+            <%= render "internal/lqcc_letters/warning_letter/form", { form: form } %>
+        </div>
+        <%=render 'internal/lqcc_letters/warning_letter/card_footer' %>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <%= render "form_script" %>
+<% end %>

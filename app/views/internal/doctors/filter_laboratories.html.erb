@@ -1,0 +1,24 @@
+<%
+	# Need to define, otherwise will be identified as undefined variable
+	selected ||= nil
+	@selected_facilities ||= []
+%>
+
+<% @laboratory_facilities.each do |facility| %>
+	<% bool = selected || @selected_facilities.include?(facility.id) %>
+
+	<tr class="filter-table-search-results <%= "bg-selected" if bool %>" data-type="laboratory" data-id="<%= facility.id %>" data-name="<%= facility.name %>">
+        <td><%= facility.name %></td>
+        <td><%= facility.code %></td>
+        <td><%= facility.state.name %></td>
+        <td><%= facility.postcode %></td>
+        <td><%= facility.town.name %></td>
+        <td><%= check_box_tag "laboratories[]", facility.id, bool, class: "font-size-6" %></td>
+    </tr>
+<% end %>
+
+<% if @laboratory_facilities.blank? %>
+    <tr>
+        <td colspan="6">No laboratories found with these search options</td>
+    </tr>
+<% end %>

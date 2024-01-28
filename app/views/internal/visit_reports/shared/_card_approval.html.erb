@@ -1,0 +1,33 @@
+<div class="card" v-if="onApprove">
+    <div class="card-header">APPROVAL</div>
+    <div class="card-body">
+
+        <div class="form-group row">
+            <label class="col-md-4 col-form-label required">
+                Decision
+            </label>
+            <div class="col-md-8">
+                <div class="form-check form-check-inline mr-5" :class="{ 'is-invalid': errors.has('visit_report[visit_report_approval[decision]') }">
+                    <input v-validate="'required'" data-vv-as="Decision" v-model="visit_report_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_report_approval[decision]') }" id="decision_approve" type="radio" value="APPROVE" name="visit_report_approval[decision]" @change="approvalUpdate($event)" required>
+                    <label class="form-check-label" for="decision_approve">APPROVE</label>
+                    
+                </div>
+                <div class="form-check form-check-inline mr-5">
+                    <input v-model="visit_report_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_report_approval[decision]') }" id="decision_reject" type="radio" value="REJECT" name="visit_report_approval[decision]" @change="approvalUpdate($event)" required>
+                    <label class="form-check-label" for="decision_reject">REJECT</label>
+                    <div class="invalid-feedback">{{ errors.first('visit_report_approval[decision]') }}</div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="required" for="">Comments</label>
+                    <textarea v-validate="commentValidationRule" data-vv-as="Comments" v-model="visit_report_approval.comment" name="visit_report_approval[comment]" class="form-control" :class="{ 'is-invalid': errors.has('visit_report_approval[comment]') }" id="" rows="2"></textarea>
+                    <div class="invalid-feedback">{{ errors.first('visit_report_approval[comment]') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

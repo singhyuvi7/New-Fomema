@@ -1,0 +1,230 @@
+<%= render "/shared/all_flash" %>
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Special Renewal Approval
+    </div>
+
+    <%= form_for @transaction, url: view_internal_transaction_path(@transaction), method: 'patch', html: {class: "#{params[:action]}_transaction transaction-form"} do |form| %>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :code, "Transaction Code" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.code %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :employer %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.employer.name %> (<%= @transaction.employer.code %>)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_code, "Foreign Worker Code" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_code %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_name, "Foreign Worker Name" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_name %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_gender, "Gender" %>
+                        <p class="form-control-plaintext">
+                            <%= ForeignWorker::GENDERS[@transaction.fw_gender] %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_date_of_birth, "Date of Birth" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_date_of_birth.strftime("%d/%m/%Y") %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_passport_number, "Passport Number" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_passport_number %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_country_id, "Country" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_country.name %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :programme, "Programme" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.programme_indicator %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_plks_number, "PLKS No." %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_plks_number %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="<%= internal_transactions_path(worker_code: @transaction.foreign_worker.code) %>" target="_blank">View Transactions</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- <div><%= @transaction.approval_request.category %></div> -->
+                    <%#= render 'internal/shared/approval_comment_decision', form: form %>
+                        <div class="row">
+                            <div class="col">
+                                <label for="employer_uploads">Uploaded Documents</label>
+                                <table class="table table-bordered table-striped">
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Documents</th>
+                                        <th>Date Uploaded</th>
+                                        <th>Uploaded By</th>
+                                    </tr>
+                                       <% @transaction.uploads.each do |upload| %>
+                                            <tr>
+                                                <td class="filenames"><%= upload.category %></td>
+                                                <td class="filenames">
+                                                    <% upload.documents.each do |document| %>
+                                                        <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                                                    <% end %>
+                                                </td>
+                                                <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                                                <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                            </tr>
+                                        <% end %>
+
+                                        <% if @transaction.uploads.blank? %>
+                                            <tr><td colspan="3">There are no uploaded documents</td></tr>
+                                        <% end %>
+                                </table>
+                            </div>
+                        </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <%= form.label :decision, class: 'required' %>
+                                <div class="col-form-label">
+                                    <div class="form-check form-check-inline">
+                                        <%= radio_button_tag "approval[decision]", "APPROVE", false, class: "form-check-input approval-decision", required: true %>
+                                        <%= label_tag "approval[decision_APPROVE]", "APPROVE", class: "form-check-label" %>
+                                        &emsp;
+                                        <%= radio_button_tag "approval[decision]", "REJECT", false, class: "form-check-input approval-decision ml-5" %>
+                                        <%= label_tag "approval[decision_REJECT]", "REJECT", class: "form-check-label" %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <%= form.label :comment, for: 'approval_comment' %>
+                                <%= text_area_tag "approval[comment]", nil, class: "form-control" %>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transactions_path) %>
+                <button class="btn btn-sm btn-primary submit-decision" type="submit"><i class="icon-pencil"></i> Submit decision</button>
+            </div>
+
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+$('input.approval-decision').change(function() {
+    if (this.value === 'REJECT') {
+        $('#approval_comment').prop('required', true);
+    }
+    else {
+        $('#approval_comment').prop('required', false);
+    }
+});
+
+// check viewed attached documents
+$('.submit-decision').on('click',function (e){
+    e.preventDefault();
+    form = $('#approvalSpecialRenewalForm')
+    submit_btn = $(this)
+    submit_btn.prop('disabled', true);
+
+    $.ajax({
+        url: `<%= check_internal_documents_path %>`,
+        method: 'GET',
+        data: {
+            type: 'Transaction',
+            id: `<%= @transaction.id %>`
+        },
+        success: function (response) {
+            if (response.has_viewed){
+                validity = form[0].checkValidity();
+                form[0].reportValidity();
+                if(validity){
+                    form.submit();
+                }
+            }else{
+                alert('Please review all the uploaded document(s) before approval.')
+            }
+        }
+    }).done(function () {
+        submit_btn.prop('disabled', false);
+    })
+});
+
+
+</script>
+<% end %>

@@ -1,0 +1,56 @@
+<div class="p-4 border-bottom">
+    <h3><u>To Do List</u></h3>
+</div>
+
+<% @tcupi_review.transaction_tcupi_todos.includes(:tcupi_todo).order(:tcupi_todo_id).each do |transaction_tcupi| %>
+    <%
+        tcupi_todo_description =
+            if transaction_tcupi.tcupi_todo_id == 7
+                "#{ transaction_tcupi.tcupi_todo&.description } - #{ transaction_tcupi.description_other }"
+            else
+                transaction_tcupi.tcupi_todo&.description
+            end
+    %>
+
+    <div class="px-4 py-2 border-bottom todo-parent">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <p class="mb-0 flex-grow-1"><%= tcupi_todo_description %></p>
+
+            <div class="d-flex flex-shrink-0 boolean-field-parent">
+                <% value = transaction_tcupi.done? %>
+                <%= hidden_field_tag "tcupi_test_done[#{transaction_tcupi.id}]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: true, placeholder: "Test Done") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: false, placeholder: "Test Not Done", classes: "w-em-10") %>
+            </div>
+
+            <%= text_field_tag "tcupi_date[#{transaction_tcupi.id}]", transaction_tcupi.completed_date.present? ? transaction_tcupi.completed_date.strftime("%F") : nil, placeholder: "Select date", class: "ml-4 w-em-12 form-control rounded-0px-2 datepicker test-dates", min: @transaction.certification_date.strftime("%F"), max: Date.today.strftime("%F"), autocomplete: "off" %>
+        </div>
+
+        <label>Comments</label>
+        <%= text_area_tag "tcupi_comment[#{transaction_tcupi.id}]", transaction_tcupi.comment, rows: 5, class: "p-2 w-100" %>
+    </div>
+<% end %>
+
+<% unless @doctor %>
+    <div class="p-4 border-bottom">
+        <h3><u>TCUPI Review Decision</u></h3>
+    </div>
+
+    <div class="px-4 py-2 border-bottom todo-parent">
+        <div id="review-decision-container" class="d-flex justify-content-between align-items-center mb-4 boolean-field-parent">
+            <label class="mb-0 flex-grow-1">Review Decision</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% review_decision = @tcupi_review.medical_mle1_decision %>
+                <%= tcupi_review_form.hidden_field :medical_mle1_decision, value: review_decision, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "success", active: review_decision == "SUITABLE", readonly: false, value: "SUITABLE", placeholder: "Suitable", classes: "tcupi-bool-check") %>
+                <%= raw boolean_field_button(active_color: "danger", active: review_decision == "UNSUITABLE", readonly: false, value: "UNSUITABLE", placeholder: "Unsuitable", classes: "tcupi-bool-check") %>
+            </div>
+        </div>
+
+        <div id="review-justification-container">
+            <label>Justifications</label>
+            <%= tcupi_review_form.text_area :medical_mle1_comment, rows: 5, class: "p-2 w-100" %>
+        </div>
+    </div>
+<% end %>

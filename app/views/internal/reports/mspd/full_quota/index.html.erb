@@ -1,0 +1,61 @@
+<div class="card">
+    <div class="card-header">
+        Full Quota GP (Up to <%= @current.strftime(get_standard_date_format) %>)
+    </div>
+
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+        <%=render 'internal/reports/mspd/full_quota/filter' %>
+
+        <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>DOCTOR CODE</th>
+            <th>DOCTOR NAME</th>
+            <th>CLINIC NAME</th>
+            <th>GP STATUS</th>
+            <th>STATE NAME</th>
+            <th>TOWN NAME</th>
+            <th>CURRENT USAGE</th>
+            <th><%= Time.current.prev_year.strftime('%Y')%> USAGE</th>
+            <th><%= Time.current.years_ago(2).strftime('%Y')%> USAGE</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @doctors.blank? %>
+            <tr>
+                <td colspan="10" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @doctors.each.with_index((@doctors.current_page - 1) * get_per + 1) do |doctor, index| %>
+            <tr>
+                <td class="module-row-numbers"><%= index %></td>
+                <td><%= doctor.code %></td>
+                <td><%= doctor.name %></td>
+                <td><%= doctor.clinic_name %></td>
+                <td><%= doctor.status %></td>
+                <td><%= doctor.state.try(:name) %></td>
+                <td><%= doctor.town.try(:name) %></td>
+                <td><%= doctor.quota_used %></td>
+                <td><%= doctor.previous_year %></td>
+                <td><%= doctor.previous_two_year %></td>
+            </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+        </div>
+        <!-- /.table-responsive -->
+
+        <div class="row">
+            <%= paginate @doctors %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

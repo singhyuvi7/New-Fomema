@@ -1,0 +1,60 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Daily Non Complicance Report</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+                <%= link_to "Download as excel", "#{ request.path }.xlsx#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% if @filter_options.present? %>
+                <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+                <%= render partial: "shared/reports/report_filter_options" %>
+            <% end %>
+        <% end %>
+    </div>
+
+    <div class="card-body">
+        <div class="w-100 pb-3" style="overflow-x: auto;">
+            <table id="preview-csv-table" class="table-borders w-100">
+                <thead>
+                    <% ["No","Code", "Name", "State", "Month", "Non Comply", "Total", "Percentage", "Preview"].each do |header| %>
+                        <th><%= header %></th>
+                    <% end %>
+                </thead>
+
+                <tbody>
+                    <% month_map = Date::MONTHNAMES %>
+
+                    <% @non_compliance_facilities.each.with_index do |row,index| %>
+                        
+                        <tr>
+                          <td> <%= index+1 %> </td>
+                            <% row.values[1..-1].each.with_index do |value, index| %>
+                                <td>
+                                    <%= index == 3 ? month_map[value.to_i] : value %>
+                                </td>
+                            <% end %>
+                            <td><%= link_to "PDF", daily_non_compliance_report_download_internal_xqcc_reports_path(id: row["id"], month: row["xr_month"], year: params[:selected_year], non_comply: row["non_comply"], total: row["total"]), class: "btn btn-primary font-weight-bold", target: :_blank %></td>
+                        </tr>
+                    <% end %>
+
+                    <% if @non_compliance_facilities.to_a.blank? %>
+                        <tr><td colspan="9">No data found</td></tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

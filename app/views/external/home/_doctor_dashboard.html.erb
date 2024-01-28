@@ -1,0 +1,49 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <span>Statistics</span>
+        <span id="last-refresh-timestamp"></span>
+    </div>
+
+    <%
+        data_url =
+            case current_user.userable_type
+            when "Doctor"
+                doctor_dashboard_statistics_external_home_index_path
+            when "Laboratory"
+                laboratory_dashboard_statistics_external_home_index_path
+            when "XrayFacility"
+                xray_facility_dashboard_statistics_external_home_index_path
+            end
+    %>
+
+    <div class="card-body" id="merts-statistics-append-target" data-url="<%= data_url %>">
+        <div class="text-center p-4">
+            <i class="spinner-load-icon fas fa-spinner fa-spin text-primary font-size-14 text-center"></i>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $.ajax({
+        url: $('#merts-statistics-append-target').attr('data-url'),
+        type: 'GET'
+    }).done(function(response) {
+        $('#merts-statistics-append-target').html(response);
+        var timestamp = $(response).find('data#last-refresh-timestamp').text();
+        $('span#last-refresh-timestamp').text(timestamp);
+        setSectionHeaderHeights();
+        $(window).resize(setSectionHeaderHeights);
+    });
+
+    function setSectionHeaderHeights() {
+        var heights = $('.section-headers').map(function(){
+            return $(this).find('p').outerHeight();
+        });
+
+        var maxHeight = Math.max(...heights);
+        $('.section-headers').height(maxHeight);
+        console.log(maxHeight);
+    }
+</script>
+<% end %>

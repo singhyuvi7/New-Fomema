@@ -1,0 +1,1 @@
+json.partial! "internal/bypass_fingerprint_reasons/bypass_fingerprint_reason", bypass_fingerprint_reason: @bypass_fingerprint_reason

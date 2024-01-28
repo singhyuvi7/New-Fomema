@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Orders</strong> - New Order
+    </div>
+    <%= form_for @order, url: internal_orders_path do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

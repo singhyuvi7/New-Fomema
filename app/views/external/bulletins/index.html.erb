@@ -1,0 +1,39 @@
+<%=render "/shared/all_flash" %>
+
+<div class="card">
+    <div class="card-header">Bulletins</div>
+    <div class="card-body">
+        <table class="table table-responsive-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th class="module-row-actions">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @bulletins.order('bulletins.updated_at DESC').each do |bulletin| %>
+                    <tr>
+                        <td><a href="<%= external_bulletin_path bulletin %>"><%== bulletin.title %></a></td>
+                        <td><%= bulletin.created_at.strftime("%d/%m/%Y") %></td>
+                        <td class="module-row-actions">
+                            <% if bulletin.created_at.to_date > '2020-08-18'.to_date %>
+                                <% if bulletin.bulletin_user_view_logs.where(user_id: current_user.id).count == 0 %>
+                                    <span class="badge badge-success">NEW</span>
+                                <% end %>
+                            <% end %>
+                            <% if bulletin.require_acknowledge %>
+                                <% if @bulletin_user_view_log = current_user.bulletin_user_view_logs.where("bulletin_id = ? and acknowledged is true", bulletin.id).first %>
+                                    <span class="badge badge-success">ACKNOWLEDGED on <%= @bulletin_user_view_log.updated_at.strftime('%d/%m/%Y') %></span>
+                                <% else %>
+                                    <span class="badge badge-danger">REQUIRE ACKNOWLEDGE</span>
+                                <% end %>
+                            <% end %>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <%= paginate @bulletins %>
+    </div>
+</div>

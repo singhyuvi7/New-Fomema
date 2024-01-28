@@ -1,0 +1,87 @@
+<%
+    show_partial = false if show_partial.blank?
+    @amendments = show_partial ? @fw_amendments.first(5) : @fw_amendments
+%>
+
+<% if !show_partial %>
+<div class="card">
+    <div class="card-header">
+        <strong>Foreign Worker</strong> - Amendment History (<%= @foreign_worker.code %>)
+    </div>
+    <div class="card-body">
+<% end %>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Requested Date</th>
+        <th>Field Changed</th>
+        <th>Old Value</th>
+        <th>New Value</th>
+        <th>Requested By</th>
+        <th>Assigned To</th>
+        <th>Approval By</th>
+        <th>Approval Date</th>
+        <th>Approval Decision</th>
+        <th>Approval Comment</th>
+    </tr>
+    <% if @amendments.blank? %>
+        <tr>
+            <td colspan="10" class="text-danger">No records found.</td>
+        </tr>
+    <% else %>
+
+        <% @amendments.each do |fw_amendment| %>
+
+            <%
+                item = Approval::Item.find_by(id: fw_amendment.approval_item_id)
+                request = Approval::Request.find_by(id: item.request_id)
+                comment = Approval::Comment.find_by(request_id: request.id)
+            %>
+
+            <tr>
+                <% fw_amendment.fw_amendment_details.each do |fw_amendment_detail| %>
+                    <td><%= fw_amendment.created_at.try(:strftime, get_standard_date_format) %></td>
+                    <td><%= fw_amendment_detail.field.upcase %></td>
+                    <%
+                        case fw_amendment_detail.field
+                        when "country_id"
+                            if fw_amendment_detail.old_value.to_i == 0  # Migration data store country as code
+                                old_value = Country.find_by(old_code: fw_amendment_detail.old_value).name
+                                new_value = Country.find_by(old_code: fw_amendment_detail.new_value).name
+                            else
+                                old_value = Country.find(fw_amendment_detail.old_value).name
+                                new_value = Country.find(fw_amendment_detail.new_value).name
+                            end
+                        when "date_of_birth"
+                            old_value = fw_amendment_detail.old_value.try(:to_date).try(:strftime, get_standard_date_format)
+                            new_value = fw_amendment_detail.new_value.try(:to_date).try(:strftime, get_standard_date_format)
+                        else
+                            old_value = fw_amendment_detail.old_value
+                            new_value = fw_amendment_detail.new_value
+                        end
+                    %>
+                    <td><%= old_value %></td>
+                    <td><%= new_value %></td>
+                    <td><%= fw_amendment.creator.name %></td>
+                    <td><%= request&.assigned_to_user&.name || "-" %></td>
+                    <td><%= request&.respond_user&.name %></td>
+                    <td><%= request&.approval_at.try(:strftime, get_standard_date_format) %></td>
+                    <td><%= request.approval_decision %></td>
+                    <td><%= fw_amendment.approval_comment %></td>
+                <% end %>
+            </tr>
+        <% end %>
+    <% end %>
+</table>
+
+<% if !show_partial %>
+    </div>
+    <div class="card-footer text-right">
+        <%=raw show_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+    </div>
+</div>
+<% end %>
+
+<% if show_partial && @fw_amendments.count > 5 %>
+    <%= link_to "View More Amendment History", show_amendment_history_internal_employer_employer_worker_path %>
+<% end %>

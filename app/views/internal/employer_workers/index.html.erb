@@ -1,0 +1,65 @@
+<div class="card">
+    <div class="card-body">
+        <%=render partial: '/internal/employers/shared/employer' %>
+
+        <%=render partial: '/internal/employers/shared/tabs', locals: {active_tab: "workers"} %>
+
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <%=render "filter" %>
+
+                <%=render '/shared/all_flash' %>
+
+                <form method="post" action="<%= bulk_action_internal_employer_employer_workers_path %>">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                    <div class="row">
+                        <% if @employer.status == 'ACTIVE' %>
+                            <div class="col module-actions text-left">
+                                <% if has_permission?('CREATE_TRANSACTION') %>
+                                    <button class="btn btn-sm btn-primary" type="submit" name="bulk_action" value="add_cart"><i class="fa fa-plus"></i> Add To Cart</button>
+                                    <% if @cart_count > 0 %>
+                                        <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#transaction-cart">View Cart (<%= @cart_count %>)</button>
+                                    <% end %>
+                                    <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-plus\"></i> Purchase Medical Form (Skip Special Renewal Case)", title: "Purchase Medical Form (Skip Special Renewal Case)", value: "register_transaction_no_special") %>
+                                <% end %>
+                                <% if has_permission?("CREATE_INSURANCE_PURCHASE") %>
+                                    <%= render partial: "/shared/insurance_menu", locals: {button_class: "btn btn-sm btn-primary dropdown-toggle"} %>
+                                <% end %>
+                                <% if has_permission?('CREATE_SPECIAL_RENEWAL_TRANSACTION') %>
+                                    <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-plus\"></i> Purchase Medical Form", title: "Purchase Medical Form (Including Special Renewal Case)", value: "register_transaction", classes: 'btn btn-sm btn-warning') %>
+                                <% end %>
+                            </div>
+                            <div class="col module-actions text-right">
+                                <% if has_permission?('CREATE_FOREIGN_WORKER') %>
+                                    <%=raw index_table_new_button(bulk_upload_internal_employer_employer_workers_path, label: '<i class="fa fa-plus"></i> Bulk Upload', title: 'Bulk Upload') %>
+                                    <%=raw index_table_new_button(new_internal_employer_employer_worker_path) %>
+                                <% end %>
+                            </div>
+                        <% end %>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <%=render partial: '/internal/employer_workers/index_table' %>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row">
+                    <%= paginate @foreign_workers %>
+                </div>
+            </div>
+            <!-- /.tab-pane -->
+        </div>
+        <!-- /.tab-content -->
+    </div>
+</div>
+
+<%= render "/shared/carts/index", {form_action: bulk_action_internal_employer_employer_workers_path} %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#bulk-upload-btn').click(function () {
+        $('#bulk-upload-modal').modal();
+    });
+</script>
+<% end %>

@@ -1,0 +1,95 @@
+<!-- card -->
+<div class="card">
+  <!-- card-header -->
+  <div class="card-header">
+    <strong>Approval Requests</strong> - Request Detail
+  </div>
+  <!-- /card-header -->
+
+  <!-- card-body -->
+  <div class="card-body">
+
+    <div id="notice"><%= notice %></div>
+
+    <div class="row margin-top-10">
+      <div class="col-2">
+        <strong>Requester:</strong>
+      </div>
+      <div class="col-10">
+        <%= @request.request_user.username %>
+      </div>
+    </div>
+
+    <div class="row margin-top-10">
+      <div class="col-2">
+        <strong>requested at:</strong>
+      </div>
+      <div class="col-10">
+        <%= @request.requested_at %>
+      </div>
+    </div>
+
+    <div class="row margin-top-10">
+      <div class="col-2">
+        <strong>Type:</strong>
+      </div>
+      <div class="col-10">
+        <%= @item.resource.class.to_s %>
+      </div>
+    </div>
+
+    <% if @item.resource.try(:attributes).present? %>
+    <div class="row margin-top-10">
+      <div class="col-2">
+        <strong>Attributes:</strong>
+      </div>
+      <div class="col-10">
+        <% @item.resource.attributes.each do |attribute| %>
+          <div class="row margin-top-10">
+            <div class="col-4">
+              <strong><%= attribute.first %></strong>
+            </div>
+            <div class="col-8">
+              <%= attribute.last %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+      <% end %>
+<br>
+    <div class="row margin-top-10">
+      <div class="col-2">
+        <strong>your changes:</strong>
+      </div>
+      <div class="col-10">
+        <% @item.params.each do |attribute| %>
+          <div class="row margin-top-10">
+            <div class="col-4">
+              <strong><%= attribute.first %></strong>
+            </div>
+            <div class="col-8">
+              <%= attribute.last %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <!-- /card-body -->
+
+  <!-- card-footer -->
+  <div class="card-footer">
+    <div class="text-right">
+      <% if @request.request_user_id.eql?(current_user.id) %>
+        <% path = @item.resource.try(:attributes).present? ? @item.resource.class.to_s.tableize.singularize : 'approval' %>
+        <% resource =  @item.resource.try(:attributes).present? ? @item.resource_id : @item.id %>
+        <%= link_to 'Edit', send("edit_internal_#{path}_path", resource) , class: 'btn btn-sm btn-primary' %>
+        <%= link_to 'Back', send("internal_#{path}s_path") , class: 'btn btn-sm btn-secondary' %>
+      <% end %>
+    </div>
+  </div>
+  <!-- /card-footer -->
+
+  </div>
+</div>
+<!-- /card -->

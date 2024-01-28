@@ -1,0 +1,16 @@
+<%#=render "shared/approval_comments", { comments: @record.approval_request.comments } if @record.approval_request %>
+<div class="card">
+    <div class="card-header">
+        Comments
+    </div>
+    <div class="card-body">
+        <% comments.each do |comment| %>
+            <div class="alert alert-secondary">
+                <pre><%= comment.content %></pre>
+                <div class="text-right">
+                    By <%= comment.user.name %> on <%= comment.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>

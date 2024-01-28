@@ -1,0 +1,74 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Foreign Workers') do |sheet|
+  sheet.add_row %w[
+    WORKER_CODE 
+    TRANSDATE 
+    EXAM_DATE 
+    XRAY_TESTDONE_DATE 
+    XRAY_SUBMIT_DATE 
+    LAB_SPECIMEN_TAKEN_DATE 
+    LAB_SPECIMEN_RECEIVE_DATE 
+    LAB_SUBMIT_DATE 
+    CERTIFY_DATE 
+    BRANCH 
+    RENEWAL 
+    PATI 
+    REG_IND 
+    FW_STATUS 
+    PLKS_NO 
+    JOB_TYPE 
+    SEX 
+    GP_CODE 
+    GP_NAME 
+    GP_CLINIC_NAME 
+    GP_STATUS 
+    XRAY_CODE 
+    XRAY_NAME 
+    XRAY_STATUS 
+    DISTRICT_NAME 
+    STATE_NAME 
+    COUNTRY_NAME 
+    LABORATORY_CODE 
+    LABORATORY_NAME 
+    LAB_STATUS 
+    STATUS
+  ]
+
+  if @transactions.present?
+    @transactions.each do |t|
+      sheet.add_row [
+        t.fw_code,
+        t.transaction_date,
+        t.medical_examination_date,
+        t.xray_taken_date,
+        t.xray_transmit_date,
+        t.lab_exam_specimen_taken_date,
+        t.lab_exam_specimen_received_date,
+        t.laboratory_transmit_date,
+        t.certification_date,
+        t.org_code,
+        t.registration_type.upcase,
+        t.fw_pati.present? ? t.fw_pati == 1 ? 'Y' : 'N' : '',
+        t.reg_ind,
+        t.registration_type.present? ? t.registration_type == 'new' ? 'NEW COMER' : 'EXISTING' : '',
+        t.fw_plks_number,
+        t.fw__job_type_name,
+        t.fw_gender,
+        t.gp_code,
+        t.gp_name,
+        t.gp_clinic_name,
+        t.gp_status,
+        t.xray_code,
+        t.xray_name,
+        t.xray_status,
+        t.emp_town_name,
+        t.emp_state_name,
+        t.fw__country_name,
+        t.lab_code,
+        t.lab_name,
+        t.lab_status,
+        t.final_result
+      ]
+    end
+  end
+end

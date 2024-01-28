@@ -1,0 +1,76 @@
+
+<div class="card">
+  <div class="card-header"><strong><%= controller_name.gsub('_', ' ') %> Revisions</strong></div>
+
+  <div class="card-body">
+    <div>
+      <div class="col-md-12 module-actions text-right">
+        <%= link_to "New #{controller_name.split('_').map(&:capitalize).join(' ').singularize}", send("new_external_#{controller_name.singularize}_path"), class: 'btn btn-sm btn-primary' %>
+        <%= link_to controller_name.split('_').map(&:capitalize).join(' '), send("external_#{controller_name}_path"), class: 'btn btn-sm btn-primary' %>
+        <%= link_to "#{controller_name.split('_').map(&:capitalize).join(' ')} Revisions", send("revisions_external_#{controller_name}_path"), class: 'btn btn-sm btn-primary' %>
+      </div>
+    </div>
+    <div>
+      <div class="col-md-12">
+        <table class="table table-responsive-sm table-striped table-outline">
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>ID</th>
+            <th>Requested by</th>
+            <th>Responded by</th>
+            <th>state</th>
+            <th>requested at</th>
+            <th>Action(s)</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <% if @revisions.blank? %>
+            <tr><td colspan="11" class="text-blue">There are no pending <%= controller_name.gsub('_', ' ') %> revisions currently registered in the system.</td></tr>
+          <% else %>
+            <% @revisions.each.with_index((@revisions.current_page - 1) * get_per + 1) do |revision, index| %>
+              <tr>
+                <td>
+                  <%= link_to send("revision_external_#{controller_name}_path", revision) do %>
+                    <%= index %>
+                  <% end %>
+                </td>
+                <td><%= revision.id %></td>
+                <td><%= revision.request_user.name %></td>
+                <td><%= revision.respond_user.try(:name) %></td>
+                <td><%= revision.state %></td>
+                <td><%= revision.requested_at %></td>
+                <td>
+                  <!--                  <div class="module-row-actions">-->
+                  <%# if !(revision = password_policy.password_policy_revisions.where(revision_status: [PasswordPolicyRevision::REVISION_STATUS_NEW, PasswordPolicyRevision::REVISION_STATUS_APPROVAL]).first).nil? %>
+                  <%#= link_to edit_external_password_policy_revision_path(revision), class: 'btn btn-fomema btn-sm btn-white', dataToggle:'tooltip', dataPlacement:'top', title:'Edit Change Request' do %>
+                  <!--                    <i class="fa fa-edit"></i>-->
+                  <%# end %>
+                  <%# else %>
+                  <%#= link_to edit_external_password_policy_path(password_policy), class: 'btn btn-fomema btn-sm btn-blue', dataToggle:'tooltip', dataPlacement:'top', title:'New Change Request' do %>
+                  <!--                      <i class="fa fa-plus"></i> Change Request-->
+                  <%# end %>
+                  <%# end %>
+                  <%# if has_permission? "delete_password_policy" %>
+                  <%#= link_to external_password_policy_path(password_policy), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-fomema btn-sm btn-red', dataToggle:'tooltip', dataPlacement:'top', title:'Delete' do %>
+                  <!--                        <i class="fa fa-trash"></i>-->
+                  <%# end %>
+                  <%# end %>
+                  <!--                  </div>-->
+                </td>
+              </tr>
+            <% end %>
+
+          <% end %>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="11"><%= paginate @revisions %></td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

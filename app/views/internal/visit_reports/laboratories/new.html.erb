@@ -1,0 +1,21 @@
+<div class="card">
+
+    <% 
+        if @visit_report.laboratory_type&.name == 'COLLECTION'
+            render_path = 'internal/visit_reports/laboratories/collection_form'
+            title = 'Collection Centre'
+        else
+            render_path = 'internal/visit_reports/laboratories/full_partial_form'
+            title = 'Full/Partial'
+        end
+    %>
+    <div class="card-header">
+        <strong>Visit Report</strong> - LQCC Visit <%= title %> Checklist
+    </div>
+    <%= form_for @visit_report, url: internal_visit_reports_laboratories_path, html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+        <div class="card-body">
+            <%=render render_path, { form: form } %>
+        </div>
+        <%=render 'internal/visit_reports/laboratories/card_footer' %>
+    <% end %>
+</div>

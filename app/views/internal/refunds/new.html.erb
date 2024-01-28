@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Refunds</strong> - New Refund
+    </div>
+    <%= form_for @refund, url: internal_refunds_path, html: {multipart: true, class: "with-parsley"} do |form| %>
+        <div class="card-body">
+            <%= render 'form', { form: form } %>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_refunds_path) %>
+                <%=raw edit_save_draft_button() %>
+                <%=raw edit_submit_for_approval_button() %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<%= render "search_customer" %>

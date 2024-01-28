@@ -1,0 +1,74 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Foreign Workers</strong> - Foreign Worker Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="foreign_worker_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @foreign_worker.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="foreign_worker_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @foreign_worker.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="foreign_worker_code">Employer</label>
+                    <p class="form-control-plaintext">
+                        <%= @foreign_worker.employer.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="foreign_worker_uploads">Uploaded Documents</label>
+                    <p class="form-control-plaintext">
+                        <% @foreign_worker.uploads.each do |upload| %>
+                            <div><%= upload.category %></div>
+                            <% upload.documents.each do |document| %>
+                                <% if document.content_type.in?(["image/png", "image/jpg"]) %>
+                                    <%= image_tag document %>
+                                <% else %>
+                                    <%= link_to("Download", rails_blob_url(document), target: "_blank") %>
+                                <% end %>
+                            <% end %>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_foreign_workers_path) %>
+            <% if has_permission?('EDIT_FOREIGN_WORKER') %>
+                <%=raw show_edit_button(edit_internal_foreign_worker_path(@foreign_worker)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

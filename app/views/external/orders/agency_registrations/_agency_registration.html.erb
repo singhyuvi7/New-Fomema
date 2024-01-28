@@ -1,0 +1,5 @@
+<tr>
+    <td><input type="checkbox" class="bulk" name="addon_foreign_worker_ids[]" value="<%= order_item.order_itemable.id %>"></td>
+    <td><%= order_item.order_itemable.name %></td>
+    <td class="currency item-amount" data-amount="<%= order_item.amount %>"><%= number_to_currency(order_item.amount, unit: "") %></td>
+</tr>

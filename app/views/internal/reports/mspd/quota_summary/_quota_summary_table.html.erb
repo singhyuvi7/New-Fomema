@@ -1,0 +1,25 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<% if @data.present? %>
+				<tbody>
+					<% @data.each_with_index do |d, index| %>
+						<tr>
+							<td><%= index + 1 %></td>
+							<td><%= d[0].gsub('quota_',  '') %></td>
+							<td><%= d[1] %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			<% end %>
+		</table>
+
+	</div>
+</div>

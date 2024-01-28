@@ -1,0 +1,40 @@
+# fees
+[
+    {code: "FOC", name: "FOC", amount: 0},
+    {code: "DOCTOR_CHANGE_ADDRESS", name: "DOCTOR CHANGE ADDRESS", amount: 25},
+    {code: "XRAY_FACILITY_CHANGE_ADDRESS", name: "X-RAY FACILITY CHANGE ADDRESS", amount: 25},
+    {code: "LABORATORY_CHANGE_ADDRESS", name: "LABORATORY CHANGE ADDRESS", amount: 25},
+    {code: "FOREIGN_WORKER_AMENDMENT", name: "FOREIGN WORKER AMENDMENT", amount: 0},
+    {code: "FOREIGN_WORKER_GENDER_AMENDMENT", name: "FOREIGN WORKER GENDER AMENDMENT", amount: 10},
+    {code: "TRANSACTION_MALE", name: "TRANSACTION (MALE)", amount: 180},
+    {code: "TRANSACTION_FEMALE", name: "TRANSACTION (FEMALE)", amount: 190},
+    {code: "CANCEL_TRANSACTION", name: "CANCEL TRANSACTION", amount: 25},
+    {code: "EXTEND_TRANSACTION", name: "EXTEND TRANSACTION", amount: 0},
+    {code: "CHANGE_CLINIC", name: "CHANGE CLINIC", amount: 0},
+    {code: "DOCTOR_REGISTRATION", name: "DOCTOR REGISTRATION", amount: 255},
+    {code: "XRAY_FACILITY_REGISTRATION", name: "X-RAY FACILITY REGISTRATION", amount: 255},
+    {code: "LABORATORY_REGISTRATION", name: "LABORATORY REGISTRATION", amount: 255},
+    {code: "RADIOLOGIST_REGISTRATION", name: "RADIOLOGIST REGISTRATION", amount: 50},
+    {code: "REPRINT_MEDICAL_FORM", name: "REPRINT MEDICAL FORM", amount: 0},
+    {code: "IPAY_FPX_B2C", name: "CONVENIENT FEE", amount: 1},
+    {code: "IPAY_FPX_B2B", name: "CONVENIENT FEE", amount: 3},
+    {code: "SWIPE_FPX_B2C", name: "CONVENIENT FEE", amount: 1},
+    {code: "SWIPE_FPX_B2B", name: "CONVENIENT FEE", amount: 3},
+    {code: "PAYNET_FPX_B2C", name: "CONVENIENT FEE", amount: 1},
+    {code: "PAYNET_FPX_B2B", name: "CONVENIENT FEE", amount: 3},
+    {code: "BOLEH", name: "CONVENIENT FEE", amount: 3},
+    {code: "INSURANCE_GROSS_PREMIUM", name: "INSURANCE GROSS PREMIUM", amount: 0},
+    {code: "INSURANCE_SST", name: "INSURANCE SST", amount: 0},
+    {code: "INSURANCE_STAMP_DUTY", name: "INSURANCE STAMP DUTY", amount: 0},
+    {code: "INSURANCE_ADMINFEES", name: "INSURANCE ADMIN FEES", amount: 0},
+    {code: "INSURANCE_ADMINFEES_SST", name: "INSURANCE ADMIN FEES SST", amount: 0},
+    {code: "AGENCY_REGISTRATION", name: "AGENCY REGISTRATION", amount: 500},
+    {code: "AGENCY_RENEWAL", name: "AGENCY RENEWAL", amount: 500},
+    {code: "SPECIAL_RENEWAL_REJECTED_FEE", name: "SPECIAL RENEWAL REJECTED FEE", amount: 25},
+    {code: "BIOMETRIC_DEVICE", name: "BIOMETRIC DEVICE", amount: 1150},
+    {code: "BIOMETRIC_ADMIN", name: "BIOMETRIC ADMIN AND DEPLOYMENT FEE", amount: 700},
+].each do |data|
+    fs = Fee.where(:code => data[:code]).first_or_create
+    fs.update(data)
+end
+puts("fees seeded")

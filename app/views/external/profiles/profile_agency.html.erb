@@ -1,0 +1,184 @@
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if @agency.errors.any? %>
+    <p class="alert alert-danger">error : <%= @agency.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<%= render "/shared/all_flash" %>
+
+<%= form_for @user, url: external_profile_update_path, method: :PUT, html: {id: "profile_form", class: "with-parsley"} do |form| %>
+    <div class="card" style="width:100%">
+        <div class="card-header border-0 bg-transparent text-dark">
+            <strong>Profile </strong>
+        </div>
+        <div class="card-body bgportalprofile" >
+            <div class="row">
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title", class: 'col-form-label' %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+                 <div class="col-md-5">
+                    <div class="form-group">
+                        <%= label_tag :agency_name, 'Agency Name', class: 'col-form-label required' %>
+                        <%= text_field :userable, :name, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :business_registration_number, 'Business Registration Number', class: 'col-form-label' %>
+                        <%= text_field :userable, :business_registration_number, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :license_number, 'License Number', class: 'col-form-label' %>
+                        <%= text_field :userable, :license_number, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :agency_license_category_id,'License Category', class: 'col-form-label' %>
+                        <%= select_tag "agency[agency_license_category_id]", options_from_collection_for_select(AgencyLicenseCategory.order(:name).all, 'id', 'name', @agency.agency_license_category_id), include_blank: form_select_option_text, class: 'form-control', disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :license_expired_at, 'License Expired Date', class: 'col-form-label' %>
+                        <%= date_field :userable, :license_expired_at, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :director_name, 'Director Name', class: 'col-form-label' %>
+                        <%= text_field :userable, :director_name, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :director_ic_number, 'Director NRIC', class: 'col-form-label' %>
+                        <%= text_field :userable, :director_ic_number, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :pic_name, 'Person In Charge Name', class: 'col-form-label' %>
+                        <%= text_field :userable, :pic_name, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :pic_ic_number, 'Person In Charge NRIC', class: 'col-form-label' %>
+                        <%= text_field :userable, :pic_ic_number, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :agency_address1, 'Agency Address', class: 'col-form-label required' %>
+                        <%= text_field :agency, :address1, class: 'form-control', required: true, maxlength: "50" %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :agency_phone, 'Phone', class: 'col-form-label required' %>
+                        <%= telephone_field :agency, :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :email, 'Email ', class: 'col-form-label required' %>
+                        <%= text_field :userable, :email, class: 'form-control ', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="address2"></label>
+                        <%= text_field :agency, :address2, { class: 'form-control', maxlength: "50"} %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :agency_bank_id, 'Bank', class: 'col-form-label required' %>
+                        <%= select_tag "agency[bank_id]", options_from_collection_for_select(Bank.where(status: 'ACTIVE').where.not(routing: [nil, '']).order(:name).all, 'id', 'name', @agency.bank_id), include_blank: form_select_option_text, required: true, class: 'form-control' %>
+                    </div>
+                 </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="address3"></label>
+                        <%= text_field :agency, :address3, { class: 'form-control', maxlength: "50"} %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :agency_bank_account_number, 'Bank Account Number', class: 'col-form-label required' %>
+                        <%= text_field :agency, :bank_account_number, required: true, class: 'form-control', data: { parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <%= label_tag :agency_bank_payment_id, 'Bank Payment ID', class: 'col-form-label required' %>
+                        <%= text_field :agency,  :bank_payment_id, required: true, class: 'form-control',  data: { parsley_pattern: "^([a-zA-Z0-9]+)$",  parsley_pattern_message: "Only alphabets, numbers are allowed"} %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="address4"></label>
+                        <%= text_field :agency, :address4, { class: 'form-control', maxlength: "50"} %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group text-danger">
+                        <label for="address4"></label>
+                        <b><i>***Bank details should belongs to agency, representative is not allowed***</i></b>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <%= render 'external/shared/agency_profile_form_state_postcode_town', {form: form} %>
+            </div>
+            <br>
+            <div class="form-group">
+                <%= check_box "agency", "sop_acknowledge", checked_value: true, unchecked_value: false, required: true %> I hereby acknowledge that I have read and understood the <a href="<%= agency_sop_external_agencies_path %>">Standard Operating Procedure (SOP)</a> and shall comply with all policies and procedures set forth by FOMEMA Sdn Bhd.
+            </div>
+
+            <div class="row text-danger">
+                <div class="col-md-7">
+                </div>
+                <div class="col-md-5">
+                    <div class="card-footer border-0 bg-transparent text-dark text-right">
+                        <a class="btn btn-red-portal" href="#">Cancel</a>
+                        <button class="btn btn-blue-portal " type="submit" name="submit" value="Save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+</script>
+<% end %>

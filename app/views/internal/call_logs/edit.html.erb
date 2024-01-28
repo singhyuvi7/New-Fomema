@@ -1,0 +1,10 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Call Logs</strong> - Edit Call Log
+    </div>
+    <%= form_for @call_log, url: internal_call_log_path(@call_log), html: {class: "#{params[:action]}_call_log call_log-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>
+
+<%= render 'search_callable' %>

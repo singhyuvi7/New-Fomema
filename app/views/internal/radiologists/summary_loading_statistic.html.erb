@@ -1,0 +1,35 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Radiologists</strong> - Summary Loading Statistic
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+        <table class="table table-bordered table-sm w-auto mx-auto">
+            <tr>
+                <th>&nbsp;</th>
+                <th>Previous Year (<%= @previous_year.year %>)</th>
+                <th>Current Year (<%= @current_year.year %>)</th>
+            </tr>
+            <tr>
+                <th># of worker allocated</th>
+                <td><%= @radiologist.transactions.where("transaction_date between ? and ?", @previous_year.beginning_of_year, @previous_year.end_of_year).count %></td>
+                <td><%= @radiologist.transactions.where("transaction_date between ? and ?", @current_year.beginning_of_year, @current_year.end_of_year).count %></td>
+            </tr>
+            <tr>
+                <th># submit result to x-ray</th>
+                <td><%= @radiologist.transactions.joins(:xray_examinations).where("transactions.transaction_date between ? and ? and xray_examinations.radiologist_transmitted_at is not null", @previous_year.beginning_of_year, @previous_year.end_of_year).count %></td>
+                <td><%= @radiologist.transactions.joins(:xray_examinations).where("transactions.transaction_date between ? and ? and xray_examinations.radiologist_transmitted_at is not null", @current_year.beginning_of_year, @current_year.end_of_year).count %></td>
+            </tr>
+        </table>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw show_back_button(internal_radiologists_path) %>
+    </div>
+    <!-- /.card-footer -->
+
+</div>
+<!-- /.card -->

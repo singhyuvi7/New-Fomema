@@ -1,0 +1,137 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag form_action, method: 'get' do |form| %>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-2 col-form-label">Visit Report ID</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+   
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="sp_name" class="col-sm-2 col-form-label"><%= sp_type === XrayFacility.to_s ? 'License Holder Name' : "#{sp_type.constantize.model_name.human.titlecase} Name" %></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="sp_name" id="sp_name" value="<%= params[:sp_name] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="sp_code" class="col-sm-2 col-form-label"><%= sp_type.constantize.model_name.human.titlecase %> Code</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="sp_code" id="sp_code" value="<%= params[:sp_code] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% if sp_type === Doctor.to_s %>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="clinic_name" class="col-sm-2 col-form-label">Clinic Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="clinic_name" id="clinic_name" value="<%= params[:clinic_name] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% end %>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="plan_id" class="col-sm-2 col-form-label">Facility Status</label>
+                        <div class="col-sm-10">
+                            <select class="col-md-12 form-control document-type-selector select2" name="facility_status">
+                                <option value="">Select option</option>
+                                <% filter_facility_status.each do |status, index| %>
+                                <option value="<%= status %>" <% if params[:facility_status] === status  %> selected <% end %>>
+                                    <%= index %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <% if filter_type %>
+
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="visitable_category" class="col-sm-2 col-form-label">Type</label>
+                        <div class="col-sm-10">
+                            <select class="col-md-12 form-control document-type-selector" name="visitable_type">
+                                <option value="">Select option</option>
+                                <% VisitPlan::VISITABLE_TYPES.each do |visitable_type, index| %>
+                                    <option value="<%= visitable_type %>" <% if params[:visitable_type] === visitable_type  %> selected <% end %> ><%= index %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <% end %>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="visit_date_from" class="col-sm-2 col-form-label">Visit Date From</label>
+                        <div class="col-sm-12 col-md-4">
+                            <input type="date" class="form-control" name="visit_date_from" id="visit_date_from" value="<%= params[:visit_date_from] %>">
+                        </div>
+                        <label for="visit_date_to" class="col-sm-3 col-md-2 col-form-label">Visit Date To</label>
+                        <div class="col-sm-12 col-md-4">
+                            <input type="date" class="form-control" name="visit_date_to" id="visit_date_to" value="<%= params[:visit_date_to] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          <div class="row">
+
+
+            <div class="col">
+              <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">Status</label>
+                <div class="col-sm-10">
+                  <select class="col-md-12 form-control document-type-selector select2" name="status">
+                    <option value="">Select option</option>
+                    <% filter_status.each do |status, index| %>
+                        <option value="<%= status %>" <% if params[:status] === status  %> selected <% end %> ><%= index %></option>
+                    <% end %>
+                </select>
+                </div>
+              </div>
+            </div>
+
+
+            <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+          </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%= raw filter_clear_button form_action %>
+                <%= raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

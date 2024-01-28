@@ -1,0 +1,103 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :transaction_code, "Transaction Code", class: 'col-form-label' %>
+                <%= form.text_field :transaction_code, :value => @transaction.try(:code), class: 'form-control', :readonly => true  %>
+                <%= form.hidden_field :transaction_id, :value => @transaction.id  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :service_providable_type, "Service Provider Type", class: 'col-form-label' %>
+                <%= form.text_field :service_providable_type, :value => @payment.service_providable_type, class: 'form-control', required: true, :readonly => true  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :service_provider_code, "#{@payment.service_providable_type.constantize.model_name.human.titlecase} Code", class: 'col-form-label' %>
+                <%= form.text_field :service_provider_code, :value => @service_provider.code, class: 'form-control', :readonly => true  %>
+                <%= form.hidden_field :service_providable_id, :value => @service_provider.id %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :service_provider_name, "#{@payment.service_providable_type.constantize.model_name.human.titlecase} Name", class: 'col-form-label' %>
+                <%= form.text_field :service_provider_name, :value => @service_provider.name, class: 'form-control', :readonly => true  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :foreign_worker_code, "Worker Code", class: 'col-form-label' %>
+                <%= form.text_field :foreign_worker_code, :value => @transaction&.fw_code, class: 'form-control', :readonly => true  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :foreign_worker_name, "Worker Name", class: 'col-form-label' %>
+                <%= form.text_field :foreign_worker_name, :value => @transaction&.fw_name, class: 'form-control', :readonly => true  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :user_code, "User Code", class: 'col-form-label' %>
+                <%= form.text_field :user_code, :value => current_user.code, class: 'form-control', :readonly => true  %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% 
+                    is_lab = @payment.service_providable_type == Laboratory.to_s ? true : false
+                    amount_readonly = @payment.id.present? ? true : !is_lab 
+                %>
+                <%= form.label :amount, "Payment Amount", class: 'col-form-label required' %>
+                <%= form.number_field :amount, class: 'form-control', required: true, step: 0.01, :readonly => false , :value => (@payment.id.present? ? @payment.amount : (is_lab ? '' : @payment.amount)) %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :pay_at, "Payment Date", class: 'required' %>
+                <%= form.date_field :pay_at, class: 'form-control', required: true, max: Time.now.strftime('%Y-%m-%d'), :readonly => @payment.id.present? %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_manual_payment_view_transactions_path(:worker_code => @transaction&.fw_code)) %>
+        <% if @payment.id.nil? %>
+            <%=raw edit_save_button() %>
+        <% end %>
+    </div>
+
+</div>

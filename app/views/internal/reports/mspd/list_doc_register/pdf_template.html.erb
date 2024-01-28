@@ -1,0 +1,85 @@
+<table class="workers-table w-100" style="margin-top: 2rem;">
+    <thead>
+        <tr>
+            <% @headers.each do |header| %>
+            <th><%= header %></th>
+            <% end %>
+        </tr>
+    </thead>
+    <tbody valign="top">
+        <% @doctors.each.with_index(1) do |doctor,index| %>
+        <tr>
+            <td><%= index %></td>
+            <td>
+                <div class="service-provider-details"><%= doctor.code %></div>
+                <div class="paired-service-provider">
+                    <div><%= doctor.xray_facility.try(:code) %></div>
+                    <div><%= doctor.laboratory.try(:code) %></div>
+                </div>
+            </td>
+            <td>
+                <div class="service-provider-details">
+                    <div><%= doctor.name %></div>
+                    <div><%= doctor.clinic_name %></div>
+                    <div><%= doctor.address1 %></div>
+                    <div><%= doctor.address2 %></div>
+                    <div><%= doctor.address3 %></div>
+                    <div><%= doctor.address4 %></div>
+                    <div><%= doctor.town.try(:name) %></div>
+                    <div><%= doctor.postcode %> <%= doctor.state.try(:name) %></div>
+                </div>
+                <div class="paired-service-provider">
+                    <div><%= doctor.xray_facility.try(:name) %></div>
+                    <div><%= doctor.laboratory.try(:name) %></div>
+                </div>
+            </td>
+            <td class="multi-line">
+                <div><%= doctor.created_at.try(:strftime, get_standard_date_format) %></div>
+            </td>
+            <td class="multi-line">
+                <div><%= doctor.activated_at.try(:strftime, get_standard_date_format) %></div>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+
+<style>
+    .w-100 {
+        width: 100%;
+    }
+
+    table {
+        border-collapse: collapse;
+        border: 1px solid #aaa;
+    }
+
+    .workers-table {
+        padding: 1rem 0px;
+    }
+
+    thead {
+        background-color: #d0d0d0;
+    }
+
+    thead th {
+        padding: 3px;
+        border: 1px solid #aaa;
+    }
+
+    tbody td {
+        padding: 5px 5px;
+        vertical-align: center;
+        border: none;
+        border-bottom: 1px solid #aaa;
+    }
+
+    .service-provider-details {
+        height: 170px;
+    }
+
+    .paired-service-provider div,
+    .multi-line div {
+        padding: 5px 0px;
+    }
+</style>

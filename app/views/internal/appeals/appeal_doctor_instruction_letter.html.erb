@@ -1,0 +1,142 @@
+<pdfbody>
+    <div>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png", style: "float:left; height: 110px; padding-bottom: 20px;"%>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png", style: "float:right; height: 110px; padding-bottom: 20px;"%>
+        <%#= wicked_pdf_image_tag "letters/fomema_letterhead_25.png", style: "float:right; height: 110px; max-width:100%; padding-bottom: 20px;"%>
+    </div>
+
+    <div style="height: 2.2cm;">
+        &nbsp;
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Our Ref</td>
+            <td>: <%= @data[:letter_ref_no] %></td>
+            <td style="text-align: right;"><b>CONFIDENTIAL</b></td>
+        </tr>
+
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:letter_date] %></td>
+            <td></td>
+        </tr>
+    </table><br>
+
+    <table>
+        <% @data[:doctor_address].each do |address| %>
+            <tr><td><%= address %></td></tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">Dear Dr,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+        Appeal of Foreign Worker's Medical Examination Results<br>
+        Name: <%= @data[:worker_name] %>, Passport No: <%= @data[:worker_passport_no] %>
+    </b></p>
+
+    <p class="paragraph-spacing">The following employer has appealed based on the foreign worker's medical examination results.</p>
+
+    <table class="w-100 paragraph-spacing">
+        <tr>
+            <td valign="top" style="width: 13em;">Employee (Foreign worker)</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:worker_name] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 13em;">Worker Code</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:worker_code] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 13em;">Worker Passport No.</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:worker_passport_no] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 13em;">Employer's Name</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:employer_name] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 13em;">Telephone</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:employer_phone] %></td>
+        </tr>
+    </table>
+
+    <p class="paragraph-spacing">
+        You have been appointed to conduct the re-examination/investigation of the foreign worker as part of the appeal process. Kindly carry out the following re-examination/investigation:<br>
+
+        <ul style="padding-top: 0.8em; padding-bottom: 0.8em;">
+            <% @data[:appeal_comments].each do |comment| %>
+                <li style="padding-left: 0.5em;"><b><%= comment %></b></li>
+            <% end %>
+        </ul>
+
+        Please confirm the identity of the mentioned foreign worker with the original passport before carrying out the medical examination/ investigation.<br><br>
+
+        <b>
+            You must not conduct any medical examination if you doubt the identity of the worker and if the worker does not bring his/her original passport for verification.<br><br>
+            The employer shall be responsible to bear the cost of the medical re-examination/investigation. FOMEMA is NOT responsible for any cost arising from this appeal.<br><br>
+        </b>
+
+        Please be reminded that as this is an appeal case, every care and due diligence should be taken to ensure that the medical re-examination/investigation are not in any way compromised or disputable.<br><br>
+        Kindly submit the results to the Appeal Committee via email: appeal@fomema.com.my, followed by original copy of the results as soon as possible.
+    </p>
+
+    <p class="paragraph-quad-spacing">
+        Yours sincerely,<br>
+        <b>FOMEMA SDN BHD</b>
+    </p>
+
+    <p class="paragraph-triple-spacing" style="font-size: 0.85em;">This letter is computer generated and no signature is required.</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .paragraph-triple-spacing {
+        padding-top: 1.5em;
+    }
+
+    .paragraph-quad-spacing {
+        padding-top: 2em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    br {
+        font-size: 1.2em;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td, tr {
+        padding: 0;
+        margin: 0;
+    }
+</style>

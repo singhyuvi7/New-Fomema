@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Fees</strong> - Edit Fee
+    </div>
+    <%= form_for @fee, url: internal_fee_path(@fee), html: {class: "#{params[:action]}_fee fee-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

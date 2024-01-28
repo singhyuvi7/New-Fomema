@@ -1,0 +1,325 @@
+<%= render 'shared/all_validation_flash', { model_obj: @radiologist } %>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :title_id, "Title" %>
+            <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, disabled: true, class: 'form-control select2' %>
+            <% if form.object.title_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.title_id_was.nil? ? '* EMPTY' : Title::find(form.object.title_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :name, "Doctor Name", class: 'required' %>
+            <%= form.text_field :name, class: 'form-control', readonly: true %>
+            <% if form.object.name_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.name_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :icno, "ICNO", class: 'required' %>
+            <%= form.text_field :icno, class: 'form-control', readonly: true %>
+            <% if form.object.icno_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.icno_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :xray_facility_name, "X-Ray Facility Name" %>
+            <%= form.text_field :xray_facility_name, class: 'form-control', readonly: true %>
+            <% if form.object.xray_facility_name_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.xray_facility_name_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :nationality_id, class: 'required' %>
+            <%= form.select :nationality_id, options_from_collection_for_select(Country.order(:name).all, 'id', 'name', form.object.nationality_id), {include_blank: form_select_option_text}, disabled: true, class: 'form-control select2' %>
+            <% if form.object.nationality_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.nationality_id_was.blank? ? '* EMPTY' : Country::find(form.object.nationality_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div> 
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :race_id,"Race/Ethnic", class: 'required' %>
+            <%= form.select :race_id, options_from_collection_for_select(Race.order(:name).all, 'id', 'name', form.object.race_id), {include_blank: form_select_option_text}, disabled: true, class: 'form-control select2' %>
+            <% if form.object.race_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.race_id_was.blank? ? '* EMPTY' : Race::find(form.object.race_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row"> 
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :gender, "Gender" %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :gender, "M", class: "form-check-input", disabled: form.object.gender %> 
+                    <label class="form-check-label" for="male">Male</label>
+                </div>
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :gender, "F", class: "form-check-input", disabled: form.object.gender %>
+                    <label class="form-check-label" for="female">Female</label>
+                </div>
+                <% if form.object.gender_changed? %>
+                    <p class="form-control-plaintext approval-previous-value"><%= form.object.gender_was ? 'Male' : 'Female' %></p>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<!-- address -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :address, class: 'required' %>
+            <%= form.text_field :address1, class: 'form-control', readonly: true %>
+            <% if form.object.address1_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.address1_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.text_field :address2, class: 'form-control', readonly: true %>
+            <% if form.object.address2_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.address2_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.text_field :address3, class: 'form-control', readonly: true %>
+            <% if form.object.address3_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.address3_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.text_field :address4, class: 'form-control', readonly: true %>
+            <% if form.object.address4_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.address4_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+<!-- /address -->
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :state, class: 'required' %>
+            <%= form.select :state_id, options_from_collection_for_select(State.order(:name).all, 'id', 'name', form.object.state_id), {include_blank: form_select_option_text}, disabled: true, class: 'form-control select2' %>
+            <% if form.object.state_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.state_id_was.nil? ? '* EMPTY' : State::find(form.object.state_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :town, class: 'required' %>
+            <%= form.select :town_id, options_from_collection_for_select(Town.where(state_id: form.object.state_id).order(:name).all, 'id', 'name', form.object.town_id), {include_blank: form_select_option_text}, disabled: true, class: 'form-control select2' %>
+            <% if form.object.town_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.town_id_was.nil? ? '* EMPTY' : Town::find(form.object.town_id_was).try(:code) %></p>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :postcode, class: 'required' %>
+            <%= form.text_field :postcode, class: 'form-control', readonly: true %>
+            <% if form.object.postcode_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.postcode_was %></p>
+            <% end %>
+        </div>
+    </div>
+    
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :phone, "Phone Number", class: 'required' %>
+            <%= form.text_field :phone, class: 'form-control', readonly: true %>
+            <% if form.object.phone_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.phone_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :fax_number, "Fax Number" %>
+            <%= form.text_field :fax, class: 'form-control', readonly: true %>
+            <% if form.object.fax_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.fax_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :mobile, "Mobile Number" %>
+                <%= form.text_field :mobile, class: 'form-control', required: false, readonly: true %>
+                <% if form.object.mobile_changed? %>
+                    <p class="form-control-plaintext approval-previous-value"><%= form.object.mobile_was %></p>
+                <% end %>
+            </div>
+        </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :email, class: 'required' %>
+            <%= form.email_field :email, class: 'form-control', readonly: true %>
+            <% if form.object.email_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.email_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :qualification, class: 'required' %>
+            <%= form.text_field :qualification, class: 'form-control', readonly: true %>
+            <% if form.object.qualification_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.qualification_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :is_pcr, "Is PCR" %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :is_pcr, true, class: "form-check-input", disabled: form.object.is_pcr ? false : true %>
+                    <label class="form-check-label" for="radiologist_is_pcr_true">Yes</label>
+                </div>
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :is_pcr, false, class: "form-check-input", disabled: form.object.is_pcr ? true : false %>
+                    <label class="form-check-label" for="radiologist_is_pcr_false">No</label>
+                </div>
+                <% if form.object.is_pcr_changed? %>
+                    <p class="form-control-plaintext approval-previous-value"><%= form.object.is_pcr_was ? 'Yes' : 'No' %></p>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :is_panel_xray_facility, "Panel X-Ray Facility" %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :is_panel_xray_facility, true, class: "form-check-input", disabled: form.object.is_panel_xray_facility ? false : true %>
+                    <label class="form-check-label" for="lab_is_panel_xray_facility_true">Yes</label>
+                </div>
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.radio_button :is_panel_xray_facility, false, class: "form-check-input", disabled: form.object.is_panel_xray_facility ? true : false %>
+                    <label class="form-check-label" for="lab_has_is_panel_xray_facility_false">No</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :xray_facility_id, "X-Ray Facilities", class: form.object.is_panel_xray_facility ? "required" : "" %>
+            <ul id="panel_xray_facilities" class="list-group">
+                <% @radiologist.panel_radiologists.each do |panel_radiologist| %>
+                    <li id="panel_radiologist_<%= panel_radiologist.id %>" class="list-group-item clearfix">
+                        <input type="hidden" name="radiologist[panel_radiologists][]" value="<%= panel_radiologist.xray_facility_id %>">
+                        <%= "#{panel_radiologist.xray_facility.name} (#{panel_radiologist.xray_facility.code})" %>
+                    </li>
+                <% end %>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :apc_year, "APC Year", class: 'required' %>
+            <%= form.number_field :apc_year, class: 'form-control', readonly: true %>
+            <% if form.object.apc_year_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.apc_year_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :apc_number, "APC Number", class: 'required' %>
+            <%= form.text_field :apc_number, class: 'form-control', readonly: true %>
+            <% if form.object.apc_number_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.apc_number_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :nsr_number, "NSR Number", class: 'required' %>
+            <%= form.text_field :nsr_number, class: 'form-control', readonly: true %>
+            <% if form.object.nsr_number_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.nsr_number_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :renewal_agreement_date, "Renewal Agreement Date" %>
+            <%= form.date_field :renewal_agreement_date, class: 'form-control', readonly: true %>
+            <% if form.object.renewal_agreement_date_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.renewal_agreement_date_was %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :district_health_office_id, "Nearest District Health Office", class: 'required' %>
+            <%= form.select :district_health_office_id, options_from_collection_for_select(DistrictHealthOffice.order(:name).all, 'id', 'name', form.object.district_health_office_id), {include_blank: form_select_option_text}, class: 'form-control select2', disabled: true %>
+            <% if form.object.district_health_office_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.district_health_office_id_was.nil? ? '* EMPTY' : DistrictHealthOffice.find(form.object.district_health_office_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+        <%= form.label :comment %>
+        <%= form.text_field :comment, class: 'form-control', disabled: true %>
+        </div>
+    </div>
+</div>

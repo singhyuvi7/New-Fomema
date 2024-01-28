@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag "audits", method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="created_at_from" class="col-sm-3 col-form-label">Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" placeholder="YYYY-MM-DD" class="form-control" name="created_at_from" id="created_at_from" value="<%= params[:created_at_from] %>">
+                                <div class="input-group-append">
+                                    <label class="input-group-text col-form-label" for="created_at_to">To</label>
+                                </div>
+                                <input type="date" placeholder="YYYY-MM-DD" class="form-control" name="created_at_to" id="created_at_to" value="<%= params[:created_at_to] %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button "audits" %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,147 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent">
+        <b>Requery Payment</b> - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <div class="card-body">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <label class="col-md-6 col-form-label">Pay with <img src="<%= image_path('logo/boleh-logo.png')%>" class="img-responsive" style="max-height: 30px"></label>
+                </div>
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Payment Code</label>
+                    <div class="form-control-plaintext col-md-9"><%= @order.code %></div>
+                </div>
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Amount (RM)</label>
+                    <div class="form-control-plaintext col-md-9"><%= number_to_currency(@order.amount, unit: "") %></div>
+                </div>
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Payment of</label>
+                    <div class="form-control-plaintext col-md-9"><%= @order.category %></div>
+                </div>
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Payment Method</label>
+                    <div class="form-control-plaintext col-md-9"><%= @order.payment_method.name %></div>
+                </div>
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Payment Status</label>
+                    <div class="form-control-plaintext col-md-9"><%= Order::STATUSES[@order.status] %></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <p style="color:red"><b>REQUERY WILL HAVE IMPACT ON FINANCE COLLECTION. DO THIS <u>ONCE ONLY</u> IF THE PAYMENT IS SUCCESSFUL.</b></p>
+                <p style="color:red"><b>Order with sync date is not allowed to requery.</b></p>
+                <p style="color:red"><b>Order with status new, paid, failed and cancelled is not allowed to requery.</b></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Request ID</th>
+                                <th>Request Time</th>
+                                <th>Message Type</th>
+                                <th>Order Number</th>
+                                <th>Amount</th>
+                                <th>Sync Date</th>
+                                <th>Status Received</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @boleh_requests.blank? %>
+                                <tr>
+                                    <td colspan="9" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @boleh_requests.each.with_index do |request, index| %>
+                                    <%
+                                        response = BolehResponse.where(boleh_request_id: request.id).order(:id).last
+                                        responses = BolehResponse.where(boleh_request_id: request.id).order(:id)
+                                    %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index + 1 %></td>
+                                        <td><%= request.id %></td>
+                                        <td><%= request.created_at&.strftime(get_standard_datetime_format) %></td>
+                                        <td><%= request.msg_type %></td>
+                                        <td><%= request.order_number %></td>
+                                        <td><%= ActionController::Base.helpers.number_to_currency(request.amount, unit: "", delimiter: "") %></td>
+                                        <td><%= request.sync_date&.strftime(get_standard_datetime_format) %></td>
+                                        <td>
+                                            <% responses.each do |response| %>
+                                                <%
+                                                    status = "#{response.created_at&.strftime(get_standard_datetime_format)} - (#{response&.response_category}) #{response&.status}"
+                                                %>
+                                                <%= status %><br>
+                                            <% end %>
+                                        </td>
+                                        <td class="module-row-actions">
+                                            <% if has_permission?("REQUERY_ORDER_PAYMENT") and !["PAID", "FAILED", "CANCELLED", "NEW"].include?(@order.status) and @order.payment_method&.code&.start_with? ('BOLEH') and request.msg_type == 'AR' and !request.has_sync_date? %>
+                                                <a class="btn btn-sm btn-warning requery-btn" data-toggle="tooltip" data-html="true" title="Requery" data-original-title="Requery" href="<%= requery_boleh_request_ae_internal_order_path(@order, request) %>"><i class="fa fa-retweet"></i></a>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th>Legend</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Message Type</th>
+                                <td>
+                                    <b>AR</b> = Payment request<br>
+                                    <b>AE</b> = Payment requery
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    <b>approved</b> = Paid<br>
+                                    <b>rejected</b> = Failed<br>
+                                    <b>pending</b> = Pending payment<br>
+                                    <b>pending_auth</b> = Pending authorization
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col text-right">
+                <a class="btn btn-secondary" href="<%= external_orders_path %>">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+<% content_for :page_end_scripts do %>
+<% end %>

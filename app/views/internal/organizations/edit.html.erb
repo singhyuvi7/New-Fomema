@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Organizations</strong> - Edit Organization
+    </div>
+    <%= form_for @organization, url: internal_organization_path(@organization), html: {class: "#{params[:action]}_town town-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

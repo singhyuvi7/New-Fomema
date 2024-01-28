@@ -1,0 +1,123 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Laboratories</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class='col'>
+                <% if has_permission?("MSPD_REPORTS") %>
+                    <%= link_to(internal_laboratories_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-primary') do %>
+                        <i class='fa fa-download'></i>
+                        Export
+                    <% end %>
+                <% end %>
+            </div>
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_DRAFT_LABORATORY') %>
+                    <%=raw index_table_new_button(new_internal_laboratory_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Code</th>
+            <th>Facility Name</th>
+            <th>Address</th>
+            <th>State</th>
+            <th>Postcode</th>
+            <th>Town</th>
+            <th>Active Clinic Allocated</th>
+            <th>Activated</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @laboratories.blank? %>
+            <tr>
+                <td colspan="11" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @laboratories.each.with_index((@laboratories.current_page - 1) * get_per + 1) do |laboratory, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= laboratory.code or raw '<i>N/A</i>' %></td>
+                    <td><%= laboratory.name %></td>
+                    <td><%= raw laboratory.laboratory_address.present? ? laboratory.laboratory_address : "<i>N/A</i>" %></td>
+                    <td><%= laboratory.try(:state).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= laboratory.postcode or raw '<i>N/A</i>' %></td>
+                    <td><%= laboratory.try(:town).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= laboratory.active_gp_count %></td>
+                    <td><%= laboratory.activated_at.nil? ? (raw '<i>N/A</i>') : laboratory.activated_at.strftime(get_standard_date_format) %></td>
+                    <td>
+                        <div><%= Laboratory::STATUSES[laboratory.status] %></div>
+                        <div class="font-italic"><small><%= laboratory.status_display %></small></div>
+                    </td>
+                    <td class="module-row-actions">
+                    <%=raw index_table_show_button(internal_laboratory_path(laboratory)) %>
+
+                    <% if can_request_update?(laboratory) and has_any_permission?('EDIT_NON_FINANCE_INFO_LABORATORY', 'EDIT_FINANCE_INFO_LABORATORY') %>
+                        <%=raw index_table_edit_button edit_internal_laboratory_path(laboratory) %>
+                    <% end %>
+
+                    <% if can_continue_draft?(laboratory, any_user: true) %>
+                        <% if has_permission?("EDIT_NON_FINANCE_INFO_LABORATORY") %>
+                            <%=raw index_table_draft_button(draft_internal_laboratory_path(laboratory)) %>
+                        <% else %>
+                            <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                        <% end %>
+                    <% end %>
+
+                    <% if can_cancel_approval?(laboratory) %>
+                        <%=raw index_table_cancel_button(cancel_internal_laboratories_path(laboratory)) %>
+                    <% end %>
+
+                    <% if can_do_approval?(laboratory) %>
+                        <% if has_permission?("APPROVAL_LABORATORY") %>
+                            <%=raw index_table_approval_button(approval_internal_laboratories_path(laboratory)) %>
+                        <% else %>
+                            <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                        <% end %>
+                    <% end %>
+
+                    <% if can_do_approval2?(laboratory) %>
+                        <% if has_permission?("CONCUR_LABORATORY") %>
+                            <%=raw index_table_approval_button(concur_internal_laboratories_path(laboratory), title: "Concur") %>
+                        <% else %>
+                            <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                        <% end %>
+                    <% end %>
+
+                    <% if has_permission?('DELETE_LABORATORY') %>
+                        <%=raw index_table_delete_button(internal_laboratory_path(laboratory)) %>
+                    <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @laboratories %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

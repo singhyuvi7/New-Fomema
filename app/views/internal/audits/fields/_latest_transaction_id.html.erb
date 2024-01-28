@@ -1,0 +1,5 @@
+<%
+t = Transaction.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{t.code}" if !value.blank? && t %></td>

@@ -1,0 +1,57 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag mspd_suspension_internal_mspd_reports_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="status_scheduleable_type" class="col-sm-3 col-form-label">Type</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="status_scheduleable_type" id="status_scheduleable_type">
+                                <option value="">All</option>
+                                <% StatusSchedule::STATUS_SCHEDULEABLE_TYPES.each do |value, label| %>
+                                    <option value="<%= value %>" <%= " selected" if value == params[:status_scheduleable_type] %>><%= label %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="effective_date_from" class="col-sm-3 col-form-label">Effective Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" class="form-control" name="effective_date_from" id="effective_date_from" value="<%= params[:effective_date_from] %>">
+                                <div class="input-group-append"><label class="input-group-text" for="effective_date_to"> To </label></div>
+                                <input type="date" class="form-control" name="effective_date_to" id="effective_date_to" value="<%= params[:effective_date_to] %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="created_at_from" class="col-sm-3 col-form-label">Created At Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" class="form-control" name="created_at_from" id="created_at_from" value="<%= params[:created_at_from] %>">
+                                <div class="input-group-append"><label class="input-group-text" for="created_at_to"> To </label></div>
+                                <input type="date" class="form-control" name="created_at_to" id="created_at_to" value="<%= params[:created_at_to] %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button mspd_suspension_internal_mspd_reports_path %>
+            <button type="submit" class="btn btn-sm btn-warning" formaction="<%= mspd_suspension_internal_mspd_reports_path(format: :xlsx) %>"><i class="fa fa-file-excel"> Export</i></button>
+            <%=raw filter_button %>
+        </div>
+    <% end %>
+</div>

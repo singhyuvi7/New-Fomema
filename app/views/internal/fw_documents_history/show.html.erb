@@ -1,0 +1,44 @@
+<div class="card">
+    <div class="card-header">
+        <strong>FW Documents History</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped ">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                            <th>Uploaded By</th>
+                            <th>Deleted By</th>
+                        </tr>
+
+                        <% @foreign_worker.uploads.where.not(deleted_at: nil).order(created_at: :desc).each do |upload| %>
+                                <tr>
+                                    <td class="filenames" width="20%">
+                                        <%= upload.category%>
+                                    </td>
+                                    <td class="filenames" width="25%">
+                                        <% upload.documents.each do |document| %>
+                                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                        <% end %>
+                                    </td>
+                                    <td width="20%"><%= "#{User.find(upload&.created_by).name } (#{upload.created_at&.strftime(get_standard_datetime_format)})" %></td>
+                                    <td width="20%">
+                                        <%= "#{User.find(upload&.updated_by).name } (#{upload.deleted_at&.strftime(get_standard_datetime_format)})" %>
+                                    </td>
+                                </tr>
+                        <% end %>
+                        <% if @foreign_worker.uploads.blank? %>
+                            <tr><td colspan="5">There are no uploaded documents</td></tr>
+                        <% end %>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

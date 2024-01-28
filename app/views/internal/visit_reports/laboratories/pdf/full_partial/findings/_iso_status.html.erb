@@ -1,0 +1,20 @@
+<tr class="finding-row mso-iso-status">
+    <td class="row-name" colspan="2">MS ISO Status</td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:iso_status] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:iso_status] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>
+<% if !finding.iso_status_comment.blank? %>
+    <tr>
+        <td class="row-name" colspan="2">
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= finding.iso_status_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

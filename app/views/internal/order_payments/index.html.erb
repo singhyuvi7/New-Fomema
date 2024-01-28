@@ -1,0 +1,91 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Other Payments</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Payer</th>
+                                <th>Payment Method</th>
+                                <th>Reference No.</th>
+                                <th>Creation Date</th>
+                                <th>Issue Date</th>
+                                <th>Amount</th>
+                                <th>Branch</th>
+                                <th>Holded</th>
+                                <th>Bad</th>
+                                <th>Posted</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @order_payments.blank? %>
+                                <tr>
+                                    <td colspan="13" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                                <% @order_payments.each.with_index((@order_payments.current_page - 1) * get_per + 1) do |order_payment, index| %>
+                                    <% order = order_payment.order %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= order.try(:customerable).try(:name) %><br>(<%= order.try(:customerable).try(:code) %>)</td>
+                                        <td><%= order&.payment_method&.name %></td>
+                                        <td><%= order_payment.reference %></td>
+                                        <td><%= order_payment.created_at.try(:strftime,'%d/%m/%Y') || '-' %></td>
+                                        <td><%= order_payment.issue_date.try(:strftime,'%d/%m/%Y') || '-' %></td>
+                                        <td><%= number_to_currency(order&.amount, unit: "") %></td>
+                                        <td><%= order_payment.order&.organization&.name %></td>
+                                        <td><%= order_payment.holded ? "Yes" : "No" %></td>
+                                        <td><%= order_payment.bad ? "Yes" : "No" %></td>
+                                        <td><%= order_payment.sync_date.blank? ? "No" : "Yes" %></td>
+
+                                        <td class="module-row-actions">
+                                            <%=raw index_table_show_button(internal_order_payment_path(order_payment)) %>
+                                            <% if !order_payment.bad %>
+                                                <% if has_permission?('EDIT_OTHER_PAYMENT') %>
+                                                    <%=raw index_table_edit_button edit_internal_order_payment_path(order_payment) %>
+                                                <% end %>
+
+                                                <% if order_payment.holded and has_permission?("UNHOLD_OTHER_PAYMENT") && order_payment.sync_date.blank? %>
+                                                    <%=raw index_table_primary_button(unhold_internal_order_payment_path(order_payment), title: "Unhold", label: '<i class="fa fa-toggle-off"></i>', classes: 'btn btn-sm btn-success') %>
+                                                <% elsif !order_payment.holded and has_permission?("HOLD_OTHER_PAYMENT") && order_payment.sync_date.blank? %>
+                                                    <%=raw index_table_warning_button(hold_internal_order_payment_path(order_payment), title: "Hold", label: '<i class="fa fa-toggle-on"></i>') %>
+                                                <% end %>
+                                            <% end %>
+
+                                            <% if order_payment.bad %>
+                                                <% if has_permission?("REPLACE_OTHER_PAYMENT") and !order_payment.replacement_id? %>
+                                                    <%=raw index_table_primary_button(replace_internal_order_payment_path(order_payment), title: "Replace bad payment", label: '<i class="fa fa-adjust"></i>') %>
+                                                <% end %>
+                                            <% elsif !order_payment.bad and has_permission?("SET_BAD_OTHER_PAYMENT") %>
+                                                <%=raw index_table_confirm_button(bad_internal_order_payment_path(order_payment), question: "Once payment is set to bad, it can never be unset. Confirm tag as bad payment?", title: "Confirm tag as bad payment?", label: '<i class="fa fa-unlock"></i>', classes: 'btn btn-sm btn-danger') %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @order_payments %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

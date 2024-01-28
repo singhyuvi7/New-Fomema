@@ -1,0 +1,7 @@
+<a href="<%= internal_user_setup_path(activity.owner_id) %>"><%= activity.owner.name %></a>  request PCR Retake on
+
+<% if activity.trackable %>
+    <a href="<%= approval_internal_xray_retake_path(activity.trackable.id) %>"><%= activity.trackable.transactionz&.code %></a>
+<% else %>
+    which has since been removed
+<% end %>

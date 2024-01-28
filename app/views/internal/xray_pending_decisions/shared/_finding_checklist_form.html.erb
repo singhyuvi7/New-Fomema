@@ -1,0 +1,46 @@
+<div class="card">
+
+    <div class="card-header">
+        MLE Finding
+    </div>
+
+    <table id="pending_decision_mle_finding" class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>Findings</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <% xray_pending_decision.mle_finding_fields.each do |cond_key, label| %>
+                <tr>
+                    <td><%= label %></td>
+
+                    <% if cond_key.to_s == "certification_comment" %>
+                        <td colspan="2">
+                            <textarea disabled class="form-control" name="xray_pending_decision[<%= cond_key %>]" id="xray_pending_decision_<%= cond_key %>" rows="2" required><%= xray_pending_decision[cond_key] %></textarea>
+                        </td>
+                    <% else %>
+                        <td width="150" class="text-center">
+                            <div class="form-check">
+                                <label class="form-check-label form-check-inline">
+                                    <input class="form-check-input" type="radio" onchange="xray_pending_decision_changed(this)" name="xray_pending_decision[<%= cond_key %>]" id="pending_decision_yes_<%= cond_key %>" value="YES"<%= " checked" if xray_pending_decision[cond_key] === 'YES' %> required>
+                                    Yes
+                                </label>
+                            </div>
+                        </td>
+                        <td width="150" class="text-center">
+                            <div class="form-check">
+                                <label class="form-check-label form-check-inline">
+                                    <input class="form-check-input" type="radio" onchange="xray_pending_decision_changed(this)" name="xray_pending_decision[<%= cond_key %>]" id="pending_decision_no_<%= cond_key %>" value="NO"<%= " checked" if xray_pending_decision[cond_key] === 'NO' || xray_pending_decision[cond_key].nil? %>>
+                                    No
+                                </label>
+                            </div>
+                        </td>
+                    <% end %>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

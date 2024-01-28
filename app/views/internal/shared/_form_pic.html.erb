@@ -1,0 +1,14 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :pic_name, "Person In Charge Name", class: 'required' %>
+            <%= form.text_field :pic_name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z][^0-9]*", parsley_pattern_message: "Must not begin with a special characters and no numbers are allowed" } %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :pic_phone, "Person In Charge Contact", class: 'required' %>
+            <%= form.text_field :pic_phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+</div>

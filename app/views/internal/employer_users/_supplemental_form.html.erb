@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= label_tag "employer_supplement[pic_name]", "Name (Person In Charge)", class: "required" %>
+            <%= text_field_tag "employer_supplement[pic_name]", @user.employer_supplement.try(:pic_name), class: "form-control", required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= label_tag "employer_supplement[pic_phone]", "Person In Charge Contact No", class: "required" %>
+            <%= text_field_tag "employer_supplement[pic_phone]", @user.employer_supplement.try(:pic_phone), class: "form-control", required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+</div>
+<!-- address -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= label_tag "employer_supplement[address1]", "Address", class: "required" %>
+            <%= text_field_tag "employer_supplement[address1]", @user.employer_supplement.try(:address1), class: "form-control", required: true, data: { parsley_pattern: "[a-zA-Z0-9@.,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@) and slashes (/) are allowed" } %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= text_field_tag "employer_supplement[address2]", @user.employer_supplement.try(:address2), class: "form-control", data: { parsley_pattern: "[a-zA-Z0-9@.,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@) and slashes (/) are allowed" } %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= text_field_tag "employer_supplement[address3]", @user.employer_supplement.try(:address3), class: "form-control", data: { parsley_pattern: "[a-zA-Z0-9@.,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@) and slashes (/) are allowed" } %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= text_field_tag "employer_supplement[address4]", @user.employer_supplement.try(:address4), class: "form-control", data: { parsley_pattern: "[a-zA-Z0-9@.,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@) and slashes (/) are allowed" } %>
+        </div>
+    </div>
+</div>
+<!-- /address -->
+
+<%= form.fields_for :employer_supplement do |employer_supplement_form| %>
+    <%= render "internal/shared/form_state_postcode_town", { form: employer_supplement_form } %>
+<% end %>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= label_tag "employer_supplement[phone]", "Telephone Number", class: "required" %>
+            <%= text_field_tag "employer_supplement[phone]", @user.employer_supplement.try(:phone), class: "form-control", required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= label_tag "employer_supplement[fax]", "Fax Number" %>
+            <%= text_field_tag "employer_supplement[fax]", @user.employer_supplement.try(:fax), class: "form-control", data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+</div>

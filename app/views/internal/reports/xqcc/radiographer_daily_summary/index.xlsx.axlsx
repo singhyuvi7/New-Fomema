@@ -1,0 +1,32 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  headers = ['No', 'Batch Id', 'X-Ray Code', 'Clinic Name', 'Total Film', 'Suspicious', 'Identical', 'Wrongly Transmitted', 'Normal', 'IQA', 'Compliance', 'Non-Compliance']
+  grand_total = Array.new(8) { 0 }
+
+  # worksheet data
+  wb.add_worksheet(name: 'daily summary') do |sheet|
+    sheet.add_row ["Radiographer Daily Summary Report for the date #{params[:date].to_date.strftime('%d-%m-%Y') if params[:date]}"]
+    sheet.add_row ["Radiographer Name: #{User.find(params[:radiographer_id]).name if params[:radiographer_id]}"]
+    sheet.add_row headers, style: header_style
+
+    if @data.present?
+      @data.each.with_index do |row_data, index|
+        row_data[3..-1].each.with_index do |value, count_index|
+          grand_total[count_index] += value
+        end
+        sheet.add_row [index + 1, *row_data], style: data_style
+      end
+    end
+
+    sheet.add_row [*Array.new(3) { nil }, 'Grand total', *grand_total ]
+
+    3.times { sheet.add_row }
+
+    sheet.column_widths 10, 15, 15, 15, *Array.new(9) { 10 }
+  end
+end

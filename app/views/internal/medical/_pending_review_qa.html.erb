@@ -1,0 +1,33 @@
+<div class="p-4 border-bottom">
+    <h3><u>MEDICAL PENDING REVIEW QA</u></h3>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="row-index">1</label>
+    <label class="flex-grow-1 mb-0">Review QA Decision</label>
+
+    <div class="d-flex flex-shrink-0">
+        <% medical_mle_qa_status = @medical_review.qa_status %>
+        <%= form.hidden_field :qa_status, value: medical_mle_qa_status, class: "boolean-field" %>
+        <%= raw boolean_field_button(active_color: "success", active: medical_mle_qa_status == "ACCURATE", readonly: false, value: "ACCURATE", placeholder: "ACCURATE", classes: "qa-bool-check") %>
+        <%= raw boolean_field_button(active_color: "danger", active: medical_mle_qa_status == "INACCURATE", readonly: false, value: "INACCURATE", placeholder: "INACCURATE", classes: "qa-bool-check") %>
+    </div>
+</div>
+
+<div id="inaccurate-checklist-container" class="<%= "hidden" if medical_mle_qa_status != "INACCURATE" %>">
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+        <% medical_mle_qa_decision = @medical_review.qa_decision %>
+        <%= form.hidden_field :qa_decision, value: medical_mle_qa_decision, class: "boolean-field" %>
+        <%= raw boolean_field_button(active_color: "success", active: medical_mle_qa_decision == "SUITABLE", readonly: false, value: "SUITABLE", placeholder: "Suitable") %>
+        <%= raw boolean_field_button(active_color: "danger", active: medical_mle_qa_decision == "UNSUITABLE", readonly: false, value: "UNSUITABLE", placeholder: "Unsuitable") %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent border-bottom">
+    <div>
+        <label class="mr-4 w-em-3">2</label>
+        <label>Justifications</label>
+    </div>
+
+    <%= form.text_area :qa_comment, rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;" %>
+</div>

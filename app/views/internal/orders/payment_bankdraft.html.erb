@@ -1,0 +1,91 @@
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                Bank Drafts Filter
+            </div>
+            <form method="get" action="<%= payment_bankdraft_internal_order_path @order %>">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="code" class="col-sm-3 col-form-label">Number</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="number" id="number" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <a class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Back to Payment" data-original-title="Back to Payment" href="<%= payment_internal_order_path @order %>"><i class="icon-note"></i> Back to Payment</a>
+                        <a class="btn btn-sm btn-danger" data-toggle="tooltip" data-html="true" title="Clear" data-original-title="Clear" href="<%= payment_bankdraft_internal_order_path @order %>"><i class="icon-trash"></i> Clear</a>
+                        <button class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Filter" data-original-title="Filter" type="submit"><i class="icon-magnifier"></i> Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col col-8 text-left text-danger font-weight-bold font-italic">
+                <small>** UNUTILIZED BANKDRAFT(S) AMOUNT CAN ONLY BE ALLOCATE BY BRANCH THAT THE BANKDRAFT(S) BELONGS TO</small>
+            </div>
+            <div class="col col-4 module-actions text-right">
+                <% if has_permission?('CREATE_BANK_DRAFT') %>
+                    <%=raw index_table_new_button(payment_bankdraft_new_internal_order_path @order) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Number</th>
+            <th>Bank</th>
+            <th>Issue Date</th>
+            <th>Place of Issue (Zone)</th>
+            <th>Amount (Allocated)</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @bank_drafts.blank? %>
+            <tr>
+                <td colspan="7" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @bank_drafts.each.with_index((@bank_drafts.current_page - 1) * get_per + 1) do |bank_draft, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= bank_draft.number %></td>
+                    <td><%= bank_draft.bank&.name %></td>
+                    <td><%= bank_draft.issue_date.strftime("%F") if !bank_draft.issue_date.blank? %></td>
+                    <td><%= bank_draft.issue_place %> (<%= bank_draft.zone&.name %>)</td>
+                    <td><%= number_to_currency(bank_draft.amount || 0, unit: "") %> (<%= number_to_currency(bank_draft.amount_allocated || 0, unit: "") %>)</td>
+                    <td class="module-row-actions">
+                        <% if bank_draft.organization_id == current_user&.userable_id %>
+                            <%=raw index_table_primary_button(payment_bankdraft_add_internal_order_path(@order, bank_draft), label: '<i class="fa fa-plus"></i>', title: 'Add') %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @bank_drafts %>
+        </div>
+    </div>
+</div>

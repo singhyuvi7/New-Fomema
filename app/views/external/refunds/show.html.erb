@@ -1,0 +1,65 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent text-dark">
+     <strong>   Refund </strong>- <%= @refund.code %>
+    </div>
+    <!-- /card-header -->
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <!-- card for refund detail -->
+        <%= render "refund_info" %>
+        <!-- /card for refund detail -->
+
+        <% if @refund_items.count > 0 %>
+            <table class="table" id="etr-table">
+                <thead>
+                    <% if lookup_context.template_exists?("#{@refund_items.first.refund_itemable_type.downcase}_header", "external/refunds/items", true) %>
+                        <%= render "external/refunds/items/#{@refund_items.first.refund_itemable_type.downcase}_header" %>
+                    <% else %>
+                        <tr>
+                            <th>Type</th>
+                            <th>&nbsp;</th>
+                            <th>Amount</th>
+                        </tr>
+                    <% end %>
+                </thead>
+                <tbody>
+                    <% @refund_items.each do |refund_item| %>
+                        <% if lookup_context.template_exists?("#{refund_item.refund_itemable_type.downcase}", "external/refunds/items", true) %>
+                            <%= render "external/refunds/items/#{refund_item.refund_itemable_type.downcase}", refund_item: refund_item %>
+                        <% else %>
+                            <tr>
+                                <td><%= refund_item.refund_itemable_type %></td>
+                                <td><%= refund_item.refund_itemable.try(:code) || refund_item.refund_itemable.try(:number) %></td>
+                                <td><%= number_to_currency(refund_item.amount, unit: "") %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="<%= (@column_count || 3) - 1 %>">&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@refund.amount, unit: "") %></div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        <% end %>
+
+        <div class="text-right">
+            <%= form_for @refund, url: external_refund_path(@refund) do |form| %>
+                <a class="btn btn-blue-portal" href="<%= external_refunds_path %>">Back</a>
+            <% end %>
+        </div>
+    </div>
+    <!-- /card-body -->
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

@@ -1,0 +1,121 @@
+<%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+<%=render "/shared/all_flash" %>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :code, class: 'required' %>
+            <%= form.text_field :code, class: 'form-control', required: true, placeholder: '', readonly: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :name, class: 'required' %>
+            <%= form.text_field :name, class: 'form-control', required: true, placeholder: '', data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "[a-zA-Z0-9@&.'()-_/\s]+", parsley_pattern_message: "Only alphabets, numbers, underscore(_), hypens (-), fullstops (.), alias (@), ampersand (&), apostrophe('), brackets and slashes (/) are allowed" }, readonly: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :passport_number, "Passport Number", class: 'required' %>
+            <%= form.text_field :passport_number, class: 'form-control', required: true, placeholder: 'A123456', data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9\-]+", parsley_pattern_message: "No special characters allowed" }, readonly: true  %>
+            <% if form.object.passport_number_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.passport_number_was %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :country_id, class: 'required' %>
+            <%= form.select :country_id, options_from_collection_for_select(Country.where("code != ?", Country::MALAYSIA_CODE).order(:name).all, 'id', 'name', form.object.country_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true%>
+            <% if form.object.country_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.country_id_was.nil? ? '* EMPTY' : Country.find(form.object.country_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :date_of_birth, "Date of Birth", class: 'required' %>
+            <%= form.date_field :date_of_birth, class: 'form-control', required: true, readonly: true %>
+            <% if form.object.date_of_birth_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.date_of_birth_was.try(:strftime, get_standard_date_format) %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="required">Gender</label>
+            <div>
+                <div class="form-check form-check-inline mr-5">
+                    <%= form.radio_button(:gender, "M", class: "form-check-input", required: true, disabled: true ) %>
+                    <label class="form-check-label" for="foreign_worker_gender_m">Male</label>
+                </div>
+                <div class="form-check form-check-inline mr-5">
+                    <%= form.radio_button(:gender, "F", class: "form-check-input", required: true, disabled: true ) %>
+                    <label class="form-check-label" for="foreign_worker_gender_f">Female</label>
+                </div>
+                <% if form.object.gender_changed? %>
+                    <p class="form-control-plaintext approval-previous-value"><%= ForeignWorker::GENDERS[form.object.gender_was].capitalize %></p>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%
+    new_employer = Employer.find_by(id: @fw_change_employer&.new_employer_id)
+%>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="required">New Employer Code</label>
+            <input type="text" class="form-control" id="new_employer_code" name="new_employer_code" value="<%= new_employer&.code %>" readonly="true" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="required">New Employer Name</label>
+            <input type="text" class="form-control" id="new_employer_name" name="new_employer_name" value="<%= new_employer&.name %>" readonly="true" />
+        </div>
+    </div>
+</div>
+
+<!-- uploaded documents -->
+<div class="row">
+    <div class="col">
+        <label for="employer_uploads">Uploaded Documents</label>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Category</th>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+                <th>Uploaded By</th>
+            </tr>
+
+            <% @foreign_worker.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames"><%= upload.category %></td>
+                    <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                    <td class="filenames"><%= upload.updated_at.try(:strftime, get_standard_datetime_format) %></td>
+                    <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                </tr>
+            <% end %>
+
+            <% if @foreign_worker.uploads.blank? %>
+                <tr><td colspan="4">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>
+<!-- /uploaded documents -->

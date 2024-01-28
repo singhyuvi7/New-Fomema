@@ -1,0 +1,82 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Password Policies</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_PASSWORD_POLICY') %>
+                    <%=raw index_table_new_button(new_internal_password_policy_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Name</th>
+            <th>Minimum Length</th>
+            <th>Require Alphabet</th>
+            <th>Require Numeric</th>
+            <th>Require Special Character</th>
+            <th>Require Small and Capital</th>
+            <th>Block Previous Password</th>
+            <th>Password Expiry (Month)</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @password_policies.blank? %>
+            <tr>
+                <td colspan="11" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @password_policies.each.with_index((@password_policies.current_page - 1) * get_per + 1) do |password_policy, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= password_policy.name %></td>
+                    <td><%= password_policy.minimum_length %></td>
+                    <td><%= password_policy.require_alphabet %></td>
+                    <td><%= password_policy.require_numeric %></td>
+                    <td><%= password_policy.require_special_characters %></td>
+                    <td><%= password_policy.require_small_and_capital %></td>
+                    <td><%= password_policy.block_previous_password %></td>
+                    <td><%= password_policy.password_expiry %></td>
+                    <td><%= password_policy.approval_status %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_password_policy_path(password_policy)) %>
+                        <% if has_permission?('EDIT_PASSWORD_POLICY') %>
+                            <%=raw index_table_edit_button edit_internal_password_policy_path(password_policy) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_PASSWORD_POLICY') %>
+                            <%=raw index_table_delete_button(internal_password_policy_path(password_policy)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @password_policies %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

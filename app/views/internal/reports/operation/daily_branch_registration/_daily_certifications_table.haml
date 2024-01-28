@@ -1,0 +1,31 @@
+%h2 Daily Certification as of #{date.strftime('%d-%^b-%Y %R')}
+
+%table.table.w-600.mt-3{width: 500}
+  %thead
+    %tr
+      - (0..headers.length - 1).each do |index|
+        %th= headers[index]
+  %tbody
+    - if data.present?
+      - total_normal = 0
+      - total_pati = 0
+      - grand_total = 0
+      - data.each do |row_data|
+        - date, normal, pati, total, total_percentage = row_data
+        - total_normal += normal.to_i 
+        - total_pati += pati.to_i 
+        - grand_total += total.to_i 
+        %tr
+          %td= date
+          %td.text-right{width: '14%'}= normal
+          %td.text-right{width: '14%'}= pati
+          %td.text-right{width: '14%'}= total
+          %td.text-right= total_percentage
+      %tr.bold{:style => "background-color: #d0d0d0"}
+        %td Total
+        %td.text-right= total_normal
+        -# %td.text-right= total_normal.zero? ? number_with_precision(0, precision: 2) : number_with_precision(total_normal.to_f/grand_total.to_f * 100, precision: 2)
+        %td.text-right= total_pati
+        -# %td.text-right= total_pati.zero? ? number_with_precision(0, precision: 2) : number_with_precision(total_pati.to_f/grand_total.to_f * 100, precision: 2)
+        %td.text-right= grand_total
+        %td.text-right= number_with_precision(100, precision: 2)

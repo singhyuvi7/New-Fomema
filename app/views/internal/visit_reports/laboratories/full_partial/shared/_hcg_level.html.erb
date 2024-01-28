@@ -1,0 +1,11 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :hcg_level, 'Level of hCG detection' %>
+        <div class="drug-level" data-placeholder="(mlU/ml)">
+            <%= form_shared.number_field :hcg_level, class: 'form-control', step: :any, min: 0 %>
+         </div>   
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

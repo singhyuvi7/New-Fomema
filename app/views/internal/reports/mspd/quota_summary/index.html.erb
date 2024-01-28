@@ -1,0 +1,34 @@
+<div class="card">
+    <div class="card-header">
+        <strong>
+        	Quota Summary <%= params[:selected_year].present? ? "for Year #{params[:selected_year]}" : "" %>		
+    	</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+            <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+
+            <div class="d-flex align-items-center mb-2">
+            	<label class="mb-0 mr-3 w-em-10">Year</label>
+            	<%= select_tag "selected_year", options_for_select(Date.today.year.downto(1950), params[:selected_year]), class: "form-control w-em-34" %>
+            </div>
+        <% end %>
+
+        <%= render '/internal/reports/mspd/quota_summary/quota_summary_table' %>
+    </div>
+
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style> 

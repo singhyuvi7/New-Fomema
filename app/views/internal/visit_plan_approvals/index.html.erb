@@ -1,0 +1,97 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Plan Approvals</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/internal/visit_plans/shared/filter", {
+            form_action: internal_visit_plan_approvals_path,
+            filter_type: true,
+            filter_status: VisitPlan::APPROVAL_STATUSES
+        } %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Inspect From</th>
+                                <th>Inspect To</th>
+                                <th>Comment</th>
+                                <th>Status</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @visit_plan_approvals.blank? %>
+                                <tr>
+                                    <td colspan="10" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                            <% @visit_plan_approvals.each.with_index((@visit_plan_approvals.current_page - 1) * get_per + 1) do
+                                |visit_plan, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td>
+                                        <%= visit_plan.visitable_type %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.visit_plan_categories.map { |c| c.category }.join ',' %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.inspect_from.nil? ? "N/A" : visit_plan.inspect_from.strftime("%d/%m/%Y") %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.inspect_to.nil? ? "N/A" : visit_plan.inspect_to.strftime("%d/%m/%Y") %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.comment %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.status %>
+                                    </td>
+
+                                    <td class="module-row-actions">
+
+                                        <!-- edit -->
+                                        <% if has_any_permission?("APPROVAL_LEVEL_1_DOCTOR_VISIT_PLAN", "APPROVAL_LEVEL_2_DOCTOR_VISIT_PLAN", "APPROVAL_LEVEL_1_XRAY_FACILITY_VISIT_PLAN", "APPROVAL_LEVEL_2_XRAY_FACILITY_VISIT_PLAN", "APPROVAL_LEVEL_1_LABORATORY_VISIT_PLAN", "APPROVAL_LEVEL_2_LABORATORY_VISIT_PLAN") %>
+                                            <%= raw index_table_edit_button edit_internal_visit_plan_approval_path(visit_plan) %>
+                                        <% end %>
+
+                                    </td>
+                                </tr>
+
+                            <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_plan_approvals %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<% end %>

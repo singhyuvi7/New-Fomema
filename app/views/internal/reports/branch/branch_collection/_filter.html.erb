@@ -1,0 +1,50 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag branch_collection_internal_branch_reports_path, method: 'get' do |form| %>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="date" class="col-sm-3 col-form-label">Date</label>
+                    <div class="col-sm-9">
+                        <div class="d-flex align-items-center">
+                            <%= text_field_tag "date", params["date"], class: "form-control datepicker flex-grow-1", placeholder: "Closing Date", max: Date.today.strftime("%F"), required: true %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="branch" class="col-sm-3 col-form-label">Branch</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="branch" name="branch">
+                            <option value="">Select Branch</option>
+                            <% @branches.each do |branch| %>
+                            <option value="<%= branch.id %>" <%= 'selected' if params['branch'] == branch.id.to_s %>><%= branch.name %></option>
+                            <% end %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, branch_collection_internal_branch_reports_path, class: "btn btn-sm btn-warning with-excel-format" %>
+            <%=raw filter_button %> 
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function(e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

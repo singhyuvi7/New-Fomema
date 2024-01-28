@@ -1,0 +1,167 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Master List</strong> - Edit
+    </div>
+    <% 
+        vr_lab = @visit_report.visit_report_laboratory 
+        if vr_lab.satisfactory == 'YES'
+            letter_reference = ''
+            date_nc_letter = ''
+            date_warning_letter = ''
+        else
+            letter_reference = @visit_report&.last_lqcc_letter&.explanation_letter_reference
+            date_nc_letter = @visit_report&.last_lqcc_letter&.explanation_letter_date.try(:strftime,'%d/%m/%Y')
+            date_warning_letter = @visit_report&.last_lqcc_letter&.warning_letter_date.try(:strftime,'%d/%m/%Y')
+        end
+    %>
+    <%= form_for @visit_report, url: edit_master_list_internal_lqcc_reports_path(@visit_report), html: {multipart: true, class: "with-parsley"} do |form| %>
+        <div class="card-body">
+            <%= render 'shared/all_validation_flash', { model_obj: @visit_report } %>
+            <%= render "/shared/all_flash" %>
+
+            <input type="hidden" name="filter_params" id="filter_params" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :code, 'Visit Report ID' %> <a href="<%= internal_visit_report_laboratory_show_path(@visit_report.id) %>" target="_blank"><i><small>Click For More Details</i></small></a>
+                        <%= form.text_field :code, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Visit Date</label>
+                        <input type="text" class="form-control disable-field" value="<%= @visit_report.visit_date.strftime('%d/%m/%Y') %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Lab. Name</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.laboratory_name %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Type of facilities (CC/Partial/Full)</label>
+                        <input type="text" class="form-control disable-field" value="<%= LaboratoryType::LABORATORY_TYPES[@visit_report&.laboratory_type_id] %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Lab. code</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.laboratory.code %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" class="form-control disable-field" value="<%= [vr_lab.address_1, vr_lab.address_2, vr_lab.address_3, vr_lab.address_4].reject(&:blank?).join(", ") %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Town</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.town.name %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>State</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.state.name %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>FOMEMA Officer</label>
+                        <input type="text" class="form-control disable-field" value="<%= @visit_report.visit_report_visitors.pluck(:name).join(',') %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Type of Visit</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.type_of_visit %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Conclusion (Satisfactory - Yes/No)</label>
+                        <input type="text" class="form-control disable-field" value="<%= vr_lab.satisfactory %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Letter Reference #</label>
+                        <input type="text" class="form-control disable-field" value="<%= letter_reference %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Date of NC Letter</label>
+                        <input type="text" class="form-control disable-field" value="<%= date_nc_letter %>">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Date of Warning Letter</label>
+                        <input type="text" class="form-control disable-field" value="<%= date_warning_letter %>">
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :committee_meeting_date, 'Date of Committee Meeting' %>
+                        <%= form.date_field :committee_meeting_date, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :letter_reminder_date, 'Date of Reminder Letter' %>
+                        <%= form.date_field :letter_reminder_date, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <a class="btn btn-sm btn-secondary back-btn" data-toggle="tooltip" data-html="true" title="Back" data-original-title="Back" href="<%= master_list_internal_lqcc_reports_path %>"><i class="fa fa-history"></i> Back</a>
+                <%=raw edit_save_button() %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.disable-field').prop('disabled', true);
+    $('#filter_params').val($(location).attr('search'))
+
+    $(".back-btn").click(function(e) {
+        link = $(this).attr('href');
+        link += $(location).attr('search')
+        $(this).attr('href', link);
+    });
+</script>
+<% end %>

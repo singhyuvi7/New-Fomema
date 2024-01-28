@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="margin-top-30">
+    <h2 class="text-center">Resend Confirmation Instructions</h2>
+  </div>
+
+  <div class="row justify-content-center margin-top-30">
+    <hr class="navbar-sep-1">
+    <hr class="navbar-sep-2">
+  </div>
+  <br>
+  <div class="text-center"><%= devise_error_messages! %></div>
+  <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
+    <div class="container card container-blue text-center margin-top-30" style="width: 550px; height: 300px; border-radius: 20px;">
+      <br><br>
+      <div class="d-flex align-items-center my-2">
+          <%= f.label :email,"Email:", class: "mb-0", style: "width: 155px;" %>
+          <%= f.email_field :email, autofocus: true, class: "form-control form-field no-uppercase username-field", autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email), style: "width: 300px;" %>
+      </div>
+      <br>
+      <div class="text-center">
+        <%= f.submit "Resend confirmation instructions", class:"btn btn-resend-fomema btn-blue margin-left-10", style: "margin: 0px 50px" %>
+      </div>
+      <br><br><br>
+      <div style="d-flex">
+        <%= render "devise/shared/links" %>
+      </div>
+    </div>
+  <% end %>
+</div>

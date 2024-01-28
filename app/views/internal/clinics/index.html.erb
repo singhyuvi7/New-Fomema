@@ -1,0 +1,70 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Clinics</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_CLINIC') %>
+                    <%=raw index_table_new_button(new_internal_clinic_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                    <thead>
+                    <tr>
+                      <th class="module-row-numbers">#</th>
+                      <th>ID</th>
+                      <th>Code</th>
+                      <th>Name</th>
+                      <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% if @clinics.blank? %>
+                      <tr>
+                        <td colspan="5" class="text-danger">No records found.</td>
+                      </tr>
+                    <% else %>
+
+                      <% @clinics.each.with_index((@clinics.current_page - 1) * get_per + 1) do |clinic, index| %>
+                        <tr>
+                          <td class="module-row-numbers"><%= index %></td>
+                          <td><%= clinic.id %></td>
+                          <td><%= clinic.code %></td>
+                          <td><%= clinic.name %></td>
+                          <td class="module-row-actions">
+                            <%=raw index_table_show_button(internal_clinic_path(clinic)) %>
+                            <% if has_permission?('EDIT_CLINIC') %>
+                              <%=raw index_table_edit_button edit_internal_clinic_path(clinic) %>
+                            <% end %>
+                            <% if has_permission?('DELETE_CLINIC') %>
+                              <%=raw index_table_delete_button(internal_clinic_path(clinic)) %>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+
+                    <% end %>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @clinics %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

@@ -1,0 +1,23 @@
+<%= form_with url: internal_visit_report_laboratory_submit_to_lab_path(@visit_report), method: :get, html: {class: "with-parsley", id: 'submitToLabForm'} do |email_form| %>
+<div class="modal fade" id="labEmailModal" tabindex="-1" role="dialog" aria-labelledby="labEmail" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Send Summary Report To Lab</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <div class="text-center font-weight-bold">Laboratory Email</div>
+            <div class="email-wrapper">
+                <input type="email" class="form-control email-field" placeholder="Email Address" name="laboratory_email" required/>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="submitToLabBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

@@ -1,0 +1,98 @@
+<div class="px-4 pt-4">
+    <% merts ||= false %>
+
+    <h3>
+        <u><%= merts.present? ? "XRAY PENDING REVIEW" : "PENDING DECISION" %></u>
+    </h3>
+
+    <div class="text-right">
+        <button type="button" class="btn btn-sm btn-warning mr-2"><%= @transaction.xray_film_type || "DIGITAL" %></button>
+    </div>
+</div>
+
+<% @xray_pending_decisions.sort.each do |xp_decision| %>
+    <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+        <label class="font-size-8">Pending Decision Review</label>
+        <a id="view_salinee_xray_image" class="btn btn-primary px-4 float-right" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: @transaction.xray_examination&.id, user_id: current_user.id) %>">View Xray Image<i class="fa fa-external-link-alt ml-3"></i></a>
+
+        <div class="d-flex">
+            <b class="w-em-8">Released as</b>
+            <p class="mb-0"><%= xp_decision.decision %></p>
+        </div>
+
+        <div class="d-flex">
+            <b class="w-em-8">Released date</b>
+            <p class="mb-0"><%= xp_decision.reviewed_at.strftime(get_standard_date_format) if xp_decision.reviewed_at? %></p>
+        </div>
+
+        <!-- NF-1582 - For MERTS side, do not show released by -->
+        <% unless merts %>
+            <div class="d-flex">
+                <b class="w-em-8">Released by</b>
+                <p class="mb-0"><%= xp_decision.reviewer&.name %></p>
+            </div>
+        <% end %>
+
+        <label class="mt-3">Justifications</label>
+
+        <div class="border border-secondary mb-4 px-2 pt-2">
+            <%= simple_format xp_decision.comment %>
+        </div>
+    </div>
+
+    <!-- Do not allow doctor to see approval comments. -->
+    <% if xp_decision.status == "TRANSMITTED" && xp_decision.approval_decision? && merts.blank? %>
+        <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+            <label class="font-size-8">Pending Decision Approval</label>
+
+            <div class="d-flex">
+                <b class="w-em-8">Released as</b>
+                <p class="mb-0"><%= xp_decision.decision %></p>
+            </div>
+
+            <div class="d-flex">
+                <b class="w-em-8">Released date</b>
+                <p class="mb-0"><%= xp_decision.transmitted_at.strftime(get_standard_date_format) if xp_decision.transmitted_at? %></p>
+            </div>
+
+            <% unless merts %>
+                <div class="d-flex">
+                    <b class="w-em-8">Released by</b>
+                    <p class="mb-0"><%= xp_decision.approval_user&.name %></p>
+                </div>
+            <% end %>
+
+            <label class="mt-3">Justifications</label>
+
+            <div class="border border-secondary mb-4 px-2 pt-2">
+                <%= simple_format xp_decision.approval_comment %>
+            </div>
+        </div>
+    <% end %>
+<% end %>
+
+<%
+=begin if @transaction.transaction_comments.count > 0 %>
+    <div class="card">
+    <div class="card-header">MLE Comments</div>
+    <table class="table table-bordered table-card table-sm">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Who</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @transaction.transaction_comments.order(:created_at).each do |transaction_comment| %>
+                <tr>
+                    <td><%= transaction_comment.created_at&.strftime(get_standard_date_format) %></td>
+                    <td><%= transaction_comment.creator&.name %></td>
+                    <td><%= transaction_comment.comment %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+    </div>
+<% end
+=end %>

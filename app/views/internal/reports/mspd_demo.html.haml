@@ -1,0 +1,36 @@
+.card
+  .card-header
+    %strong MSPD Reports Demo
+  .card-body
+    %h6.card-subtitle.mb-2.text-muted
+      %p *For demo purpose only
+      Numbering and titles inheritted from
+      %span
+        #{link_to 'report master list', 'https://docs.google.com/spreadsheets/d/1WqFM1gZJrz6lQkWQzNKW6nyQ4ZOS5rGLk6FPboLAX0g/edit?usp=sharing'}.
+    %table#mspd-demo-table.table.w-100.table-borders
+      %thead{ style: 'background-color: #4a3f3f;' }
+        %tr
+          %th No.
+          %th Title
+          %th Link
+      %tbody
+        - @reports.each do |report|
+          - index, title, link = report
+          %tr
+            %td= index
+            %td= title
+            %td
+              - if link.nil?
+                WIP
+              - elsif link.is_a? Array
+                - link.each do |sp_link_data|
+                  - sp_title, sp_link = sp_link_data
+                  = link_to sp_title, sp_link
+                  %br/
+              - else
+                = link_to 'link', link
+
+:css
+  table#mspd-demo-table thead tr th {
+    background-color: #f3f3f3 !important
+  }

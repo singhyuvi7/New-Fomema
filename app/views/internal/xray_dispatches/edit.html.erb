@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Dispatches</strong> - Edit X-Ray Dispatch
+    </div>
+    
+    <%= nested_form_for @xray_dispatch, url: internal_xray_dispatch_path(@xray_dispatch) do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

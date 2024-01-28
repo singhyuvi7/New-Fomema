@@ -1,0 +1,6 @@
+<div class="card">
+    <div class="card-header"><strong>District Health Offices</strong> - New District Health Office</div>
+    <%= form_for @district_health_office, url: internal_district_health_offices_path, html: {class: "#{params[:action]}_town town-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form, district_health_office: @district_health_office} %>
+    <% end %>
+</div>

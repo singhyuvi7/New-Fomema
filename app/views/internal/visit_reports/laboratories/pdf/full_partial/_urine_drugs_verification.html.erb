@@ -1,0 +1,52 @@
+<tr class="finding-row method-field">
+    <td class="table-index"></td>
+    <td class="row-name"><div style="color:white;">invisible</div></td>
+    <td colspan="3">
+        <div class="yes-no-checkbox">
+            <div class="acceptable">Yes</div>
+            <div class="not-acceptable">No</div>
+        </div>
+    </td>
+</tr>
+
+<%=render "#{shared_path}/same_as_screening", {finding: finding} %>
+<%=render "#{shared_path}/iso_status", {finding: finding} %>
+
+<% if finding.iso_status != 'NO' %>
+    <tr class="section-header-row bold">
+        <td colspan="5">Part I: Reagent Details</td>
+    </tr>
+
+    <%=render "#{shared_path}/method", {finding: finding, row_no: 1, options: VisitReportLabOption.get_data(report_category, 'method')} %>
+    <%=render "#{shared_path}/instrumentation", {finding: finding, row_no: 2, options: VisitReportLabOption.get_data(report_category, 'instrumentation') } %>
+    <%=render "#{shared_path}/reagent_name", {finding: finding, row_no: 3 } %>
+
+    <%=render "#{shared_path}/drug_level_opiates", {finding: finding, row_no: 4 } %>
+        <%=render "#{shared_path}/drug_level_cannabinoids", {finding: finding, row_no: 5 } %>
+
+    <%=render "#{shared_path}/reagent_condition", {finding: finding, row_no: 6 } %>
+    <%=render "#{shared_path}/control_cell_name", {finding: finding, row_no: 7, report_category: report_category } %>
+    <%=render "#{shared_path}/control_cell_condition", {finding: finding, row_no: 8, report_category: report_category } %>
+
+    <tr class="section-header-row bold">
+        <td colspan="5">Part II: Quality Assurance</td>
+    </tr>
+
+    <%=render "#{shared_path}/iqa", {finding: finding, row_no: 1 } %>
+    <%=render "#{shared_path}/eqa", {finding: finding, row_no: 2 } %>
+
+    <tr class="section-header-row bold">
+        <td colspan="5">Part III: Others</td>
+    </tr>
+    <%=render "#{shared_path}/test_worksheet", {finding: finding, row_no: 1 } %>
+    <%=render "#{shared_path}/tpm", {finding: finding, row_no: 2 } %>
+    <%=render "#{shared_path}/instrument_maintenance_record", {finding: finding, row_no: 3 } %>
+
+    <%=render "#{shared_path}/test_compliance", {finding: finding } %>
+
+    <tr class="section-header-row bold">
+        <td colspan="5">Part IV: Test for Appeal Case</td>
+    </tr>
+    <%=render "#{shared_path}/in_house", {finding: finding, row_no: 1 } %>
+    <%=render "#{shared_path}/traceability", {finding: finding, row_no: 2 } %>
+<% end %>

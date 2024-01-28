@@ -1,0 +1,68 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bank Drafts</strong> - Unhold Bank Draft
+    </div>
+    <%= form_for @bank_draft_hold_log, url: unhold_internal_bank_draft_path(@bank_draft), html: {class: "with-parsley"} do |form| %>
+        <div class="card-body">
+
+            <%=render 'shared/all_validation_flash', { model_obj: @bank_draft_hold_log } %>
+            <%=render "/shared/all_flash" %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :number %>
+                        <%= text_field_tag :number, @bank_draft.number, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :holded_by, "Holded By" %>
+                        <%= text_field_tag :holded_by, form.object.holder&.name, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :hold_comment, "Hold Reason" %>
+                        <%= text_area_tag :hold_comment, form.object.hold_comment, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :unholded_by, "Unhold By" %>
+                        <%= text_field_tag :unholded_by, form.object.unholder&.name, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :unhold_comment, "Unhold Reason", class: 'required' %>
+                        <%= form.text_area :unhold_comment, class: 'form-control', required: true %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_bank_drafts_path) %>
+                <%=raw edit_save_button() %>
+            </div>
+
+        </div>
+
+    <% end %>
+</div>

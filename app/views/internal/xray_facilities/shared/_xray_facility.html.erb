@@ -1,0 +1,757 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>X-Ray Facilities</strong> - X-Ray Facility Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+        <%= render 'shared/all_validation_flash', { model_obj: @xray_facility } %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= label_tag :code %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :title %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.title.try(:name) %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :license_holder_name, "License Holder Name" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.license_holder_name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :company_name, "Company Name" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.company_name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :icno, "New IC" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.icno %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :business_registration_number, "Business Registration Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.business_registration_number || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :name, "Facility Name" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :nationality_id, "Nationality" %>
+                    <p class="form-control-plaintext">
+                        <% if !@xray_facility.nationality_id.blank? %>
+                            <%= Country.find(@xray_facility.nationality_id)&.name || raw('<i>N/A</i>') %>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :race_id, "Race/Ethnic" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.race&.name || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :gender, "Gender" %>
+                    <p class="form-control-plaintext">
+                        <% if @xray_facility.gender=='M'%>
+                            <p>Male</p>
+                        <% elsif @xray_facility.gender=='F' %>
+                            <p>Female</p>
+                        <% else @xray_facility.gender==nil %>
+                            <p><i>N/A</i></p>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :created_at, "Registration Date" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.created_at.try(:strftime,get_standard_date_format) || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- address -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= label_tag :address %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.address1 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.address2 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.address3 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.address4 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- /address -->
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :state %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.state.try(:name) %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :postcode %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.postcode %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :town %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.town.try(:name) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :telephone_number, "Telephone Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.phone %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :fax_number, "Fax Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.fax %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :mobile, "Mobile Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.mobile %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :qualification %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.qualification %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :email %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.email %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="xray_uploads">Uploaded Documents</label>
+
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Category</th>
+                        <th>Documents</th>
+                        <th>Date Uploaded</th>
+                    </tr>
+
+                    <% @xray_facility.uploads.order(created_at: :desc).each do |upload| %>
+                        <tr>
+                            <td class="filenames"><%= upload.category %></td>
+
+                                <td class="filenames">
+                                <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                                <% end %>
+                            </td>
+                            <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y") %></td>
+                        </tr>
+                    <% end %>
+
+                    <% if @xray_facility.uploads.blank? %>
+                        <tr><td colspan="3">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :film_type, "Film Type" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.film_type %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :radiologist_operated, "Radiologist Operated" %>
+                    <p class="form-control-plaintext">
+                        <% if @xray_facility.radiologist_operated == true %>
+                        YES
+                        <% else %>
+                        NO
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :radiologist_name, "Radiologist Name" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.radiologist_name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :apc_number, "APC Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.apc_number %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :apc_year, "APC Year" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.apc_year %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :xray_license_number, "X-Ray License Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.xray_license_number %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :xray_file_number, "X-Ray File Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.xray_file_number %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :xray_fac_flag, "X-Ray FAC" %>
+                    <p class="form-control-plaintext">
+                        <% if @xray_facility.xray_fac_flag == true %>
+                        YES
+                        <% else %>
+                        NO
+                        <% end %>
+                    </p>
+                </div>
+            </div> -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :xray_license_purposes_id, "X-Ray License (Status)" %>
+                    <p class="form-control-plaintext">
+                        <% if !@xray_facility.xray_license_purposes_id.blank? %>
+                            <% @xray_facility.xray_license_purposes_id["xray_license_purposes_id"].each do |ar_id| %>
+                                <% if !ar_id.blank? %>
+                                    <% ar = XrayLicensePurposes.find(ar_id) %>
+                                    <div><%= ar.name %></div>
+                                <% end %>
+                            <% end %>
+                        <% else %>
+                            <div>N/A</div>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :xray_license_expiry_date, "X-Ray License Expiry Date" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.xray_license_expiry_date&.strftime("%d/%m/%Y") %> <%= "(#{@xray_facility&.moh_license_status})" if !@xray_facility&.moh_license_status.blank? %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :doctor_association, "Doctor's Association" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.has_doctor_association ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :associations, "Name of Association" %>
+                    <p class="form-control-plaintext">
+                        <% if !@xray_facility.associations.blank? %>
+                            <% @xray_facility.associations["association"].each do |ar_id| %>
+                                <% if !ar_id.blank? %>
+                                    <% ar = Association.find(ar_id) %>
+                                    <div><%= ar.name %></div>
+                                <% end %>
+                            <% end %>
+                        <% else %>
+                            <div>N/A</div>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :renewal_agreement_date, "Renewal Agreement Date" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.renewal_agreement_date&.strftime("%d/%m/%Y") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :district_health_office, "Nearest District Health Office" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.district_health_office.try(:name) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :fp_device, "FP Device" %>
+                    <p class="form-control-plaintext">
+                        <%= XrayFacility::FP_DEVICES[@xray_facility.fp_device.to_s] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :paid_biometric_device, "Paid for Biometric Device" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.paid_biometric_device ? 'Yes' : @xray_facility.paid_biometric_device.nil? ? '' : 'No' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <%= label_tag :has_selected_re_medical, "Selected For Re-Medical" %>
+                <p class="form-control-plaintext">
+                    <%= @xray_facility.has_selected_re_medical ? 'Yes' : 'No' %>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :status %>
+                    <p class="form-control-plaintext">
+                        <%= XrayFacility::STATUSES[@xray_facility.status] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :activated_at, "Activated At" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.activated_at.nil? ? (raw '<i>N/A</i>') : @xray_facility.activated_at.strftime('%d/%m/%Y') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :total_worker_allocated, "Total Worker Allocated" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.total_worker_allocated %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <% if @xray_facility.status != 'ACTIVE' %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :status_reason, "Status (Reason)" %>
+                    <p class="form-control-plaintext">
+                        <%= XrayFacility::ALL_STATUS_REASONS[@xray_facility.status_reason] || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :status_comment, "Status (Comment)" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.status_comment || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <% end %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <%= label_tag :service_provider_group_id, "Service Provider Group" %>
+                <p class="form-control-plaintext">
+                    <%= @xray_facility.service_provider_group&.name || raw('<i>N/A</i>') %>
+                </p>
+            </div>
+        </div>
+
+        <% if has_permission? "VIEW_FINANCE_INFO_XRAY_FACILITY" %>
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :male_rate, "Male Worker Rate (RM)" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.male_rate %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :female_rate, "Female Worker Rate (RM)" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.female_rate %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :bank_id, "Bank" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.bank&.name %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :bank_account_number, "Bank Account Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.bank_account_number %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :bank_payment_id, "Bank Payment ID" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.bank_payment_id %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :payment_method_id, "Payment Method" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.payment_method&.name %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :email_payment, "Email (Payment)" %>
+                    <p class="form-control-plaintext">
+                        <%= @xray_facility.email_payment %>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <!-- /card-body -->
+
+    <div class="card-footer">
+        <style>
+            form.button_to {
+                display: inline;
+            }
+        </style>
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_xray_facilities_path) %>
+            <% if !@xray_facility.registration_approved_at.nil? and @xray_facility.activated_at.nil? %>
+                <% if @xray_facility.registration_paid? %>
+                    <%= button_to "Activate", {action: 'activate', controller: "xray_facilities", id: @xray_facility.id}, {method: :patch, class: 'btn btn-sm btn-primary', data: {confirm: 'Confirm activate?'}} if has_permission?("ACTIVATE_XRAY_FACILITY") %>
+                <% else %>
+                    <%= link_to "Payment", edit_internal_order_path(@xray_facility.registration_order), class: "btn btn-sm btn-primary" if has_permission?("VIEW_MSPD_ORDER") %>
+                <% end %>
+            <% end %>
+
+            <% if can_request_update?(@xray_facility) and has_any_permission?("EDIT_NON_FINANCE_INFO_XRAY_FACILITY", "EDIT_FINANCE_INFO_XRAY_FACILITY") %>
+                <%=raw show_edit_button edit_internal_xray_facility_path(@xray_facility) %>
+            <% end %>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_DOCUMENT_XRAY_FACILITY") %>
+                <% if !@xray_facility.registration_approved_at.nil? %>
+                    <li class="list-group-item">
+                        <%= link_to "Registration Letter", registration_letter_internal_xray_facility_path(@xray_facility) %> |
+                        <%= link_to "Registration Invoice", registration_invoice_internal_xray_facility_path(@xray_facility), target: "_BLANK" %>
+                    </li>
+                    <li class="list-group-item"><%= link_to "Change Address Approval Letter", change_address_approval_internal_xray_facility_path(@xray_facility) %></li>
+                <% end %>
+            <% end %>
+
+            <% if has_permission?("VIEW_STATUS_SCHEDULE") %>
+                <li class="list-group-item">
+                    <%= link_to "Status Schedules", internal_status_schedules_path(status_scheduleable_type: @xray_facility.class.name, status_scheduleable_code: @xray_facility.code) %>
+                    <% if has_permission?("CREATE_STATUS_SCHEDULE") %>
+                    | <%= link_to "Add", new_internal_status_schedule_path(status_scheduleable_type: @xray_facility.class.name, status_scheduleable_code: @xray_facility.code) %>
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission?("VIEW_GROUP_SCHEDULE") %>
+                <li class="list-group-item">
+                    <%= link_to "SP Group Schedules", internal_group_schedules_path(sp_schedulable_type: @xray_facility.class.name, sp_schedulable_code: @xray_facility.code) %>
+                    <% if has_permission?("CREATE_GROUP_SCHEDULE") %>
+                    | <%= link_to "Add", new_internal_group_schedule_path(sp_schedulable_type: @xray_facility.class.name, sp_schedulable_code: @xray_facility.code) %>
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission?("VIEW_AUDIT_XRAY_FACILITY") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_xray_facility_audits_path(@xray_facility) %>
+                </li>
+            <% end %>
+
+            <% if has_permission?("BULK_REALLOCATION_XRAY_FACILITY") %>
+                <li class="list-group-item">
+                    <%= link_to "Bulk Re-Allocation", bulk_reallocate_internal_xray_facilities_path(@xray_facility) %>
+                </li>
+            <% end %>
+
+            <% if has_permission?("VIEW_OPERATION_HOUR_XRAY_FACILITY") %>
+                <li class="list-group-item"><%= link_to "Operation Hour", operation_hours_internal_xray_facilities_path(@xray_facility) %></li>
+            <% end %>
+
+            <% if has_permission?("VIEW_NON_FINANCE_INFO_XRAY_FACILITY") %>
+                <li class="list-group-item"><%= link_to "License Expiry Amendment History", license_expiry_amendment_logs_internal_xray_facilities_path(@xray_facility) %></li>
+            <% end %>
+
+            <% if has_permission?('MSPD_REPORTS') %>
+                <li class="list-group-item">
+                    <%= link_to "Allocated Workers", allocated_workers_internal_xray_facility_path(@xray_facility) %>
+                </li>
+                <li class="list-group-item">
+                    <%= link_to "Summary Loading Statistics", summary_loading_statistic_internal_xray_facility_path(@xray_facility) %>
+                </li>
+                <li class="list-group-item"><%= link_to "Suspension/Lifting History", suspension_history_internal_xray_facility_path(@xray_facility) %></li>
+            <% end %>
+        </ul>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+removeAttachmentField('.removal-button:last');
+var clonedAttachmentInput = $('.custom-input-group').clone(true, true);
+removeAttachmentField('.removal-button:last');
+bindLastDocumentTypeSelectorAndFileSelector();
+// employer_type_disable_field($('#employer_employer_type_id').val());
+
+function validateFiles(inputFile) {
+    var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+    var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+    var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+    var extName;
+    var maxFileSize = <%= 10.megabytes %>;
+    var sizeExceeded = false;
+    var extError = false;
+
+    $.each(inputFile.files, function () {
+        if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+        extName = this.name.split('.').pop().toLowerCase();
+        if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+    });
+    if (sizeExceeded) {
+        window.alert(maxExceededMessage);
+        $(inputFile).val('');
+    };
+
+    if (extError) {
+        window.alert(extErrorMessage);
+        $(inputFile).val('');
+    };
+}
+function removeAttachmentField(field) {
+    $(field).click(function() {
+        $(this).closest('.custom-input-group').remove();
+
+        if ($('.custom-input-group').length === 0) {
+            $('#no-input-placeholder').show();
+        }
+    });
+}
+
+// Function to re-enable form input after selecting dom type & to set file name after selecting in input
+function bindLastDocumentTypeSelectorAndFileSelector() {
+    $('.custom-file-input:last').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    $('.document-type-selector:last').change(function() {
+        let selectedValue = $("option:selected", this).val();
+        inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+        if (selectedValue.length > 0) {
+            inputField.removeAttr('disabled');
+        } else {
+            inputField.attr("disabled", "disabled")
+        }
+    });
+}
+
+$('.set-deletion').click(function() {
+    filenames = $(this).closest('tr').find('.filenames');
+    filenames.toggleClass('text-decoration-line-through');
+    text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+    $(this).text(text).toggleClass('btn-danger btn-primary');
+
+    ids = $('.set-deletion.btn-primary').map(function() {
+        return $(this).attr('data-id');
+    }).get().join(',');
+
+    $('#remove_uploaded_file').val(ids);
+});
+
+</script>
+<% end %>

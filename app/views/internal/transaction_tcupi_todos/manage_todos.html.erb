@@ -1,0 +1,62 @@
+<div class="card">
+    <%= render "/shared/all_flash" %>
+
+    <div class="p-4 border-bottom">
+        <h3><u>TCUPI To-Do List</u></h3>
+    </div>
+
+    <%= form_for :tcupi_todo_list, url: manage_tcupi_todos_internal_medical_path(@transaction), method: :get, html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |todo_list_form| %>
+        <div class="category-switchable">
+            <div id="tcupi-checklist-container">
+
+                <% if @tcupi_todos.present? %>
+                    <%
+                        indexing        = 0
+                        tcupi_todo_ids  = @tcupi_todos.map(&:tcupi_todo_id)
+                    %>
+
+                    <% @tcupi_todo_list.pluck(:id, :description).sort.each do |tcupi_todo_id, to_do| %>
+                        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom tcupi-todo-containers">
+                            <label class="row-index"></label>
+                            <label class="flex-grow-1 mb-0"><%= to_do %></label>
+
+                            <div class="d-flex flex-shrink-0">
+                                <% if tcupi_todo_id == 7 %>
+                                    <% other_todo   = @tcupi_todos.find_by(tcupi_todo_id: tcupi_todo_id) %>
+                                    <% description  = other_todo.present? ? other_todo.description_other : nil %>
+
+                                    <%= text_field_tag :tcupi_to_do_other, description, placeholder: "Other to do item", class: "mb-0 w-em-40 form-control rounded-0 px-2 mr-2", disabled: !other_todo.present? %>
+                                    <%= hidden_field_tag :tcupi_todo_other_bool, other_todo.present? ? "YES" : "NO" %>
+                                    <%= raw boolean_field_button(active_color: "success", active: other_todo.present?, readonly: false, value: "YES", placeholder: "Yes", classes: "tcupi-todo-other-btn") %>
+                                    <%= raw boolean_field_button(active_color: "danger", active: !other_todo.present?, readonly: false, value: "NO", placeholder: "No", classes: "tcupi-todo-other-btn") %>
+                                <% else %>
+                                    <% value = tcupi_todo_ids.include?(tcupi_todo_id) %>
+                                    <%= hidden_field_tag "tcupi_to_dos[#{tcupi_todo_id}]", value ? "YES" : "NO", class: "boolean-field tcupi-todos" %>
+                                    <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: "YES", placeholder: "Yes") %>
+                                    <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: "NO", placeholder: "No") %>
+                                <% end %>
+                            </div>
+                        </div>
+                    <% end %>
+                <% end %>
+
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%= raw show_back_button(tcupi_review_internal_medical_path(@transaction, p_tab: 'review_decision', tab: 'to_do_list')) %>
+            <%= todo_list_form.submit "Update", class: "btn btn-success btn-sm", value: "Update" %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        initializeToggleableFields();
+
+        $('.tcupi-todo-other-btn').click(function() {
+            $('#tcupi_todo_other_bool').val($(this).attr('data-type'));
+            toggleDisabledAttr($('#tcupi_to_do_other'), $(this).attr('data-type') === 'NO');
+        });
+    </script>
+<% end %>

@@ -1,0 +1,507 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if @xray_facility.errors.any? %>
+    <p class="alert alert-danger">error : <%= @xray_facility.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if flash[:error] %>
+    <p class="alert alert-danger"><%= flash[:error] %></p>
+<% end %>
+
+<%= form_for @user, url: external_profile_update_path, html: {multipart:true,id: "profile_form", method: :put, class: "with-parsley"} do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    <strong>Profile - <%= form.label :xray_facility, @xray_facility.code %></strong>
+                </div>
+                <div class="col-md-2">
+                    <strong>Registration Date: <%= form.label :activated_at, @xray_facility&.activated_at&.strftime(get_standard_date_format) %></strong>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title" %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                        <input type="hidden" name="user[title_id]" id="hidden_title_id" value=""/>
+                    </div>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <%= form.label :name, 'License Holder Name', class: 'col-form-label required' %>
+                        <%= text_field :xray_facility, :license_holder_name, { class: 'form-control', required: true, disabled: true} %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :icno, 'License Holder IC No.', class: 'col-form-label required' %>
+                        <%= text_field :xray_facility, :icno, { class: 'form-control', required: true, disabled: true } %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :name, 'Facility Name', class: 'col-form-label required' %>
+                        <%= text_field :xray_facility, :name, { class: 'form-control', required: true, disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :nationality_id, 'Nationality', class: 'col-form-label required' %>
+                        <%= collection_select(:xray_facility, :nationality_id, Country.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :race_id, 'Race/Ethnic', class: 'col-form-label required' %>
+                        <%= collection_select(:xray_facility, :race_id, Race.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :gender, 'Gender', class: 'required col-form-label' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :gender, 'M', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="xray_facility_gender_m">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :gender, 'F', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="xray_facility_gender_f">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :address1, 'Address', class: 'col-form-label required' %>
+                        <%= text_field :xray_facility, :address1, { class: 'form-control', required: true, disabled: true } %>
+                        <%= text_field :xray_facility, :address2, { class: 'form-control', disabled: true } %>
+                        <%= text_field :xray_facility, :address3, { class: 'form-control', disabled: true } %>
+                        <%= text_field :xray_facility, :address4, { class: 'form-control', disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'external/shared/profile_form_state_postcode_town', {form: form} %>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :phone, 'Phone', class: 'col-form-label required' %>
+                        <%= telephone_field :xray_facility, :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :mobile, 'Mobile', class: 'col-form-label required' %>
+                        <%= telephone_field :xray_facility, :mobile, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }  %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :fax, 'Fax', class: 'col-form-label' %>
+                        <%= telephone_field :xray_facility, :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }  %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email, 'Email', class: 'col-form-label required' %>
+                        <%= email_field :xray_facility, :email, { class: 'form-control', required: true} %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email_payment, 'Email (Payment)', class: 'col-form-label' %>
+                        <%= email_field :xray_facility, :email_payment, { class: 'form-control' } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :apc_year, 'APC Year', class: 'col-form-label required' %>
+                        <% yearArr = [Date.current.years_ago(1).strftime('%Y'), Date.current.year, Date.current.years_since(1).year, Date.current.years_since(2).year, Date.current.years_since(3).year] %>
+                        <%= collection_select(:xray_facility, :apc_year, yearArr, :to_s, :to_s, {include_blank: 'Select option'}, class: 'form-control select2', required: true) %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :apc_number, 'APC Number', class: 'col-form-label required' %>
+                        <%= number_field :xray_facility, :apc_number, { class: 'form-control', required: true, min: 0, max: 9999999999 } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_license_number, "X-Ray License Number", class: 'required' %>
+                        <%= text_field :xray_facility, :xray_license_number, class: 'form-control', required: true, maxlength: '10', data: { parsley_maxlength: "10", parsley_maxlength_message: "Maximum length of 10 numbers", parsley_pattern: "[a-zA-Z0-9()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), and slashes (/) are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_file_number, "X-Ray File Number", class: 'required' %>
+                        <%= text_field :xray_facility, :xray_file_number, class: 'form-control', required: true, maxlength: '10', data: { parsley_maxlength: "10", parsley_maxlength_message: "Maximum length of 10 numbers", parsley_pattern: "[a-zA-Z0-9()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), and slashes (/) are allowed" } %>
+                    </div>
+                </div>
+            </div>
+
+            <%
+                pending_approval = true if ['NEW_PENDING_APPROVAL', 'NEW_PENDING_APPROVAL2', 'UPDATE_PENDING_APPROVAL', 'UPDATE_PENDING_APPROVAL2'].include?(@xray_facility.approval_status)
+                is_license_expired = true if !@xray_facility.xray_license_expiry_date.nil? && @xray_facility.xray_license_expiry_date < Time.now
+            %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_license_expiry_date, "X-Ray License Expiry Date", class: 'required' %>
+                        <%= date_field :xray_facility, :xray_license_expiry_date, class: 'xray_license_expiry_date form-control', required: true, readonly: pending_approval %>
+                        <% if pending_approval %>
+                            <div style="color: red">License expiry date amendment is pending for approval.</div>
+                        <% elsif is_license_expired %>
+                            <div style="color: red">License expired. Please update new expiry date and upload supporting documents.</div>
+                        <% end %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <% field_id = generate_field_id(form, :xray_license_purposes_id) %>
+                        <%= form.label :xray_license_purposes_id, "X-ray License (Status)", class: 'xray_license_purposes_id required' %>
+                        <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Add Selection"><i class="fa fa-info"></i></span>
+                        <select name="xray_facility[xray_license_purposes_id][]" id="xray_facility_xray_license_purposes_id" class="form-control select2" required multiple data-parsley-multiple="xray_facility[xray_license_purposes_id][]" data-select2-id="xray_facility_xray_license_purposes_id" data-parsley-errors-container="#select2_parsley_error__<%= field_id %>" data-parsley-class-handler='.select2-selection--multiple' data-parsley-group="xray_facility_xray_license_purposes_id">
+                            <%
+                                selected_purposes = @xray_facility.xray_license_purposes_id.nil? ? [] : @xray_facility.xray_license_purposes_id["xray_license_purposes_id"]
+                            %>
+                            <% XrayLicensePurposes.all().each do |ar| %>
+                                <option value="<%= ar.id %>" data-code="<%= ar.id %>" <%= "selected" if (selected_purposes || []).include?(ar.id.to_s) %>><%= ar.name %></option>
+                            <% end %>
+                        </select>
+                        <div id="select2_parsley_error__<%= field_id %>"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="xray_uploads">Uploaded Documents</label>
+
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                            <th>Date Uploaded</th>
+                        </tr>
+
+                        <% @xray_facility.uploads.where(category: "XRAY_LICENSE").order(created_at: :desc).take(1).each do |upload| %>
+                            <tr>
+                                <td class="filenames"><%=  upload.category %></td>
+                                <td class="filenames">
+                                <% if upload.category %>
+                                    <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target:"_blank" %></div>
+                                    <% end %>
+                                <% end %>
+                                </td>
+                                <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y")%></td>
+                            </tr>
+                        <% end %>
+                        <% @xray_facility.uploads.where(category: "LAMPIRAN_A").order(created_at: :desc).take(1).each do |upload| %>
+                            <tr>
+                                <td class="filenames"><%=  upload.category %></td>
+                                <td class="filenames">
+                                <% if upload.category %>
+                                    <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target:"_blank" %></div>
+                                    <% end %>
+                                <% end %>
+                                </td>
+                                <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y")%></td>
+                            </tr>
+                        <% end %>
+
+                        <% if @xray_facility.uploads.blank? %>
+                            <tr><td colspan="3">There are no uploaded documents</td></tr>
+                        <% end %>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="document-input-group" class="form-group">
+                            <label for="xray_facility_uploads" class="required">Upload documents</label>
+                            <div class="input-group custom-input-group">
+                                <div class="document-type col-md-6">
+                                    <select class="form-control document-type-selector" name="xray_facility[uploads][][category]" onchange="upload_category_changed(this)" <% if pending_approval %>disabled<% end %> required >
+                                        <option value="">Select option</option>
+                                        <% XrayFacility::DOCUMENT_TYPES.each do |index, document_type| %>
+                                            <option value="<%= index %>"><%= document_type %></option>
+                                        <% end %>
+                                    </select>
+                                </div>
+                                <div class="custom-file col-md-6">
+                                    <input type="file" name="xray_facility[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" disabled required >
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                                <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-md-12 col-form-label" for=""></label>
+                    <div class="col-md-12">
+                        <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                    </div>
+                </div>
+
+                <div class="form-group row" style="padding-left:130px;">
+                    <div class="col-md-12">
+                        <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button', disabled: pending_approval %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :doctor_association, "I Am Member Of Doctor’s Association", class: 'col-form-label required' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :has_doctor_association, true, class: "has_doctor_association form-check-input" %>
+                                <label class="form-check-label" for="xray_facility_has_doctor_association_true">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :has_doctor_association, false, class: "has_doctor_association form-check-input" %>
+                                <label class="form-check-label" for="xray_facility_has_doctor_association_false">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6" id="doctor_association">
+                    <div class="form-group">
+                        <% field_id = generate_field_id(form, :associations) %>
+                        <%= form.label :associations, "Name Of Association", class: 'name_of_association' %>
+                        <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Add Selection"><i class="fa fa-info"></i></span>
+                        <select name="xray_facility[associations][]" id="xray_facility_associations" class="form-control select2" multiple data-parsley-multiple="xray_facility[associations][]" data-select2-id="xray_facility_associations" data-parsley-errors-container="#select2_parsley_error__<%= field_id %>" data-parsley-class-handler='.select2-selection--multiple' data-parsley-group="xray_facility_associations">
+                            <%
+                                arrAssociation=[]
+                                if !@xray_facility.associations.nil?
+                                    @xray_facility.associations["association"].each do |association_id|
+                                        if !association_id.blank?
+                                            arrAssociation << association_id
+                                        end
+                                    end
+                                end
+                            %>
+                            <% Association.order(name: :asc).all().each do |ar| %>
+                                <option value="<%= ar.id %>" data-code="<%= ar.code %>"<%= " selected" if (arrAssociation || []).include?(ar.id.to_s) %>><%= ar.name %></option>
+                            <% end %>
+                        </select>
+                        <div id="select2_parsley_error__<%= field_id %>"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :district_health_office_id, 'Nearest District Health Office', class: 'col-form-label' %>
+                        <%= collection_select(:xray_facility, :district_health_office_id, DistrictHealthOffice.all, :id, :name,
+                        {include_blank: 'Select option'}, class: 'form-control select2', required: false, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <%= form.label :radiologist_operated, 'Radiologist Operated', class: 'col-form-label' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :radiologist_operated, true, { class: "form-check-input", disabled: true } %>Yes
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :xray_facility, :radiologist_operated, false, { class: "form-check-input", disabled: true } %>No
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <%= form.label :radiologist_name, 'Radiologist Name', class: 'col-form-label' %>
+                        <%= text_field :xray_facility, :radiologist_name, { class: 'form-control', disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'operating_hour' %>
+
+        </div>
+
+        <div class="card-footer text-right">
+            <a class="btn btn-primary" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit" name="save" id="save" value="Save">Save</button>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <%= render 'external/shared/profiles_script' %>
+    <script>
+        var i = $("input[type=radio][name='xray_facility[has_doctor_association]']:checked").val();
+        if (i == "true") {
+            $('.name_of_association').addClass("required");
+            $('#xray_facility_associations').removeAttr('disabled');
+            $('#xray_facility_associations').prop('required',true);
+        } else if (i == "false") {
+            $('.name_of_association').removeClass("required");
+            $('#xray_facility_associations').removeClass("required");
+            $('#xray_facility_associations').attr('disabled','disabled');
+            $('#xray_facility_associations').prop('required',false);
+        }
+
+        $(".has_doctor_association").change(function () {
+            var has_doctor_association = $(this).val();
+
+            if (has_doctor_association == "true") {
+                $('.name_of_association').addClass("required");
+                $('#xray_facility_associations').removeAttr('disabled');
+                $('#xray_facility_associations').prop('required',true);
+            } else if (has_doctor_association == "false") {
+                $('.name_of_association').removeClass("required");
+                $('#xray_facility_associations').removeClass("required");
+                $('#xray_facility_associations').attr('disabled','disabled');
+                $('#xray_facility_associations').val(false).trigger( "change" );
+                $('#xray_facility_associations').prop('required',false);
+            }
+        });
+
+        // file upload
+        <%= render 'shared/fileupload_script' %>
+
+        function validateFiles(inputFile) {
+            var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+            var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+            var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+            var extName;
+            var maxFileSize = <%= 10.megabytes %>;
+            var sizeExceeded = false;
+            var extError = false;
+
+            $.each(inputFile.files, function () {
+                if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+                extName = this.name.split('.').pop();
+                if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+            });
+            if (sizeExceeded) {
+                window.alert(maxExceededMessage);
+                $(inputFile).val('');
+            };
+
+            if (extError) {
+                window.alert(extErrorMessage);
+                $(inputFile).val('');
+            };
+        }
+
+        function upload_category_changed(sel)
+        {
+            $(sel).parents('div.custom-input-group').find(`input[name="xray_facility[uploads][][documents]"]`).attr("disabled", $(sel).val().length == 0);
+        }
+
+        /**
+        * Function to duplicate document fields
+        **/
+        $('#add_more_documents').click(() => {
+            $('.custom-input-group:first')
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-1')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose file")
+        });
+
+        /**
+        * Function to remove document fields
+        **/
+        $('.removal-button').click(function(){
+            if ($('.custom-input-group').length > 1){
+                $(this).closest('.custom-input-group').remove()
+            }
+        });
+
+        /**
+        * Function to set file name
+        **/
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose file")
+        });
+
+        /**
+         * Function to toggle license expiry date and upload document
+        **/
+        $(".document-type-selector").prop("disabled", true);
+        $('#add_more_documents').prop("disabled", true);
+
+        $('.xray_license_expiry_date').focusout(function() {
+            current_license_expiry = "<%= @xray_facility.xray_license_expiry_date %>";
+            new_license_expiry = $('.xray_license_expiry_date').val();
+            if (current_license_expiry != new_license_expiry) {
+                $(".document-type-selector").prop("disabled", false);
+                $('#add_more_documents').prop("disabled", false);
+            } else {
+                $(".document-type-selector").prop("disabled", true);
+                $('#add_more_documents').prop("disabled", true);
+            }
+        });
+    </script>
+<% end %>

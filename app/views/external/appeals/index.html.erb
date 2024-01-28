@@ -1,0 +1,202 @@
+<div class="card">
+    <div class="card-header bg-transparent border-0"><strong>Appeal</strong></div>
+
+    <div class="card-body">
+        <%
+            list = [
+                { title: "Worker Name", field: "worker_name", type: "text", placeholder: "Worker Name" },
+                { title: "Appeal Status", field: "appeal_status", type: "select", options: MedicalAppeal::STATUSES.invert.merge(MedicalAppeal::RESULTS.invert) },
+                { title: "Worker Code", field: "worker_code", type: "text", placeholder: "Worker Code" },
+                { title: "Appeal Date", field: "appeal_date", type: "date-range" }
+            ]
+
+            if ["Employer", "Agency"].include?(current_user.userable_type)
+                # list << { title: "Clinic/Doctor Name", field: "clinic_doctor_name", type: "text", placeholder: "Name" }
+            else
+                list << { title: "Officer Name/Code", field: "mle1_code", type: "text", placeholder: "Officer" }
+                list << { title: "Registered By", field: "registered_by_name", type: "text", placeholder: "Name" }
+                list << { title: "Registered By Type", field: "registered_by_type", type: "select", options: [["Doctor", :Doctor], ["Employer", :Employer], ["FOMEMA", :User]] }
+            end
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "external-appeal-index", filter_link: external_appeals_path, list: list } %>
+        <%= render '/shared/all_flash' %>
+        <% if flash[:notice_reminders] %>
+            <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <div id="dialog-appeal-case" class="hidden" title="Appeal Case Reminder">
+                    <p>Appeal submitted. You are required to bring Foreign Worker (<b><%= flash[:notice_reminders].fw_name %></b>) (<b><%= flash[:notice_reminders].fw_code %></b>) to FOMEMA Panel Clinic for further investigation.</p>
+                </div>
+                <% content_for :page_end_scripts do %>
+                    <script>
+                        openDialog({target: '#dialog-appeal-case', type: 'warning'});
+                    </script>
+                <% end %>
+            <% end %>
+        <% end %>
+        <form method="post" action="/transactions/bulk_action">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <table class="table table-responsive-sm table-striped table_circle">
+                    <thead>
+                        <tr>
+                            <th>Worker Name / Code</th>
+                            <th>Country / Passport</th>
+                            <th>Registration Code</th>
+                            <th>Appeal Date</th>
+                            <th>Appeal Status</th>
+                            <!--th>Decision</th-->
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+            <% else %>
+                <table class="table table-responsive-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Duration</th>
+                            <th>Appeal Date</th>
+                            <th>Registered By</th>
+                            <th>Worker</th>
+                            <th>Officer Name</th>
+                            <th>Status</th>
+                            <% unless current_user.userable_type == "Employer" %>
+                                <th>Actions</th>
+                            <% end %>
+                        </tr>
+                    </thead>
+            <% end %>
+
+                <tbody>
+                    <% @appeals.each.with_index((@appeals.current_page - 1) * get_per + 1) do |appeal, index| %>
+                        <%
+                            transaction     = appeal.transactionz
+                            foreign_worker  = transaction.foreign_worker
+                            doctor          = appeal.doctor
+                        %>
+
+                        <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                            <tr>
+                                <td>
+                                    <%= foreign_worker&.name %><br>
+                                    <b><%= foreign_worker&.code %></b>
+                                </td>
+                                <td>
+                                    <%= foreign_worker&.country&.name %><br>
+                                    <b><%= foreign_worker&.passport_number %></b>
+                                </td>
+                                <td><%= transaction.code %></td>
+                                <td><%= appeal.created_at.strftime("%d/%m/%Y") %></td>
+                                <td><%= MedicalAppeal::STATUSES[appeal.status] %></td>
+                                <!--td><%= MedicalAppeal::RESULTS[appeal.result] %></td-->
+                                <td>
+                                    <% if current_user.userable_type == "Employer" || (current_user.userable_type == "Agency" && appeal.registered_by_type == "Agency") %>
+                                        <% if ["DOCTOR_NEW", "PENDING_MOH_DOCUMENT", "PENDING_TODO", "EXAMINATION", "DOCUMENT_COMPLETED", "PENDING_APPROVAL"].include?(appeal.status) %>
+                                            <%= link_to "View Appeal", show_appeal_todos_external_appeal_path(appeal.id), class: "btn btn-primary" %>
+                                        <% end %>
+                                    <% end %>
+
+                                    <% if !appeal.employer_consented_at.nil? && appeal.registered_by_type == current_user.userable_type %>
+                                        <%= link_to "#{current_user.userable_type} Consent Form", appeal_pdpa_form_internal_transaction_path(id: appeal.transactionz.id, appeal_id: appeal.id), target: :_blank, class: "btn btn-primary" %>
+                                    <% end %>
+
+                                    <% if appeal.is_moh && appeal.status == "PENDING_MOH_DOCUMENT" %>
+                                        <%= link_to "Upload Documents", upload_document_external_appeal_path(appeal.id), class: "btn btn-warning" %>
+                                    <% end %>
+
+                                    <% if appeal.status = "CLOSED" && ["UNSUCCESSFUL", "SUCCESSFUL", "CANCEL/CLOSE"].include?(appeal.result) %>
+                                        <%= link_to "Decision Letter", appeal_employer_decision_letter_external_appeal_path(appeal.id), target: :_blank, class: "btn btn-primary" %>
+                                    <% end %>
+
+                                    <% appeal.uploads.where(category: "MOH_LETTER").order(created_at: :desc).first(1).each do |upload| %>
+                                        <% upload.documents.each do |document| %>
+                                            <%= link_to "MOH Letter", rails_blob_url(document), target: :_blank, class: "btn btn-primary" %>
+                                        <% end %>
+                                    <% end %>
+                                </td>
+                            </tr>
+
+                            <% next %>
+                        <% end %>
+
+                        <tr>
+                            <td><%= appeal.id %></td>
+                            <td><%= appeal.duration_days %></td>
+                            <td><%= appeal.created_at.strftime("%d/%m/%Y") %></td>
+
+                            <td>
+                                <%= appeal.registered_by&.name %><br>
+                                <b><%= appeal.registered_by_type == "User" ? "FOMEMA" : appeal.registered_by_type %></b>
+                            </td>
+
+                            <td>
+                                <%= transaction.foreign_worker&.name %><br>
+                                <b><%= transaction.foreign_worker&.code %></b>
+                            </td>
+
+                            <!-- <td>
+                                <%#= appeal.doctor&.name %><br>
+                                <b><#%= appeal.doctor&.code %></b>
+                            </td> -->
+
+                            <td>
+                                <%= appeal.officer_in_charge&.name %><br>
+                                <b><%= appeal.officer_in_charge&.code %></b>
+                            </td>
+
+                            <td>
+                                <% if ["EXAMINATION", "DOCUMENT_COMPLETED"].include?(appeal.status) && ["Radiologist", "XrayFacility"].include?(current_user.userable_type) %>
+                                    <% retake = appeal.current_xray_retake %>
+
+                                    <% if current_user.userable_type == "Radiologist" && retake&.xray_examination&.radiologist_transmitted_at? %>
+                                        <%= retake.try(:completed_at?) ? "Transmitted" : "Pending Acknowledgement by X-ray Facility" %>
+                                        <% button_type = "History" %>
+                                    <% elsif retake.try(:completed_at?) %>
+                                        Transmitted
+                                        <% button_type = "History" %>
+                                    <% else %>
+                                        Examination
+                                        <% button_type = "Exam" %>
+                                    <% end %>
+                                <% else %>
+                                    <%= appeal.displayed_status %>
+                                <% end %>
+                                <br>
+                                <%
+                                    xray_bypass_request = TransactionVerifyDoc.where(category: "XRAY_TRANSACTION_BYPASS_FINGERPRINT", sourceable: retake).last
+                                %>
+                                <% if current_user.userable_type == "XrayFacility" && !xray_bypass_request.blank? %>
+                                    <small><i><%= xray_bypass_request&.status == "APPROVAL" ? "Bypass pending for approval" : "Bypass #{xray_bypass_request&.status}" %></i></small>
+                                <% end %>
+                            </td>
+
+                            <td>
+                                <% if has_permission?("REVIEW_APPEALS") && ["EXAMINATION", "DOCUMENT_COMPLETED"].include?(appeal.status) %>
+                                    <% case current_user.userable_type %>
+                                    <% when "Radiologist", "XrayFacility" %>
+                                        <% if button_type == "History" %>
+                                            <%= link_to "Exam History", external_appeal_path(appeal.id), class: "btn btn-success" %>
+                                        <% elsif button_type == "Exam" %>
+                                            <%= link_to "Examination", external_appeal_path(appeal.id), class: "btn btn-primary" %>
+                                        <% end %>
+                                    <% else %>
+                                        <%= link_to "Examination", external_appeal_path(appeal.id), class: "btn btn-primary" %>
+                                    <% end %>
+                                <% elsif has_permission?("REVIEW_APPEALS") && ["PENDING_APPROVAL", "CLOSED"].include?(appeal.status) %>
+                                    <%= link_to "View Appeal", external_appeal_path(appeal.id), class: "btn btn-success" %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+
+                    <% if @appeals.blank? %>
+                        <tr><td colspan="<%= current_user.userable_type == ["Employer", "Agency"] ? 9 : 8 %>" class="text-center">No appeals found</td></tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+
+        <div class="row external-pagination-container">
+            <%= paginate @appeals %>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,564 @@
+<style>
+.condition-code {
+    display: none;
+}
+.condition-code::after {
+    content: " - ";
+}
+</style>
+<div class="card">
+    <div class="card-header">
+        XQCC Checklist
+    </div>
+    <table id="xray_review_xqcc_checklist_input" class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th width="120">Criteria</th>
+                <th>Findings</th>
+                <th colspan="2" class="text-center">Status</th>
+                <th>Item</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- id_incomplete -->
+            <tr>
+                <td rowspan="<% if @transaction.xray_film_type&.downcase == 'analog' %>4<% else %>2<% end %>">ID</td>
+                <td><span class="condition-code">6101</span>Incomplete</td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6101]" id="xray_review_detail_6101_y" value="Y" <% if xray_review.get_condition_detail("6101") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6101]" id="xray_review_detail_6101_n" value="N" <% if !xray_review.get_condition_detail("6101") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td class="items">
+                    <% 
+                    items_checker = ''
+                    [
+                        {field: :id_incomplete_clinic_name, code: "6133", label: "Clinic Name"},
+                        {field: :id_incomplete_worker_name, code: "6134", label: "Worker Name"},
+                        {field: :id_incomplete_transaction_id, code: "6135", label: "Transaction ID"},
+                        {field: :id_incomplete_xray_taken_date, code: "6136", label: "X-Ray Taken Date"},
+                    ].each do |item| 
+                        items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+                    %>
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6101") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                                <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                            </label>
+                        </div>
+                    <% end %>
+                    <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6101") == 'Y' %> required>
+                </td>
+            </tr>
+            <!-- end of id_incomplete -->
+
+            <!-- id_wrong -->
+            <tr>
+                <td><span class="condition-code">6128</span>Wrong</td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6128]" id="xray_review_detail_6128_y" value="Y" <% if xray_review.get_condition_detail("6128") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6128]" id="xray_review_detail_6128_n" value="N" <% if !xray_review.get_condition_detail("6128") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td class="items">
+                    <%
+                    items_checker = ''
+                    [
+                        {field: :id_wrong_clinic_name, code: "6137", label: "Clinic Name"},
+                        {field: :id_wrong_worker_name, code: "6138", label: "Worker Name"},
+                        {field: :id_wrong_transaction_id, code: "6139", label: "Transaction ID"},
+                        {field: :id_wrong_xray_taken_date, code: "6140", label: "X-Ray Taken Date"},
+                    ].each do |item| 
+                        items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+                    %>
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6128") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                                <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                            </label>
+                        </div>
+                    <% end %>
+                    <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6128") == 'Y' %> required>
+                </td>
+            </tr>
+            <!-- end of id_wrong -->
+
+            <!-- only show for pyhsical film -->
+            <% if @transaction.xray_film_type&.downcase == 'analog' %>
+                <%= render 'internal/xray_reviews/shared/checklist_form_analog', {
+                    form: form,
+                    xray_review: xray_review,
+                } %>
+            <% end %>
+            <!-- end of only show for pyhsical film -->
+
+            <!-- pos_roi_cut_off  -->
+            <tr>
+                <td rowspan="5">Positioning Technique</td>
+                <td><span class="condition-code">6141</span>ROI Cut Off</td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6141]" id="xray_review_detail_6141_y" value="Y" <% if xray_review.get_condition_detail("6141") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6141]" id="xray_review_detail_6141_n" value="N" <% if !xray_review.get_condition_detail("6141") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td class="items">
+                    <%
+                    items_checker = ''
+                    [
+                        {field: :pos_apices_cut, code: "6110", label: "Apices Cut"},
+                        {field: :pos_chest_wall_cut, code: "6111", label: "Chest Wall Cut"},
+                        {field: :pos_cpa_cut, code: "6112", label: "CPA Cut"},
+                    ].each do |item| 
+                        items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+                    %>
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6141") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                                <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                            </label>
+                        </div>
+                    <% end %>
+                    <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6141") == 'Y' %> required>
+                </td>
+            </tr>
+            <!-- end of pos_roi_cut_off -->
+            <!-- pos_roi_not_clearly_visualized  -->
+            <tr>
+                <td><span class="condition-code">6113</span>ROI not clearly visualized</td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6113]" id="xray_review_detail_6113_y" value="Y" <% if xray_review.get_condition_detail("6113") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6113]" id="xray_review_detail_6113_n" value="N" <% if !xray_review.get_condition_detail("6113") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td class="items">
+                    <%
+                    items_checker = ''
+                    [
+                        {field: :pos_rotation, code: "6142", label: "Rotation"},
+                        {field: :pos_angulation, code: "6143", label: "Angulation"},
+                        {field: :pos_id_obscure_apex, code: "6144", label: "ID Obscure Apex"},
+                    ].each do |item| 
+                        items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+                    %>
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6142") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                                <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                            </label>
+                        </div>
+                    <% end %>
+                    <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6113") == 'Y' %> required>
+                </td>
+            </tr>
+            <!-- end of pos_roi_not_clearly_visualized -->
+            <!-- pos_collimation  -->
+            <tr>
+                <td><span class="condition-code">6115</span>Collimation</td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6115]" id="xray_review_detail_6115_y" value="Y" <% if xray_review.get_condition_detail("6115") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="findings text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6115]" id="xray_review_detail_6115_n" value="N" <% if !xray_review.get_condition_detail("6115") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td class="items">
+                    <%
+                    items_checker = ''
+                    [
+                        {field: :pos_poor_colimation, code: "6145", label: "Poor Collimation"},
+                        {field: :pos_no_l, code: "6146", label: "No Collimation"},
+                    ].each do |item| 
+                        items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+                    %>
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail(item[:code]) == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                                <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                            </label>
+                        </div>
+                    <% end %>
+                    <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6115") == 'Y' %> required>
+                </td>
+            </tr>
+            <!-- end of pos_collimation -->
+            <!-- pos_scapular_not_retracted  -->
+            <tr>
+                <td><span class="condition-code">6109</span>Scapular not retracted</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6109]" id="xray_review_detail_6109_y" value="Y" <% if xray_review.get_condition_detail("6109") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6109]" id="xray_review_detail_6109_n" value="N" <% if !xray_review.get_condition_detail("6109") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of pos_scapular_not_retracted -->
+            <!-- pos_poor_inspiratory_effort  -->
+            <tr>
+                <td><span class="condition-code">6120</span>Poor inspiratory effort</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6120]" id="xray_review_detail_6120_y" value="Y" <% if xray_review.get_condition_detail("6120") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6120]" id="xray_review_detail_6120_n" value="N" <% if !xray_review.get_condition_detail("6120") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of pos_poor_inspiratory_effort -->
+            <!-- exp_overexposure  -->
+            <tr>
+                <td rowspan="2">Exposure</td>
+                <td><span class="condition-code">6117</span>Overexposed</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6117]" id="xray_review_detail_6117_y" value="Y" <% if xray_review.get_condition_detail("6117") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6117]" id="xray_review_detail_6117_n" value="N" <% if !xray_review.get_condition_detail("6117") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of exp_overexposure -->
+            <!-- exp_underexposure  -->
+            <tr>
+                <td><span class="condition-code">6118</span>Underexposed</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6118]" id="xray_review_detail_6118_y" value="Y" <% if xray_review.get_condition_detail("6118") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6118]" id="xray_review_detail_6118_n" value="N" <% if !xray_review.get_condition_detail("6118") %> checked <% end %> required>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of exp_underexposure -->
+            <!-- arti_processing_artifacts  -->
+            <tr>
+                <td rowspan="2">Artifacts</td>
+                <td><span class="condition-code">6119</span>Processing Artifacts</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6119]" id="xray_review_detail_6119_y" value="Y" <% if xray_review.get_condition_detail("6119") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6119]" id="xray_review_detail_6119_n" value="N" <% if !xray_review.get_condition_detail("6119") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of arti_processing_artifacts -->
+            <!-- is_arti_poor_handling_artifacts  -->
+            <tr>
+                <td><span class="condition-code">6131</span>Poor Handling Artifacts</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6131]" id="xray_review_detail_6131_y" value="Y" <% if xray_review.get_condition_detail("6131") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6131]" id="xray_review_detail_6131_n" value="N" <% if !xray_review.get_condition_detail("6131")  %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of is_arti_poor_handling_artifacts -->
+            <!-- super_same_thoracic_cage  -->
+            <tr>
+                <td rowspan="2">Superimposed</td>
+                <td><span class="condition-code">6147</span>Same thoracic cage</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6147]" id="xray_review_detail_6147_y" value="Y" <% if xray_review.get_condition_detail("6147") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6147]" id="xray_review_detail_6147_n" value="N" <% if !xray_review.get_condition_detail("6147") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of super_same_thoracic_cage -->
+            <!-- super_different_thoracic_cage  -->
+            <tr>
+                <td><span class="condition-code">6148</span>Different thoracic cage</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6148]" id="xray_review_detail_6148_y" value="Y" <% if xray_review.get_condition_detail("6148") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6148]" id="xray_review_detail_6148_n" value="N" <% if !xray_review.get_condition_detail("6148") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of super_different_thoracic_cage -->
+            
+            <% if @transaction.xray_film_type&.downcase == 'digital' %>
+                <!-- pam_wrong_placement  -->
+                <tr>
+                    <td rowspan="2">Primary Anatomical Marker</td>
+                    <td><span class="condition-code">6149</span>Wrong Placement</td>
+                    <td width="50" class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" type="radio" name="xray_review_detail[6149]" id="xray_review_detail_6149_y" value="Y" <% if xray_review.get_condition_detail("6149") == 'Y' %> checked <% end %> required>
+                                Yes
+                            </label>
+                        </div>
+                    </td>
+                    <td width="50" class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" type="radio" name="xray_review_detail[6149]" id="xray_review_detail_6149_n" value="N" <% if !xray_review.get_condition_detail("6149") %> checked <% end %>>
+                                No
+                            </label>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <!-- end of pam_wrong_placement -->
+            <% end %>
+            <!-- pam_not_available  -->
+            <tr>
+                <% if @transaction.xray_film_type&.downcase == 'analog' %>
+                    <td>Primary Anatomical Marker</td>
+                <% end %>
+                <td><span class="condition-code">6150</span>Not Available</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6150]" id="xray_review_detail_6150_y" value="Y" <% if xray_review.get_condition_detail("6150") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6150]" id="xray_review_detail_6150_n" value="N" <% if !xray_review.get_condition_detail("6150") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of pam_not_available -->
+            <!-- blur_movement  -->
+            <tr>
+                <td rowspan="2">Blur</td>
+                <td><span class="condition-code">6121</span>Movement</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6121]" id="xray_review_detail_6121_y" value="Y" <% if xray_review.get_condition_detail("6121") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6121]" id="xray_review_detail_6121_n" value="N" <% if !xray_review.get_condition_detail("6121") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of blur_movement -->
+            <!-- blur_breathing  -->
+            <tr>
+                <td><span class="condition-code">6132</span>Breathing</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6132]" id="xray_review_detail_6132_y" value="Y" <% if xray_review.get_condition_detail("6132") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6132]" id="xray_review_detail_6132_n" value="N" <% if !xray_review.get_condition_detail("6132") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of blur_breathing -->
+            
+            <% if @transaction.xray_film_type&.downcase == 'analog' %>
+                <!-- improper_report  -->
+                <tr>
+                    <td><span class="condition-code">6130</span>Improper Report</td>
+                    <td></td>
+                    <td width="50" class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" type="radio" name="xray_review_detail[6130]" id="xray_review_detail_6130_y" value="Y" <% if xray_review.get_condition_detail("6130") == 'Y' %> checked <% end %> required>
+                                Yes
+                            </label>
+                        </div>
+                    </td>
+                    <td width="50" class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" type="radio" name="xray_review_detail[6130]" id="xray_review_detail_6130_n" value="N" <% if !xray_review.get_condition_detail("6130") %> checked <% end %>>
+                                No
+                            </label>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <!-- end of improper_report -->
+            <% end %>
+            
+            <!-- is_no_diagnostic_value  -->
+            <tr>
+                <td><span class="condition-code">6151</span>No Diagnostic Value</td>
+                <td></td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6151]" id="xray_review_detail_6151_y" value="Y" <% if xray_review.get_condition_detail("6151") == 'Y' %> checked <% end %> required>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" name="xray_review_detail[6151]" id="xray_review_detail_6151_n" value="N" <% if !xray_review.get_condition_detail("6151") %> checked <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            <!-- end of is_no_diagnostic_value -->
+        </tbody>
+    </table>
+</div>

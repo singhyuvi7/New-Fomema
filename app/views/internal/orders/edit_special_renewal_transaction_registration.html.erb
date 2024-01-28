@@ -1,0 +1,139 @@
+<% has_plks_optional = false %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        Order - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: external_order_path(@order), html: {id: "order_form"} do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render '/shared/all_flash' %>
+
+            <%=render partial: '/internal/orders/shared/order_detail', locals: {form: form} %>
+
+            <p class="plks-optional-message">
+                Please review your worker list before submission. Workers highlighted in blue indicates that medical examination is optional for upcoming period. Your may choose to go ahead and register these workers for a medical or remove the workers.
+            </p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Foreign Worker</th>
+                        <th>Gender</th>
+                        <th>&nbsp;</th>
+                        <th>PLKS</th>
+                        <th><label class="required">Comment</label></th>
+                        <th>Amount</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                    @order.order_items.each do |order_item|
+                        foreign_worker = order_item.order_itemable
+                        foreign_worker.assign_attributes(order_item.additional_information["foreign_worker"]) if !order_item.additional_information.blank? and order_item.additional_information.key?("foreign_worker")
+                        has_plks_optional = true if order_item.order_itemable.plks_optional?
+                    %>
+                        <tr class="<%= "plks-optional" if order_item.order_itemable.plks_optional? %>">
+                            <td>
+                                <a href="<%= internal_employer_employer_worker_path(foreign_worker.employer, foreign_worker) %>" target="_blank"><%= foreign_worker.name %></a>
+                                <button class="btn btn-sm btn-warning" type="button" style="float: right;" data-toggle="modal" data-target="#modal-fw-<%= order_item.order_itemable_id %>">Edit</button>
+                            </td>
+                            <td><%= ForeignWorker::GENDERS[foreign_worker.gender] %></td>
+                            <td><pre><%= order_item.additional_information["comments"] %></pre></td>
+                            <td><%= order_item.order_itemable.plks_number.to_i %></td>
+                            <td><textarea name="comment[<%= order_item.id %>]" id="comment_<%= order_item.id %>" data-order_item_id="<%= order_item.id %>" class="form-control" required onblur="comment_changed(this)"><%= order_item.comment %></textarea></td>
+                            <td>
+                                <% if has_permission?("CREATE_FOC_TRANSACTION") %>
+                                    <%= select_tag("fee", options_from_collection_for_select(Fee.select("id, name || ' (' || amount || ')' as label").where("code in (?)", ["TRANSACTION_#{ForeignWorker::GENDERS[foreign_worker.gender]}", "FOC"]), :id, :label, order_item.fee_id), class: "form-control", onchange: "change_fee(this)", data: {order_item_id: order_item.id}) %>
+                                <% else %>
+                                    <%= number_to_currency(order_item.amount, unit: "") %>
+                                <% end %>
+                            </td>
+                            <td class="text-right">
+                                <a href="<%= "#{remove_fw_internal_order_path(order_item.order_id)}?foreign_worker_id=#{foreign_worker.id}" %>" class="btn btn-sm btn-secondary">X</a>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <a class="btn btn-primary" href="<%= external_orders_path %>">Back</a>
+                <% if !['PAID'].include?(@order.status) %>
+                    <button class="btn btn-primary" type="submit" name="submit" id="submit_cancel" value="cancel">Cancel order</button>
+                    <button id="submit_save_and_proceed_to_payment" class="btn btn-primary" type="submit" name="submit" value="save_and_proceed_to_payment">Save and proceed to payment</button>
+                    <!--<button class="btn btn-primary" type="submit" name="submit" id="submit_approval" value="save_and_proceed_to_approval">Save and proceed to approval</button>-->
+                <% end %>
+            </div>
+        </div>
+    <% end %>
+    <!-- /order form -->
+
+    <% @order.order_items.each do |order_item| %>
+        <%= render partial: 'internal/orders/fw_form', locals: {order_item: order_item} %>
+    <% end %>
+</div>
+
+<%=render 'etr_search_worker' %>
+
+<form action="<%= change_comment_internal_order_path(@order) %>" id="change_comment_form" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+    <input type="hidden" name="order_item_id" id="change_comment_order_item_id" value="">
+    <input type="hidden" name="comment" id="change_comment_comment" value="">
+</form>
+
+<form action="<%= change_fee_internal_order_path(@order) %>" id="change_fee_form" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+    <input type="hidden" name="order_item_id" id="change_fee_order_item_id" value="">
+    <input type="hidden" name="fee_id" id="fee_id" value="">
+</form>
+
+<style>
+.plks-optional-message {
+    display: <%= has_plks_optional ? "block" : "none" %>;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#submit_cancel').click(function () {
+        $('#order_form textarea').prop('disabled', true);
+        $('#order_form').submit();
+    });
+
+function comment_changed(ta)
+{
+    $('#change_comment_order_item_id').val(ta.getAttribute("data-order_item_id"));
+    $('#change_comment_comment').val($(ta).val());
+    $('#change_comment_form').submit();
+}
+
+function change_fee(sel)
+{
+    $('#change_fee_order_item_id').val(sel.getAttribute("data-order-item-id"));
+    $('#fee_id').val($(sel).val());
+    $('#change_fee_form').submit();
+}
+</script>
+<% end %>

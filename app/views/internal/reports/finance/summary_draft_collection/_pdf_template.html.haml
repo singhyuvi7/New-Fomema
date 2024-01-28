@@ -1,0 +1,45 @@
+- if @bank_drafts.present?
+  - @bank_drafts.each do |branch, drafts|
+    = render 'internal/reports/finance/summary_draft_collection/draft_table', branch: branch, drafts: drafts.sort_by { |data| DateTime.parse(data[0]).to_i }
+  %table.table.w-100.text-center.mt-4
+    %tbody
+      %tr.bold
+        - total_net_amount, total_gst_amount, total_processing_fee, total_draft_amount = @grand_total
+        %td{width: '20%'} Grand Total
+        %td{width: '20%'}= number_to_currency(total_net_amount, unit: '')
+        %td{width: '20%'}= number_to_currency(total_gst_amount, unit: '')
+        %td{width: '20%'}= number_to_currency(total_processing_fee, unit: '')
+        %td{width: '20%'}= number_to_currency(total_draft_amount, unit: '')
+
+:css
+  .w-100 {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 10px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 10px 5px;
+    vertical-align: center;
+    border: none;
+  }
+
+  tr:last-child {
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+  }
+
+  .bold {
+    font-weight: bold;
+  }

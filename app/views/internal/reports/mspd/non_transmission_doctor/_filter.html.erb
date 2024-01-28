@@ -1,0 +1,77 @@
+<div class="card">
+    <div class="card-header">Search</div>
+    <form action="<%= formaction %>" class="with-parsley">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="code" class="col-sm-3 col-form-label">Doctor Code</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="name" class="col-sm-3 col-form-label">Doctor Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="postcode" class="col-sm-3 col-form-label">Postcode</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="postcode" id="postcode" value="<%= params[:postcode] %>">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="State" class="col-sm-3 col-form-label">State</label>
+                    <div class="col-sm-9">
+                        <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: form_select_option_text, class: 'form-control' do %>
+                            State
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="startdate" class="col-sm-3 col-form-label required">Start Date</label>
+                    <div class="col-sm-9">
+                        <input type="date" class="form-control" name="startdate" id="startdate" value="<%= params[:startdate] %>" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="State" class="col-sm-3 col-form-label required">End Date</label>
+                    <div class="col-sm-9">
+                        <input type="date" class="form-control" name="enddate" id="enddate" value="<%= params[:enddate] %>" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="duration" class="col-sm-3 col-form-label required">Duration of Delay</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="1" min="0" class="form-control" name="duration" id="duration" value="<%= params[:duration] || 8 %>" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-right">
+        <%=raw filter_clear_button(non_transmission_doctor_internal_mspd_reports_path) %>
+        <%=raw filter_button %>
+    </div>
+</div>
+<!-- /.card /search> -->

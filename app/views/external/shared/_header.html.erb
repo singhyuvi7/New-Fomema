@@ -1,0 +1,303 @@
+<header class="app-header navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="<%= external_root_path %>">
+        <%= image_tag "logo/fomema-logo.png", height: 30, alt: "FOMEMA", class: "navbar-brand-full" %>
+        <%= image_tag "logo/fomema-logo.png", height: 30, alt: "FOMEMA", class: "navbar-brand-minimized" %>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav nav-dropdown-items">
+            <!-- This is completely pointless. You can click on the logo button.
+            <a class="nav-link" href="<%= external_root_path %>">
+                <li class="nav-item">
+                    Dashboard
+                </li>
+            </a> -->
+                <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                    <a class="nav-link" href="<%= external_root_path %>">
+                        <i class="fa fa-home" aria-hidden="true"></i>
+                    </a>
+                <!--Portal agency -->
+                <% if ["Agency"].include?(current_user.userable_type) && has_any_permission?("VIEW_ALL_EMPLOYER") %>
+                    <a class="nav-link" href="<%=external_agency_employers_path %>">
+                        <li class="nav-item">
+                            <strong>Search Employer</strong>
+                        </li>
+                    </a>
+                <% end %>
+                <!--portal employer-->
+                <% if ["Employer"].include?(current_user.userable_type) && has_any_permission?("VIEW_ALL_FOREIGN_WORKER", "VIEW_BRANCH_FOREIGN_WORKER", "VIEW_OWN_FOREIGN_WORKER") %>
+                    <a class="nav-link" href="<%= external_worker_lists_path %>">
+                        <li class="nav-item">
+                            <strong>Register Worker</strong>
+                        </li>
+                    </a>
+                <% end %>
+
+                <% if has_any_permission?("VIEW_EMPLOYER_ORDER", "VIEW_MSPD_ORDER", "VIEW_AGENCY_ORDER") %>
+                    <a class="nav-link" href="<%= external_orders_path %>">
+                        <li class="nav-item">
+                            <strong>Payment</strong>
+                        </li>
+                    </a>
+                <% end %>
+
+                <% if has_any_permission?("VIEW_ALL_TRANSACTION") %>
+                    <%
+                        transaction_external_link =
+                            if current_user.userable_type == "Radiologist"
+                                external_transactions_path(status: "examination")
+                            else
+                                external_transactions_path
+                            end
+                    %>
+
+                    <a class="nav-link" href="<%= transaction_external_link %>">
+                        <li class="nav-item">
+                            <strong> Registration History </strong>
+                        </li>
+                    </a>
+                <% end %>
+            <% end %>
+
+            <!--merts -->
+            <% if !["Employer", "Agency"].include?(current_user.userable_type) %>
+                <% if has_any_permission?("VIEW_ALL_TRANSACTION") %>
+                    <%
+                        transaction_external_link =
+                            if current_user.userable_type == "Radiologist"
+                                external_transactions_path(status: "examination")
+                            else
+                                external_transactions_path
+                            end
+                    %>
+
+                    <a class="nav-link" href="<%= transaction_external_link %>">
+                        <li class="nav-item">
+                            <strong>Transactions</strong>
+                        </li>
+                    </a>
+                <% end %>
+
+                <% if has_any_permission?("VIEW_EMPLOYER_ORDER", "VIEW_MSPD_ORDER") %>
+                    <a class="nav-link" href="<%= external_orders_path %>">
+                        <li class="nav-item">
+                            <strong>Orders</strong>
+                        </li>
+                    </a>
+                <% end %>
+            <% end %>
+
+            <% if has_permission?("VIEW_REFUND") %>
+                <a class="nav-link" href="<%= external_refunds_path %>">
+                    <li class="nav-item">
+                        <strong>Refund</strong>
+                    </li>
+                </a>
+            <% end %>
+
+            <% if has_permission?("VIEW_BULLETIN") %>
+                <% if !["Employer", "Agency"].include?(current_user.userable_type) %>
+                    <a class="nav-link" href="<%= external_bulletins_path %>">
+                        <li class="nav-item">
+                            <strong>Bulletins</strong>
+                        </li>
+                    </a>
+                <% end %>
+            <% end %>
+
+            <% if has_any_permission?("MEDICAL_EXAMINATION_TRANSACTION") && ["XrayFacility", "Radiologist"].include?(current_user.userable_type) %>
+                <a class="nav-link" href="<%= external_retakes_path %>">
+                    <li class="nav-item">
+                        <strong>Retakes</strong>
+                    </li>
+
+                    <% if @navbar_pending_retakes %>
+                        <i class="fa fa-circle pending-retake-indicator"></i>
+                    <% end %>
+                </a>
+            <% end %>
+
+            <% if has_permission?("VIEW_APPEALS") %>
+                <a class="nav-link" href="<%= external_appeals_path %>">
+                    <li class="nav-item">
+                        <strong>Appeals</strong>
+                    </li>
+                </a>
+            <% end %>
+
+            <% if has_permission?("VIEW_NOTIFIABLE_CASES") %>
+                <a class="nav-link" href="<%= external_amended_notifiable_transactions_path %>">
+                    <li class="nav-item">
+                        <strong>Notifiable Cases</strong>
+                    </li>
+
+                    <% if @navbar_notifiable_cases %>
+                        <i class="fa fa-circle pending-retake-indicator"></i>
+                    <% end %>
+                </a>
+            <% end %>
+
+            <% if has_permission?("SEARCH_FOREIGN_WORKER") %>
+                <a class="nav-link" href="<%= external_foreign_workers_path %>">
+                    <li class="nav-item">
+                        <strong>Medical Result</strong>
+                    </li>
+                </a>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_INSURANCE_PURCHASE") && ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <a class="nav-link" href="<%= external_insurance_histories_path %>">
+                    <li class="nav-item">
+                        <strong>Insurance</strong>
+                    </li>
+                </a>
+            <% end %>
+
+            <!-- (Start) These are xray/radiologist specific links. Only viewable when on small sized screens. On large screens, it's located on the breadcrumbs bar. external/shared/_breadcrumb.html.erb -->
+                <% if has_permission?("VIEW_FAVOURITE_RADIOLOGIST") && ["XrayFacility"].include?(current_user.userable_type) %>
+                    <a class="nav-link d-lg-none" href="<%= external_favourite_radiologists_path %>">
+                        <li class="nav-item">
+                            <strong>Favourite Radiologists</strong>
+                        </li>
+                    </a>
+                <% end %>
+
+                <% if has_any_permission?("DELETE_DIGITAL_XRAY_IMAGE_FROM_SALINEE") && ["XrayFacility"].include?(current_user.userable_type) %>
+                    <a class="nav-link d-lg-none" href="<%= external_xray_images_path %>">
+                        <li class="nav-item">
+                           <strong>Delete Images</strong>
+                        </li>
+                    </a>
+                <% end %>
+
+                <% if has_any_permission?("VIEW_MERTS_XRAY_TO_RADIOLOGIST_REPORTED_CASES", "VIEW_MERTS_RADIOLOGIST_TO_XRAY_REPORTED_CASES") && ["XrayFacility", "Radiologist"].include?(current_user.userable_type) %>
+                    <a class="nav-link d-lg-none" href="<%= external_reported_cases_path %>">
+                        <li class="nav-item">
+                            <strong>Reported Cases</strong>
+                        </li>
+                    </a>
+                <% end %>
+            <!-- (End) -->
+
+            <% if ["Employer", "Agency"].include?(current_user.userable_type) && has_any_permission?("VIEW_ALL_FOREIGN_WORKER", "VIEW_BRANCH_FOREIGN_WORKER", "VIEW_OWN_FOREIGN_WORKER") %>
+                <!--
+                <a class="nav-link" href="<%= external_fw_change_employers_path %>">
+                    <li class="nav-item">
+                        <strong>Change Employer Requests</strong>
+                    </li>
+                </a>
+                -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <strong>Others</strong>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <%= link_to external_fw_change_employers_path, class:'dropdown-item' do %>
+                            Change Employer Requests
+                        <% end %>
+                    </div>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+    <!-- /#navbarNav -->
+
+    <ul class="nav navbar-nav ml-auto profile-nav">
+        <p class="mb-0"><%= @displayed_avatar_name %></p>
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                aria-expanded="false">
+                <%= image_tag "avatars/people.png", alt: current_user.email, class: "img-avatar", data: {toggle: "tooltip", placement: "left", html: "true", "original-title": current_user.username} %>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-header text-center">
+                    <strong>Settings</strong>
+                </div>
+                <a class="dropdown-item" href="<%= external_profile_path %>"><i class="fa fa-user"></i> Profile</a>
+
+                <%= link_to external_password_path, class:'dropdown-item' do %>
+                    <i class="fa fa-lock"></i> Password
+                <% end %>
+
+                <%= link_to destroy_external_user_session_path(user_type: current_user.userable_type), :method => :delete, :confirm => "You sure?", :title => "Logout #{current_external_user.email}", class:'dropdown-item' do %>
+                    <i class="fa fa-lock"></i> Log Out
+                <% end %>
+            </div>
+        </li>
+    </ul>
+    <%
+=begin %>
+    <button class="navbar-toggler aside-menu-toggler d-md-down-none" type="button" data-toggle="aside-menu-lg-show">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <button class="navbar-toggler aside-menu-toggler d-lg-none" type="button" data-toggle="aside-menu-show">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <%
+=end %>
+</header>
+
+<style>
+    i.fa.fa-circle.pending-retake-indicator {
+        color:          red;
+        position:       absolute;
+        font-size:      0.7em;
+        margin-left:    -3px;
+    }
+    .profile-nav {
+        position: absolute !important;
+        right: 0 !important;
+        flex-direction: row !important;
+    }
+    .nav-dropdown-items .nav-link {
+        text-align: center;
+    }
+    .nav-dropdown-items .nav-item {
+        font-size: 1.2em;
+        padding-right: 1.5em;
+        border: 0px solid black;
+    }
+    @media only screen and (max-width: 1366px) {
+        .nav-dropdown-items .nav-item {
+            font-size: 1em !important;
+            min-width: 0 !important;
+            padding-right: 0;
+        }
+    }
+
+    /*@media only screen and (max-width: 1240px) {
+        .nav-dropdown-items .nav-item {
+            padding: 0 0.5rem !important;
+        }
+    }*/
+
+    @media only screen and (max-width: 991px) {
+        .nav-dropdown-items {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            margin-top: 15px !important;
+            width: 100%;
+            background-color: #e9ecef;
+        }
+        .nav-dropdown-items .nav-link {
+            width: 100%;
+            position: relative;
+            border-bottom: 1px solid white;
+        }
+        .nav-dropdown-items .nav-item {
+            padding: 15px !important;
+        }
+        #navbarNav {
+            position: absolute !important;
+            top: 40px !important;
+            width: 100% !important;
+        }
+        i.fa.fa-circle.pending-retake-indicator {
+            bottom: 8px;
+        }
+    }
+</style>

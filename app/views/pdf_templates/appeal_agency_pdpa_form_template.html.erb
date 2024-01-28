@@ -1,0 +1,126 @@
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+
+<pdfbody>
+    <table class="w-100" border="0" cellpadding="5">
+        <tr>
+            <td style="width: 10%"><%= image_tag wicked_pdf_asset_base64("logo/fomema-logo.png"), style: "width: 200px; height: 60px;" %></td>
+            <td>
+                <table class="w-100" border style="border-collapse: collapse; height: 100%">
+                    <tr>
+                        <td style="text-align: center">
+                            <div style="font-size: 2em"><b>APPEAL FORM</b></div>
+                            <div style="font-size: 0.9em"><i>(Appeal application for a case allowed to appeal must be made within <%= SystemConfiguration.get("INIT_APPEAL_WITHIN_DAYS") %> days from the date of certification)</i></div>
+                            <div>&nbsp;</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <p style="font-size: 1.3em; text-align: right; color: #4F81BF">
+        <b>Appendix 4</b>
+    </p>
+
+    <p class="paragraph-spacing text-justify">
+        I (Private Employment Agency), on behalf of the employer of the below-mentioned employee who has been certified unsuitable for employment after undergoing a medical examination at the below-mentioned clinic would like to request for a review of the medical examination result ("appeal process"). I acknowledge that the decision of the Appeal Committee of FOMEMA shall be final and I agree unreservedly to abide by it. I undertake to hold FOMEMA harmless from any loss or liability arising from this appeal including the spread of any infectious diseases by the said employee; and I further agree to indemnify and keep FOMEMA and/or its directors, shareholders and employees indemnified from any loss or liability arising from this appeal. I undertake to bear any and all cost of this appeal and acknowledge that this appeal process may take up to four (4) weeks from the time of its submission. I hereby consent and authorize FOMEMA to process my personal data for the purpose of appeal process in accordance with the Personal Data Protection Act (PDPA) 2010 and any applicable Malaysian laws.
+    </p>
+    <p class="paragraph-spacing text-justify">
+        Saya (Agensi Pekerjaan Swasta), sebagai wakil kepada majikan bagi pekerja yang dinyatakan di bawah yang telah disahkan tidak sesuai untuk bekerja selepas menjalani pemeriksaan kesihatan di klinik yang dinyatakan di bawah ingin meminta semakan keputusan pemeriksaan perubatan ("proses rayuan"). Saya mengakui bahawa keputusan Jawatankuasa Rayuan FOMEMA adalah muktamad dan saya bersetuju tanpa syarat untuk mematuhinya. Saya berjanji untuk memastikan FOMEMA tidak dipertanggungjawabkan daripada sebarang kerugian atau liabiliti yang timbul daripada proses rayuan ini termasuklah penyebaran sebarang penyakit berjangkit oleh pekerja tersebut dan saya seterusnya bersetuju untuk menanggung rugi dan memastikan FOMEMA dan/atau pengarah, pemegang saham dan pekerjanya dilindungi daripada sebarang kerugian atau liabiliti yang timbul daripada rayuan ini. Saya berjanji untuk menanggung semua kos rayuan ini dan mengakui bahawa proses rayuan ini mungkin mengambil masa sehingga empat (4) minggu dari masa permohonan rayuan. Saya dengan ini mengizinkan dan memberi kuasa kepada FOMEMA untuk memproses data peribadi saya bagi tujuan proses rayuan menurut Akta Perlindungan Data Peribadi (PDPA) 2010 dan mana-mana undang-undang Malaysia yang berkenaan.
+    </p>
+
+    <table class="w-100" cellpadding="5">
+        <tr>
+            <td style="width: 25%">Date: <br><i>Tarikh:</i></td>
+            <td style="width: 25%"><%= @data[:consented_date] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Name of Agency: <br><i>Nama Ejen:</i></td>
+            <td style="width: 25%"><%= @data[:agency_name] %></td>
+            <td style="width: 25%">Name of Employer: <br><i>Nama Majikan:</i></td>
+            <td style="width: 25%"><%= @data[:employer_name] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Agency Contact No.: <br><i>Nombor Ejen Untuk Dihubungi:</i></td>
+            <td style="width: 25%"><%= @data[:agency_phone] %></td>
+            <td style="width: 25%">Agency Email Address: <br><i>Alamat Emel Ejen:</i></td>
+            <td style="width: 25%"><%= @data[:agency_email] %></td>
+        </tr>
+    </table>
+
+    <p class="paragraph-spacing text-justify">
+        <b>Detail of Employee & Clinic <br><i>Butiran Pekerja & Klinik</i></b>
+    </p>
+
+    <table class="w-100" border="0" cellpadding="5">
+        <tr>
+            <td style="width: 25%">Name of Foreign Worker: <br><i>Nama Pekerja Asing:</i></td>
+            <td style="width: 25%"><%= @data[:worker_name] %></td>
+            <td style="width: 25%">Worker Code:<br><i>Kod Pekerja:</i></td>
+            <td style="width: 25%"><%= @data[:worker_code] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Passport No.: <br><i>No. Pasport:</i></td>
+            <td style="width: 25%"><%= @data[:worker_passport] %></td>
+            <td style="width: 25%">Country of Origin:<br><i>Negara Asal:</i></td>
+            <td style="width: 25%"><%= @data[:worker_country] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Gender: <br><i>Jantina:</i></td>
+            <td style="width: 25%"><%= @data[:worker_gender] %></td>
+            <td style="width: 25%">Date of Birth:<br><i>Tarikh Lahir:</i></td>
+            <td style="width: 25%"><%= @data[:worker_dob] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Name of Clinic: <br><i>Nama Klinik</i></td>
+            <td colspan="3"><%= @data[:clinic_name] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Examination Date: <br><i>Tarikh Pemeriksaan:</i></td>
+            <td style="width: 25%"><%= @data[:examination_date] %></td>
+            <td style="width: 25%">Certification Date:<br><i>Tarikh Perakuan:</i></td>
+            <td style="width: 25%"><%= @data[:certification_date] %></td>
+        </tr>
+        <tr>
+            <td style="width: 25%">Unsuitable Reason: <br><i>Sebab Tidak Lulus:</i></td>
+            <td colspan="3">
+                <ul class="paragraph-spacing text-justify">
+                    <% @data[:failed_reasons_bm].each do |reason| %>
+                        <li><%= reason %></li>
+                    <% end %>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <p class="paragraph-spacing text-justify">
+        <%= image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png" %>
+        I declare that all information provided is true and accurate and by initiating this appeal, I agree to FOMEMA's Terms of Service and Privacy Policy.
+    </p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 16px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

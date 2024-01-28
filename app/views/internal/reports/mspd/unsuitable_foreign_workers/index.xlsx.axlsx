@@ -1,0 +1,37 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Foreign Workers') do |sheet|
+
+  headers = %w[NO. WORKER_NAME PASSPORT_NO COUNTRY_NAME JOB_TYPE GENDER
+               D.O.B AGE ARRIVAL_DATE EXAM_DATE CERTIFY_DATE EMPLOYER_NAME
+               EMPLOYER_PHONE_NO EMPLOYER_ADDRESS STATE_CODE CLINIC_NAME
+               DOCTOR_PHONE_NO DOCTOR_ADDRESS DISEASE]
+
+  attributes = %i[fw_name fw_passport_number fw_country_name fw_job_type_name fw_gender
+                  fw_date_of_birth fw_age foreign_worker_arrival_date medical_examination_date certification_date employer_name
+                  employer_phone employer_displayed_address employer_state_code doctor_clinic_name
+                  doctor_phone doctor_displayed_address]
+  sheet.add_row headers
+  attribute_types = attributes.map do |attribute|
+    case attribute
+    when :fw_passport_number
+      :string
+    when :employer_phone
+      :string
+    when :doctor_phone
+      :string
+    end
+  end
+  types = [nil, *attribute_types]
+
+  if @transactions.present?
+    @transactions.each_with_index do |transaction, index|
+      de_diseases = transaction.doctor_examination&.diseases || []
+      me_diseases = transaction.medical_examination&.diseases || []
+
+      diseases = de_diseases | me_diseases
+      diseases.each do |disease|
+        sheet.add_row([index + 1, *attributes.map { |attribute| transaction.try(attribute) }, disease], types: types)
+      end
+    end
+  end
+end

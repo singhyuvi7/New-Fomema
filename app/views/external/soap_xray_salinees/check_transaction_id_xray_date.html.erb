@@ -1,0 +1,7 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns:checkTransactionIDXRayDateResponse xmlns:ns="http://dbixelabs.com/xsd">
+      <ns:return><%= @response[:status] %></ns:return>
+    </ns:checkTransactionIDXRayDateResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

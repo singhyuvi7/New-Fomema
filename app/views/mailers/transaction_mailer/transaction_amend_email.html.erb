@@ -1,0 +1,94 @@
+<%
+    mail_string = {
+        'TRANSACTION_CHANGE_DOCTOR' => 'change of clinic',
+        'TRANSACTION_SPECIAL_RENEWAL' => 'special renewal'
+    }
+%>
+
+<p>
+    <b>Dear <%= @customer.name || @customer.pic_name %></b>, <br>
+    <b><i>Tuan/ Puan </i><%= @customer.name || @customer.pic_name %></b>,
+</p>
+
+<p>
+    <% organization = Organization.find_by_code('PT').id %>
+    <% if mail_string[@category] == 'special renewal'%>
+        Please be informed that your request to register “Unsuitable” worker was <%= ['APPROVE'].include?(@approval_status) ? "APPROVED" : "REJECTED due to #{@approval_comment}" %>. The details are as follows:<br>
+        <i>Dimaklumkan bahawa permohonan untuk mendaftarkan pekerja asing yang “Tidak Sesuai” <%= ['APPROVE'].include?(@approval_status) ? "DILULUSKAN" : "TIDAK DILULUSKAN kerana #{@approval_comment}" %>. Maklumat adalah seperti berikut: </i><br>
+    <% end %>
+
+    <% if mail_string[@category] == 'change of clinic' && ['APPROVE'].include?(@approval_status) %>
+        <i>Dimaklumkan Permohonan Penukaran Klinik anda  telah berjaya. Maklumat adalah seperti berikut:</i>
+    <% elsif mail_string[@category] == 'change of clinic' && !['APPROVE'].include?(@approval_status) %>
+        <i>Dimaklumkan Permohonan Penukaran Klinik anda tidak berjaya kerana <%= @approval_comment %>. Maklumat adalah seperti berikut:</i>
+    <% end %>
+</p>
+
+<div>
+    Foreign Worker Information: <br>
+    <i>Maklumat Pekerja Asing</i> <br>
+
+    Code : <%= @transaction.fw_code %> <br>
+    <i>Kod</i> <br>
+
+    Name : <%= @transaction.fw_name %> <br>
+    <i>Nama</i> <br>
+
+    Passport Number : <%= @transaction.fw_passport_number %> <br>
+    <i>Nombor Pasport</i> <br>
+
+    <% if !@agency.nil? %>
+        Employer Name : <%= "#{@employer.name} (#{@employer.code})" %><br>
+        <i>Nama Majikan</i><br>
+    <% elsif !@transaction.foreign_worker.employer_supplement.nil? %>
+        Supplementary Employer Name : <%= "#{@transaction.foreign_worker.employer_supplement.name}" %><br>
+        <i>Nama Majikan Tambahan</i><br>
+    <% end %>
+</div>
+
+<% if @transaction.organization_id == organization %>
+    <% if @transaction.approval_status == 'NEW_APPROVED' %>
+        <p>
+            The validity of the FOMEMA Medical Examination Form is 30 days from the date of <%= @transaction.transaction_date.try(:strftime,'%d/%m/%Y') %>.
+            Kindly <a href="https://portal.fomema.my/users/sign_in">login</a> to select the clinic and complete the Medical Examination for your foreign worker.
+            Failure to do so will result in the EXPIRY of the form and employers may have to re-purchase it. <br>
+            <i>Tempoh sahlaku Borang Pemeriksaan Perubatan FOMEMA adalah 30 hari dari tarikh pendaftaran <%= @transaction.transaction_date.try(:strftime,'%d/%m/%Y') %>.
+            Sila <a href="https://portal.fomema.my/users/sign_in">log masuk</a> untuk memilih klinik dan menyelesaikan Pemeriksaan Perubatan FOMEMA untuk pekerja asing anda.Kegagalan untuk melakukan
+            pemilihan klinik akan mengakibatkan borang tersebut tamat tempoh dan majikan perlu membelinya semula</i>
+        </p>
+    <% elsif @transaction.approval_status == 'NEW_REJECTED' %>
+        <% if @service_fee == 'SPECIAL_RENEWAL_REJECTED_FEE' %>
+            <p>
+                Medical fee will be refunded and RM25 will be deducted as a service fee of FOMEMA from the total refund.<br>
+                <i>Yuran perubatan akan dikembalikan dan RM25 akan ditolak sebagai yuran perkhidmatan FOMEMA daripada jumlah bayaran balik.</i>
+            </p>
+
+            <p>
+                Your refund process shall take up to 14 working days from the date of this email. You may <a href="https://portal.fomema.my/users/sign_in">login</a> and go to” Refund” to check on the status from time to time.<br>
+                <i>Proses bayaran balik akan mengambil masa sehingga 14 hari bekerja dari tarikh e-mel ini. Sila <a href="https://portal.fomema.my/users/sign_in">log masuk</a> dan pergi ke “Refund” untuk menyemak status dari semasa ke semasa.</i>
+            </p>
+        <% elsif @service_fee == 'FOC' %>
+            <p>
+                We will process your payment and refund will be credited to your account as per your registered/updated account number in our portal.<br>
+                <i>Kami akan memproses permohonan anda dan bayaran balik akan dikreditkan ke akaun yang telah didaftar/kemaskini di portal.</i>
+            </p>
+        <% end %>
+    <% end %>
+<% else %>
+    <% if @do_refund == 'Y' || @transaction.approval_status == 'NEW_REJECTED' %>
+        <p>
+            We will process your payment and refund will be credited to your account as per your registered/updated account number in our portal. <br>
+            <i>Kami akan memproses permohonan anda dan bayaran balik akan dikreditkan ke akaun yang telah didaftar/kemaskini di portal.</i>
+        </p>
+    <% end %>
+<% end %>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

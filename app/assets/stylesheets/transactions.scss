@@ -1,0 +1,19 @@
+.transactions__medical_examination,
+.transactions__examination_history,
+.transactions__previous_examination_history,
+.transactions__tcupi_review,
+.transactions__show,
+.medical__medical_review,
+.medical__medical_pr_qa,
+.medical__tcupi_review,
+.medical__tcupi_review_approval,
+.appeals__new,
+.appeals__show,
+.appeals__appeal_approval,
+.xqccs__pending_review,
+.appeals__appeal_results,
+.appeals__pcr_review,
+.retakes__edit,
+.transaction_tcupi_todos__manage_todos {
+	@import "transactions/examination_forms.scss";
+}

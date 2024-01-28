@@ -1,0 +1,6 @@
+<div class="col-md-8">
+    <%= text_field_tag "system_configuration[#{code}]", @system_configurations[code].value, class: "form-control", required: true %>
+    <% if @system_configurations[code].comment.present? %>
+        <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+    <% end %>
+</div>

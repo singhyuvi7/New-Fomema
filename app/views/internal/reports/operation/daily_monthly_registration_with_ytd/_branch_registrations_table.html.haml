@@ -1,0 +1,38 @@
+%h2 Comparison with Same Day Last Week(T-7) and Day Before(T-1) (Registration)
+%table.table.w-600.mt-3{width: 600}
+  %thead
+    %tr.text-center
+      %th Branch
+      - data.each do |selector, _|
+        %th{width: '9%'}
+          %p.mb-0 Normal
+          %p.mb-0 (#{selector})
+        %th{width: '9%'}
+          %p.mb-0 Rekab
+          %p.mb-0 (#{selector})
+        %th{width: '9%'}
+          %p.mb-0 Total
+          %p.mb-0 (#{selector})
+  %tbody
+    - if data.present?
+      - total_sum = { :'T-7' => Hash.new(0), :'T-1' => Hash.new(0), T: Hash.new(0) }
+      - branches&.sort.each do |branch|
+        %tr
+          %td= branch
+          - data.each do |selector, count_hash|
+            - total_sum[selector][:normal] += normal = count_hash.dig([branch, :normal]).to_i
+            - total_sum[selector][:pati] += pati = count_hash.dig([branch, :pati]).to_i
+            - total_sum[selector][:total] += total = normal + pati
+            %td.text-right= normal
+            %td.text-right= pati
+            %td.text-right= total
+      %tr
+        %td TOTAL
+        - total_sum.each do |selector, collection|
+          - collection.each do |_, value|
+            %td.text-right= value
+%div.p-2
+  %p.mb-0 Note:
+  %p.mb-0 (T-7) = Same day last week
+  %p.mb-0 (T-1) = Day before
+  %p.mb-0 (T) = Current day

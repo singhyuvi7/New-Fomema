@@ -1,0 +1,90 @@
+<div class="modal fade" id="search-callable-modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Search recipient</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-callable-form" class="disable-enter-keypress">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Recipient Type</label>
+                                <div class="col-md-10">
+                                    <%= select_tag "search_callable_type", options_for_select(CallLog::CALLABLE_TYPES.invert, params[:search_callable_type]), include_blank: form_select_option_text, class: 'form-control' %>
+                                    </>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4">
+                                    <input class="form-control" name="search_code" id="search_code">
+                                </div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4">
+                                    <input class="form-control" name="search_name" id="search_name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="button" id="search-callable-button" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table id="search-callable-table" class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Search recipient</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+$('#search-callable-button').click(function () {
+    var data = {
+        callable_type: $('#search_callable_type').val(),
+        code: $('#search_code').val().toUpperCase(),
+        name: $('#search_name').val(),
+    };
+    if ($('#search_callable_type').val().length < 1) {
+        alert('Recipient type is required');
+        return;
+    }
+    if ($('#search_code').val().length < 1 && $('#search_name').val().length < 1) {
+        alert('Please key in code or name');
+        return;
+    }
+    $.ajax({
+        url: '<%= search_callable_internal_call_logs_path %>.json',
+        method: 'GET',
+        data: data,
+        success: function (response) {
+            $('#search-callable-table tbody').html('');
+            for (var i=0, j = response.length; i < j; i ++){
+                $('#search-callable-table tbody').append('<tr><td>' + response[i].code + '</td><td>' + response[i].name + '</td><td class="text-right"><button type="button" class="btn btn-primary" data-callable="' + encodeURIComponent(JSON.stringify(response[i])) + '" onclick="select_callable(this)">Select</button></td></tr>');
+            }
+        },
+    });
+});
+</script>
+<% end %>

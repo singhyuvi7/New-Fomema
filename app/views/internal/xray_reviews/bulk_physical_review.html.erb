@@ -1,0 +1,160 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Review</strong> - Bulk XQCC Review
+    </div>
+
+    <form method="POST" action="<%= bulk_physical_review_internal_xray_reviews_path %>" class="bulk_physical_review_form with-parsley">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="hidden" name="_method" value="PATCH">
+
+        <div class="card-body">
+            <%=render '/shared/all_flash' %>
+
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label for="transaction_code" class="required">Transaction Code</label>
+                        <div class="input-group">
+                            <input class="form-control" id="transaction_code" type="text" placeholder="Transaction Code">
+                            <span class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="add-btn" onclick="add_transaction()">Add</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <table class="table table-sm table-bordered" id="transaction-codes-table">
+                        <thead>
+                            <tr>
+                                <th>Transaction Codes</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <input type="hidden" id="codes-error" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="" class="required">Decision</label>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-4">
+                        <input class="form-check-input bulk_physical_review_decision" type="radio" name="bulk_physical_review[result]" id="bulk_physical_review_normal" value="NORMAL" required data-parsley-errors-container="#bulk_physical_review_decision_errors" >
+                        <label class="form-check-label" for="bulk_physical_review_normal">Normal</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-4">
+                        <input class="form-check-input bulk_physical_review_decision" type="radio" name="bulk_physical_review[result]" id="bulk_physical_review_suspicious" value="SUSPICIOUS">
+                        <label class="form-check-label" for="bulk_physical_review_suspicious">Suspicious</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-4">
+                        <input class="form-check-input bulk_physical_review_decision" type="radio" name="bulk_physical_review[result]" id="bulk_physical_review_iqa" value="IQA">
+                        <label class="form-check-label" for="bulk_physical_review_iqa">IQA</label>
+                    </div>
+                </div>
+                <div id="bulk_physical_review_decision_errors"></div>
+            </div>
+
+            <div class="form-group hidden" id="bulk_physical_review_assign_to_field">
+                <label for="bulk_physical_review_assign_to" class="required">Assign To PCR</label>
+                <select name="bulk_physical_review[assign_to]" id="bulk_physical_review_assign_to" class="form-control select2" data-parsley-errors-container="#bulk_physical_review_assign_to_errors">
+                    <option value="">Select Option</option>
+                    <% User.active.search_permission("PICKUP_PCR_POOL").order(:name).each do |user| %>
+                        <option value="<%= user.id %>"><%= user.name %></option>
+                    <% end %>
+                </select>
+                <div id="bulk_physical_review_assign_to_errors"></div>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_xray_reviews_path) %>
+                <%=raw edit_submit_button %>
+            </div>
+        </div>
+        <!-- /.card-footer -->
+    </form>
+
+</div>
+<!-- /.card -->
+
+<% content_for :page_head_styles do %>
+<style>
+.invalid-feedback {
+    display: block;
+}
+</style>
+<% end %>
+
+<!--javascript-->
+<% content_for :page_end_scripts do %>
+<script>
+$(".bulk_physical_review_decision").change(function () {
+    var bulk_physical_review_decision = $(this).val();
+    toggleAssignTo(bulk_physical_review_decision);
+});
+
+$(document).on('keypress',function(e) {
+    if (e.which == 13) {
+        e.preventDefault();
+        $('#add-btn').trigger('click');
+    }
+});
+
+function add_transaction()
+{
+    code = $('#transaction_code').val();
+    if (code.length == 0) {
+        $('#transaction_code').focus();
+        return false;
+    }
+    new_row = `<tr>
+        <td>${code}<input type="hidden" name="bulk_physical_review[transaction_codes][]" value="${code}"></td>
+        <td><button type="button" onclick="remove_transaction(this)" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></td>
+    </tr>`;
+    $('#transaction-codes-table tbody').append(new_row);
+    $('#transaction_code').val('');
+    $('#transaction_code').focus();
+    set_codes_error();
+}
+
+function remove_transaction(btn)
+{
+    $(btn).closest('tr').remove();
+    $('#transaction_code').focus();
+    set_codes_error();
+}
+
+function set_codes_error()
+{
+    $('#codes-error').val($('input[name="bulk_physical_review[transaction_codes][]"]').length > 0 ? "1" : "");
+}
+
+function toggleAssignTo(bulk_physical_review_decision) {
+    if (bulk_physical_review_decision == 'SUSPICIOUS' || bulk_physical_review_decision == 'IQA') {
+        $("#bulk_physical_review_assign_to_field").show();
+        $("#bulk_physical_review_assign_to").prop("required", true);
+        $("#bulk_physical_review_assign_to").prop("disabled", false);
+    } else {
+        $("#bulk_physical_review_assign_to_field").hide();
+        $("#bulk_physical_review_assign_to").prop("required", false);
+        $("#bulk_physical_review_assign_to").prop("disabled", true);
+    }
+}
+/*
+// autofocus transasction codes
+$("#bulk_physical_review_transaction_codes").focus();
+
+<%=render '/internal/shared/validation_init', { form_element: '.bulk_physical_review_form' } %>
+
+*/
+</script>
+<% end %>
+<!--javascript-->

@@ -1,0 +1,544 @@
+<% if laboratory_examination.present? %>
+<form>
+<div class="card">
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th colspan="5">Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of Laboratory test not done -->
+            <tr>
+                <td colspan="5">Laboratory tests not done</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="YES"
+                            <% if laboratory_examination.laboratory_test_not_done === 'YES' %> checked <% else %> disabled <% end %>>
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="NO"
+                            <% if laboratory_examination.laboratory_test_not_done === 'NO' %> checked <% else %> disabled <% end %>>
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Laboratory test not done -->
+
+            <!-- Start of date and time of specimen taken -->
+            <tr>
+                <td colspan="5">Date & time of specimen taken</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.specimen_taken_date&.strftime(get_standard_datetime_format) %></pre>
+                </td>
+            </tr>
+            <!--End of date and time of specimen taken -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Date & time of specimen received</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.specimen_received_date&.strftime(get_standard_datetime_format) %></pre>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Barcode of blood specimen</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.blood_specimen_barcode %></pre>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Barcode of urine specimen</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.urine_specimen_barcode %></pre>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of blood -->
+            <tr>
+                <td colspan="7">Blood Tests</td>
+            </tr>
+            <!--End of blood -->
+
+            <tr>
+                <th width="50">No</th>
+                <th colspan="4">Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+
+            <!-- Start of blood group -->
+            <tr>
+                <td>1</td>
+                <td>Blood Group Type</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_status form-check-input" type="radio" value="A"
+                            <% if laboratory_examination.blood_group === 'A' %> checked <% else %> disabled <% end %>>
+                            A
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_status form-check-input" type="radio" value="B"
+                            <% if laboratory_examination.blood_group === 'B' %> checked <% else %> disabled <% end %>>
+                            B
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_status form-check-input" type="radio" value="AB"
+                            <% if laboratory_examination.blood_group === 'AB' %> checked <% else %> disabled <% end %>>
+                            AB
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_status form-check-input" type="radio" value="O"
+                            <% if laboratory_examination.blood_group === 'O' %> checked <% else %> disabled <% end %>>
+                            O
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_status form-check-input" type="radio" value="OTHER"
+                            <% if laboratory_examination.blood_group === 'OTHER' %> checked <% else %> disabled <% end %>>
+                            OTHER
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of blood group -->
+
+            <!-- Start of blood group is other type -->
+            <tr>
+                <td></td>
+                <td colspan="4">If Blood Group is Other type</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.blood_group_other %></pre>
+                </td>
+            </tr>
+            <!-- End of blood group is other type -->
+
+            <!-- Start of blood group rh -->
+            <tr>
+                <td></td>
+                <td colspan="3">Blood Group RH</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_rhesus_status form-check-input" type="radio" value="+VE"
+                            <% if laboratory_examination.blood_group_rhesus === '+VE' %> checked <% else %> disabled <% end %>>
+                            +VE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_rhesus_status form-check-input" type="radio" value="-VE"
+                            <% if laboratory_examination.blood_group_rhesus === '-VE' %> checked <% else %> disabled <% end %>>
+                            -VE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="blood_group_rhesus_status form-check-input" type="radio" value="OTHER"
+                            <% if laboratory_examination.blood_group_rhesus === 'OTHER' %> checked <% else %> disabled <% end %>>
+                            OTHER
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of blood group rh -->
+
+            <!-- Start of blood group rh is other type -->
+            <tr>
+                <td></td>
+                <td colspan="4">If Blood Group RH is Other type</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.blood_group_rhesus_other %></pre>
+                </td>
+            </tr>
+            <!-- End of blood group rh is other type -->
+
+            <!-- Start of HIV -->
+            <tr>
+                <td>2</td>
+                <td colspan="4">HIV</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="elisa_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.elisa %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="elisa_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.elisa %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of HIV -->
+
+            <!-- Start of HBSAG -->
+            <tr>
+                <td>3</td>
+                <td colspan="4">HBsAg</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="hbsag_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.hbsag %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="hbsag_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.hbsag %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of HBSAG -->
+
+            <!-- Start of syphilis -->
+            <tr>
+                <td>4</td>
+                <td colspan="4">Syphilis (VDRL/RPR)</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="vdrl_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.vdrl %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="vdrl_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.vdrl %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of syphilis -->
+
+            <!-- Start of tpha -->
+            <tr>
+                <td>5</td>
+                <td colspan="4">TPHA/TPPA</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="tpha_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.tpha %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="tpha_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.tpha %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of tpha -->
+
+            <!-- Start of malaria -->
+            <tr>
+                <td>6</td>
+                <td colspan="4">Malaria (Screening)</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="malaria_status form-check-input" type="radio" value="POSITIVE"
+                            <% if laboratory_examination.malaria %> checked <% else %> disabled <% end %>>
+                            POSITIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="malaria_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.malaria %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of malaria -->
+
+            <!-- Start of BFMP -->
+            <tr>
+                <td>7</td>
+                <td colspan="4">BFMP</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="bfmp_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.bfmp %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="bfmp_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.bfmp %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of BFMP -->
+
+            <!-- Start of urine -->
+            <tr>
+                <td colspan="7">Urine Tests</td>
+            </tr>
+            <!--End of urine -->
+
+            <!-- Start of opiates -->
+            <tr>
+                <td>8</td>
+                <td colspan="4">Opiates</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="opiates_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.opiates %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="opiates_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.opiates %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of opiates -->
+
+            <!-- Start of cannabis -->
+            <tr>
+                <td>9</td>
+                <td colspan="4">Cannabis</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="cannabis_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.cannabis %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="cannabis_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.cannabis %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of cannabis -->
+
+            <!-- Start of Urine Pregnancy Test -->
+            <tr>
+                <td>10</td>
+                <td colspan="4">Urine Pregnancy Test</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="pregnancy_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.pregnancy %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="pregnancy_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.pregnancy %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Urine Pregnancy Test -->
+
+            <!-- Start of Serum Beta HCG -->
+            <tr>
+                <td>11</td>
+                <td colspan="4">Serum Beta-HCG</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="pregnancy_serum_beta_hcg_status form-check-input" type="radio" value="REACTIVE"
+                            <% if laboratory_examination.pregnancy_serum_beta_hcg %> checked <% else %> disabled <% end %>>
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="pregnancy_serum_beta_hcg_status form-check-input" type="radio" value="NEGATIVE"
+                            <% if !laboratory_examination.pregnancy_serum_beta_hcg %> checked <% else %> disabled <% end %>>
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Serum Beta HCG -->
+
+            <!-- Start of Sugar -->
+            <tr>
+                <td>12</td>
+                <td colspan="4">Sugar</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="sugar_status form-check-input" type="radio" value="PRESENT"
+                            <% if laboratory_examination.sugar %> checked <% else %> disabled <% end %>>
+                            PRESENT
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="sugar_status form-check-input" type="radio" value="ABSENT"
+                            <% if !laboratory_examination.sugar %> checked <% else %> disabled <% end %>>
+                            ABSENT
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Sugar -->
+
+            <!-- Start of Sugar Value -->
+            <tr>
+                <td></td>
+                <td colspan="4">Sugar Value</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.sugar_value %></pre>
+                        millimoles per litre
+                </td>
+            </tr>
+            <!--End of Sugar Value -->
+
+            <!-- Start of Albumin -->
+            <tr>
+                <td>13</td>
+                <td colspan="4">Albumin</td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="albumin_status form-check-input" type="radio" value="PRESENT"
+                            <% if laboratory_examination.albumin %> checked <% else %> disabled <% end %>>
+                            PRESENT
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="albumin_status form-check-input" type="radio" value="ABSENT"
+                            <% if !laboratory_examination.albumin %> checked <% else %> disabled <% end %>>
+                            ABSENT
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Albumin -->
+
+            <!-- Start of Albumin Value -->
+            <tr>
+                <td></td>
+                <td colspan="4">Albumin Value</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.albumin_value %></pre>
+                        grams per litre
+                </td>
+            </tr>
+            <!--End of Albumin Value -->
+
+            <!-- Start of Reason if abnormal -->
+            <tr>
+                <td></td>
+                <td colspan="4">Reason if abnormal</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.abnormal_reason %></pre>
+                </td>
+            </tr>
+            <!--End of Reason if abnormal -->
+
+            <!-- Start of Date of laboratory report -->
+            <tr>
+                <td></td>
+                <td colspan="4">Date of laboratory report</td>
+                <td colspan="2">
+                    <pre class="form-control"><%= laboratory_examination.created_at.strftime("%d/%m/%Y") %></pre>
+                </td>
+            </tr>
+            <!--End of Date of laboratory report -->
+
+        </tbody>
+    </table>
+</div>
+</form>
+<% else %>
+    <h4>There is no Laboratory Report</h4>
+<% end %>

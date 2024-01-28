@@ -1,0 +1,77 @@
+<div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?(create_permission) %>
+                    <%= raw index_table_new_button(internal_visit_plans_xray_facilities_new_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Category</th>
+                                <th>Inspect From</th>
+                                <th>Inspect To</th>
+                                <th>Status</th>
+                                <th>Comment</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @visit_plans.blank? %>
+                                <tr>
+                                    <td colspan="10" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                            
+                            <% @visit_plans.each.with_index((@visit_plans.current_page - 1) * get_per + 1) do
+                                |visit_plan, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td>
+                                        <%= visit_plan.visitable_category %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.inspect_from.nil? ? "N/A" : visit_plan.inspect_from.strftime("%d/%m/%Y") %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.inspect_to.nil? ? "N/A" : visit_plan.inspect_to.strftime("%d/%m/%Y") %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.status %>
+                                    </td>
+                                    <td>
+                                        <%= visit_plan.comment %>
+                                    </td>
+
+                                    <td class="module-row-actions">
+                            
+                                        <!-- edit -->
+                                        <% if has_permission?(edit_permission) %>
+                                            <%= raw index_table_edit_button internal_visit_plan_xray_facility_edit_path(visit_plan) %>
+                                        <% end %>
+                            
+                                        <!-- delete -->
+                                        <% if has_permission?(delete_permission) %>
+                                            <%= raw index_table_delete_button(internal_visit_plan_xray_facility_delete_path(visit_plan)) %>
+                                        <% end %>
+
+                                    </td>
+                                </tr>
+                            
+                            <% end %>
+                            
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_plans %>
+        </div>

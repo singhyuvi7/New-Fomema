@@ -1,0 +1,202 @@
+<% initialize_numbering_and_subnumbering %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - X-Ray Film Movement
+    </div>
+
+    <div class="card-body">
+
+        <div class="form-row">
+            <div class="col-md-8">
+                <%=render '/internal/xqccs/shared/transaction_worker_info', { transaction_model: @transaction } %>
+            </div>
+            <div class="col-md-4">
+                <%=render 'internal/xqccs/shared/related_transaction', {
+                    transaction: @transaction
+                } %>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#xqcc-movement">XQCC Movement</a>
+            </li>
+
+            <!--
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#doctor_examination-<%#= @transaction.doctor_examination&.id %>-content">Doctor Certification <%#= xqcc_result_badge(@transaction.doctor_examination.suitability) %></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#laboratory_examination-<%#= @transaction.laboratory_examination&.id %>-content">Laboratory Report <%#= xqcc_result_badge(@transaction.laboratory_examination.result) %></a>
+            </li>
+            -->
+
+            <% @transaction.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <% @examination_hashmap["#{ xray_examination.sourceable_type }__#{ xray_examination.sourceable_id }"] = index %>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_examination.id %>-content">
+                        <% if xray_examination.sourceable_type == "XrayRetake"
+                            retake_tag  = xray_examination.sourceable.requestable_type == "MedicalAppeal" ? "Appeal" : "XQCC Retake"
+                        end %>
+
+                        <%= "#{ index }. X-Ray Report" %>
+                        <%= xqcc_result_badge("#{ xray_examination.result }#{ " - #{ retake_tag.upcase }" if retake_tag.present? }") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#transaction_comment-content">MLE Comments</a>
+            </li>
+
+            <% @transaction.xray_reviews.order(:created_at).each.with_index(1) do |xray_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= xray_review.id %>-content">XQCC Review <%= xqcc_result_badge(xray_review.result) %></a>
+                </li>
+            <% end %>
+
+            <% @transaction.pcr_reviews.where(medical_appeal_id: nil).each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">
+                        <%= generate_sub_numbering(pcr_review) %>.
+                        PCR Review
+                        <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button><% end %>
+                        <%= xqcc_result_badge("#{pcr_review.result}") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% PcrReview.where(medical_appeal_id: @transaction.medical_appeals.pluck(:id)).each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">
+                        <%= generate_sub_numbering(pcr_review) %>.
+                        PCR Review
+                        <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button><% end %>
+                        <%= xqcc_result_badge("#{pcr_review.result}") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% @transaction.xray_pending_reviews.order(:created_at).each.with_index(1) do |xray_pending_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_review-<%= xray_pending_review.id %>-content">XQCC Pending Review <%= xqcc_result_badge(xray_pending_review.decision) %></a>
+                </li>
+            <% end %>
+
+            <% @transaction.xray_pending_decisions.order(:created_at).each.with_index(1) do |xray_pending_decision, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_decision-<%= xray_pending_decision.id %>-content">XQCC Pending Decision <%= xqcc_result_badge(xray_pending_decision.decision) %> <%= xqcc_result_badge(xray_pending_decision.approval_decision) %></a>
+                </li>
+            <% end %>
+        </ul>
+
+        <!-- tab content -->
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active" role="tabpanel" id="xqcc-movement">
+                <div class="card">
+                    <div class="card-header">XQCC Movement</div>
+                    <table class="table table-bordered table-card">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Who</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @xqcc_movements.present? %>
+                                <% @xqcc_movements.each do |movement, index| %>
+                                    <tr>
+                                        <td><%= movement.created_at.strftime(get_standard_date_format) %></td>
+                                        <td><%= movement.creator&.name || movement.creator&.code %></td>
+                                        <td><%= movement.status %></td>
+                                        <td><%= movement.description %></td>
+                                    </tr>
+                                <% end %>
+                            <% else %>
+                                <tr>
+                                    <td colspan="4" class="text-danger">No result</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!--
+            <div class="tab-pane fade" role="tabpanel" id="doctor_examination-<%#= @transaction.doctor_examination&.id %>-content">
+                <%#=render 'internal/doctor_examinations/doctor_examination', { doctor_examination: @transaction.doctor_examination } %>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="laboratory_examination-<%#= @transaction.laboratory_examination&.id %>-content">
+                <%#=render 'internal/laboratory_examinations/laboratory_examination', { laboratory_examination: @transaction.laboratory_examination } %>
+            </div>
+            -->
+
+            <% @transaction.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination&.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <div class="tab-pane fade" role="tabpanel" id="transaction_comment-content">
+                <%=render 'internal/xqccs/shared/mle_comments' %>
+            </div>
+
+            <% @transaction.xray_reviews.each.with_index(1) do |xray_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= xray_review&.id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: xray_review } %>
+                </div>
+            <% end %>
+
+            <% @transaction.pcr_reviews.where(medical_appeal_id: nil).each.with_index(1) do |pcr_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <% PcrReview.where(medical_appeal_id: @transaction.medical_appeals.pluck(:id)).each.with_index(1) do |pcr_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                    <%= render "internal/pcr_reviews/appeal_pcr_form", { pcr_review: pcr_review, readonly: true } %>
+                </div>
+            <% end %>
+
+            <% @transaction.xray_pending_reviews.each.with_index(1) do |xray_pending_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_pending_review-<%= xray_pending_review&.id %>-content">
+                    <%=render 'internal/xray_pending_reviews/xray_pending_review', { xray_pending_review: xray_pending_review } %>
+                </div>
+            <% end %>
+
+            <% @transaction.xray_pending_decisions.each.with_index(1) do |xray_pending_decision, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_pending_decision-<%= xray_pending_decision&.id %>-content">
+                    <%=render 'internal/xray_pending_decisions/xray_pending_decision', { xray_pending_decision: xray_pending_decision } %>
+                </div>
+            <% end %>
+        </div>
+        <!-- end of tab content -->
+
+    </div>
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(movement_index_internal_xqccs_path) %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.pending_review_form *').prop('disabled', true);
+$('.xray_report_form *').prop('disabled', true);
+$('.previous_xqcc_review_form *').prop('disabled', true);
+$('.xqcc_review_form *').prop('disabled', true);
+$('.previous_pcr_review_form *').prop('disabled', true);
+$('.pcr_review_form *').prop('disabled', true);
+$('.pending_decision_form *').prop('disabled', true);
+$('#pending-decision *').prop('disabled', true);
+</script>
+<% end %>

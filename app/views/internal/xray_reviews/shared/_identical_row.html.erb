@@ -1,0 +1,23 @@
+<tr class="filter-table-search-results" data-type="xray_review" data-id="<%= xray_review.id %>">
+    <% if show_checkbox %>
+        <td>
+            <input type="checkbox" class="transaction_ids" name="xray_review_ids[]" value="<%= xray_review.id %>" />
+        </td>
+    <% end %>
+    <td>
+        <input type="hidden" name="xqcc_review_identical[identical_xray_review_id][]" value="<%= xray_review.id %>">
+        <a target="_blank" href="<%= internal_xray_review_path(xray_review.id) %>"><%= xray_review.transactionz&.code %></a>
+    </td>
+    <td><%= xray_review.transactionz&.xray_facility.code %></td>
+    <td><%= xray_review.transactionz&.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{xray_review.transactionz&.foreign_worker&.code}"  %></td>
+    <td><%= xray_review.transactionz&.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{xray_review.transactionz&.foreign_worker&.name}"  %></td>
+    <td><%= xray_review.created_at.strftime(get_standard_date_format) %></td>
+    <td><%= xray_review.transactionz&.xray_examination&.xray_taken_date.nil? ? "N/A" : xray_review.transactionz&.xray_examination.xray_taken_date.strftime(get_standard_date_format) %></td>
+    <td><%= xray_review.result %></td>
+    <td><%= xray_review.batch_id %></td>
+    <% if show_remove %>
+        <td>
+            <button type='button' class='btn btn-danger btn-sm delete_identical' data-transaction_id='<%= xray_review.transaction_id %>'><i class='fa fa-trash'></i></button>
+        </td>
+    <% end %>
+</tr>

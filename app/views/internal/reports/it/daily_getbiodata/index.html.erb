@@ -1,0 +1,22 @@
+<div class="card">
+    <div class="card-header">
+        <strong>IT - Daily Getbiodata</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+
+        <div class="row-fluid">
+            <%=render "/internal/reports/it/daily_getbiodata/filter", filter_link: daily_getbiodata_report_internal_it_reports_path %>
+            <%=render "/internal/reports/it/daily_getbiodata/preview_table" %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+    </script>
+<% end %>

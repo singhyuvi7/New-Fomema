@@ -1,0 +1,70 @@
+<% if flash[:notice] %>
+    <p><%= flash[:notice] %></p>
+<% end %>
+
+<div class="card">
+    <div class="card-header">
+        Favourite Radiologists
+        <div class="card-header-actions">
+        </div>
+    </div>
+    <div class="card-body">
+
+        <form method="post" action="/favourite_radiologists/bulk_action">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="row mb-4">
+                <div class="col-md-6 text-left">
+                <% if has_permission? "DELETE_FAVOURITE_RADIOLOGIST" %>
+                    <button class="btn btn-danger" type="submit" name="bulk_action" value="destroy1">Delete</button>
+                <% end %>
+                </div>
+                <div class="col-md-6 text-right">
+                    <% if has_permission? "CREATE_FAVOURITE_RADIOLOGIST" %>
+                        <a class="btn btn-primary" href="<%= new_external_favourite_radiologist_path %>">New</a>
+                    <% end %>
+                </div>
+            </div>
+            <table class="table table-responsive-sm table-striped">
+                <thead>
+                    <tr>
+                        <th><input class="master-checkbox" type="checkbox"> &nbsp; #</th>
+                        <th>Radiologist Code</th>
+                        <th>Radiologist Name</th>
+                        <th>State</th>
+                        <th>Place of Practice</th>
+                        <th class="module-row-actions">&nbsp;</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% @favourite_radiologists.each.with_index((@favourite_radiologists.current_page - 1) * get_per + 1) do |favourite_radiologist, index| %>
+                        <% radiologist = favourite_radiologist.radiologist %>
+
+                        <tr>
+                        <td>
+                            <label><input class="child-checkbox" type="checkbox" name="favourite_radiologist_ids[]" value="<%= favourite_radiologist.id %>"> &nbsp; <%= index %></label>
+                        </td>
+                            <td><%= radiologist.code %></td>
+                            <td><%= radiologist.name %></td>
+                            <td><%= radiologist.state.try(:name) %></td>
+                            <td><%= radiologist.xray_facility_name %></td>
+
+                            <td class="module-row-actions">
+
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+        <div class="row external-pagination-container">
+            <%= paginate @favourite_radiologists %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+</script>
+<% end %>

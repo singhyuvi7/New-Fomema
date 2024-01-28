@@ -1,0 +1,113 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Banks</strong> - Bank Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_status">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= Bank::STATUSES[@bank.status] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_local_bank">Local Bank</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.local_bank ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_swift_code">Swift Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.swift_code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_bank_draft_expiry_day">Expiry Day</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.bank_draft_expiry_day %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_routing">Routing</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.routing %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_routing2">Routing2</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank.routing2 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_banks_path) %>
+            <% if has_permission?('EDIT_BANK') %>
+                <%=raw show_edit_button(edit_internal_bank_path(@bank)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_BANK") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_bank_audits_path(@bank) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

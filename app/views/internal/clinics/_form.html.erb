@@ -1,0 +1,43 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @clinic } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <!-- address -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :address, class: 'required' %>
+                <%= form.text_field :address1, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+    <% [:address2, :address3, :address4].each do |sym| %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.text_field sym, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- /address -->
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_clinics_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

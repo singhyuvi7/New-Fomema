@@ -1,0 +1,101 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Favourite Radiologists</strong> - New Favourite Radiologist
+    </div>
+
+    <div class="card-body">
+
+
+        <div class="card">
+            <%= form_tag new_external_favourite_radiologist_path, method: 'get' do |form| %>
+            <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="code" class="col-sm-3 col-form-label">Radiologist Code</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-sm-3 col-form-label">Radiologist Name</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <div class="text-right">
+                        <%=raw filter_clear_button new_external_favourite_radiologist_path %>
+                        <%=raw filter_button %>
+                    </div>
+                </div>
+                <!-- /.card-footer -->
+            <% end %>
+        </div>
+        <!-- /.card -->
+
+
+        <%= form_tag external_favourite_radiologists_path do |form| %>
+           <!-- <div class="row">
+                <div class="col module-actions text-right">
+                    <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-plus\"></i> Add", title: "Add", value: "add") %>
+                </div>
+            </div> -->
+            <div class="table-responsive">
+                <table class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th class="module-row-numbers">#</th>
+                            <th>Radiologist Code</th>
+                            <th>Radiologist Name</th>
+                            <th>State</th>
+                            <th>Place of Practice</th>
+                            <th class="module-row-actions">Action(s)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% if @radiologists.blank? %>
+                            <tr>
+                                <td colspan="4" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+
+                            <% @radiologists.each.with_index((@radiologists.current_page - 1) * get_per + 1) do |radiologist, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td><%= radiologist.code %></td>
+                                    <td><%= radiologist.name %></td>
+                                    <td><%= radiologist.state.try(:name) %></td>
+                                    <td><%= radiologist.xray_facility_name %></td>
+
+                                    <td class="module-row-actions">
+                                        <button type="submit" class="btn btn-primary" name="radiologist_ids[]" value="<%= radiologist.id %>">Add</button>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row external-pagination-container">
+                <%= paginate @radiologists %>
+            </div>
+        <% end %>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw edit_back_button(external_favourite_radiologists_path) %>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,73 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header required">
+            <label class="required"></label>
+                Audiences 
+                &nbsp;
+                <label class="text-danger" id="warning-text"></label>
+                <div class="card-header-actions">
+                    <a class="card-header-action btn-add" href="javascript:add_audience()" data-toggle="tooltip" title="Add audience"><i class="icon-plus"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-5 font-weight-bold">Category</div>
+                    <div class="col-sm-5 font-weight-bold">Target</div>
+                    <div class="col-sm-2">&nbsp;</div>
+                </div>
+                <div id="audiences-container">
+                    <% @bulletin.bulletin_audiences.each do |bulletin_audience| %>
+                        <%=render partial: "form_audience", locals: {bulletin_audience: bulletin_audience} %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+var last_select_audience_button;
+function remove_audience(btn)
+{
+    $(btn).closest('.row').remove();
+}
+
+function add_audience()
+{
+    tpl = `<%=render partial: "form_audience", locals: {bulletin_audience: @bulletin.bulletin_audiences.new} %>`;
+    $('#audiences-container').append(tpl);
+}
+
+function select_audience(btn)
+{
+    last_select_audience_button = btn;
+    $('#filter-'+($(btn).closest('div.row').find('.input-bulletin_audienceable_type').val().toLowerCase())+'-audience').modal('show');
+}
+
+function set_audience(btn, value, label)
+{
+    $(last_select_audience_button).closest('.form-audience-row').find('.input-bulletin_audienceable_id').val(value);
+    $(last_select_audience_button).closest('.form-audience-row').find('.placeholder-bulletin_audienceable_id').val(label);
+    $(btn).closest(".modal").modal('hide');
+}
+
+function audience_filter_state_change(sel)
+{
+    $(sel).closest('.row').find('.filter-town').html('<option>Select option</option');
+    if ($(sel).val().length <= 0) {
+        return;
+    }
+
+    $.ajax({
+        url: `/states/${$(sel).val()}/towns.json`,
+        method: "GET",
+    }).done(function (data) {
+        $.each(data, function (idx, town) {
+            $(sel).closest('.row').find('.filter-town').append(`<option value="${town.id}">${town.name}</option>`);
+        });
+    });
+}
+</script>
+<% end %>

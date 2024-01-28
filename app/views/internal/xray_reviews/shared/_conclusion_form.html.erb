@@ -1,0 +1,68 @@
+<div class="card border-primary">
+    <div class="card-header">
+        XQCC Review Conclusion
+    </div>
+    <table class="table table-bordereda table-card">
+        <tbody>
+            <tr>
+                <td width="120">
+                    Decision
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="NORMAL" id="xray_review_decision_normal" <% if xray_review.result == 'NORMAL' || xray_review.result == 'ABORT'%> checked <% end %> required>
+                            Normal
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="SUSPICIOUS" id="xray_review_decision_suspicious" <% if xray_review.result == 'SUSPICIOUS' %> checked <% end %> required >
+                            Suspicious
+                        </label>
+                    </div>
+                </td>
+                
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="IDENTICAL" id="xray_review_decision_identical" <% if xray_review.result == 'IDENTICAL' %> checked <% end %> >
+                            Identical
+                            <button <%= " disabled " if xray_review.result != 'IDENTICAL' %> type="button" id="xray_review_showIdenticalModal" class="btn btn-primary btn-sm py-0 ml-1"><i class="fa fa-search"></i></button>
+                        </label>
+                    </div>
+                    <input type="hidden" name="xray_review_identical_xqcc_review_ids" id="xray_review_identical_xqcc_review_ids" value="<%= xray_review.xqcc_review_identicals.pluck(:identical_xray_review_id).to_json if xray_review.xqcc_review_identicals.count > 0 %>" data-parsley-error-message="Identical XQCC Review is required" <%= " required" if xray_review.result == 'IDENTICAL' %>>
+                </td>
+                
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="WRONGLY_TRANSMITTED" id="xray_review_decision_wrongly_transmitted" <% if xray_review.result == 'WRONGLY_TRANSMITTED' %> checked <% end %> >
+                            Wrongly Transmitted
+                        </label>
+                    </div>
+                </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="ABORT" id="xray_review_decision_abort" <% if xray_review.result == 'ABORT' %> disabled <% end %> <% if !@can_retake %> disabled <% end %> >
+                            Abort
+                        </label>
+                    </div>
+                </td>
+                
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_review[result]" type="radio" value="RETAKE" id="xray_review_decision_retake" <% if xray_review.result == 'RETAKE' %> checked <% else %> disabled <% end %> <% if !@can_retake %> disabled <% end %> >
+                            Retake
+                        </label>
+                    </div>
+                </td>   
+            </tr>
+        </tbody>
+    </table>
+</div>

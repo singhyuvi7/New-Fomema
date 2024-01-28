@@ -1,0 +1,26 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  headers = ['No', 'Report Date', 'X-Ray Code', 'X-Ray Name', 'Count']
+
+  # worksheet data
+  wb.add_worksheet(name: 'pcr summary') do |sheet|
+    sheet.add_row ['PCR Audit Summary Report'], style: title_style
+    sheet.add_row ["Date Searched from #{params[:date_from]} to #{params[:date_to]}"]
+    sheet.add_row headers, style: header_style
+
+    if @data.present?
+      @data.each.with_index do |row_data, index|
+        sheet.add_row [index + 1, row_data.transmit_date.try(:strftime, get_standard_date_format), row_data.xray_facility_code, row_data.xray_facility_name, row_data.pcr_review_count], style: data_style
+      end
+    end
+
+    3.times { sheet.add_row }
+
+    sheet.column_widths 5, *Array.new(9) { nil }
+  end
+end

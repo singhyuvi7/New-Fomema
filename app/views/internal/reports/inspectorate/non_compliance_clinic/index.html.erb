@@ -1,0 +1,22 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Non-compliance Clinic</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+        <%=render 'internal/reports/inspectorate/shared/filter', { filter_link: non_compliance_clinic_internal_inspectorate_reports_path} %>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function (e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

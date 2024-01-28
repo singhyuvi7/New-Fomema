@@ -1,0 +1,65 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_call_logs_path, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Type</label>
+                <div class="col-sm-4">
+                    <%= select_tag("callable_type", options_for_select(CallLog::CALLABLE_TYPES.invert, params[:callable_type]), class: 'form-control', include_blank: form_select_option_text, onchange: "callable_type_changed(this)") %>
+                </div>
+                <label for="filter_name" class="col-sm-2 col-form-label">Case ID</label>
+                <div class="col-sm-4">
+                    <%= text_field_tag("call_log_id", params[:call_log_id], class: "form-control") %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Code</label>
+                <div class="col-sm-4">
+                    <%= text_field_tag("callable_code", params[:callable_code], class: "form-control", disabled: params[:callable_type].blank?) %>
+                </div>
+                <label for="filter_name" class="col-sm-2 col-form-label">Recipient</label>
+                <div class="col-sm-4">
+                    <%= text_field_tag("callable_name", params[:callable_name], class: "form-control", disabled: params[:callable_type].blank?) %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="filter_name" class="col-sm-2 col-form-label">Call Date</label>
+                        <div class="col-sm-5">
+                            <input type="date" name="start_date" id="filter_start_date" value="<%= params[:start_date] %>" id="start_date" class="form-control">
+                        </div>
+                        <div class="col-sm-5">
+                            <input type="date" name="end_date" id="filter_end_date" value="<%= params[:end_date] %>" id="end_date" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_call_logs_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+function callable_type_changed(sel)
+{
+    if ($(sel).val().length > 0) {
+        $('#callable_code').removeAttr('disabled');
+        $('#callable_name').removeAttr('disabled');
+    } else {
+        $('#callable_code').attr('disabled', true);
+        $('#callable_name').attr('disabled', true);
+    }
+}
+</script>
+<% end %>

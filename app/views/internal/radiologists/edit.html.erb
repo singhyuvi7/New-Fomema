@@ -1,0 +1,17 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Radiologists</strong> - Edit Radiologist
+    </div>
+    <%= form_for @radiologist, url: internal_radiologist_path(@radiologist), html: {class: "#{params[:action]}_radiologist radiologist-form with-parsley disable-enter-keypress"} do |form| %>
+
+        <%= render 'form', { form: form } %>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_radiologists_path) %>
+                <%=raw edit_submit_button %>
+            </div>
+        </div>
+
+    <% end %>
+</div>

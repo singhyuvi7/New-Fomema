@@ -1,0 +1,10 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Digital X-Ray Providers</strong> - Edit Digital X-Ray Provider
+    </div>
+    <%= form_for @digital_xray_provider, url: internal_digital_xray_provider_path(@digital_xray_provider), html: {class: "#{params[:action]}_digital_xray_provider digital_xray_provider-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+    
+</div>

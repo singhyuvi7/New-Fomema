@@ -1,0 +1,40 @@
+<div class="headerContent" style="display:none;">
+    <table style="width: 100%;">
+        <tr>
+            <th style="text-align: left; padding-right: 1em; width: 3.3em;">Ref No</th>
+            <td>: <%= ref_number %></td>
+        </tr>
+
+        <tr>
+            <th style="text-align: left; padding-right: 1em; width: 3.3em;">Date</th>
+            <td>: <%= raw letter_date %></td>
+        </tr>
+
+        <tr>
+            <th style="text-align: left; padding-right: 1em; width: 3.3em;">Title</th>
+            <td>: <%= letter_title %></td>
+        </tr>
+    </table>
+
+    <hr>
+</div>
+
+<div class="firstPageHeader" style="display: none;">
+    <div style="margin-bottom: -3em;">
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png",  style: "height: 110px;" %>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png",   style: "height: 110px; position: absolute; right: 0;" %>
+
+    </div><br>
+</div>
+
+<script>
+    var headerCheck = function() {
+        var x = document.location.search.substring(1).split('&');
+        if(x[0] !== "page=1") { document.getElementsByClassName("headerContent")[0].style.display = "block"; }
+    }();
+
+    var firstHeaderCheck = function() {
+        var x = document.location.search.substring(1).split('&');
+        if(x[0] == "page=1") { document.getElementsByClassName("firstPageHeader")[0].style.display = "block"; }
+    }();
+</script>

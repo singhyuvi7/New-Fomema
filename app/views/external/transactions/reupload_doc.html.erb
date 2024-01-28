@@ -1,0 +1,171 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Reupload Document</strong> - <%= @transaction.code %> (<%= @transaction.fw_name %>/<%= @transaction.fw_code %>)
+    </div>
+
+    <%= form_for @transaction, url: upload_doc_external_transaction_path(@transaction, upload_status: 'reupload'), html: { multipart: true, class: "with-parsley" } do |form| %>
+        <div class="card-body">
+            <%= render '/shared/all_flash' %>
+            <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Please upload the following documents for verification. Please upload each document separately.</p>
+                    <div class="" id="agency_document_list">
+                        <ol class="ol-list-portal">
+                           <li>A copy of passport (front page)</li>
+                           <li>Latest Work permit/ Calling Visa for New Arrival / Immigration Approval</li>
+                           <li>Special Pass (if the Work Permit expired)</li>
+                           <li>Individual - Employer NRIC or Passport<br>
+                            Company - Copy of Company Registration papers (SSM)</li>
+                           <li>Employer’s Authorisation Letter to perform registration</li>
+                        </ol>
+                    </div>
+                    <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB. </p>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="employer_uploads">Uploaded Documents</label>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Documents</th>
+                                    <th>Date Uploaded</th>
+                                </tr>
+
+                                <% @transaction.uploads.each do |upload| %>
+                                    <tr>
+                                        <td class="filenames"><%= upload.category %></td>
+                                        <td class="filenames">
+                                            <% upload.documents.each do |document| %>
+                                                <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                            <% end %>
+                                        </td>
+                                        <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                    </tr>
+                                <% end %>
+
+                                <% if @transaction.uploads.blank? %>
+                                    <tr><td colspan="3">There are no uploaded documents</td></tr>
+                                <% end %>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="document-input-group" class="form-group">
+                        <label for="employer_uploads">Upload New Documents</label>
+                        <p id="no-input-placeholder" class="hidden">Click on "Add more documents to begin adding files"</p>
+
+                        <div class="input-group custom-input-group">
+                            <div class="col-md-6 document-type">
+                                <select class="col-md-12 form-control document-type-selector" name="transaction[uploads][][category]" required>
+                                    <option value="">Select option</option>
+                                    <% ForeignWorker::DOCUMENT_TYPES_AGENCY_WORKER.each do |index, document_type| %>
+                                        <option value="<%= index %>"><%= document_type %></option>
+                                    <% end %>
+                                </select>
+                            </div>
+                            <div class="custom-file col-md-6">
+                                <input type="file" name="transaction[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" disabled required>
+                                <label class="custom-file-label">Choose file</label>
+                            </div>
+                            <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                </div>
+            </div>
+
+            <div class="card-footer border-0 bg-transparent text-dark text-right">
+                <a class="btn btn-blue-portal" href="<%= external_transactions_path %>">Back</a>
+                <%= button_tag 'Submit', type: 'submit', class: 'btn btn-success', data: { disable_with: "Submiting..."} %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        <%= render 'shared/fileupload_script' %>
+
+        removeAttachmentField('.removal-button:last');
+        var clonedAttachmentInput = $('.custom-input-group:first').clone();
+        removeAttachmentField('.removal-button:last');
+        bindLastDocumentTypeSelectorAndFileSelector();
+
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose file")
+        });
+
+        // Function to duplicate document fields
+        $('#add_more_documents').click(() => {
+            clonedAttachmentInput
+                .clone()
+                .appendTo("#document-input-group")
+                .addClass('mt-1')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled");
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose file");
+
+            bindLastDocumentTypeSelectorAndFileSelector();
+            removeAttachmentField('.removal-button:last');
+            $('#no-input-placeholder').hide();
+        });
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                if ($('.custom-input-group').length > 1) {
+                    $(this).closest('.custom-input-group').remove();
+                }
+                if ($('.custom-input-group').length === 0) {
+                    $('#no-input-placeholder').show();
+                }
+            });
+        }
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+    </script>
+<% end %>

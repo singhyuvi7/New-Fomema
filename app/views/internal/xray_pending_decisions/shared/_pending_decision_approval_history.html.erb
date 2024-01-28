@@ -1,0 +1,30 @@
+<div class="card border-dark">
+    <div class="card-header">
+        Approval History
+    </div>
+
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Decision</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% xray_pending_decision.transactionz.xray_pending_decisions.where.not(id: xray_pending_decision.id).each.with_index do |xray_pending_decision_approval, index| %>
+                <tr class="<%= 'table-danger' if xray_pending_decision_approval.status == 'REJECTED' %>">
+                    <td><%= index + 1 %></td>
+                    <td><%= xray_pending_decision_approval.approval_user&.name %></td>
+                    <td><strong><%= xray_pending_decision_approval.approval_decision %></strong></td>
+                    <td><%= xray_pending_decision_approval.approval_comment %></td>
+                    <td><%= xray_pending_decision_approval.transmitted_at&.strftime(get_standard_datetime_format) %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+

@@ -1,0 +1,1 @@
+json.array! @xray_retakes, partial: '/internal/xray_retakes/xray_retake', as: :xray_retake

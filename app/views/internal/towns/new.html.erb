@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Towns</strong> - New Town
+    </div>
+    <%= form_for @town, url: internal_towns_path, html: {class: "#{params[:action]}_town town-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,34 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'c8ced3', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: 'Insurance Summary') do |sheet|
+    sheet.add_row ["#{@company_name.to_s.upcase} - #{@date}"], style: title_style
+    sheet.add_row ["SUMMARY WORKER INSURANCE REPORT FROM #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} TO #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL STATE'}"], style: title_style
+    sheet.add_row
+
+    sheet.column_widths 15
+
+    @data.each do |branch, insurances|
+      sheet.add_row [branch]
+
+      sheet.add_row @headers, style: header_style
+      insurances.each do |insurance|
+        sheet.add_row [insurance.paid_date.try(:strftime,'%d/%m/%Y'),'Insurance',insurance.gender,insurance.count,insurance.sum], style: data_style
+      end
+
+      sheet.add_row ['Branch Summary','Male','Female','Total','Total'], style: header_style
+      sheet.add_row ['Insurance',
+        insurances.map {|s| s['gender'] == 'M' ? s['count'] : 0}.sum,
+        insurances.map {|s| s['gender'] == 'F' ? s['count'] : 0}.sum,
+        insurances.map {|s| s['count']}.sum,
+        insurances.map {|s| s['sum']}.sum], style: data_style
+    end
+
+    sheet.add_row
+    sheet.add_row ['Report Summary','Male','Female','Grand Total','Grand Total'], style: header_style
+    sheet.add_row ['Insurance',@grand_total_male,@grand_total_female,@grand_total_count,@grand_total_sum], style: data_style
+  end
+end

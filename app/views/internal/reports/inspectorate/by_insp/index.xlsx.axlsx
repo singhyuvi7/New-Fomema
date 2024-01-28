@@ -1,0 +1,39 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  ## by insp
+  wb.add_worksheet(name: "By Insp") do |sheet|
+    sheet.add_row ["BY INSP - CLINIC & X-RAY - #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+    sheet.add_row ['MLE','Clinics visited'], style: header_style
+    @doctor_inps_counts.each do |count|
+      sheet.add_row [count.name, count.total], style: data_style
+    end
+
+    sheet.add_row 
+
+    sheet.add_row ['MLE','Clinics Reported'], style: header_style
+    @doctor_prepared_counts.each do |count|
+      sheet.add_row [count.name, count.total], style: data_style
+    end
+
+    sheet.add_row 
+
+    sheet.add_row ['MLE','Xray Facility visited'], style: header_style
+    @xray_inps_counts.each do |count|
+      sheet.add_row [count.name, count.total], style: data_style
+    end
+
+    sheet.add_row 
+
+    sheet.add_row ['MLE','Xray Facility Reported'], style: header_style
+    @xray_prepared_counts.each do |count|
+      sheet.add_row [count.name, count.total], style: data_style
+    end
+  end
+end

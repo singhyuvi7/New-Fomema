@@ -1,0 +1,102 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Letters</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <%= render "/shared/all_flash" %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="<%= index_table_class %>">
+
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>Visit Report Code</th>
+                                    <th>Explanation Type</th>
+                                    <th>Explanation Status</th>
+                                    <th>Warning Letter Status</th>
+                                    <th class="module-row-actions">Action(s)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% if @letters.blank? %>
+                                    <tr>
+                                        <td colspan="9" class="text-danger">No records found.</td>
+                                    </tr>
+                                <% else %>
+
+                                    <% @letters.each.with_index((@letters.current_page - 1) * get_per + 1) do
+                                        |letter, index| %>
+                                        <tr>
+                                            <td class="text-center"><%= index %></td>
+                                            <td>
+                                                <a target="_blank" href="<%= internal_visit_report_laboratory_show_path(letter.visit_report) %>"><%= letter.visit_report.code %></a>
+                                            </td>
+                                            <td><%= LqccLetter::EXPLANATION_TYPES[letter.explanation_type] %></td>
+                                            <td><%= LqccLetter::STATUSES[letter.explanation_status] %></td>
+                                            <td><%= LqccLetter::STATUSES[letter.warning_status] || '-' %></td>
+                                            <td class="module-row-actions">
+
+                                                <!-- show -->
+                                                <%= raw index_table_show_button(internal_lqcc_letter_path(letter)) %>
+
+                                                <!-- edit -->
+                                                <% if has_permission?('EDIT_LQCC_LETTER') %>
+                                                    <%= raw(index_table_edit_button(edit_internal_lqcc_letter_path(letter))) if ["DRAFT", "REJECTED"].include?(letter.explanation_status) %>
+                                                    <%= raw(index_table_edit_button(edit_warning_letter_internal_lqcc_letter_path(letter))) if ["DRAFT", "REJECTED"].include?(letter.warning_status) %>
+                                                <% end %>
+
+                                                <!-- approval -->
+                                                <% if has_permission?('APPROVAL_LQCC_LETTER') and letter.explanation_status.eql?("APPROVAL") and !letter.explanation_request_by.eql?(current_user.id) %>
+                                                    <%= raw index_table_approval_button(approval_internal_lqcc_letter_path(letter)) %>
+                                                <% end %>
+
+                                                <% if has_permission?('APPROVAL_LQCC_LETTER') and letter.warning_status.eql?("APPROVAL") and !letter.warning_request_by.eql?(current_user.id) %>
+                                                    <%= raw index_table_approval_button(approval_warning_letter_internal_lqcc_letter_path(letter)) %>
+                                                <% end %>
+
+                                                <!-- approved -->
+                                                <% if ["APPROVED"].include?(letter.explanation_status) %>
+                                                    <%=raw index_table_primary_button(explanation_letter_internal_lqcc_letter_path(letter), label: '<i class="fa fa-print"></i>', title: 'Explanation Letter', classes: "btn btn-sm btn-primary", target: "_blank") %>
+                                                <% end %>
+
+                                                <% if ["APPROVED"].include?(letter.warning_status) %>
+                                                    <%=raw index_table_primary_button(warning_letter_internal_lqcc_letter_path(letter), label: '<i class="fa fa-exclamation-circle"></i>', title: 'Warning Letter', classes: "btn btn-sm btn-primary", target: "_blank") %>
+                                                <% end %>
+
+                                                <!-- delete -->
+                                                <% if has_permission?('DELETE_LQCC_LETTER') %>
+                                                    <%= raw index_table_delete_button(internal_lqcc_letter_path(letter)) %>
+                                                <% end %>
+
+                                            </td>
+                                        </tr>
+
+                                    <% end %>
+
+                                <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        <div class="row">
+            <%= paginate @letters %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

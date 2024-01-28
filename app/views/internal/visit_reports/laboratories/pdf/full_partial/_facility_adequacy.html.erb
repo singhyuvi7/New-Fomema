@@ -1,0 +1,147 @@
+<tr class="finding-row method-field">
+    <td class="table-index">1.</td>
+    <td class="row-name">
+        <div class="row-wrap">Adequate Facility</div>
+    </td>
+    <td class="text-center"><%= visit_report_lab.adequate_facility == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_facility == 'NO' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_facility == 'NA' ? @checkbox_checked : @checkbox_unchecked %></td>
+</tr>
+<% if !visit_report_lab.adequate_facility_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= visit_report_lab.adequate_facility_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+
+<tr class="finding-row method-field">
+    <td class="table-index">2.</td>
+    <td class="row-name">
+        <div class="row-wrap">Adequate Staff</div>
+    </td>
+    <td class="text-center"><%= visit_report_lab.adequate_staff == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_staff == 'NO' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_staff == 'NA' ? @checkbox_checked : @checkbox_unchecked %></td>
+</tr>
+<% if !visit_report_lab.adequate_staff_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= visit_report_lab.adequate_staff_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+
+<tr>
+    <td class="table-index">3.</td>
+    <td class="row-name" colspan="4">
+        <div class="row-wrap">Pathologist</div>
+    </td>
+</tr>
+<tr>
+    <td class="table-sub-index">3.1</td>
+    <td class="row-sub-name">
+        <div class="row-wrap">Pathologist's Name</div>
+    </td>
+    <td class="text-center"><%= visit_report_lab.pathologist == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.pathologist == 'NO' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.pathologist == 'NA' ? @checkbox_checked : @checkbox_unchecked %></td>
+</tr>
+<% if !visit_report_lab.pathologist_name.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Name :</span>
+                <span class="unbold"><%= visit_report_lab.pathologist_name %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+<% if !visit_report_lab.pathologist_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= visit_report_lab.pathologist_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+
+<tr>
+    <td class="table-sub-index">3.2</td>
+    <td class="row-sub-name">NSR No. :<%= visit_report_lab.pathologist_nsr.blank? ? ' -' : visit_report_lab.pathologist_nsr %>
+    </td>
+    <td colspan="3"></td>
+</tr>
+
+<tr>
+    <td class="table-sub-index">3.3</td>
+    <td class="row-sub-name">
+        <div class="row-wrap">Logbook</div>
+    </td>
+    <td class="text-center"><%= visit_report_lab.logbook == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.logbook == 'NO' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.logbook == 'NA' ? @checkbox_checked : @checkbox_unchecked %></td>
+</tr>
+<% if !visit_report_lab.logbook_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= visit_report_lab.logbook_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+
+
+<tr class="finding-row method-field">
+    <td class="table-index">4.</td>
+    <td class="row-name">
+        <div class="row-wrap">Adequate instrument/material/consumables</div>
+    </td>
+    <td class="text-center"><%= visit_report_lab.adequate_instrument == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_instrument == 'NO' ? @checkbox_checked : @checkbox_unchecked %></td>
+    <td class="text-center"><%= visit_report_lab.adequate_instrument == 'NA' ? @checkbox_checked : @checkbox_unchecked %></td>
+</tr>
+<tr>
+    <td class="table-index"></td>
+    <td class="checkbox-field">
+        <% VisitReportLabOption.get_data('', 'instrument').each do |option| %>
+            <div class="option">
+                <%= visit_report_lab.adequate_instrument_items&.include?(option.code) ? @checkbox_checked : @checkbox_unchecked %>
+                <div><%= option.name %></div>
+            </div>
+        <% end %>
+    </td>
+    <td colspan="3"></td>
+</tr>
+<% if !visit_report_lab.adequate_instrument_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= visit_report_lab.adequate_instrument_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "LABORATORY_DEFAULT_MALE_RATE" %>"><%= @system_configurations["LABORATORY_DEFAULT_MALE_RATE"].name %></label>
+<div class="col-md-8">
+    <%= text_field_tag "LABORATORY_DEFAULT_MALE_RATE", @system_configurations["LABORATORY_DEFAULT_MALE_RATE"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["LABORATORY_DEFAULT_MALE_RATE"].value %></p>
+</div>

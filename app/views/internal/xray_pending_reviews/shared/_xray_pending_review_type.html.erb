@@ -1,0 +1,16 @@
+<% unless xray_pending_review.nil? %>
+    <% if !xray_pending_review.quarantine_reason.blank? %>
+        <div class="alert alert-warning">
+            <%= xray_pending_review.quarantine_reason %>
+        </div>
+    <% elsif !xray_pending_review.quarantine_type.blank? && xray_pending_review.transactionz.xray_examination&.xray_examination_not_done != 'YES' %>
+        <div class="alert alert-warning">
+            <%= XrayPendingReview::QUARANTINE_TYPES[xray_pending_review.quarantine_type] %>
+        </div>
+    <% end %>
+    <% xray_pending_review.transactionz.xqcc_quarantine_reasons.each do |xqcc_quarantine_reason| %>
+        <div class="alert alert-warning">
+            <%= xqcc_quarantine_reason.quarantine_reason.code %> - <%= xqcc_quarantine_reason.quarantine_reason.reason %>
+        </div>
+    <% end %>
+<% end %>

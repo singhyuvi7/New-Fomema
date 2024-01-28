@@ -1,0 +1,47 @@
+<div class="card">
+    <div class="card-body">
+        <!-- <% if has_permission?('BULK_UPDATE_SERVICE_PROVIDER_PAYMENT') %>
+            <%= render "/internal/service_provider_payments/shared/upload" %>
+        <% end %> -->
+        <%=render '/internal/service_provider_payments/shared/filter_status' %>
+        <%=render '/internal/service_provider_payments/shared/batch' %>
+
+    </div>
+</div>
+
+
+<% content_for :page_end_scripts do %>
+<script>
+    batch_code = '<%= @batch.code %>'
+    start_date = '<%= @batch.start_date %>'
+    end_date = '<%= @batch.end_date %>'
+    batch_code_string = batch_code+' ('+moment(start_date).format('DD/MM/YYYY')+' - '+moment(end_date).format('DD/MM/YYYY')+')'
+    $('#batch_code_string').html(batch_code_string)
+
+    $('#download_payment_csv').click(function(e) {
+        e.preventDefault()
+        export_btn = $(this)
+        export_btn.addClass("disabled");
+
+        fetch($(this).attr('href'))
+        .then(resp => resp.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            // the filename you want
+            a.download = batch_code_string+'.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            export_btn.removeClass('disabled');
+        })
+        .catch(() => export_btn.removeClass('disabled'));
+    });
+
+    $('.process-payment-btn').click(function(e) {
+        $(this).addClass("disabled");
+    });
+</script>
+<% end %>

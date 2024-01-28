@@ -1,0 +1,10 @@
+<%#= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+<% if model_obj.errors.any? %>
+    <div id="error_explanation" class="error_explanation">
+        <ul class="text-danger">
+            <% model_obj.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+        </ul>
+    </div>
+<% end %>

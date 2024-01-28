@@ -1,0 +1,31 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style   = style.add_style sz: 14
+  header_style  = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  data_style    = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  headers       = @headers
+  query_date    = params[:type] == 'daily' ? params[:date].to_time.strftime("%d-%m-%Y") : params[:date].to_time.strftime("%m-%Y")
+
+  # worksheet data
+  wb.add_worksheet(name: 'daily summary') do |sheet|
+    sheet.add_row headers, style: header_style
+
+    if @daily_data.present?
+      sheet.add_row [query_date, "Monitoring", "MERTS", @daily_data.monitoring_total_amended, @daily_data.monitoring_total_amended, @daily_data.monitoring_total_concurred], style: data_style
+      sheet.add_row [query_date, "Quarantine", "MERTS", @daily_data.quarantine_total_amended + @daily_data.quarantine_total_concurred, @daily_data.quarantine_total_amended, @daily_data.quarantine_total_concurred], style: data_style
+    end
+  end
+
+  wb.add_worksheet(name: 'monthly summary') do |sheet|
+    sheet.add_row headers, style: header_style
+
+    if @monthly_data.present?
+      sheet.add_row [query_date, "Monitoring", "MERTS", @monthly_data.monitoring_total_amended, @monthly_data.monitoring_total_amended, @monthly_data.monitoring_total_concurred], style: data_style
+      sheet.add_row [query_date, "Quarantine", "MERTS", @monthly_data.quarantine_total_amended, @monthly_data.quarantine_total_amended, @monthly_data.quarantine_total_concurred], style: data_style
+    end
+  end
+
+
+end

@@ -1,0 +1,355 @@
+<div class="row">
+
+    <% last_year = Date.current.years_ago(1).strftime('%Y') %>
+    <% current_year = Date.current.year %>
+
+    <div class="col-md-12">
+
+        <div v-if="visit_plan_data.status" class="alert alert-info" role="alert">
+            LATEST STATUS: <b><%= VisitPlan::STATUSES[@visit_plan.status] %></b>
+        </div>
+
+        <div v-if="visit_plan_data.status === 'REJECTED'" class="alert alert-danger" role="alert">
+            COMMENT ON REJECTION: <b v-if="visit_plan_data.level_1_approval_decision === 'REJECT'">{{ visit_plan_data.level_1_approval_comment }}</b><b v-if="visit_plan_data.level_2_approval_decision === 'REJECT'">{{ visit_plan_data.level_2_approval_comment }}</b>
+        </div>
+
+        <div v-if="!canEdit" class="alert alert-warning" role="alert">
+            FORM UPDATE IS DISABLE FOR STATUS: <b><%= VisitPlan::STATUSES[@visit_plan.status] %></b>
+        </div>
+
+        <form ref="visit_plan_form" method="POST" action="<%= form_action %>">
+
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+            <% if form_method.downcase !='post' %>
+            <input type="hidden" name="_method" value="<%= form_method %>">
+            <% end %>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label class="required" for="">Visit Type</label>
+
+                        <multiselect v-validate="categoryRule" :data-vv-name="'selected_categories'" :data-vv-value-path="selected_categories" :data-vv-as="'Visit Type'" v-model="selected_categories" :disabled="formReadOnly" data-vv-as="Visit Type" :options="categories_arr" :multiple="false" :hide-selected="true" placeholder="Select Visit Type" :class="{ 'is-invalid': errors.has('selected_categories') }">
+                        </multiselect>
+                        <div class="invalid-feedback">{{ errors.first('selected_categories') }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <v-date v-model="visit_plan_data.inspect_from" :field_name="'visit_plan[inspect_from]'" :rules="inspectFromRule" :label="'Inspect From'" :readonly="formReadOnly" id="inspect_from"></v-date>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+                        <v-date v-model="visit_plan_data.inspect_to" :field_name="'visit_plan[inspect_to]'" :rules="inspectToRule" :label="'Inspect To'" :readonly="formReadOnly" id="inspect_to" :min_date="visit_plan_data.inspect_from"></v-date>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="" for="">Comments</label>
+                <textarea v-validate="commentRule" :readonly="formReadOnly" data-vv-as="Comments" v-model="visit_plan_data.comment" name="visit_plan[comment]" class="form-control" :class="{ 'is-invalid': errors.has('visit_plan[comment]') }" id="" rows="2"></textarea>
+                <div class="invalid-feedback">{{ errors.first('visit_plan[comment]') }}</div>
+
+                <!-- hidden select to map vue multiselect to normal form data -->
+
+                <select multiple name="visit_plan_categories[]" id="" class="hidden">
+                    <option selected="selected" :value="selected_categories">{{ selected_categories }}</option>
+                </select>
+
+                <select multiple name="visit_plan_states[]" id="" class="hidden">
+                    <option selected="selected" v-for="(state, index) in selected_states" :value="state.id">{{ state.name }}</option>
+                </select>
+
+                <select multiple name="visit_plan_towns[]" id="" class="hidden">
+                    <option selected="selected" v-for="(town, index) in selected_towns" :value="town.id">{{ town.name }}</option>
+                </select>
+
+                <select multiple name="visit_plan_items[]" id="" class="hidden">
+                    <option selected="selected" v-for="(provider, index) in selected_providers" :value="provider.id">
+                        {{ providerInfo(provider) }}</option>
+                </select>
+
+                <!-- hidden select to map vue multiselect to normal form data -->
+
+                <input type="hidden" name="submit_action" v-model="submit_action" />
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group col">
+                    <label for="status" class="required">State</label>
+                    <multiselect v-model="selected_states" v-validate="stateRule" :data-vv-name="'selected_states'" :data-vv-value-path="selected_states" :disabled="formReadOnly" :data-vv-as="'State'" :options="states" :multiple="true" :hide-selected="true" placeholder="Select State" label="name" track-by="id" @input="updateStateSelection" @select="selectNewState" :class="{ 'is-invalid': errors.has('selected_states') }">
+                    </multiselect>
+                    <div class="invalid-feedback">{{ errors.first('selected_states') }}</div>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group col">
+                    <label for="status" class="required">Town</label>
+                    <multiselect v-model="selected_towns" v-validate="townRule" :data-vv-name="'selected_towns'" :data-vv-value-path="selected_towns" :disabled="formReadOnly" :data-vv-as="'Town'" :options="town_options" :multiple="true" :hide-selected="true" placeholder="Select Town" label="name" track-by="id" group-values="towns" group-label="state" :group-select="true" @input="updateTownSelection" @select="selectNewTown" :class="{ 'is-invalid': errors.has('selected_towns') }">
+                    </multiselect>
+                    <div class="invalid-feedback">{{ errors.first('selected_towns') }}</div>
+                </div>
+
+            </div>
+
+            <%= render "/internal/visit_plans/shared/provider_filter" %>
+
+            <%= render "/internal/visit_plans/shared/filtered_provider_table" %>
+
+            <hr>
+
+            <div class="form-group overflow-auto">
+                <label class="required" for="">Selected Visit List</label>
+
+                <!-- hidden input to check for visit list validation error -->
+                <input type="hidden" name="selected_providers" v-validate="selectedProviderRule" data-vv-as="Visit List" v-model="selected_providers" class="form-control" :class="{ 'is-invalid': errors.has('selected_providers') }" />
+                <div class="invalid-feedback">{{ errors.first('selected_providers') }}</div>
+                <!-- hidden input to check for visit list validation error -->
+
+                <table class="table table-sm table-bordered table-striped">
+                    <thead>
+                        <tr class="text-center">
+                            <th class="module-row-numbers">#</th>
+
+                            <template v-if="visit_plan.visitable_type == 'Doctor'">
+                                <th>Doc. Code</th>
+                                <th class="min-width-120">Doc. Name</th>
+                                <th class="min-width-120">Clinic Name</th>
+                                <th class="min-width-120">Address</th>
+                                <th class="text-nowrap">Own X&#8209;ray</th> <!-- use non-breaking hyphen request by user -->
+                                <th>Phone</th>
+                                <th>SOP Compliance</th>
+                                <th>Last Visit Date</th>
+                                <th style="width: 5%">Allocation (<%= last_year %> / <%= current_year %>)</th>
+                                <th style="width: 5%">Examined (<%= last_year %> / <%= current_year %>)</th>
+                                <th style="width: 5%">Certified (<%= last_year %> / <%= current_year %>)</th>
+                                <th>Status</th>
+
+                            </template>
+
+                            <template v-if="visit_plan.visitable_type == 'XrayFacility'">
+                                <th>X-Ray Code</th>
+                                <th class="text-nowrap">X-Ray Name</th>
+                                <th class="min-width-120">License Holder Name</th>
+                                <th class="min-width-120">Address</th>
+                                <th style="width: 5%">Total Associated Clinic</th>
+                                <th>Phone</th>
+                                <th>SOP Compliance</th>
+                                <th>Last Visit Date</th>
+                                <th style="width: 5%">Allocation (<%= last_year %> / <%= current_year %>)</th>
+                                <th style="width: 5%">Examined (<%= last_year %> / <%= current_year %>)</th>
+                                <th>Status</th>
+
+                            </template>
+
+                            <template v-if="visit_plan.visitable_type == 'Laboratory'">
+                                <th>Laboratory Code</th>
+                                <th class="min-width-120">Laboratory Name</th>
+                                <th>Facility Type</th>
+                                <th class="min-width-120">Address</th>
+                                <th>Total Associated Clinic</th>
+                                <th>Phone</th>
+                                <th>Last Visit Date</th>
+                                <th>Status</th>
+
+                            </template>
+
+                            <th>Category</th>
+                            <th>Action(s)</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr v-if="!selected_providers.length">
+                            <td colspan="16" class="text-danger">No records selected. Please select at least one Visit List</td>
+                        </tr>
+
+                        <tr v-for="(provider, index) in selected_providers">
+                            <td class="module-row-numbers">
+                                {{ index + 1 }}
+                            </td>
+
+                            <template v-if="visit_plan.visitable_type == 'Doctor'">
+                                <td>
+                                    <% if has_permission?('VIEW_DOCTOR') %>
+                                    <a target="_blank" :href="'/doctors/'+provider.id">{{ provider.code }}</a>
+                                    <% else %>
+                                    {{ provider.code }}
+                                    <% end %>
+                                </td>
+                                <td>{{ provider.name }}</td>
+                                <td>{{ provider.clinic_name }}</td>
+                                <td>
+                                    {{ provider.address1 }}<br v-if="provider.address1">
+                                    {{ provider.address2 }}<br v-if="provider.address2">
+                                    {{ provider.address3 }}<br v-if="provider.address3">
+                                    {{ provider.address4 }}<br v-if="provider.address4">
+                                    {{ safeAccess(provider.town, 'name') }}<br>
+                                    {{ provider.postcode }}<br>
+                                    {{ safeAccess(provider.state, 'name') }}
+                                </td>
+                                <td class="text-center">{{ provider.xray_facility_id ? 'Yes' : 'No' }}</td>
+                                <td>{{ provider.phone }}</td>
+                                <td>{{ provider.sop_compliance }}</td>
+                                <td>{{ provider.last_visit_report_date }}</td>
+                                <td class="text-center">{{ provider.allocations_last_year+'/'+provider.allocations_current_year }}</td>
+                                <td class="text-center">{{ provider.examined_last_year+'/'+provider.examined_current_year }}</td>
+                                <td class="text-center">{{ provider.certification_last_year+'/'+provider.certification_current_year }}</td>
+                                <td>{{ provider.status }}</td>
+                                <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                                <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                                <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+
+                                <td>
+                                    <% if has_permission?('VIEW_OPERATION_HOUR_DOCTOR') %>
+                                    <a class="btn btn-sm btn-secondary my-1" data-toggle="tooltip" data-html="true" title="View Operation Hours" data-original-title="View Operation Hours" :href="'/doctors/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                                    <% end %>
+                                    <button v-if="canEdit" @click="removeSelectedProvider(provider)" type="button" class="btn btn-sm btn-danger">Remove</button>
+                                    <% if has_permission?('CREATE_DOCTOR_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="!provider.isVisitReportExist" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="New Visit Report" data-original-title="New Visit Report" :href="'<%= internal_visit_report_clinics_new_path%>?visit_plan_item_id='+provider.visit_plan_item_id">New Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('VIEW_DOCTOR_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && provider.visit_report.status != 'REJECTED' && provider.visit_report.status != 'DRAFT'" class="btn btn-sm btn-success" data-toggle="tooltip" data-html="true" title="View Visit Report" data-original-title="View Visit Report" :href="'/visit_report_clinics/'+provider.visit_report.id">View Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('EDIT_DOCTOR_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && (provider.visit_report.status === 'REJECTED' || provider.visit_report.status === 'DRAFT')" class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Edit Visit Report" data-original-title="Edit Visit Report" :href="'/visit_report_clinics/'+provider.visit_report.id+'/edit'">Edit Visit Report</a>
+                                    <% end %>
+                                </td>
+
+                            </template>
+
+                            <template v-if="visit_plan.visitable_type == 'XrayFacility'">
+                                <td>
+                                    <% if has_permission?('VIEW_XRAY_FACILITY') %>
+                                    <a target="_blank" :href="'/xray_facilities/'+provider.id">{{ provider.code }}</a>
+                                    <% else %>
+                                    {{ provider.code }}
+                                    <% end %>
+                                </td>
+                                <td>{{ provider.name }}</td>
+                                <td>{{ provider.license_holder_name }}</td>
+                                <td>
+                                    {{ provider.address1 }}<br v-if="provider.address1">
+                                    {{ provider.address2 }}<br v-if="provider.address2">
+                                    {{ provider.address3 }}<br v-if="provider.address3">
+                                    {{ provider.address4 }}<br v-if="provider.address4">
+                                    {{ safeAccess(provider.town, 'name') }}<br>
+                                    {{ provider.postcode }}<br>
+                                    {{ safeAccess(provider.state, 'name') }}
+                                </td>
+                                <td class="text-center"><a :href="'<%= internal_doctors_path %>'+'?xray_facility_code='+provider.code" target="_blank">{{ provider.doctors | associated_clinic }}</a></td>
+                                <td>{{ provider.phone }}</td>
+                                <td>{{ provider.sop_compliance }}</td>
+                                <td>{{ provider.last_visit_report_date }}</td>
+                                <td class="text-center">{{ provider.allocations_last_year+'/'+provider.allocations_current_year }}</td>
+                                <td class="text-center">{{ provider.examined_last_year+'/'+provider.examined_current_year }}</td>
+                                <td>{{ provider.status }}</td>
+                                <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                                <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                                <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+
+                                <td>
+                                    <% if has_permission?('VIEW_OPERATION_HOUR_XRAY_FACILITY') %>
+                                    <a class="btn btn-sm btn-secondary my-1" data-toggle="tooltip" data-html="true" title="View Operation Hours" data-original-title="View Operation Hours" :href="'/xray_facilities/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                                    <% end %>
+                                    <button v-if="visit_plan.status === 'DRAFT'" @click="removeSelectedProvider(provider)" type="button" class="btn btn-sm btn-danger">Remove</button>
+                                    <% if has_permission?('CREATE_XRAY_FACILITY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="!provider.isVisitReportExist" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="New Visit Report" data-original-title="New Visit Report" :href="'<%= internal_visit_report_xray_facilities_new_path%>?visit_plan_item_id='+provider.visit_plan_item_id">New Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('VIEW_XRAY_FACILITY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && provider.visit_report.status != 'REJECTED' && provider.visit_report.status != 'DRAFT'" class="btn btn-sm btn-success" data-toggle="tooltip" data-html="true" title="View Visit Report" data-original-title="View Visit Report" :href="'/visit_report_xray_facilities/'+provider.visit_report.id">View Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('EDIT_XRAY_FACILITY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && (provider.visit_report.status === 'REJECTED' || provider.visit_report.status === 'DRAFT')" class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Edit Visit Report" data-original-title="Edit Visit Report" :href="'/visit_report_xray_facilities/'+provider.visit_report.id+'/edit'">Edit Visit Report</a>
+                                    <% end %>
+                                </td>
+                            </template>
+
+                            <template v-if="visit_plan.visitable_type == 'Laboratory'">
+                                <td>
+                                    <% if has_permission?('VIEW_LABORATORY') %>
+                                    <a target="_blank" :href="'/laboratories/'+provider.id">{{ provider.code }}</a>
+                                    <% else %>
+                                    {{ provider.code }}
+                                    <% end %>
+                                </td>
+                                <td>{{ provider.name }}</td>
+                                <td v-if="provider.laboratory_type_id == 1 || provider.laboratory_type_id == 2">Full/Partial</th>
+                                <td v-if="provider.laboratory_type_id == 3">Collection</th>
+                                <td>
+                                    {{ provider.address1 }}<br v-if="provider.address1">
+                                    {{ provider.address2 }}<br v-if="provider.address2">
+                                    {{ provider.address3 }}<br v-if="provider.address3">
+                                    {{ provider.address4 }}<br v-if="provider.address4">
+                                    {{ safeAccess(provider.town, 'name') }}<br>
+                                    {{ provider.postcode }}<br>
+                                    {{ safeAccess(provider.state, 'name') }}
+                                </td>
+                                <td><a :href="'<%= internal_doctors_path%>'+'?laboratory_code='+provider.code" target="_blank">{{ provider.doctors | associated_clinic }}</a></td>
+                                <td>{{ provider.phone }}</td>
+                                <td>{{ provider.last_visit_report_date }}</td>
+                                <td>{{ provider.status }}</td>
+                                <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                                <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                                <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+
+                                <td>
+                                    <% if has_permission?('VIEW_OPERATION_HOUR_LABORATORY') %>
+                                    <a class="btn btn-sm btn-secondary my-1" data-toggle="tooltip" data-html="true" title="View Operation Hours" data-original-title="View Operation Hours" :href="'/laboratories/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                                    <% end %>
+                                    <button v-if="visit_plan.status === 'DRAFT'" @click="removeSelectedProvider(provider)" type="button" class="btn btn-sm btn-danger">Remove</button>
+                                    <% if has_permission?('CREATE_LABORATORY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="!provider.isVisitReportExist" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="New Visit Report" data-original-title="New Visit Report" :href="'<%= internal_visit_reports_laboratories_new_path%>?visit_plan_item_id='+provider.visit_plan_item_id">New Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('VIEW_LABORATORY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && provider.visit_report.status != 'REJECTED' && provider.visit_report.status != 'DRAFT'" class="btn btn-sm btn-success" data-toggle="tooltip" data-html="true" title="View Visit Report" data-original-title="View Visit Report" :href="'/visit_reports_laboratories/'+provider.visit_report.id">View Visit Report</a>
+                                    <% end %>
+                                    <% if has_permission?('EDIT_LABORATORY_VISIT_REPORT') && @visit_plan.status === 'LEVEL_2_APPROVED' %>
+                                    <a v-if="provider.isVisitReportExist && (provider.visit_report.status === 'REJECTED' || provider.visit_report.status === 'DRAFT')" class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Edit Visit Report" data-original-title="Edit Visit Report" :href="'/visit_reports_laboratories/'+provider.visit_report.id+'/edit'">Edit Visit Report</a>
+                                    <% end %>
+                                </td>
+                            </template>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <!-- on approve -->
+                <%= render 'internal/visit_plans/shared/card_approval' %>
+                <!-- end on approve -->
+            </div>
+
+            <div class="text-right">
+
+                <%=raw edit_back_button(index_path) %>
+
+                <% if @visit_plan.status == 'LEVEL_2_APPROVED' %>
+                <a class="btn btn-danger btn-sm" href="<%= internal_visit_plan_download_path %>" target="_blank"><i class="fa fa-download"></i> Download</a>
+                <% end %>
+
+                <button v-if="canEdit" @click="save" type="button" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Save Draft</button>
+
+                <button v-if="canEdit" @click="submit" type="button" class="btn btn-warning btn-sm"><i class="icon-flag"></i> Submit for Approval</button>
+
+                <button v-if="onApprove" @click="submit" type="button" class="btn btn-warning btn-sm"><i class="icon-flag"></i>Submit Decision</button>
+            </div>
+
+        </form>
+
+    </div>
+
+
+</div>

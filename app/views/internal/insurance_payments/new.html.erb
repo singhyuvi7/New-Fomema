@@ -1,0 +1,89 @@
+<%= form_with url: internal_insurance_payments_path, html: {class: "with-parsley"}, local: true do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Insurance Payment</strong> - Generate Payment Batch
+        </div>
+        <div class="card-body">
+        
+                <%= render "/shared/all_flash" %>
+
+                <div class="form-group row">
+                    <label for="batch_date" class="col-sm-2 col-form-label required">Batch Date</label>
+                    <div class="col-sm-5">
+                        <%= text_field_tag "start_date", params[:start_date], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'batch_date' }, max: Date.today.strftime("%F"), :required => true %>
+                    </div>
+                    <div class="col-sm-5">
+                        <%= text_field_tag "end_date", params["end_date"], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'batch_date' }, max: Date.today.strftime("%F"), :required => true %>
+                    </div>
+                </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_insurance_payments_path) %>
+                <%= form.submit 'Generate', id: 'generate_submit', class: 'btn btn-sm btn-primary' %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$(document).ready(function() {
+    set_start_datepicker()
+    set_end_date_picker($('.custom-date-range-picker'))
+    $('.custom-date-range-picker').change(function() {
+        set_end_date_picker($(this))
+    });
+
+    function get_disabled_dates(){
+        pass_dates = JSON.parse('<%=raw @pass_dates.to_json %>')
+        return pass_dates;
+    }
+
+    function set_start_datepicker(){
+        options = datepickerDefault
+        options.maxDate = new Date();
+        options.dateFormat = 'Y-m-d'
+        options.altInput = true
+        options.altFormat = 'd/m/Y'
+        options.disable = get_disabled_dates()
+
+        $('.datepicker').flatpickr(options);
+    }
+
+    function set_end_date_picker(dateField){
+        var type        = dateField.attr('data-type');
+        var target      = dateField.attr('data-target');
+        var dateValue   = dateField.val();
+        var otherType   = type === 'start' ? 'end' : 'start';
+        var checkDate   = dateValue ? dateValue : null;
+        var options     = datepickerDefault();
+        var otherField  = $(`.custom-date-range-picker[data-type="${ otherType }"][data-target="${ target }"]`);
+        options.defaultDate = otherField.val();
+        originalMaxDate = $(otherField).attr('data-end-date');
+        originalMinDate = $(otherField).attr('data-start-date');
+
+        if (type === 'start' && originalMinDate && checkDate) {
+            options.minDate = originalMinDate > checkDate ? originalMinDate : checkDate;
+        } else if (originalMinDate) {
+            options.minDate = originalMinDate;
+        } else if (type === 'start') {
+            options.minDate = checkDate;
+        }
+
+        if (type === 'end' && originalMaxDate && checkDate) {
+            options.maxDate = originalMaxDate < checkDate ? originalMaxDate : checkDate;
+        } else if (originalMaxDate) {
+            options.maxDate = originalMaxDate;
+        } else if (type === 'end') {
+            options.maxDate = checkDate;
+        }
+
+        // disable dates
+        options.disable = get_disabled_dates()
+
+        $(otherField).flatpickr(options);
+    }
+});
+</script>
+<% end %>

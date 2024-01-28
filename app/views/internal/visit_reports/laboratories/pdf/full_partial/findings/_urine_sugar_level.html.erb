@@ -1,0 +1,14 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">
+        <div class="d-inline">Level of Urine Sugar detected as 'Present' :</div>
+        <div class="d-inline">
+            <% if finding.urine_sugar_level.blank? %>
+                -
+            <% else %>
+            <%= finding.urine_sugar_level %> (mmol/L), <%= finding.urine_sugar_qualitative %> (qualitative)
+            <% end %>
+        </div>
+    </td>
+    <td colspan="3"></td>
+</tr>

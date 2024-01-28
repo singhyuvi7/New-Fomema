@@ -1,0 +1,53 @@
+<%# The container tag
+  - available local variables
+    current_page:  a page object for the currently displayed page
+    total_pages:   total number of pages
+    per_page:      number of items to fetch per page
+    remote:        data-remote
+    paginator:     the paginator that renders the pagination tags inside
+-%>
+<%= paginator.render do -%>
+<nav class="col">
+    <ul class="pagination">
+        <%= first_page_tag unless current_page.first? %>
+        <%= prev_page_tag unless current_page.first? %>
+        <% each_page do |page| -%>
+            <% if page.display_tag? -%>
+                <%= page_tag page %>
+            <% elsif !page.was_truncated? -%>
+                <%= gap_tag %>
+            <% end -%>
+        <% end -%>
+        <% unless current_page.out_of_range? %>
+            <%= next_page_tag unless current_page.last? %>
+            <%= last_page_tag unless current_page.last? %>
+        <% end %>
+    </ul>
+</nav>
+<% end -%>
+<% if total_pages == 1 %>
+    <nav class="col">
+        <ul class="pagination">
+            <li class="page-item active"><a class="page-link active"><%= total_pages %></a></li>
+        </ul>
+    </nav>
+<% end %>
+<div class="input-group col justify-content-end">
+    <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Show per page</span>
+    </div>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <% unless params["per"] %>
+                <%= get_per_options.first %>
+            <% else %>
+                <%= params["per"] %>
+            <% end %>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <% get_per_options.each do |per_item| %>
+                <%= link_to per_item, per_link(per_item), class: "dropdown-item" %>
+            <% end %>
+        </div>
+    </div>
+</div>

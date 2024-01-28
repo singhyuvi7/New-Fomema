@@ -1,0 +1,225 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Service Provider Groups</strong> - Service Provider Group Detail
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="service_provider_group_code">Category</label>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.category || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="service_provider_group_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.name || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="service_provider_group_code">Business Registration Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.business_registration_number || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- address -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= label_tag :address %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.address1 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.address2 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.address3 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.address4 %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- /address -->
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :state %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.state.try(:name) %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :postcode %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.postcode %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= label_tag :town %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.town.try(:name) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :telephone_number, "Telephone Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.phone %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :fax_number, "Fax Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.fax || raw('<i>N/A</i>') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :email %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.email %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :created_at, "Created At" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <% if has_permission? "VIEW_FINANCE_INFO_SERVICE_PROVIDER_GROUP" %>
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :male_rate, "Male Worker Rate (RM)" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.male_rate %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :female_rate, "Female Worker Rate (RM)" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.female_rate %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :bank_id, "Bank" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.bank&.name %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :bank_account_number, "Bank Account Number" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.bank_account_number %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :bank_payment_id, "Bank Payment ID" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.bank_payment_id %>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <%= label_tag :payment_method_id, "Payment Method" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.payment_method&.name %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= label_tag :email_payment, "Email (Payment)" %>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider_group.email_payment %>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_service_provider_groups_path) %>
+            <% if has_permission?('EDIT_SERVICE_PROVIDER_GROUP') %>
+                <%=raw show_edit_button(edit_internal_service_provider_group_path(@service_provider_group)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_SERVICE_PROVIDER_GROUP") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_service_provider_group_audits_path(@service_provider_group) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

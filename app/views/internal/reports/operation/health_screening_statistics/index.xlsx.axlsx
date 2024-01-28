@@ -1,0 +1,99 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER,
+                                 bg_color: 'b7b7b7'
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+
+  # worksheet data
+  wb.add_worksheet(name: 'statistic') do |sheet|
+    # sector statistics data
+    sheet.add_row ["STATISTIK SARINGAN KESIHATAN #{@company_name.to_s.upcase} TERHADAP PEKERJA ASING MENGIKUT SEKTOR"],
+                  style: title_style
+    sheet.add_row ['', 'JUMLAH DIPERIKSA', '', 'BIL. SESUAI', '', 'BIL. TIDAK SESUAI', ''],
+                  style: header_style
+    ['B2:C2', 'D2:E2', 'F2:G2'].each { |range| sheet.merge_cells(range) }
+    sheet.add_row %w[SEKTOR BARU PEMBAHARUAN BARU PEMBAHARUAN BARU PEMBAHARUAN],
+                  style: header_style
+    if @sector_data.present?
+      total_data, suitable_data, unsuitable_data = @sector_data
+      total_data.keys.map(&:first).sort.each do |sector|
+        [].tap do |row_data|
+          row_data << sector
+          [total_data, suitable_data, unsuitable_data].each do |count_data|
+            row_data << count_data[[sector, 'new']]
+            row_data << count_data[[sector, 'renewal']]
+          end
+        end.then do |result_data|
+          sheet.add_row result_data, style: data_style
+        end
+      end
+      %i[all suitable unsuitable]
+        .map { |status| @total_count.dig([:sector, status])&.values }
+        .flatten
+        .then { |data| sheet.add_row ['TOTAL', *data] }
+    end
+
+    3.times { sheet.add_row }
+
+    # state statistics data
+    sheet.add_row ["STATISTIK SARINGAN KESIHATAN #{@company_name.to_s.upcase} TERHADAP PEKERJA ASING MENGIKUT NEGERI"],
+                  style: title_style
+    sheet.add_row ['', 'JUMLAH DIPERIKSA', '', 'BIL. SESUAI', '', 'BIL. TIDAK SESUAI', ''],
+                  style: header_style
+    ['B2:C2', 'D2:E2', 'F2:G2'].each { |range| sheet.merge_cells(range) }
+    sheet.add_row %w[NEGERI BARU PEMBAHARUAN BARU PEMBAHARUAN BARU PEMBAHARUAN],
+                  style: header_style
+    if @state_data.present?
+      total_data, suitable_data, unsuitable_data = @state_data
+      total_data.keys.map(&:first).sort.each do |state|
+        [].tap do |row_data|
+          row_data << state
+          [total_data, suitable_data, unsuitable_data].each do |count_data|
+            row_data << count_data[[state, 'new']]
+            row_data << count_data[[state, 'renewal']]
+          end
+        end.then do |result_data|
+          sheet.add_row result_data, style: data_style
+        end
+      end
+      %i[all suitable unsuitable]
+        .map { |status| @total_count.dig([:state, status])&.values }
+        .flatten
+        .then { |data| sheet.add_row ['TOTAL', *data] }
+    end
+
+    3.times { sheet.add_row }
+
+    # origin statistics data
+    sheet.add_row ["STATISTIK SARINGAN KESIHATAN #{@company_name.to_s.upcase} TERHADAP PEKERJA ASING MENGIKUT NEGARA SUMBER"],
+                  style: title_style
+    sheet.add_row ['', 'JUMLAH DIPERIKSA', '', 'BIL. SESUAI', '', 'BIL. TIDAK SESUAI', ''],
+                  style: header_style
+    ['B2:C2', 'D2:E2', 'F2:G2'].each { |range| sheet.merge_cells(range) }
+    sheet.add_row %w[NEGERA BARU PEMBAHARUAN BARU PEMBAHARUAN BARU PEMBAHARUAN],
+                  style: header_style
+    if @origin_data.present?
+      total_data, suitable_data, unsuitable_data = @origin_data
+      total_data.keys.map(&:first).sort.each do |origin|
+        [].tap do |row_data|
+          row_data << origin
+          [total_data, suitable_data, unsuitable_data].each do |count_data|
+            row_data << count_data[[origin, 'new']]
+            row_data << count_data[[origin, 'renewal']]
+          end
+        end.then do |result_data|
+          sheet.add_row result_data, style: data_style
+        end
+      end
+      %i[all suitable unsuitable]
+        .map { |status| @total_count.dig([:origin, status])&.values }
+        .flatten
+        .then { |data| sheet.add_row ['TOTAL', *data] }
+    end
+
+    sheet.column_widths 15, 10, 10, 10, 10, 10, 10
+  end
+end

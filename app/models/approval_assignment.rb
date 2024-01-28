@@ -1,0 +1,2 @@
+class ApprovalAssignment < ApplicationRecord
+end

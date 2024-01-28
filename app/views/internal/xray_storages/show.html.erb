@@ -1,0 +1,35 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>X-Ray Storages</strong> - X-Ray Storage Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="xray_storage_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @xray_storage.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_xray_storages_path) %>
+            <% if has_permission?('EDIT_XRAY_STORAGE') %>
+                <%=raw show_edit_button(edit_internal_xray_storage_path(@xray_storage)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

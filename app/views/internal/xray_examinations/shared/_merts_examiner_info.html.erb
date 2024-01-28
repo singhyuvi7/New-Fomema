@@ -1,0 +1,41 @@
+<div class="card">
+    <div class="card-header">
+        Examination Info
+    </div>
+
+    <table class="table table-bordered table-card table-sm">
+        <tbody>
+            <% if xray_examination.sourceable_type == 'Transaction' %>
+                <tr>
+                    <td class="font-weight-bold" >Doctor Name</td>
+                    <td><%= xray_examination.sourceable&.doctor&.name %></td>
+                    <td class="font-weight-bold" >Doctor Code</td>
+                    <td><%= xray_examination.sourceable&.doctor&.code %></td>
+                </tr>
+            <% end %>
+
+            <% unless xray_examination.sourceable&.xray_reporter_type == 'SELF' %>
+                <tr>
+                    <td class="font-weight-bold" >Radiologist Name</td>
+                    <td><%= xray_examination.sourceable&.radiologist&.name %></td>
+                    <td class="font-weight-bold" >Radiologist Code</td>
+                    <td><%= xray_examination.sourceable&.radiologist&.code %></td>
+                </tr>
+            <% else %>
+                <tr>
+                    <td class="font-weight-bold" >X-Ray Facility Name</td>
+                    <td><%= xray_examination.sourceable&.xray_facility&.name %></td>
+                    <td class="font-weight-bold" >X-Ray Facility Code</td>
+                    <td><%= xray_examination.sourceable&.xray_facility&.code %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td class="font-weight-bold">X-Ray Taken Date</td>
+                <td><%= xray_examination.try(:xray_taken_date).nil? ? "N/A" : xray_examination.xray_taken_date.strftime(get_standard_date_format) %></td>
+                <td class="font-weight-bold">X-Ray Report Date</td>
+                <td><%= xray_examination.try(:transmitted_at).nil? ? "N/A" : xray_examination.transmitted_at.strftime(get_standard_date_format) %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

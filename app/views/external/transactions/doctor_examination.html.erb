@@ -1,0 +1,224 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong> - Doctor Medical Examination</div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                medical: "Medical History",
+                physical: "Physical Examination",
+                system: "System Exam"
+            }
+
+            waiting_for_results = []
+
+            if @transaction.laboratory_examination.try(:transmitted_at?)
+                category_parent_tabs[:laboratory]  = "Laboratory"
+            else
+                waiting_for_results << "Laboratory"
+            end
+
+            if @transaction.xray_examination.try(:transmitted_at?)
+                category_parent_tabs[:xray]        = "Xray"
+            else
+                waiting_for_results << "Chest X-ray"
+            end
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",        parent: "information",      title: "Worker Information"},
+                {type: "category_1",    parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",    parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",      parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",      parent: "system",           title: "System Exam 1"},
+                {type: "system_2",      parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",    parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",          parent: "xray",             title: "X-ray"},
+                {type: "condition",     parent: "certification",    title: "Condition"},
+                {type: "certification", parent: "certification",    title: "Certification"},
+                {type: "follow_up",     parent: "certification",    title: "Follow Up"}
+            ]
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 1}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= nested_form_for @transaction, url: medical_examination_external_transactions_path(@transaction), html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <%= render "/shared/transactions_tab_params" %>
+        <%= render partial: "external/transactions/doctor_examinations/worker_information", locals: { form: form } %>
+        <% doctor_examination = @transaction.doctor_examination %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+
+        <% if category_parent_tabs[:laboratory].present? %>
+            <div class="category-switchable hidden" data-type="laboratory">
+                <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true, doctor_examination: doctor_examination } %>
+            </div>
+        <% end %>
+
+        <% if category_parent_tabs[:xray].present? %>
+            <div class="category-switchable hidden" data-type="xray">
+                <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true, doctor_examination: doctor_examination } %>
+            </div>
+        <% end %>
+
+        <div class="card-footer text-right">
+            <%= form.submit "Save", class: "btn btn-primary", value: "Save", id: "save-submit" %>
+            <%= form.submit "Save and Transmit", class: "btn btn-secondary", value: "Save and Transmit", id: "save-and-transmit-submit" %>
+        </div>
+    <% end %>
+</div>
+
+<%
+    if @past_exams.present?
+        examination_history = @past_exams.map do |transaction|
+            { date: transaction.transaction_date.strftime("%d/%m/%Y"), title: "Transaction ##{ transaction.code }", path: previous_examination_history_external_transaction_path(transaction.id)}
+        end
+    end
+%>
+
+<% if examination_history.present? %>
+    <div class="card">
+        <div class="card-header"><strong>Previous Certified Transaction(s)</strong></div>
+        <div class="card-body">
+                <p>The other certified transaction(s) that belong to this foreign worker</p>
+
+                <% examination_history.each.with_index(1) do |hash, index| %>
+                    <span class="d-inline-block w-em-2"><%= index %>.</span>
+
+                    <%= link_to hash[:path], target: :_blank do %>
+                        <b><%= hash[:date] %></b> - <%= hash[:title] %>
+                    <% end %><br>
+                <% end %>
+            </div>
+    </div>
+<% end %>
+
+<div id="dialog-prevent-transmit" class="hidden" title="Awaiting <%= waiting_for_results.join(" and ") %> <%= "result".pluralize(waiting_for_results.size) %>">
+    <p><%= waiting_for_results.join(" and ") %> <%= "result".pluralize(waiting_for_results.size) %> need to be transmitted by the relevant <%= "party".pluralize(waiting_for_results.size) %> before you can proceed with the certification of medical examination result of this worker.</p>
+</div>
+
+<div id="dialog-measurement-range-transmit" class="hidden" title="Double check entered value">
+    <label></label>
+    <p>The normal value range for this field is: <span></span>. Please recheck this field.</p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        initializeToggleableFields('doctor examination');
+        loadParentCategoryTabSelection();
+        loadCategoryTabSelection();
+
+        $('#save-and-transmit-submit').click(function(e) {
+            openDialogAndPreventSubmit('#dialog-prevent-transmit', e);
+        });
+
+        $('.measurement-range-check').change(function(e) {
+            type    = $(this).attr('data-type');
+            value   = $(this).val();
+
+            if (!value.trim()) {
+                return false;
+            }
+
+            focusField      = $(this).closest('.boolean-field-parent');
+            floatedValue    = parseFloat(value);
+
+            parameters = {
+                physical_height: {name: 'HEIGHT', min: 75, max: 225},
+                physical_weight: {name: 'WEIGHT', min: 30, max: 120},
+                physical_pulse: {name: 'PULSE', min: 40, max: 120},
+                physical_blood_pressure_systolic: {name: 'SYSTOLIC', min: 80, max: 139},
+                physical_blood_pressure_diastolic: {name: 'DIASTOLIC', min: 50, max: 89}
+            }[type]
+
+            if (floatedValue < parameters.min || parameters.max < floatedValue) {
+                $('#dialog-measurement-range-transmit label').text(parameters.name);
+                $('#dialog-measurement-range-transmit span').text(`${parameters.min} - ${parameters.max}`);
+                openDialogAndPreventSubmit('#dialog-measurement-range-transmit', e);
+
+                $('#dialog-measurement-range-transmit').on('dialogclose', function(event, ui) {
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            }
+        });
+
+        $('.doc-exam-vision-aided-wipe').change(function() {
+            var value = $(this).val();
+
+            if (value === 'false') {
+                $(`#${ $(this).attr('id') }_a_value`).val('');
+                $(`#${ $(this).attr('id') }_b_value`).val('');
+            }
+        });
+
+        listOfTriggerTypes = [
+            {
+                triggerFields:  ".auto-field-check--speech",
+                resultField:    "#de_attributes_system_nervous_speech_quality"
+            },
+            {
+                triggerFields:  ".auto-field-check--general-mental",
+                resultField:    "#de_attributes_system_nervous_general_mental_status"
+            },
+            {
+                triggerFields:  ".auto-field-check--thoughts",
+                resultField:    "#de_attributes_system_nervous_thought"
+            },
+            {
+                triggerFields:  ".auto-field-check--orientation",
+                resultField:    "#de_attributes_system_nervous_orientation"
+            },
+            {
+                triggerFields:  ".auto-field-check--suicidal-secondary",
+                resultField:    "#de_attributes_system_nervous_thought_suicidality"
+            }
+        ]
+
+        for(i = 0; i < listOfTriggerTypes.length; ++i) {
+            var triggerHash = listOfTriggerTypes[i];
+            setupTriggerButtons(triggerHash);
+        }
+
+        function setupTriggerButtons(triggerHash) {
+            $(triggerHash.triggerFields).change(function() {
+                var state = $(triggerHash.triggerFields).map(function() {
+                    return $(this).val() === 'true';
+                }).get().includes(true);
+
+                var input           = $(triggerHash.resultField);
+                var dangerButton    = $(input).closest('.boolean-field-parent').find('.boolean-field-btn-dummy[data-type="true"]');
+                var successButton   = $(input).closest('.boolean-field-parent').find('.boolean-field-btn-dummy[data-type="false"]');
+                dangerButton.removeClass('btn-danger');
+                successButton.removeClass('btn-success');
+
+                if (state) {
+                    input.val(true);
+                    dangerButton.addClass('btn-danger');
+                } else {
+                    input.val(false);
+                    successButton.addClass('btn-success');
+                }
+
+                input.trigger('change');
+            });
+        }
+    </script>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

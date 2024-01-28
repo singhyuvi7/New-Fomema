@@ -1,0 +1,64 @@
+<div class="p-4 border-bottom">
+    <h3><u>REVIEW DECISION</u></h3>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="row-index">1</label>
+    <label class="flex-grow-1 mb-0">Review Decision</label>
+
+    <div class="d-flex flex-shrink-0">
+        <% mle_decision = @medical_review.medical_mle1_decision %>
+        <%= form.hidden_field :medical_mle1_decision, value: mle_decision, class: "boolean-field" %>
+        <%= raw boolean_field_button(active_color: "success", active: mle_decision == "SUITABLE", readonly: false, value: "SUITABLE", placeholder: "Suitable", classes: "tcupi-bool-check") %>
+        <%= raw boolean_field_button(active_color: "danger", active: mle_decision == "UNSUITABLE", readonly: false, value: "UNSUITABLE", placeholder: "Unsuitable", classes: "tcupi-bool-check") %>
+
+        <% unless @transaction.medical_pr_source == "XQCC" %>
+            <%= raw boolean_field_button(active_color: "danger", active: mle_decision == "TCUPI", readonly: false, value: "TCUPI", placeholder: "TCUPI", classes: "tcupi-bool-check") %>
+        <% end %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent border-bottom">
+    <div>
+        <label class="mr-4 w-em-3">2</label>
+        <label>Justifications</label>
+    </div>
+
+    <%= form.text_area :medical_mle1_comment, rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;" %>
+</div>
+
+<div id="tcupi-checklist-container" class="<%= "hidden" if mle_decision != "TCUPI" %>">
+    <h5 class="px-4 py-3 border-bottom mb-0">3. TCUPI To-Do List</h5>
+    <%
+        indexing        = 0
+        tcupi_todo_ids  = @tcupi_todos.map(&:tcupi_todo_id)
+    %>
+
+    <% TcupiTodo.where(is_active: true).where.not(id: 7).pluck(:id, :description).sort.each do |id, to_do| %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom tcupi-todo-containers">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0"><%= to_do %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = tcupi_todo_ids.include?(id) %>
+                <%= hidden_field_tag "tcupi_to_dos[#{id}]", value ? "YES" : "NO", class: "boolean-field tcupi-todos" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: "YES", placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: "NO", placeholder: "No") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"></label>
+        <label class="flex-grow-1 mb-0">Others</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% other_todo = @tcupi_todos.to_a.find {|todo| todo.tcupi_todo_id == 7 } %>
+
+            <%= text_field_tag :tcupi_to_do_other, other_todo&.description_other, placeholder: "Other to do item", class: "mb-0 w-em-40 form-control rounded-0 px-2 mr-2", disabled: other_todo.blank? %>
+            <%= hidden_field_tag :tcupi_todo_other_bool, other_todo.present? ? "YES" : "NO" %>
+            <%= raw boolean_field_button(active_color: "success", active: other_todo.present?, readonly: false, value: "YES", placeholder: "Yes", classes: "tcupi-todo-other-btn") %>
+            <%= raw boolean_field_button(active_color: "danger", active: other_todo.blank?, readonly: false, value: "NO", placeholder: "No", classes: "tcupi-todo-other-btn") %>
+        </div>
+    </div>
+</div>

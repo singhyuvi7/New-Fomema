@@ -1,0 +1,113 @@
+<%=render 'internal/xray_reviews/shared/checklist_form', { xray_review: xray_review, form: form } %>
+
+<% if @xray_review.transactionz&.xray_film_type&.downcase == 'analog' %>
+    <%=render 'internal/xray_reviews/shared/perform_by_form', { xray_review: xray_review, form: form } %>
+<% end %>
+
+<%=render 'internal/xray_reviews/shared/conclusion_form', { xray_review: xray_review, form: form } %>
+
+<%=render 'internal/xray_reviews/shared/identical_form', { xray_review: xray_review, form: form } %>
+
+<%=render 'internal/xray_reviews/shared/xqcc_comments', { xray_review: xray_review, form: form } %>
+
+<div class="text-right">
+    <%=raw edit_back_button(internal_xray_reviews_path) %>
+    <%=raw edit_submit_button %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#xray_review_xqcc_checklist_input td.findings input[type=radio]').change(function (e) {
+    var finding = e.target;
+    $(finding).closest('tr').find('.items input[type=checkbox]').each(function (idx, cb) {
+        $(cb).prop('disabled', (finding.value == "N" || finding.value == "NO"));
+    });
+    $(finding).closest('tr').find('.items .items_checker').each(function (idx, cb) {
+        $(cb).prop('disabled', (finding.value == "N" || finding.value == "NO"));
+    });
+});
+
+$('#xray_review_xqcc_checklist_input td.items input[type=checkbox]').change(function (e) {
+    var cb = e.target;
+    var hidden_value = ''
+    $(cb).parents('td.items').find('input[type=checkbox]').each(function (idx, cb) {
+        hidden_value = hidden_value + (cb.checked ? '1' : '');
+    });
+    $(cb).parents('td.items').find('.items_checker').val(hidden_value);
+});
+
+$("#add_comment").click(function () {
+    var first_row = $("#comments_table tbody tr:first");
+    clone_row = first_row.clone(false);
+    clone_row.find("td:last-child .delete_comment").removeClass('hidden');
+    clone_row.find(".xqcc_comment").val('');
+    $("#comments_table tbody").append(clone_row);
+    $('.xray_review_form').parsley().refresh();
+});
+
+$(document).on("click", ".delete_comment", function() {
+    $(this).closest('tr').remove();
+});
+
+$("#xray_review_showIdenticalModal").click(function () {
+    $('#identicalModal').modal('show')
+});
+
+$(document).on("click", ".delete_identical", function() {
+    var transaction_id = $(this).data('transaction_id');
+    $(this).closest('tr').remove();
+    refresh_identical_ids();
+});
+
+function refresh_identical_ids()
+{
+    var arr = [];
+    $('#identical_table input[name="xqcc_review_identical[identical_xray_review_id][]"]').each(function (ind, inp) {
+        arr.push(inp.value);
+    });
+    $("#xray_review_identical_xqcc_review_ids").val(arr.length > 0 ? JSON.stringify(arr) : "");
+    $('#xray_review_identical_xqcc_review_ids').parsley().reset();
+}
+
+$("#xray_review_xqcc_checklist_input input[type='radio']").change(function () {
+    var current_element = $(this);
+    var status = current_element.val();
+
+    if ((status == 'Y' || status == 'YES') && can_retake) {
+        $("#xray_review_decision_retake").prop("disabled", false);
+    } else {
+        var disable_retake = true;
+        $("#xray_review_xqcc_checklist_input input[type='radio']:checked").each(function () {
+            if ($(this).val() == 'Y' || $(this).val() == 'YES') {
+                disable_retake = false;
+            }
+        });
+        if (disable_retake) {
+            $("#xray_review_decision_retake").prop("disabled", true);
+            $("#xray_review_decision_retake").prop('checked', false);
+        }
+    }
+});
+
+$('input[name="xray_review[result]"]').change(function () {
+    var xray_review_result = $(this).val();
+    if (xray_review_result == "NORMAL") {
+        $(".xqcc_comment").prop("required", false);
+    } else {
+        $(".xqcc_comment").prop("required", true);
+    }
+
+    if (xray_review_result == 'IDENTICAL') {
+        $("#xray_review_identical_xqcc_review_ids").prop("required", true);
+        $("#xray_review_identical_xqcc_review_ids").prop("disabled", false);
+        $("#xray_review_showIdenticalModal").prop("disabled", false);
+        $("#identical_card").show();
+    } else {
+        $("#xray_review_identical_xqcc_review_ids").prop("required", false);
+        $("#xray_review_identical_xqcc_review_ids").prop("disabled", true);
+        $("#xray_review_showIdenticalModal").prop("disabled", true);
+        $("#identical_card").hide();
+    }
+});
+</script>
+<% end %>

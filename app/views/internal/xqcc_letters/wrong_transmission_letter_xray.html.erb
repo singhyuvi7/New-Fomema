@@ -1,0 +1,86 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        With reference to the above matter, it is noted that you have transmitted a foreign worker's chest X-ray findings as <%= @letter.amended_status == "Suitable" ? "abnormal" : "normal" %> even though the chest X-ray report delineates <%= @letter.amended_status == "Suitable" ? "normal" : "abnormal" %> findings.<br><br>
+        Foreign worker's particulars are as follows:<br>
+    </p>
+
+    <table class="w-100" style="font-weight: bold; padding: 1em 0;">
+        <tr>
+            <td valign="top" style="width: 8em;">WORKER NAME</td>
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_name %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 8em;">WORKER CODE</td>
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_code %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 8em;">PASSPORT NO.</td>
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_passport %></td>
+        </tr>
+    </table>
+
+    <p class="text-justify">
+        Based on the transmitted report, the worker has been certified as <%= @letter.amended_status == "Suitable" ? "UNSUITABLE" : "SUITABLE" %> for employment. However, after subsequent auditing of the worker's chest X-ray, the X-ray findings has been reported otherwise by our consultant radiologist.
+        Please refer to the attached copy of the audit report by our panel consultant radiologist for details.<br><br>
+        As such, this worker's medical status has now been amended to <b><%= @letter.amended_status.upcase %></b> for employment in Malaysia.
+        Please undertake the necessary corrective measures to ensure such lapses in reporting does not recur in future.<br><br>
+        Thank you.<br><br><br>
+        Yours sincerely,<br><br>
+        FOMEMA Management<br><br>
+    </p>
+
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="width: 1.7em;"><p>Cc:</p></td>
+            <td colspan="2"><%= simple_format @letter.doctor_address %></td>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

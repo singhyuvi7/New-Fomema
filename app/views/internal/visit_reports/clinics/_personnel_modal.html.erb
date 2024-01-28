@@ -1,0 +1,44 @@
+<%
+    path = @visit_report.id.blank? ? '' : internal_visit_report_clinic_signature_path(@visit_report)
+%>
+
+<%= form_for @visit_report, url: path, html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+<div class="modal fade" id="labPersonnelModal" tabindex="-1" role="dialog" aria-labelledby="labPersonnel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Clinic PIC Signature</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form.fields_for :visit_report_doctor do |visit_report_doctor| %>
+            <h3 class="text-center">E-Signature</h3>
+            <h5 class="text-center">PIC Acknowledgement</h5>
+            <div class="wrapper">
+                <%= visit_report_doctor.signature_field :personnel_signature %>
+                <%= image_tag @visit_report.visit_report_doctor.personnel_signature, class: "signature-img" if !@visit_report.visit_report_doctor.personnel_signature.blank? %>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap personnel-acknowledge-details text-center">
+                <%= visit_report_doctor.text_field :personnel_name, class: 'form-control personnel-detail-input', placeholder: 'Full Name' %>
+                <%= visit_report_doctor.text_field :personnel_designation, class: 'form-control personnel-detail-input', placeholder: "PIC Designation" %>
+            </div>
+        <% end %>
+      </div>
+      <% if !['show','approval'].include?(params[:action]) %>
+        <div class="modal-footer">
+          <% if !@visit_report.id.blank? %>
+            <button type="button" class="btn btn-warning signature-clear-btn">Clear</button>
+            <button type="button" class="btn btn-warning signature-cancel-edit-btn">Cancel</button>
+            <button type="button" class="btn btn-warning signature-edit-btn">Edit</button>
+            <button type="submit" class="btn btn-primary signature-save-btn" name="submit_action" value="summary_with_personnel_signature" formnovalidate>Save</button>
+          <% else %>
+            <div class="text-danger"><small><i>*Please save form as draft before signature</i></small></div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<% end %>

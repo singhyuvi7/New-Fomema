@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Titles</strong> - Edit Title
+    </div>
+    <%= form_for @title, url: internal_title_path(@title), html: {class: "#{params[:action]}_title title-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

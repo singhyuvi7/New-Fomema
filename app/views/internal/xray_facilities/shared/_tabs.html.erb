@@ -1,0 +1,8 @@
+<%
+active_tab = local_assigns[:active_tab]
+%>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link<%= ' active show' if active_tab.eql?('favourite_radiologists') %>" href="<%= internal_xray_facility_favourite_radiologists_path xray_facility_id: @xray_facility.id %>">Favourite Radiologists</a>
+    </li>
+</ul>

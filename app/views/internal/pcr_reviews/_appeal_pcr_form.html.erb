@@ -1,0 +1,111 @@
+<div class="pcr_review_form">
+    <div class="text-right mb-3">
+        <%= link_to "Download PDF", internal_pcr_review_report_path(pcr_review.id, format: "pdf"), class: "btn btn-success font-weight-bold", target: :_blank %>
+    </div>
+
+    <%= render 'internal/xqccs/shared/perform_by_info', { name: pcr_review.pcr_user&.name, code: pcr_review.pcr_user&.code, label: "PCR", transaction_code: retrieve_pcr_review_transaction_code(pcr_review) } %>
+
+    <%
+        readonly    ||= nil
+        namespace   = readonly ? "pcr_review_#{ pcr_review.id }" : "pcr_review"
+
+        impression_types = {
+            "NORMAL"      => "X-ray's are normal. Lung clear heart normal",
+            "ABNORMAL"     => "X-ray is abnormal",
+            "REPEAT"            => "Repeat",
+        }
+    %>
+
+    <div class="pcr_conclusion_form">
+        <div class="card border-primary">
+            <div class="card-header">PCR Review Conclusion</div>
+
+            <table class="table table-card">
+                <tbody>
+                    <tr>
+                        <td><label class="required">X-Ray Details</label></td>
+
+                        <td>
+                            <% ["YES", "NO"].each do |type| %>
+                                <% checked = pcr_review.belong == type %>
+
+                                <div class="form-check mb-3">
+                                    <label class="form-check-label">
+                                        <%= radio_button_tag "#{ namespace }[belong]", type, checked, required: !readonly, disabled: !checked && readonly, class: "form-check-input" %>
+                                        X-Ray images <%= type == "YES" ? "BELONG" : "DO NOT BELONG" %> to the same worker <%= raw "<b>(Comment Mandatory)</b>" if type == "NO" %>
+                                    </label>
+                                </div>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label>Xray Detail Comment</label></td>
+                        <td><%= text_area_tag "#{ namespace }[belong_comment]", pcr_review.belong_comment, rows: 5, readonly: readonly, class: "form-control" %></td>
+                    </tr>
+
+                    <tr>
+                        <td><label class="required">Impression</label></td>
+
+                        <td>
+                            <% impression_types.each do |key, value| %>
+                                <% checked = pcr_review.result == key %>
+
+                                <div class="mb-3">
+                                    <label class="form-check-label form-check-inline">
+                                        <%= radio_button_tag "#{ namespace }[result]", key, checked, required: !readonly, disabled: !checked && readonly, class: "form-check-input" %>
+                                        <%= value %>
+                                    </label>
+                                </div>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label>Comment</label></td>
+                        <td><%= text_area_tag "#{ namespace }[comment]", pcr_review.comment, rows: 5, readonly: readonly, required: true, class: "form-control" %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-right">
+        <%= raw edit_back_button(internal_pcr_reviews_path) %>
+        <%= raw edit_submit_button %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        var pcrReviewComment = $('#pcr_review_comment');
+        var pcrReviewBelongComment = $('#pcr_review_belong_comment');
+
+        $('[name="pcr_review[belong]"]').click(function() {
+            var conditionalRadio = $('[name="pcr_review[result]"][value="NORMAL"]');
+
+            if ($(this).val() === 'YES') {
+                conditionalRadio.removeAttr('disabled');
+                pcrReviewBelongComment.removeAttr('required');
+
+                if ($('[name="pcr_review[result]"][value="NORMAL"]').prop('checked')) {
+                    pcrReviewComment.removeAttr('required');
+                } else {
+                    pcrReviewComment.attr('required', true);
+                }
+            }  else {
+                conditionalRadio.attr('disabled', true).prop('checked', false);
+                pcrReviewBelongComment.attr('required', true);
+                pcrReviewComment.attr('required', true);
+            }
+        });
+
+        $('[name="pcr_review[result]"]').click(function() {
+            if ($(this).val() === 'NORMAL' && $('[name="pcr_review[belong]"][value="YES"]').prop('checked')) {
+                pcrReviewComment.removeAttr('required');
+            }  else {
+                pcrReviewComment.attr('required', true);
+            }
+        });
+    </script>
+<% end %>

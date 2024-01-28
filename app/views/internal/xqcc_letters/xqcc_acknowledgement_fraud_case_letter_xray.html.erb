@@ -1,0 +1,76 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        Referring to the matter above, we acknowledge your explanation letter dated
+        <%= raw @data[:explain_date] %>. We appreciate your efforts and commitment in continuing to adhere to our Standard Operating Procedure (SOP).
+    </p>
+    <p class="text-justify">
+        We would like to emphasize that FOMEMA SOP states that;
+    </p>
+    <b>Clause 8.1</b>
+    <p style="margin-left: 3em;" class="text-justify">
+        The radiologist/ doctor/ radiographer is responsible for the verification
+        of the identity of the foreign worker through his/her passport or the biometric identification
+        and shall not proceed with the X-ray examination if the original passport is not made available
+         or the biometric identification is not carried out / not accepted.
+         </p>
+    </p>
+    <p style="margin-left: 3em;" class="text-justify">
+        The original passport and the FOMEMA Medical Form shall be made available throughout the X-ray examination. If at any stage, the foreign worker&apos;s identity cannot be verified or ascertained, the radiologist/doctor/radiographer
+        shall not proceed with the examination, and the foreign worker shall be rejected and referred by the X-ray facility to FOMEMA for further action.
+    </p>
+    <p class="text-justify">
+        In the event you encounter a recurrence issue in the future, please contact our customer service via live chat, WhatsApp (03-2782 8777), or email to <u>cs@fomema.com.my</u> / <u>mspd@fomema.com.my</u>
+    </p>
+    <p>
+    Your cooperation in this matter is much appreciated.
+    </p>
+        Thank you for your continuous commitment.<br><br><br>
+        Yours sincerely,<br><br><br><br><br><br>
+
+        <b><%= @letter.issuer_name %></b><br>
+        <%= @letter.issuer_title %>
+
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

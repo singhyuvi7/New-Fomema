@@ -1,0 +1,62 @@
+<thead>
+    <tr>
+        <th>No.</th>
+        <th>Doctor Code</th>
+        <th>Doctor Name</th>
+        <th>Clinic Name</th>
+        <th>Status</th>
+        <th>State</th>
+        <th>Own X-Ray</th>
+
+        <% unless params[:exclude_previous_year] == "true" %>
+            <th>Total <%= params[:previous_year] %></th>
+            <th>Unfit <%= params[:previous_year] %></th>
+            <th>Change <%= params[:previous_year] %></th>
+        <% end %>
+
+        <th>Total <%= Date.today.year %></th>
+        <th>Pending Cert <%= Date.today.year %></th>
+        <th>Unfit <%= Date.today.year %></th>
+        <th>Change <%= Date.today.year %></th>
+        <th>Action</th>
+    </tr>
+</thead>
+
+<tbody>
+    <% @doctors.each.with_index((@doctor_ids.current_page - 1) * get_per + 1) do |doctor, index| %>
+        <tr class="filter-table-search-results">
+            <td><%= index %></td>
+            <td><%= doctor[:code] %></td>
+            <td><%= doctor[:name] %></td>
+            <td><%= doctor[:clinic] %></td>
+            <td><%= doctor[:status] %></td>
+            <td><%= doctor[:state] %></td>
+            <td><%= doctor[:xray] %></td>
+
+            <% unless params[:exclude_previous_year] == "true" %>
+                <td><%= doctor[:total_previous] %></td>
+                <td><%= doctor[:unfit_previous] %></td>
+                <td><%= doctor[:change_previous] %></td>
+            <% end %>
+
+            <td><%= doctor[:total_current] %></td>
+            <td><%= doctor[:pending_cert_current] %></td>
+            <td><%= doctor[:unfit_current] %></td>
+            <td><%= doctor[:change_current] %></td>
+
+            <td>
+                <div class="select-doctor btn btn-success" data-id="<%= doctor[:id] %>" data-code="<%= doctor[:code] %>" data-name="<%= doctor[:name] %>">Select</div>
+            </td>
+        </tr>
+    <% end %>
+</tbody>
+
+<% if @doctors.blank? %>
+    <tr>
+        <td colspan="6"><font color='red'><b>The doctor you search for is temporary not available OR has exceeded its allocated quota for this quarter of the year. Search other clinic to continue.</b></font></td>
+    </tr>
+<% end %>
+
+<div id="pagination-response" class="row">
+    <%= paginate @doctor_ids %>
+</div>

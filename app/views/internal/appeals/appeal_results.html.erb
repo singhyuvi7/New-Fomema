@@ -1,0 +1,83 @@
+<div class="card">
+    <div class="card-header"><strong>Appeal Results</strong> - <%= @appeal.id %></div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information"
+            }
+
+            transaction_displayed_sections
+
+            sections = [
+                ["Medical History", { medical: "Medical History" }],
+                ["Physical Examination", { physical: "Physical Examination" }],
+                ["System Exam", { system: "System Exam" }],
+                ["Laboratory", { laboratory: "Laboratory" }],
+                ["X-Ray", { xray: "X-Ray" }],
+                ["Certification", { certification: "Certification" }],
+                ["FOMEMA Result Review", { review_decision: "FOMEMA Result Review" }],
+                ["Update Result", { update_result: "Update Result" }],
+                ["Amendment Final Result", { final_result_update: "Amendment Final Result" }],
+                ["XQCC", { xqcc_pcr: "XQCC" }],
+                ["Appeal", { appeal: "Appeal" }]
+            ].each {|key, hash| category_parent_tabs.merge!(hash) if @displayed_sections.include?(key) }
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",            parent: "information",      title: "Worker Information"},
+                {type: "category_1",        parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",        parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",          parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",          parent: "system",           title: "System Exam 1"},
+                {type: "system_2",          parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",        parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",              parent: "xray",             title: "X-ray"},
+                {type: "condition",         parent: "certification",    title: "Condition"},
+                {type: "certification",     parent: "certification",    title: "Certification"},
+                {type: "follow_up",         parent: "certification",    title: "Follow Up"},
+                {type: "appeal_details",    parent: "appeal",           title: "Appeal Details"}
+            ]
+
+            category_tabs += [{type: "decision",            parent: "review_decision", title: "Medical PR"}]            if @medical_review.present?
+            category_tabs += [{type: "tcupi_decision",      parent: "review_decision", title: "TCUPI Review"}]          if @tcupi_review.present?
+            category_tabs += [{type: "pcr_comments",        parent: "xqcc_pcr",        title: "PCR Comments"}]          if @pcr_comments.present?
+            category_tabs += [{type: "xqcc_p_decision",     parent: "xqcc_pcr",        title: "Pending Decision"}]      if @displayed_sections.include?("Pending Decision")
+            category_tabs += [{type: "mle_comments",        parent: "xqcc_pcr",        title: "MLE Comments"}]          if @displayed_sections.include?("MLE Comments")
+            category_tabs += [{type: "unsuitable_reasons",  parent: "certification",   title: "Unsuitable Reasons"}]    if @displayed_sections.include?("Unsuitable Reasons")
+            category_tabs += [{type: "update_result_details",   parent: "update_result",        title: "Details"}]      if @result_updates.present?
+            category_tabs += [{type: "final_result_details",    parent: "final_result_update",  title: "Details"}]      if @amendments.present?
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 0}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= render "/internal/appeals/transaction_displayed_sections" %>
+
+    <div class="category-switchable hidden" data-type="appeal_details">
+        <%= render partial: "internal/appeals/appeal_results", locals: { appeal: @appeal } %>
+    </div>
+
+    <div class="card-footer text-right">
+        <%= raw show_back_button(internal_appeals_path) %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        loadParentCategoryTabSelection();
+        loadCategoryTabSelection();
+    </script>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :code, class: '' %>
+            <p class="form-control-plaintext">
+                <%= @transaction.try(:code) %>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :employer, class: 'required' %>
+            <%= form.select :employer_id, options_from_collection_for_select(Employer.where("id = ?", form.object.employer_id).order(:name).all, 'id', 'name', form.object.employer_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+            <% if form.object.employer_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.employer_id_was.nil? ? '* EMPTY' : Employer.find(form.object.employer_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+           <%= form.label :foreign_worker, class: 'required' %>
+            <%= form.select :foreign_worker_id, options_from_collection_for_select(ForeignWorker.order(:name).all, 'id', 'name', form.object.foreign_worker_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+            <% if form.object.foreign_worker_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.foreign_worker_id_was.nil? ? '* EMPTY' : ForeignWorker.find(form.object.foreign_worker_id_was).try(:name) %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :doctor, class: 'required' %>
+            <%= form.select :doctor_id, options_from_collection_for_select(Doctor.order(:name).all, 'id', 'name', form.object.doctor_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+            <% if form.object.doctor_id_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= form.object.doctor_id_was.nil? ? '* EMPTY' : Doctor.find(form.object.doctor_id_was).try(:name) %></p>                     
+            <% end %>
+        </div>
+    </div>
+</div>

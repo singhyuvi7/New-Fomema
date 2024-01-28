@@ -1,0 +1,10 @@
+<tr>
+    <% if @refund.category == 'TRANSACTION_CANCELLATION' %>
+        <td><%= refund_item.refund_itemable_type == 'Transaction' ? Order::CATEGORIES[refund_item.refund_itemable.order_item.order.category].try(:titleize) : Refund::CATEGORIES[refund_item.refund.category] %></td>
+    <% else %>
+        <td><%= Refund::CATEGORIES[@refund.category] %></td>
+    <% end %>
+    <td><%= refund_item.refund_itemable&.code %></td>
+    <td><%= "#{refund_item.refund_itemable&.foreign_worker&.name} (#{refund_item.refund_itemable&.foreign_worker&.code}) " if refund_item.refund_itemable and refund_item.refund_itemable&.foreign_worker %></td>
+    <td><%= number_to_currency(refund_item.amount, unit: "") %></td>
+</tr>

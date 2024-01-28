@@ -1,0 +1,91 @@
+
+    <div class="card-body">
+
+        <%= render 'shared/all_validation_flash', { model_obj: @group_schedule } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :sp_schedulable_type, "Service Provider", class: 'required' %>
+                    <%= form.select :sp_schedulable_type, options_for_select(SpGroupSchedule::SP_SCHEDULEABLE_TYPES.invert, form.object.sp_schedulable_type), {include_blank: form_select_option_text}, class: 'form-control', required: true, readonly: ["edit", "update", "show"].include?(params[:action]) %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :sp_scheduleable_id, "Service Provider Code", class: 'required' %>
+                    <%= form.hidden_field :sp_schedulable_id %>
+                    <%= text_field_tag :sp_schedulable_code, @sp_schedulable_code, class: 'form-control', required: true, disabled: ["edit", "update","show"].include?(params[:action]) %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :service_provider_group_id,"Group" %>
+                    <%= form.select :service_provider_group_id, options_from_collection_for_select(@groups, 'id', 'name', form.object.service_provider_group_id), {include_blank: form_no_group_text}, class: 'form-control', required: false,disabled: ["show"].include?(params[:action]) %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :scheduled_date, "Scheduled Date", class: 'required' %>
+                    <%= form.date_field :scheduled_date, class: 'form-control', required: true, disabled: ["show"].include?(params[:action]), min: Date.today  %>
+                </div>
+            </div>
+        </div>
+
+        <p class="font-italic">
+            <strong>* Payment Cycle</strong><br>
+            1-6<br>
+            7-12<br>
+            13-18<br>
+            19-24<br>
+            25-31
+        </p>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw edit_back_button(internal_group_schedules_path(
+                {}.merge(
+                    params.key?("sp_schedulable_code") ? {sp_scheduleable_code: params[:sp_schedulable_code]} : {}
+                ).merge(
+                    params.key?("sp_schedulable_type") ? {sp_scheduleable_type: params[:sp_schedulable_type]} : {}
+                )
+            )) %>
+            <% if !["show"].include?(params[:action]) %>
+            <%=raw edit_save_button() %>
+            <% end %>
+        </div>
+
+    </div>
+
+
+<% content_for :page_end_scripts do %>
+<script>
+    selectedGroup = '<%= @group_schedule.service_provider_group_id %>'
+    getGroups(selectedGroup)
+    $('#sp_group_schedule_sp_schedulable_type').change(function () {
+        getGroups('')
+    });
+
+    function getGroups(groupId){
+        serviceProvider = $('#sp_group_schedule_sp_schedulable_type').val()
+        if(serviceProvider){
+            $.ajax({
+                url: "/group_schedules/service_provider_groups/" + serviceProvider,
+                method: "GET",
+                success: function (response) {
+                    $('#sp_group_schedule_service_provider_group_id').html('<option value="">Leave Group</option>');
+                    response.forEach(function (row, index) {
+                        $('#sp_group_schedule_service_provider_group_id').append('<option value="' + row.id + '" '+ (groupId == row.id ? 'selected' : '') +'>' + row.name + '</option>');
+                    });
+                },
+            });
+        }
+    }
+</script>
+<% end %>

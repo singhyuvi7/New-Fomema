@@ -1,0 +1,974 @@
+<%= render 'shared/all_validation_flash', { model_obj: @employer } %>
+<div class="container container-blue-portal" style="width:100%;">
+    <div class="form-group row">
+        <%= f.label :employer_type_id, class: 'form-label required' %>
+        <div class="col-md-5 col-form-label">
+            <% EmployerType.order(:name).all.each do |et| %>
+                <div class="form-check form-check-inline mr-4">
+                    <input class="form-check-input" id="employer_employer_type_id_<%= et.id %>" type="radio" value="<%= et.id %>" name="employer[employer_type_id]" onclick="employer_type_selected(this)" required data-employer_type_name="<%= et.name %>">
+                    <label class="form-check-label" for="employer_employer_type_id_<%= et.id %>"><%= et.name %></label>
+                </div>
+            <% end %>
+            <div class="form-check form-check-inline">
+                <button type="button"
+                    data-toggle="popover"
+                    data-placement="top"
+                    data-html="true"
+                    data-content="
+
+                    <h6>Individual Employers</h6>
+                    <ul class='emp_type_desc'>
+                        <li>Employers who hire foreign workers for non-commercial purposes</li>
+                    </ul>
+
+                    <h6>Company Employers</h6>
+                    <ul class='emp_type_desc'>
+                        <li>Employers who hire foreign workers for commercial purposes</li>
+                    </ul>
+
+                    <!-- <h6>Maid Online Employers</h6>
+                    <ul class='emp_type_desc'>
+                        <li>Individual employers who can directly hire foreign maid (Maid Online)</li>
+                    </ul> -->"
+                    title="Employer Type Information"
+                    class="btn btn-primary btn-sm"><i class="fa fa-info-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row" id="employer_business_registration_number_row">
+        <%= f.label :business_registration_number, 'Business Registration Number', class: 'form-label required'%>
+        <div class="col-sm-4">
+            <%= f.text_field :business_registration_number, class: 'form-inputtext', required: true, disabled: true, maxlength: "20", pattern: "^([a-zA-Z0-9]+)$", data: { parsley_pattern_message: "Only alphabets and numbers" } %>
+        </div>
+    </div>
+
+    <div class="form-group row" id="employer_ic_passport_number_row">
+        <%= f.label :ic_passport_number, 'ICNO / Passport Number', class: 'form-label required'%>
+        <div class="col-sm-4">
+            <%= f.text_field :ic_passport_number, class: 'form-inputtext', required: true, disabled: true, maxlength: "20", pattern: "^([a-zA-Z0-9]+)$", data: { parsley_pattern_message: "Only alphabets and numbers" } %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :name, 'Company Name', id: 'name_label', class: 'form-label required'%>
+        <div class="col-sm-4">
+            <%= f.text_field :name, class: 'form-inputtext', required: true, pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Employer / Company Name must not begin with a special characters", maxlength: "150" %>
+        </div>
+    </div>
+
+    <div class="form-group row" id="employer_pic_name_row">
+        <%= f.label :pic_name, 'Person In Charge Name', class: 'form-label required' %>
+        <div class="col-sm-4">
+            <%= f.text_field :pic_name, class: 'form-inputtext', required: true, disabled: true, maxlength: "150", pattern:"^([a-zA-Z0-9\s]+)$" %>
+        </div>
+    </div>
+
+    <div class="form-group row" id="employer_pic_phone_row">
+        <%= f.label :pic_phone, 'Person In Charge Contact No.', class: 'form-label required', style:'padding-right:28px;' %>
+        <div class="col-sm-4">
+            <%= f.text_field :pic_phone, class: 'form-inputtext', required: true, disabled: true, :data => { 'parsley-type' => 'number' }, maxlength: "20", pattern: "[0-9]*" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :address1, 'Address',class: 'form-label required' %>
+        <div class="col-sm-4">
+            <%= f.text_field :address1, class: 'form-inputtext2', required: true, maxlength: "50" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :address2, class: 'form-label' do %>
+        <% end %>
+        <div class="col-sm-4">
+            <%= f.text_field :address2,  class: 'form-inputtext2', maxlength: "50" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :address3, class: 'form-label' do %>
+        <% end %>
+        <div class="col-sm-4">
+            <%= f.text_field :address3, class: 'form-inputtext2', maxlength: "50" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :address4, class: 'form-label' do %>
+        <% end %>
+        <div class="col-sm-4">
+            <%= f.text_field :address4, class: 'form-inputtext2', maxlength: "50" %>
+        </div>
+    </div>
+
+    <%= render 'external/shared/vertical_form_state_postcode_town', {form: f} %>
+
+    <div class="form-group row">
+        <%= f.label :phone, class: 'form-label required'%>
+        <div class="col-sm-4">
+            <%= f.text_field :phone, class: 'form-inputtext', required: true, :data => { 'parsley-type' => 'number' }, maxlength: "20", pattern: "[0-9]*" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :fax,style:'padding-left:12px', class: 'form-label'%>
+        <div class="col-sm-4">
+            <%= f.text_field :fax, class: 'form-inputtext', maxlength: "20", pattern: "[0-9]*" %>
+        </div>
+    </div>
+
+    <div class="form-group row" id="employer_email_row">
+        <%= f.label :email, class: 'form-label required'%>
+        <div class="col-sm-4">
+            <%= f.email_field :email, readonly: true, class: 'form-inputtext', required: true, maxlength: "100", pattern: "[a-zA-Z0-9]..*" %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="form-label"></label>
+        <div class="col-md-6">
+            <%= f.check_box :personal_data_consent, required: true %>
+            I consent to the processing of my personal data by FOMEMA
+            Sdn Bhd in accordance with the terms as set out in the
+            <a href="https://www.fomema2u.com.my/privacy-policy/">Privacy Policy</a>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%=f.label :documents, class: 'form-label required' %>
+
+        <div class="col-md-6" style="padding-left:120px;">
+            <p style="padding-top: calc(0.375rem + 1px);">Please upload the following documents for verification. Please upload each document separately.</p>
+
+            <div class="hidden" id="individual_document_list">
+                <ol class="ol-list-portal">
+                    <li>Your NRIC if you are Malaysian or your passport if you are non-Malaysian</li>
+                    <li>A Copy of current work permit/ Calling VISA/ Sistem Maid Online slip/ Approval slip from Immigration for a worker</li>
+                </ol>
+            </div>
+
+            <div class="" id="company_document_list">
+                <ol class="ol-list-portal">
+                    <li>Your company's registration paper such as Form 9 or equivalent</li>
+                    <li>Letter of authorization for contact person to perform worker registrations</li>
+                    <li>NRIC of Contact Person to perform worker's registrations</li>
+                    <li>A Copy of current work permit/ Calling VISA/ Sistem Maid Online slip/ Approval slip from Immigration for a worker</li>
+                    <li>RTK quota approval email (For RTK worker only)</li>
+                </ol>
+            </div>
+
+            <div class="hidden" id="maidonline_document_list">
+                <ol class="ol-list-portal">
+                    <li>Your NRIC if you are Malaysian or your passport if you are non-Malaysian</li>
+                    <li>A copy of the Calling Visa, Worker Permit for a worker/ Application of Foreign Domestic Helper (Maid Online)</li>
+                </ol>
+            </div>
+
+            <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB.</p>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-7 offset-md-2">
+            <!-- add more fields or remove them by jquery -->
+            <div class="input-group custom-input-group">
+                <div class="col-md-4 document-type">
+                    <select class="col-md-12 form-control document-type-selector" name="employer[uploads][][category]">
+                        <option value="">Select option</option>
+                        <% Employer::DOCUMENT_TYPES.each do |document_type, index| %>
+                        <option value="<%= document_type %>"><%= index %></option>
+                        <% end %>
+                    </select>
+                </div>
+
+                <div class="custom-file col-md-6">
+                    <input type="file" name="employer[uploads][][documents]" class="custom-file-input"
+                        onchange="validateFiles(this)" disabled>
+                    <label class="custom-file-label"></label>
+                </div>
+
+                <div style="width: 90px;" class="">
+                    <input type="text" style="border-radius: 0; border: 0;" readonly="readonly" class="form-control inline-file-size" placeholder="0 MB" value="">
+                </div>
+
+                <div class="removal-button btn btn-danger font-weight-bold">X</div>
+
+            </div>
+
+            <div id="document-input-group"></div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for=""></label>
+        <div class="col-md-6">
+            <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <%= f.label :submit, class: 'col-md-4 col-form-label' do %>
+        <% end %>
+        <div class="col-md-6 buttons-wrapper"  style="padding-left:20px;">
+            <%= f.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-left',style:'margin-left: 50px;', type: 'button' %>
+        </div>
+    </div>
+
+    <div class="form-group row mt-6">
+        <label class="col-form-label" style="margin-right:69px;">Pending Documents</label>
+        <div class="col-md-7">
+            <textarea class="form-control" readonly="readonly" data-parsley-uploaded-documents="" data-parsley-validate-if-empty="" name="" id="employer_pending_documents" rows="5"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-6 buttons-wrapper">
+            <%= f.submit 'Submit', id: 'approval_submit', class: 'btn btn-fomema blue-portal float-right' %>
+        </div>
+    </div>
+</div>
+
+    <style>
+        div.custom-radio > label {
+            margin-left: 10px;
+            margin-right: 40px;
+        }
+
+        .form-group>label {
+            text-align: left;
+            padding-left:3px;
+        }
+
+        input,
+        select {
+            border: 1px solid #337ab7;
+            border-radius: 20px;
+            padding: 5px;
+        }
+
+        #approval_submit {
+            background-color: #2b3990;
+            border-radius: 20px;
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        #add_more_documents {
+            border-radius: 20px;
+        }
+
+        #draft_submit {
+            background-color: #337ab7;
+            border-radius: 20px;
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        .select2-selection.select2-selection--single,
+        .select2-selection.select2-selection--multiple {
+            border-radius: 20px;
+        }
+
+        .select2-selection {
+            border: 1px solid #337ab7 !important;
+            border-radius: 5px;
+            height: calc(2.0625rem + 2px);
+        }
+        .custom-input-group {
+            border: 1px solid #337ab7 !important;
+            border-radius: 5px;
+            padding: 0;
+        }
+        .document-type {
+            padding: 0;
+        }
+        .document-type > select {
+            border: 0px;
+        }
+        .buttons-wrapper {
+            padding: 0;
+        }
+        .top-margin {
+            margin-top: 10px;
+        }
+
+        ul.emp_type_desc {
+            padding-left: 15px;
+        }
+        .form-label {
+            display: inline-block;
+            width: 210px;
+        }
+        .form-town {
+            display:inline-block;
+            width:40px;
+        }
+        .form-poscode {
+            display:inline-block;
+            width:70px;
+        }
+        .form-inputtext {
+            display: inline-block;
+            width: 130%;
+            border-radius:5px;
+        }
+        .form-inputtext2 {
+            display: inline-block;
+            width: 250%;
+            border-radius:5px;
+        }
+        .form-inputtext3 {
+            display: inline-block;
+            width: 110%;
+            border-radius:5px;
+        }
+        .form-inputtext4 {
+            display: inline-block;
+            width: 100%;
+            border-radius:5px;
+        }
+    </style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+
+        // hide conditional fields on load
+
+        var disable_required_fields = [
+            'employer_business_registration_number',
+            'employer_pic_name',
+            'employer_pic_phone',
+            'employer_ic_passport_number',
+        ];
+
+        enableDisableFields(disable_required_fields);
+
+        // define default clone
+
+        var cloned_company_select = null;
+        var cloned_individual_select = null;
+        var cloned_maidonline_select = null;
+
+        // get current employer type
+
+        function getActiveEmployerType() {
+            if ($("[name='employer[employer_type_id]']:checked").length <= 0) {
+                return null;
+            }
+            return $("[name='employer[employer_type_id]']:checked").attr('data-employer_type_name').replace(' ', '').toLowerCase();
+        }
+
+        // get employer type
+
+        function getEmployerType(employer_type_id) {
+
+            if (employer_type_id === '1') {
+                return 'individual';
+            }
+
+            if (employer_type_id === '2') {
+                return 'company';
+            }
+
+            if (employer_type_id === '3') {
+                return 'maidonline';
+            }
+
+            return null;
+        }
+
+        function isLabuan() {
+            // get labuan id
+            var labuan_id = <%= State.find_by(code: "G").id %>;
+            var employer_state_id = $('#employer_state_id').val();
+            let is;
+            if (employer_state_id == labuan_id) {
+                is = true;
+            } else {
+                is = false;
+            }
+            // console.log(`isLabuan: ${is ? 'yes' : 'no'}`);
+            return is;
+        }
+
+        function getRegion() {
+            let ret;
+            if (isLabuan()) {
+                ret = 'labuan';
+            } else {
+                ret = 'peninsular';
+            }
+            // console.log(`getRegion: ${ret}`);
+            return ret;
+        }
+
+        function setUploadCategoryOption(employer_type_id) {
+            // console.log(`setUploadCategoryOption called`);
+            var employer_type = getEmployerType(employer_type_id);
+
+            if (!employer_type) {
+                return false;
+            }
+
+            var region = getRegion();
+
+            $('.document-type-selector').each(function (index, obj) {
+
+                // clear existing option
+
+                $(obj).empty();
+
+                // append new option based on the employer type
+
+                $(obj).append(new Option('Select option', ''));
+
+                var needed_validate_documents = attach_documents[employer_type][region];
+
+                needed_validate_documents.forEach(function (document_type) {
+
+                    var document_type_label = document_types[document_type];
+
+                    $(obj).append(new Option(document_type_label, document_type));
+                });
+
+            });
+
+            // clone select option after updating the option
+
+            cloneSelect(employer_type);
+        }
+
+        function cloneSelect(employer_type) {
+            window['cloned_' + employer_type + '_select'] = $('.custom-input-group:first').clone(true, true);
+        }
+
+        // re-sync pending documents
+
+        function syncPendingDocuments() {
+
+            var pending_uploads = getPendingUploads();
+
+            if (!pending_uploads) {
+                return false;
+            }
+
+            setPendingDocuments(pending_uploads);
+        }
+
+        // get pending uploads depending on employer type
+
+        function getPendingUploads() {
+
+            var employer_type_id = $("[name='employer[employer_type_id]']:checked").val();
+
+            var employer_type = getEmployerType(employer_type_id);
+
+            if (!employer_type) {
+                return false;
+            }
+
+            var region = getRegion();
+
+            var needed_validate_documents = required_documents[employer_type][region];
+
+            // var pending_uploads = needed_validate_documents;
+            var pending_uploads = needed_validate_documents.slice();
+
+            // console.log(needed_validate_documents);
+
+            $('.custom-input-group').each(function (index, obj) {
+
+                var document_type = $(obj).find('.document-type-selector').val();
+
+                var selected_file = $(obj).find('.custom-file-input').val();
+
+                // check if this document needed by current employer type
+                // if yes we need to check file exist
+
+                if (needed_validate_documents.includes(document_type)) {
+
+                    // if valid upload
+
+                    if (selected_file) {
+
+                        // remove from pending uploads
+
+                        for( var i = 0; i < pending_uploads.length; i++){
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            return pending_uploads;
+        }
+
+        // set pending documents list
+
+        function setPendingDocuments(pending_uploads) {
+
+            var pending_list = '';
+
+            pending_uploads.forEach(function (document_type) {
+
+                var document_type_label = document_types[document_type];
+
+                pending_list = pending_list + document_type_label + '\n';
+            });
+
+            var pending_documents = $("#employer_pending_documents");
+
+            // reset pending list
+
+            pending_documents.val('');
+
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        // js validation
+
+        var document_types = <%= Employer::DOCUMENT_TYPES.to_json.html_safe %>;
+
+        var attach_documents = {
+            company: {
+                peninsular: [
+                    'COMPANY_REGISTRATION_PAPER',
+                    'LETTER_OF_AUTHORIZATION',
+                    'CONTACT_PERSON_NRIC',
+                    'CALLING_VISA_WORK_PERMIT',
+                    'RTK_QUOTA_EMAIL',
+                ],
+                labuan: [
+                    'COMPANY_REGISTRATION_PAPER',
+                    'LETTER_OF_AUTHORIZATION',
+                    'CONTACT_PERSON_NRIC',
+                    'FRONT_PASSPORT_VISIT_PASS',
+                    'RTK_QUOTA_EMAIL',
+                ]
+            },
+            individual: {
+                peninsular: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT',
+                ],
+                labuan: [
+                    'NRIC_PASSPORT',
+                    'FRONT_PASSPORT_VISIT_PASS',
+                ]
+            },
+            maidonline: {
+                peninsular: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT_MAID',
+                ],
+                labuan: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT_MAID',
+                ]
+            }
+        };
+
+        var required_documents = {
+            company: {
+                peninsular: [
+                    'COMPANY_REGISTRATION_PAPER',
+                    'LETTER_OF_AUTHORIZATION',
+                    'CONTACT_PERSON_NRIC',
+                    'CALLING_VISA_WORK_PERMIT',
+                ],
+                labuan: [
+                    'COMPANY_REGISTRATION_PAPER',
+                    'LETTER_OF_AUTHORIZATION',
+                    'CONTACT_PERSON_NRIC',
+                    'FRONT_PASSPORT_VISIT_PASS',
+                ]
+            },
+            individual: {
+                peninsular: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT',
+                ],
+                labuan: [
+                    'NRIC_PASSPORT',
+                    'FRONT_PASSPORT_VISIT_PASS',
+                ]
+            },
+            maidonline: {
+                peninsular: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT_MAID',
+                ],
+                labuan: [
+                    'NRIC_PASSPORT',
+                    'CALLING_VISA_WORK_PERMIT_MAID',
+                ]
+            }
+        };
+
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+
+                    var pending_uploads = getPendingUploads();
+
+                    // if there is still pending documents, return false
+
+                    if (pending_uploads.length > 0) {
+
+                        // append to pending list
+
+                        setPendingDocuments(pending_uploads);
+
+                        // return false validation of there is documents pending
+
+                        return false;
+                    }
+
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+
+        $("#employer-registration-form").parsley({
+            errorClass: 'is-invalid text-danger',
+            errorsWrapper: '<div class="invalid-feedback"></div>',
+            errorTemplate: '<span></span>',
+            trigger: 'change'
+        });
+
+        // when user click employer type radio
+        function employer_type_selected(radio) {
+            // reset validation error
+            $('#employer-registration-form').parsley().reset();
+
+            if (radio.value === '1') { // employer type individual
+                $('#employer_business_registration_number').prop('disabled', true);
+                $('#employer_pic_name').prop('disabled', true);
+                $('#employer_pic_phone').prop('disabled', true);
+                $('#employer_ic_passport_number').prop('disabled', false);
+
+                // disable required validation for unused fields
+                var disable_required_fields = [
+                    'employer_business_registration_number',
+                    'employer_pic_name',
+                    'employer_pic_phone',
+                ];
+
+                enableDisableFields(disable_required_fields);
+                // show / hide document list based on type
+
+                $('#individual_document_list').show();
+                $('#company_document_list').hide();
+                $('#maidonline_document_list').hide();
+
+                // change name label
+                changeNameLabel('Employer Name');
+
+            } else if (radio.value === '2') { // employer type company
+                // disable required validation for unused fields
+                enableDisableFields(['employer_ic_passport_number']);
+
+                $('#employer_business_registration_number').prop('disabled', false);
+                $('#employer_pic_name').prop('disabled', false);
+                $('#employer_pic_phone').prop('disabled', false);
+                $('#employer_ic_passport_number').prop('disabled', true);
+
+                // show / hide document list based on type
+                $('#individual_document_list').hide();
+                $('#company_document_list').show();
+                $('#maidonline_document_list').hide();
+
+                // change name label
+                changeNameLabel('Company Name');
+
+            } else if (radio.value === '3') { // employer type maid online
+                // disable required validation for unused fields
+                var disable_required_fields = [
+                    'employer_business_registration_number',
+                    'employer_pic_name',
+                    'employer_pic_phone',
+                ];
+
+                enableDisableFields(disable_required_fields);
+
+                $('#employer_business_registration_number').prop('disabled', true);
+                $('#employer_pic_name').prop('disabled', true);
+                $('#employer_pic_phone').prop('disabled', true);
+                $('#employer_ic_passport_number').prop('disabled', false);
+
+                // show / hide document list based on type
+                $('#individual_document_list').hide();
+                $('#company_document_list').hide();
+                $('#maidonline_document_list').show();
+
+                // change name label
+                changeNameLabel('Employer Name');
+            }
+
+            // set upload category option
+            setUploadCategoryOption(radio.value);
+
+            // re-set pending documents
+            syncPendingDocuments();
+        }
+
+        function state_changed(sel)
+        {
+            if ($('input[name="employer[employer_type_id]"]:checked').length == 0) {
+                return;
+            }
+            // set upload category option
+            setUploadCategoryOption($('input[name="employer[employer_type_id]"]:checked')[0].value);
+
+            // re-set pending documents
+            syncPendingDocuments();
+        }
+
+        function changeNameLabel(label) {
+            $("#name_label").text(label);
+        }
+
+        function enableDisableFields(field_list) {
+            hideFields(field_list);
+            disableRequired(field_list);
+        }
+
+        function hideFields(field_list) {
+
+            // reset the conditional field
+
+            $("#employer_pic_name_row").show();
+            $("#employer_pic_phone_row").show();
+            $("#employer_email_row").show();
+            $("#employer_ic_passport_number_row").show();
+            $("#employer_business_registration_number_row").show();
+
+            field_list.forEach(function (field_name) {
+                $("#" + field_name + '_row').hide();
+            });
+        }
+
+        function disableRequired(field_list) {
+
+            // reset the required field
+
+            $("#employer_pic_name").attr("required", "required");
+            $("#employer_pic_phone").attr("required", "required");
+            $("#employer_email").attr("required", "required");
+            $("#employer_ic_passport_number").attr("required", "required");
+            $("#employer_business_registration_number").attr("required", "required");
+
+            // disable required for selected field
+
+            field_list.forEach(function (field_name) {
+                $("#" + field_name).removeAttr("required");
+            });
+        }
+
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("")
+        });
+
+        /**
+        * Function to duplicate document fields
+        **/
+
+        // if not yet select employer type but click Add documents
+
+        if (!getActiveEmployerType()) {
+            var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);
+        }
+
+        $('#add_more_documents').click(() => {
+
+            var employer_type = getActiveEmployerType();
+
+            if (getActiveEmployerType()) {
+                clonedAttachmentInput = window['cloned_' + employer_type + '_select'];
+            }
+
+            clonedAttachmentInput
+                .clone(true,true)
+                .appendTo("#document-input-group")
+                .addClass('top-margin')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+                $('.custom-input-group:last')
+                .find(".custom-file-label").html("")
+                bindLastDocumentTypeSelectorAndFileSelector();
+
+            removeAttachmentField('.removal-button:last');
+
+
+        });
+
+        removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                $(this).closest('.custom-input-group').remove();
+
+                syncPendingDocuments();
+            });
+        }
+
+        bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+
+        $('.set-deletion').click(function() {
+            filenames = $(this).closest('tr').find('.filenames');
+            filenames.toggleClass('text-decoration-line-through');
+            text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+            $(this).text(text).toggleClass('btn-danger btn-primary');
+
+            ids = $('.set-deletion.btn-primary').map(function() {
+                return $(this).attr('data-id');
+            }).get().join(',');
+
+            $('#remove_uploaded_file').val(ids);
+        });
+
+        /**
+        * Function to re-enable form input after selecting dom type
+        **/
+        $(".document-type-selector").change(function() {
+            let selectedValue = $("option:selected", this).val()
+
+            if (selectedValue.length > 0)
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+            else
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+        });
+
+        function validateFiles(inputFile) {
+            var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+            var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+            var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+            var extName;
+            var maxFileSize = <%= 10.megabytes %>;
+            var sizeExceeded = false;
+            var extError = false;
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var file = inputFile.files[0];
+
+            var file_size = file.size;
+
+            // check if single file exceed max file size
+
+            if (file_size && maxFileSize && file_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            // check if combine with previous file will exceed max file size
+
+            var combine_size = (file_size + total_uploaded_size) - file_size;
+
+            if (combine_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            extName = file.name.split('.').pop().toLowerCase();
+
+            if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+
+            if (sizeExceeded) {
+                window.alert(maxExceededMessage);
+                $(inputFile).val('');
+            }
+
+            if (extError) {
+                window.alert(extErrorMessage);
+                $(inputFile).val('');
+            }
+
+            // set inline size
+
+            var file_size_label = getUploadSizeLabel(file_size);
+
+            $(inputFile).closest('div').next().find('.inline-file-size').val(file_size_label);
+
+            // set label
+
+            setTotalUploadLabel();
+
+            // sync pending documents
+
+            syncPendingDocuments();
+        }
+
+        function getTotalUploadedSize() {
+
+            var total_uploaded_size = 0;
+
+            $('.custom-file-input').each(function (index, obj) {
+
+                if (obj.files.length > 0) {
+                    total_uploaded_size = total_uploaded_size + parseFloat(obj.files[0].size);
+                }
+
+            });
+
+            return total_uploaded_size;
+        }
+
+        function setTotalUploadLabel() {
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var total_uploaded_label =  getUploadSizeLabel(total_uploaded_size);
+
+            $("#total_uploaded_label").text(total_uploaded_label);
+        }
+
+        function getUploadSizeLabel(upload_size) {
+
+            var total_mb = upload_size / 1000000;
+
+            total_mb = total_mb.toFixed(2);
+
+            var upload_size_label = total_mb + ' MB';
+
+            return upload_size_label;
+        }
+
+    </script>
+<% end %>

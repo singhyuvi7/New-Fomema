@@ -1,0 +1,33 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+    title_style = s.add_style :alignment => { :horizontal=> :center, :vertical=> :center}, :border=>Axlsx::STYLE_THIN_BORDER
+    data_style = s.add_style :border=>Axlsx::STYLE_THIN_BORDER
+    wb.add_worksheet(:name => "Custom Styles") do |sheet|
+
+        sheet.add_row ["ERROR_ID", "DESC1", "DESC2","HOUR","","","","","","","","","","","","","","","","","","","","","","","","TOTAL"], :style => title_style
+        sheet.add_row @column_hours, :style => title_style
+
+        sheet.merge_cells "A1:A2"
+        sheet.merge_cells "B1:B2"
+        sheet.merge_cells "C1:C2"
+        sheet.merge_cells "D1:AA1"
+        sheet.merge_cells "AB1:AB2"
+
+        @new_responses.each do |new_response|
+            sheet.add_row new_response, :style => data_style
+        end
+
+        sheet.add_row @total_cells, :style => data_style
+
+
+        cells = sheet["D#{@total_cell_index+1}:AB#{@total_cell_index+1}"] # select an array of cells
+
+        cells.each do |cell|
+            cell_arr = cell.r_abs.split('$')
+            cell_alpha = cell_arr[1]
+            cell.type = :string
+            cell.value = "=SUM(#{cell_alpha}3:#{cell_alpha+@total_cell_index.to_s})"
+        end
+    end
+end

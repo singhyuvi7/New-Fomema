@@ -1,0 +1,21 @@
+<div id="transaction-history-list-modal" class="hidden" title="Transaction History">
+    <label>List of transactions</label>
+
+    <ol>
+        <% transactions.each do |transaction| %>
+            <li><%= link_to "#{ transaction.transaction_date.strftime("%d/%m/%Y") } - Transaction ##{ transaction.code }", internal_transaction_path(transaction.id, history: true), target: :_blank, class: "text-primary" %></li>
+        <% end %>
+    </ol>
+
+    <% if transactions.blank? %>
+        <p class="mb-0">There are no previous transactions</p>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#transaction-history-list-btn').click(function() {
+            openDialog({target: '#transaction-history-list-modal', type: 'success'});
+        });
+    </script>
+<% end %>

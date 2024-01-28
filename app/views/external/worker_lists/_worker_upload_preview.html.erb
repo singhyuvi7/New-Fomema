@@ -1,0 +1,90 @@
+<% if @file_path.present? %>
+
+<form method="post" action="<%= form_action_path %>" id="upload_fw_form">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <%= hidden_field_tag :redirect_path, redirect_path %>
+    <div class="card">
+        <div class="card-header">
+            Preview Foreign Worker List
+        </div>
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                #
+                                <input type="checkbox" value="" name="check_all" id="check_all" class="check_all">
+                            </th>
+                            <th>Worker Name</th>
+                            <th>Gender</th>
+                            <th>Date Of Birth</th>
+                            <th>Passport No.</th>
+                            <th>Country Of Origin</th>
+                            <th>Job Type</th>
+                            <th>Arrival Date</th>
+                            <th>Worker Code</th>
+                            <th>Illegal Worker / PATI</th>
+                            <th>PLKS No.</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% CSV.foreach(@file_path).with_index do |row, rownum| %>
+                            <% if rownum > 0 %>
+                                <% validate_result = validate_worker(@employer, row, site) %>
+
+                                <tr class="<% if validate_result['status'] != 'ok' %> table-danger <% end %>">
+                                    <td>
+                                        <% if validate_result['status'] == 'ok' %>
+                                            <input type="checkbox" value="<%= row.to_json %>" name="selected_foreign_workers[]" checked>
+                                        <% end %>
+                                    </td>
+                                    <td><%= row[0].try(:strip).try(:upcase) %></td>
+                                    <td><%= row[1] %></td>
+                                    <td><%= row[2] %></td>
+                                    <td><%= row[3].try(:strip).try(:upcase) %></td>
+                                    <td><%= row[4] %></td>
+                                    <td><%= row[5] %></td>
+                                    <td><%= row[6] %></td>
+                                    <td><%= row[7].try(:strip).try(:upcase) %></td>
+                                    <td><%= row[8] %></td>
+                                    <td><%= row[9] %></td>
+                                    <td><%= validate_result['output'] %></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <% if ["Employer", "Agency"].include? current_user.userable_type %>
+                    <a href="<%= cancel_path %>" class="btn btn-blue-portal" id="cancel_fw_btn">Cancel</a>
+                    <%= button_tag 'Submit', class: 'btn btn-red-portal', data: { disable_with: "<i class='fa fa-spinner fa-spin'></i> Uploading..."} %>
+                <% else %>
+                    <a href="<%= cancel_path %>" class="btn btn-danger" id="cancel_fw_btn">Cancel</a>
+                    <%= button_tag 'Submit', class: 'btn btn-primary', data: { disable_with: "<i class='fa fa-spinner fa-spin'></i> Uploading..."} %>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</form>
+
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $("#check_all").click(function(){
+            $('input:checkbox').not(this).prop('checked', this.checked);
+        });
+
+        $("#upload_fw_form").submit(function(e){
+            $('#cancel_fw_btn').toggleClass("disabled");
+        });
+
+    </script>
+<% end %>

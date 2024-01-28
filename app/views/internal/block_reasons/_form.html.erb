@@ -1,0 +1,41 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @block_reason } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :category, class: 'required' %>
+                <%= form.select :category, options_for_select(BlockReason::CATEGORIES, form.object.category), {include_blank: form_select_option_text}, {class: 'form-control', required: true} %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true, disabled: (params[:action].eql?('edit') and form.object.code.eql?("OTHER")) %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :description, class: 'required' %>
+                <%= form.text_field :description, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_block_reasons_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

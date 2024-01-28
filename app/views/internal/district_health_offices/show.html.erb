@@ -1,0 +1,154 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>District Health Offices</strong> - District Health Office Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="district_health_office_address">Address</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.address1 %>
+                        <%=raw "<br>#{@district_health_office.address2}" if !@district_health_office.address2.blank? %>
+                        <%=raw "<br>#{@district_health_office.address3}" if !@district_health_office.address3.blank? %>
+                        <%=raw "<br>#{@district_health_office.address4}" if !@district_health_office.address4.blank? %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="district_health_office_state">State</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.state&.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="district_health_office_town">Town</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.town&.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="district_health_office_postcode">Postcode</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.postcode %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_email">Email</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.email %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_phone">Phone Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.phone %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_fax">Fax Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.fax %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_status">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= DistrictHealthOffice::STATUSES[@district_health_office.status] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_pic_name">Person In Charge Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.pic_name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="district_health_office_pic_phone">Person In Charge Contact</label>
+                    <p class="form-control-plaintext">
+                        <%= @district_health_office.pic_phone %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_district_health_offices_path) %>
+            <% if has_permission?('EDIT_DISTRICT_HEALTH_OFFICE') %>
+              <%=raw show_edit_button(edit_internal_district_health_office_path(@district_health_office)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_DISTRICT_HEALTH_OFFICE") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_district_health_office_audits_path(@district_health_office) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

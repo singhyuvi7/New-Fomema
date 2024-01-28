@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>JobTypes</strong> - Edit JobType
+    </div>
+    <%= form_for @job_type, url: internal_job_type_path(@job_type), html: {class: "#{params[:action]}_job_type job_type-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

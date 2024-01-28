@@ -1,0 +1,31 @@
+/*
+	- Overflows -
+	x and y axis.
+	Examples:
+		1. overflow-y-auto
+		2. overflow-x-auto
+		3. overflow-x-sm-auto
+		4. overflow-y-lg-auto
+*/
+
+@mixin overflows($screen) {
+	.overflow-x#{$screen}-auto {
+		overflow-x: auto !important;
+	}
+
+	.overflow-y#{$screen}-auto {
+		overflow-y: auto !important;
+	}
+}
+
+@include overflows(null);
+
+/* Large screen sizes - 1024px and above */
+@media screen and (min-width: 1024px) {
+	@include overflows(-lg);
+}
+
+/* Small screen sizes - 1023px and below */
+@media screen and (max-width: 1023px) {
+	@include overflows(-sm);
+}

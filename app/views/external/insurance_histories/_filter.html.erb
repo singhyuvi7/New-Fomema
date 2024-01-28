@@ -1,0 +1,59 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <Strong> </strong>
+    </div>
+    <form action="/insurance_histories" method="get" id="insurance_histories-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="fw_name" class="col-sm-2 col-form-label">Worker Name</label>
+                <div class="col-sm-4">
+                    <input type="text" name="fw_name" id="fw_name" value="<%= params[:fw_name] %>" class="form-control">
+                </div>
+                <label for="fw_code" class="col-sm-2 col-form-label">Worker Code</label>
+                <div class="col-sm-4">
+                    <input type="text" name="fw_code" id="fw_code" value="<%= params[:fw_code] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="fw_passport_number" class="col-sm-2 col-form-label">Worker Passport</label>
+                <div class="col-sm-4">
+                    <input type="text" name="fw_passport_number" id="fw_passport_number" value="<%= params[:fw_passport_number] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="order_code" class="col-sm-2 col-form-label">Payment Code</label>
+                <div class="col-sm-4">
+                    <input type="text" name="order_code" id="order_code" value="<%= params[:order_code] %>" class="form-control">
+                </div>
+                <label for="order_status" class="col-sm-2 col-form-label">Payment Status</label>
+                <div class="col-sm-4">
+                    <select name="order_status" id="order_status" class="form-control">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% Order::STATUSES.each do |key, value| %>
+                            <option value="<%= key %>" <%= " selected" if params[:order_status] == key %>><%= value %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+<%
+=begin %>
+            <div class="form-group row">
+                <label for="filter_policy_date_start" class="col-sm-1 col-form-label">Policy From</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_policy_date_start" id="filter_policy_date_start" value="<%= params[:filter_policy_date_start] %>" class="form-control">
+                </div>
+                <label for="filter_policy_date_end" class="col-sm-1 col-form-label">Policy To</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_policy_date_end" id="filter_policy_date_end" value="<%= params[:filter_policy_date_end] %>" class="form-control">
+                </div>
+            </div>
+<%
+=end %>
+        </div>
+        <div class="card-footer text-right border-0 bg-transparent text-dark">
+            <a href="<%= external_insurance_histories_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+            <button type="submit" form="insurance_histories-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+         </div>
+    </form>
+</div>

@@ -1,0 +1,16 @@
+<% if params[:p_tab].present? && params[:tab].present? %>
+    <% content_for :page_end_scripts do %>
+        <script>
+            parentTab = '<%= params[:p_tab] %>';
+            $(`.category-parent-tab[data-type="${ parentTab }"]`).click();
+            childTab = '<%= params[:tab] %>';
+            $(`.category-tab[data-type="${ childTab }"]`).click();
+        </script>
+    <% end %>
+<% else %>
+	<% content_for :page_end_scripts do %>
+        <script>
+			$('.category-parent-tab:first').click();
+		</script>
+    <% end %>
+<% end %>

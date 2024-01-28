@@ -1,0 +1,135 @@
+<div class="row">
+    <label class="col-md-3 col-form-label">Code</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.code %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Date</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.date&.strftime("%d/%m/%Y") %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Amount</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext">
+            <input type="hidden" name="refund_amount" id="refund_amount" value="<%= @refund.amount.to_f %>">
+            <%= number_to_currency(@refund.amount, unit: "") %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Category</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Refund::CATEGORIES[@refund.category] %></div>
+    </div>
+</div>
+<% if @refund.customerable %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Customer</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= "#{@refund.customerable&.name} (#{@refund.customerable&.code})" %></div>
+    </div>
+</div>
+<% end %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Payment Method (Incoming)</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.payment_method&.name || (raw '<i>N/A</i>') %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Unutilised Payment</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.unutilised ? 'Yes' : 'No' %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Status</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Refund::STATUSES[@refund.status] %></div>
+    </div>
+</div>
+<% if @refund.status == 'PAYMENT_FAILED' %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Failed Reason</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= "#{@refund.fail_reason} - " %><%= Refund::REASONS[@refund.fail_reason] %></div>
+    </div>
+</div>
+<% end %>
+<% if ['MANUAL', 'AUTOMATIC'].include? @refund.category %>
+<div class="row">
+    <label class="col-md-3 col-form-label"><%= @refund&.payment_method&.code == 'BANKDRAFT' ? 'Issue Date' : 'Payment Date' %></label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.payment_date.try(:strftime,'%d/%m/%Y') || '-' %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Reference Number</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @refund.reference || '-' %></div>
+    </div>
+</div>
+<% end %>
+
+<!-- uploaded documents -->
+<div class="card">
+    <div class="card-header">Uploaded Documents</div>
+    <div class="card-body">
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+            </tr>
+
+            <% @refund.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames">
+                    <% upload.documents.each do |document| %>
+                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                    <% end %>
+                    </td>
+                    <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                </tr>
+            <% end %>
+
+            <% if @refund.uploads.blank? %>
+                <tr><td colspan="3">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+
+    </div>
+</div>
+<!-- /uploaded documents -->
+
+<!-- refund items -->
+<div class="card">
+    <div class="card-header">Refund Items</div>
+    <div class="card-body">
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Type</th>
+                <th>Comment</th>
+                <th>Amount</th>
+            </tr>
+
+            <% if @refund.refund_items.blank? %>
+                <tr><td colspan="3">There are no items</td></tr>
+            <% else %>
+                <% @refund.refund_items.each do |refund_item| %>
+                    <tr>
+                        <td><%= refund_item.refund_itemable_type %></td>
+                        <td><%= refund_item.comment %></td>
+                        <td><%= number_to_currency(refund_item.amount, unit: "") %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+        </table>
+
+    </div>
+</div>
+<!-- /refund items -->

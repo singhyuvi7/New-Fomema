@@ -1,0 +1,124 @@
+<pdfbody>
+    <div>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png", style: "float:left; height: 110px; padding-bottom: 20px;"%>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png", style: "float:right; height: 110px; padding-bottom: 20px;"%>
+        <%#= wicked_pdf_image_tag "letters/fomema_letterhead_25.png", style: "float:right; height: 110px; max-width:100%; padding-bottom: 20px;"%>
+    </div>
+
+    <div style="height: 2.2cm;">
+        &nbsp;
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Our Ref</td>
+            <td>: <%= @data[:letter_ref_no] %></td>
+            <td style="text-align: right;"><b>CONFIDENTIAL</b></td>
+        </tr>
+
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:letter_date] %></td>
+            <td></td>
+        </tr>
+    </table><br>
+
+    <table>
+        <% @data[:employer_address].each do |address| %>
+            <tr><td><%= address %></td></tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">Dear Sir/Madam,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+        Appeal on Your Employee's Medical Examination Results<br>
+        Name: <%= @data[:worker_name] %>, Passport No: <%= @data[:worker_passport_no] %>
+    </b></p>
+
+
+    <p class="paragraph-spacing">We refer to the matter above. As you have appealed on your employee's medical examination results, you are required to contact the doctor/clinic bellow for further instructions:</p>
+
+    <table class="w-100 paragraph-double-spacing">
+        <tr>
+            <td valign="top" style="width: 6em;">Clinic</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= raw @data[:doctor_address].join("<br>") %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 6em;">Doctor</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:doctor_name] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 6em;">Telephone</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:doctor_phone] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 6em;">Fax</td>
+            <td valign="top" style="width: 0.7em;">:</td>
+            <td><%= @data[:doctor_fax] %></td>
+        </tr>
+    </table>
+
+    <p class="paragraph-double-spacing">
+        You need to bring along the foreign worker with his/her original passport for medical re-examination / investigation.<br><br>
+        Kindly complete the Appeal Form and the Commitment Letter and submit to the Appeal Committee via email: appeal@fomema.com.my<br><br>
+        Original copy of the forms must be submitted to the Appeal Committee for the appeal process.<br><br>
+        Please be informed that you shall be responsible for the cost of the medical re-examination / investigation and the appeal may take up to four (4) weeks.
+    </p>
+
+    <p class="paragraph-quad-spacing">
+        Yours sincerely,<br>
+        <b>FOMEMA SDN BHD</b>
+    </p>
+
+    <p class="paragraph-double-spacing" style="font-size: 0.85em;">This letter is computer generated and no signature is required.</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .paragraph-triple-spacing {
+        padding-top: 1.5em;
+    }
+
+    .paragraph-quad-spacing {
+        padding-top: 2em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    br {
+        font-size: 1.2em;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td, tr {
+        padding: 0;
+        margin: 0;
+    }
+</style>

@@ -1,0 +1,21 @@
+<tr class="finding-row method-field">
+    <td class="table-index"></td>
+    <td class="row-name"></td>
+    <td class="text-center bold">Yes</td>
+    <td class="text-center bold">No</td>
+    <td class="text-center bold">N/A</td>
+</tr>
+
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">Traceability to referral laboratory</td>
+    <td class="text-center bold">
+        <div><%= finding[:traceability] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+    </td>
+    <td class="text-center bold">
+        <div><%= finding[:traceability] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+    </td>
+    <td class="text-center bold">
+        <div><%= finding[:traceability] == 'NA' ? @checkbox_checked : @checkbox_unchecked %></div>
+    </td>
+</tr>

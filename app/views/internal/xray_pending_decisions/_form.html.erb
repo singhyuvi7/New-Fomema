@@ -1,0 +1,103 @@
+<%=render 'internal/xray_pending_decisions/shared/finding_checklist_form', {xray_pending_decision: xray_pending_decision, form: form} %>
+
+<div class="card border-primary">
+    <div class="card-header">
+        Final X-Ray Result
+    </div>
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th class="text-center" colspan="2" width="50%">Decision</th>
+                <th width="50%">Comment</th>
+            </tr>
+            <tr>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="xray_pending_decision_decision form-check-input" name="xray_pending_decision[decision]" type="radio" value="SUITABLE" id="xray_pending_decision_decision_suitable" onchange="xray_pending_decision_decision_changed(this)"<%= " checked" if xray_pending_decision.decision == 'SUITABLE' %> required>
+                            <%= XrayPendingDecision::DECISIONS["SUITABLE"] %>
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="xray_pending_decision_decision form-check-input" name="xray_pending_decision[decision]" type="radio" value="UNSUITABLE" id="xray_pending_decision_decision_unsuitable" onchange="xray_pending_decision_decision_changed(this)"<%= " checked" if xray_pending_decision.decision == 'UNSUITABLE' %>>
+                            <%= XrayPendingDecision::DECISIONS["UNSUITABLE"] %>
+                        </label>
+                        <input type="hidden" id="unsuitable-error" data-parsley-error-message="Require abnormal finding"<%= " required" if xray_pending_decision.decision == 'UNSUITABLE' %>>
+                    </div>
+                </td>
+                <td>
+                    <textarea class="form-control" name="xray_pending_decision[comment]" id="xray_pending_decision_comment" rows="2" required><%= xray_pending_decision.comment %></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2" rowspan="2">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="xray_pending_decision_decision form-check-input" name="xray_pending_decision[decision]" type="radio" value="PCR" id="xray_pending_decision_decision_pcr" onchange="xray_pending_decision_decision_changed(this)"<%= " checked" if xray_pending_decision.decision == 'PCR' %><%= " disabled" unless @can_pcr %>>
+                            <%= XrayPendingDecision::DECISIONS["PCR"] %>
+                        </label>
+                    </div>
+                </td>
+                <th>PCR</th>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pcr-decision-pcr-options">
+                        <select name="xray_pending_decision[pcr_id]" id="xray_pending_decision_pcr_id" class="form-control select2" data-parsley-errors-container="#xray_pending_decision_pcr_id_errors"<%= xray_pending_decision.decision == 'PCR' ? " required" : " disabled" %>>
+                            <option value="">Select PCR</option>
+                            <% (@pcrs || User.active.search_role(Role.find_by(code: "PCR").id).order(:name)).each do |pcr, idx| %>
+                                <option value="<%= pcr.id %>"<%= " selected" if xray_pending_decision.pcr_id == pcr.id %>><%= pcr.name %></option>
+                            <% end %>
+                        </select>
+                        <div id="xray_pending_decision_pcr_id_errors"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(internal_xray_pending_decisions_path) %>
+        <%=raw edit_submit_button %>
+    </div>
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+function xray_pending_decision_decision_changed(chkbox)
+{
+    if (chkbox.value == 'PCR') {
+        // $('.pcr-decision-pcr-options').show();
+        $('#xray_pending_decision_pcr_id').prop('disabled', false);
+        $('#xray_pending_decision_pcr_id').prop('required', true);
+        $('#unsuitable-error').prop('required', false);
+    } else if (chkbox.value == 'UNSUITABLE') {
+        update_unsuitable_error();
+        $('#unsuitable-error').prop('required', true);
+    } else {
+        // $('.pcr-decision-pcr-options').hide();
+        $('#xray_pending_decision_pcr_id').prop('disabled', true);
+        $('#xray_pending_decision_pcr_id').prop('required', false);
+        $('#unsuitable-error').prop('required', false);
+    }
+    $(chkbox).closest('form').parsley().validate();
+}
+
+function xray_pending_decision_changed(rad)
+{
+    update_unsuitable_error();
+    if (rad.getAttribute('value') == 'YES') {
+        $('#xray_pending_decision_decision_unsuitable').prop('checked', true).trigger('change');
+    }
+}
+
+function update_unsuitable_error()
+{
+    $('#unsuitable-error').val("");
+    $('.xray-pending-decision-form #pending_decision_mle_finding input[type="radio"][value="YES"]:checked').each(function (idx, ele) {
+        $('#unsuitable-error').val($('#unsuitable-error').val() + "1");
+    });
+}
+</script>
+<% end %>

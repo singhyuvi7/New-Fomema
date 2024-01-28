@@ -1,0 +1,146 @@
+    <div class="row">
+        <div class="form-group col">
+            <label for="">Agency Name</label>
+            <input type="text" value="<%= @agency.name %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">License number</label>
+            <input type="text" value="<%= @agency.license_number %>" class="form-control" readonly="readonly" id="">
+        </div>
+         <div class="form-group col">
+            <label for="">License Expired Date</label>
+            <input type="text" value="<%= @agency.license_expired_at&.strftime(get_standard_date_format) %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">License Category</label>
+            <input type="text" value="<%= @agency.agency_license_category&.name %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">Director Name</label>
+            <input type="text" value="<%= @agency.director_name %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">Director ICNO</label>
+            <input type="text" value="<%= @agency.director_ic_number %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">Business Registration Number</label>
+            <input type="text" value="<%= @agency.business_registration_number %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col">
+            <label for="">ICNO Person In Charge</label>
+            <input type="text" value="<%= @agency.pic_ic_number %>" class="form-control" readonly="readonly" id="">
+        </div>
+        <div class="form-group col">
+            <label for="">Person In Charge Name</label>
+            <input type="text" value="<%= @agency.pic_name %>" class="form-control" readonly="readonly" id="">
+        </div>
+        <div class="form-group col">
+            <label for="">Person In Charge Contact</label>
+            <input type="text" value="<%= @agency.pic_phone %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+<div class="row">
+
+    <div class="form-group col">
+        <label for="">Address</label>
+        <input type="text" value="<%= @agency.address1 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @agency.address2 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @agency.address3 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @agency.address4 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="form-group col">
+        <label for="">State</label>
+        <input type="text" value="<%= @agency&.state&.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Postcode</label>
+        <input type="text" value="<%= @agency.postcode %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Town</label>
+        <input type="text" value="<%= @agency&.town&.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<div class="row">
+    <div class="form-group col">
+        <label for="">Phone</label>
+        <input type="text" value="<%= @agency.phone %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Email</label>
+        <input type="text" value="<%= @agency.email %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <label for="agency_uploads">Uploaded Documents</label>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Category</th>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+            </tr>
+
+            <% @agency.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames"><%= upload.category %></td>
+
+                        <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                    <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                </tr>
+            <% end %>
+
+            <% if @agency.uploads.blank? %>
+                <tr><td colspan="3">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>

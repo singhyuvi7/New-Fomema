@@ -1,0 +1,122 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Bypass Fingerprint Transaction
+    </div>
+    <%= form_for @transaction, url: bypass_fingerprint_internal_transaction_path(@transaction), html: {class: "#{params[:action]}_transaction transaction-form with-parsley"} do |form| %>
+
+        <div class="card-body">
+
+            <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :code, class: '' %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.try(:code) %> (Fingerprint Availability : <%= !@transaction&.biodata_transaction&.afis_id.blank? ? 'Yes' : 'No' %>)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :doctor_fp, "Doctor Bypass Fingerprint" %>
+                        <%= form.select :doctor_fp, options_for_select(Transaction::FINGERPRINT_BYPASS_OPTION.invert,form.object.doctor_fp), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_fp, "X-Ray Bypass Fingerprint" %>
+                        <%= form.select :xray_fp, options_for_select(Transaction::FINGERPRINT_BYPASS_OPTION.invert,form.object.xray_fp), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :doctor_bypass_fingerprint_reason_id, "Doctor Bypass Reason", class: "#{" required" if form.object.doctor_fp}" %>
+                        <%= form.select :doctor_bypass_fingerprint_reason_id, options_from_collection_for_select(@bypass_reasons, :id, :description, form.object.doctor_bypass_fingerprint_reason_id), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_bypass_fingerprint_reason_id, "X-Ray Bypass Reason", class: "#{" required" if form.object.xray_fp}" %>
+                        <%= form.select :xray_bypass_fingerprint_reason_id, options_from_collection_for_select(@bypass_reasons, :id, :description, form.object.xray_bypass_fingerprint_reason_id), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- xray retake -->
+            <% if !@xray_retake.blank? %>
+                <div>
+                    <hr>
+                    <p><b>Retake/Appeal Bypass</b></p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <%= form.label :xray_retake_fp, "X-Ray Bypass Fingerprint" %>
+                                <%= select_tag :xray_retake_fp, options_for_select(Transaction::FINGERPRINT_BYPASS_OPTION.invert, @xray_retake.xray_fp), include_blank: form_select_option_text, class: 'form-control' %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <%= form.label :xray_retake_bypass_fingerprint_reason_id, "X-Ray Bypass Reason", class: "#{" required" if @xray_retake.xray_fp}" %>
+                                <%= select_tag :xray_retake_bypass_fingerprint_reason_id, options_from_collection_for_select(@bypass_reasons, :id, :description, @xray_retake.xray_bypass_fingerprint_reason_id), include_blank: form_select_option_text, class: 'form-control' %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transaction_path @transaction) %>
+                <%=raw edit_save_button() %>
+            </div>
+
+        </div>
+
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#transaction_doctor_fp').change(function () {
+    if (this.value == 'true') {
+        $('#transaction_doctor_bypass_fingerprint_reason_id').prop('required', true);
+        $('label[for=transaction_doctor_bypass_fingerprint_reason_id]').addClass('required');
+    } else {
+        $('#transaction_doctor_bypass_fingerprint_reason_id').removeAttr('required');
+        $('label[for=transaction_doctor_bypass_fingerprint_reason_id]').removeClass('required');
+    }
+});
+$('#transaction_xray_fp').change(function () {
+    if (this.value == 'true') {
+        $('#transaction_xray_bypass_fingerprint_reason_id').prop('required', true);
+        $('label[for=transaction_xray_bypass_fingerprint_reason_id]').addClass('required');
+    } else {
+        $('#transaction_xray_bypass_fingerprint_reason_id').removeAttr('required');
+        $('label[for=transaction_xray_bypass_fingerprint_reason_id]').removeClass('required');
+    }
+});
+$('#xray_retake_fp').change(function () {
+    if (this.value == 'true') {
+        $('#xray_retake_bypass_fingerprint_reason_id').prop('required', true);
+        $('label[for=transaction_xray_retake_bypass_fingerprint_reason_id]').addClass('required');
+    } else {
+        $('#xray_retake_bypass_fingerprint_reason_id').removeAttr('required');
+        $('label[for=transaction_xray_retake_bypass_fingerprint_reason_id]').removeClass('required');
+    }
+});
+</script>
+<% end %>

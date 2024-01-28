@@ -1,0 +1,87 @@
+`<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_status_schedules_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Type</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status_scheduleable_type, options_for_select(StatusSchedule::STATUS_SCHEDULEABLE_TYPES.invert, params[:status_scheduleable_type]), include_blank: "Select Option", class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Service Provider Code</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :status_scheduleable_code, params[:status_scheduleable_code], class: 'form-control', disabled: params[:status_scheduleable_type].blank? %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="from" class="col-sm-3 col-form-label">Date From</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :from, params[:from], class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"} %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="to" class="col-sm-3 col-form-label">Date To</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :to, params[:to], class: 'form-control datepicker datepicker-range-filter', data: { type: "end", target: "from"} %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="from" class="col-sm-3 col-form-label">Created By</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :created_by, options_from_collection_for_select(User.select("id, name || ' (' || email || ')' as label").where("exists (select 1 from role_permissions where role_permissions.role_id = users.role_id and role_permissions.permission in ('CREATE_STATUS_SCHEDULE')) or exists (select 1 from user_permissions where users.id = user_permissions.user_id and user_permissions.permission in ('CREATE_STATUS_SCHEDULE'))").order(:label), :id, :label, params[:created_by]), include_blank: "Select Option", class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-3 col-form-label">Status</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status, options_for_select({
+                                "Active" => "ACTIVE", 
+                                "Inactive" => "INACTIVE", 
+                                "Temporary Inactive" => "TEMPORARY_INACTIVE", 
+                            }, params[:status]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%= raw filter_clear_button internal_status_schedules_path %>
+                <%= raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#status_scheduleable_type').change(function () {
+    $('#status_scheduleable_code').prop("disabled", $(this).val().length == 0);
+});
+
+$('#from').change(function() {
+    $('#to').attr("data-start-date", $('#from').val());
+});
+</script>
+<% end %>`

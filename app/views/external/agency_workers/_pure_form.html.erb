@@ -1,0 +1,556 @@
+
+<% if @jim_verified %>
+    <div class="alert alert-primary alert-dismissible font-size-8 fade show" role="alert">
+        Worker info verified. Please update new passport number if any.
+    </div>
+<% end %>
+
+<%
+    display = ""
+    display = "none" if is_change_employer
+%>
+
+<div class="row disableable-fields" data-type="name">
+    <label class="col-md-2 col-form-label"> <%= form.label :name, class: 'required' %> </label>
+    <div class="col-md-7">
+        <div class="form-control-plaintext">
+            <%= form.text_field :name, class: 'form-control critical-field', required: true, placeholder: '', id: 'name', readonly: @disallow_amend_critical_info, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "[a-zA-Z0-9@&.'()-_/\s]+", parsley_pattern_message: "Only alphabets, numbers, underscore(_), hypens (-), fullstops (.), alias (@), ampersand (&), apostrophe('), brackets and slashes (/) are allowed" } %>
+        </div>
+    </div>
+
+    <div class="col-md-1">
+        <button type="button"
+            data-toggle="popover"
+            data-placement="right"
+            data-html="true"
+            data-content='
+            <%= image_tag("forms/callingvisacompany1.png", :style => "width: 300px;")%>
+            <h6>Or</h6>
+            <%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>
+            '
+            title=""
+            class="btn btn-primary btn-sm"><i class="fa fa-info-circle"></i>
+        </button>
+    </div>
+</div>
+
+<input type="hidden" id="employer_id" name="employer_id" value="<%=@employer.id%>">
+
+<div class="row disableable-fields" data-type="gender">
+    <label class="col-md-2  col-form-label required">Gender</label>
+    <div class="col-md-5 col-form-label">
+        <div class="form-check form-check-inline mr-5">
+            <%= form.radio_button(:gender, "M", class: "form-check-input critical-field", required: true, disabled: (@foreign_worker[:code] && @disallow_amend_critical_info) || !has_permission?("EDIT_GENDER_FOREIGN_WORKER") || !@foreign_worker.gender_amended_at.blank? || @foreign_worker.has_valid_latest_transaction_registered_by_employer? ? true : false) %>
+            <label class="form-check-label" for="foreign_worker_gender_m">Male</label>
+            &emsp;
+            <%= form.radio_button(:gender, "F", class: "form-check-input critical-field", required: true, disabled: (@foreign_worker[:code] && @disallow_amend_critical_info) || !has_permission?("EDIT_GENDER_FOREIGN_WORKER") || !@foreign_worker.gender_amended_at.blank? || @foreign_worker.has_valid_latest_transaction_registered_by_employer? ? true : false) %>
+            <label class="form-check-label" for="foreign_worker_gender_f">Female</label>
+        </div>
+        <% if !@foreign_worker.gender_amended_at.blank? %>
+            <small><i>(Gender changed on <%= @foreign_worker.gender_amended_at.strftime('%d/%m/%Y') %>)</i></small>
+        <% end %>
+    </div>
+</div>
+
+<div class="row disableable-fields" data-type="dob">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :date_of_birth, "Date Of Birth", class: 'required' %>
+    </label>
+    <div class="col-md-2 col-form-label">
+        <%= form.date_field :date_of_birth, class: 'form-control critical-date critical-field', id: 'date_of_birth', disabled: @disallow_amend_critical_info, required: true, min: Date.today - 70.year, max: Date.today - 18.year %>
+    </div>
+</div>
+
+<div class="row disableable-fields" data-type="passport">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :passport_number, "Passport Number", class: 'required' %>
+    </label>
+    <div class="col-md-2 col-form-label">
+        <%= form.text_field :passport_number, class: 'form-control critical-field', required: true, placeholder: 'A123456', id: 'passport_number', readonly: @disallow_amend_passport, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9\-]+", parsley_pattern_message: "No special characters allowed" } %>
+    </div>
+</div>
+
+<div class="row disableable-fields" data-type="country">
+    <label class="col-md-2  col-form-label">
+        <% field_id = generate_field_id(form, :country_id) %>
+        <%= form.label :country_id, class: 'required' %>
+    </label>
+    <div class="col-md-2">
+        <%= form.select :country_id, options_from_collection_for_select(Country.where("code != ?", Country::MALAYSIA_CODE).order(:name).all, 'id', 'name', form.object.country_id), {include_blank: form_select_option_text}, required: true, class: 'form-control critical-field',disabled: @disallow_amend_critical_info, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+        <div id="select2_parsley_error__<%= field_id %>"></div>
+    </div>
+</div>
+
+<!--<div class="row">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address1, 'Address (Accommodation of foreign worker)',class: 'required' %>
+    </label>
+    <div class="col-sm-5">
+        <%= form.text_field :address1, class: 'form-control', required: true, maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address2,  class: 'form-label' do %>
+        <% end %>
+    </label>
+    <div class="col-sm-5">
+        <%= form.text_field :address2,  class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address3, class: 'form-label' do %>
+        <% end %>
+    </label>
+    <div class="col-sm-5">
+        <%= form.text_field :address3, class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+<div class="row form-group">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :address4, class: 'form-label' do %>
+        <% end %>
+    </label>
+    <div class="col-sm-5">
+        <%= form.text_field :address4, class: 'form-control', maxlength: "50" %>
+    </div>
+</div>
+
+<%= render 'external/shared/worker_form_state_postcode_town', {form: form} %>
+-->
+
+<div class="row disableable-fields" data-type="arrival" style="display:<%= display %>">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :arrival_date, "Arrival Date" %>
+    </label>
+    <div class="col-md-2  col-form-label">
+        <%= form.date_field :arrival_date, class: 'form-control critical-date', id: 'arrival_date', max: Date.today %>
+    </div>
+</div>
+
+<div class="row" style="display:<%= display %>">
+    <label class="col-md-2  col-form-label">Programme</label>
+    <div class="col-md-2  col-form-label">
+        <% if @employer.is_individual? %>
+            <label>
+                <input type="checkbox" name="programme[]" value="PRAON" <%= "checked" if @foreign_worker.is_maid_online? %> >
+                Maid Online
+            </label>
+        <% end %>
+        <label>
+            <input type="checkbox" name="programme[]" value="RTK" <%= "checked" if @foreign_worker.is_recalibration? %> >
+            Recalibration
+        </label>
+    </div>
+</div>
+
+
+<div class="row" style="display:<%= display %>">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :job_type_id, "Job Type", class: 'required' %>
+        <% field_id = generate_field_id(form, :job_type_id) %>
+    </label>
+    <div class="col-md-2">
+        <%#= form.select :job_type_id, options_from_collection_for_select(JobType.order(:name).all, 'id', 'name', form.object.job_type_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+        <select name="foreign_worker[job_type_id]" id="foreign_worker_job_type_id" class="form-control " data-parsley_errors_container="#select2_parsley_error__<%= field_id %>" data-parsley_class_handler=".select2-selection--single[aria-labelledby=\"select2-<%= field_id %>-container\"]" data-parsley_group="<%= field_id %>" required>
+            <option value=""><%= form_select_option_text %></option>
+            <% if @employer.is_individual?
+                   job_type = JobType.where(:name => ['DOMESTIC','PLANTATION','AGRICULTURE']).all
+                elsif @employer.is_company?
+                   job_type = JobType.where.not(:name => ['DOMESTIC']).all
+                end
+            %>
+            <% job_type.order(:name).each do |jt| %>
+                <option value="<%= jt.id %>" data-name="<%= jt.name %>"
+                <%= " selected" if @foreign_worker.job_type_id == jt.id %>
+                <%= " disabled" if @foreign_worker.is_maid_online? and jt.name != 'DOMESTIC' %>
+                ><%= jt.name %></option>
+            <% end %>
+        </select>
+        <div id="select2_parsley_error__<%= field_id %>"></div>
+<%
+=begin %>
+                <% if !@is_maindonline %>
+                    <% field_id = generate_field_id(form, :job_type_id) %>
+                    <%= form.select :job_type_id, options_from_collection_for_select(JobType.order(:name).all, 'id', 'name', form.object.job_type_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                <% else %>
+                    <input type="text" class="form-control" name="foreign_worker[job_type]" value="<%= @domestic_job %>" readonly="readonly">
+                    <input type="hidden" class="form-control" name="foreign_worker[job_type_id]" value="<%= @foreign_worker.job_type_id %>">
+                <% end %>
+<%
+=end %>
+    </div>
+</div>
+
+<div class="row" style="display:<%= display %>">
+    <label class="col-md-2  col-form-label">
+        <%= form.label :plks_number, "PLKS Number", class: 'required' %>
+    </label>
+    <div class="col-md-2">
+        <%= form.text_field :plks_number, class: 'form-control', required: true, maxlength: "2", data: { parsley_maxlength: "2", parsley_maxlength_message: "Maximum length of 2 characters", parsley_pattern: "^[0-9]*", parsley_pattern_message: "PLKS Number can only contain numbers" } %>
+    </div>
+    <div class="col-md-8">
+        <button type="button"
+            data-toggle="popover"
+            data-placement="auto"
+            data-html="true"
+            data-content='<%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>'
+            title=""
+            class="btn btn-primary btn-sm mr-2"><i class="fa fa-info-circle"></i>
+        </button>
+        The PLKS number for new arrival worker is #0
+    </div>
+</div>
+
+<% if !['edit', 'update', 'revert'].include?(action_name) %>
+
+    <div class="row pati-row"<%=raw ' style="display: none"' if @foreign_worker.is_maid_online? || SystemConfiguration.get("PATI_PORTAL").eql?("0") %>>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-form-label required">PATI / Rehiring Programme</label>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-5">
+                        <%= form.radio_button(:pati, true, class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_pati_true">Yes</label>
+                        &emsp;
+                        <%= form.radio_button(:pati, false, class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_pati_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<% end %>
+
+<% if ["edit", "update", "revert"].include?(params[:action]) and !@foreign_worker.code.blank? %>
+    <div class="row">
+        <label class="col-md-2  col-form-label">
+            <% field_id = generate_field_id(form, :amendment_reasons) %>
+            <%= form.label :amendment_reasons, "Amendment Reason", class: 'required' %>
+        </label>
+        <div class="col-md-2">
+            <select name="foreign_worker[amendment_reasons][]" id="foreign_worker_amendment_reasons" class="form-control" required data-parsley-single="foreign_worker[amendment_reasons][]" data-select2-id="foreign_worker_amendment_reasons" data-parsley-errors-container="#select2_parsley_error__foreign_worker_amendment_reasons" data-parsley-class-handler='.select2-selection--single' data-parsley-group="foreign_worker_amendment_reasons">
+                <option value=""><%= form_select_option_text %></option>
+                <% AmendmentReason.where.not(:code => ['JOB_TYPE','INPUT_ERROR','AUTHORITY_REQUEST','CHANGE_NEW_PASSPORT','ADDRESS']).each do |ar| %>
+                    <option value="<%= ar.id %>" data-code="<%= ar.code %>"<%= " selected" if (form.object.amendment_reasons || []).include?(ar.id.to_s) %>><%= ar.name %></option>
+                <% end %>
+            </select>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+<% end %>
+
+<%
+    display_upload = "none"
+    display_upload = "block" if !@foreign_worker.code.blank? or is_change_employer
+    require_upload = ""
+
+    if ["edit", "revert", "update"].include?(params[:action]) && !form.object.code.blank? && !@disallow_amend_critical_info
+        require_upload = "required"
+    elsif is_change_employer
+        require_upload = "required"
+    end
+%>
+
+<% if ["edit", "revert", "update"].include?(params[:action]) || is_change_employer %>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="document-input-group" class="form-group">
+                <label for="foreign_worker_uploads" class="<%= require_upload %>">Upload documents</label>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Please upload the following documents for verification.</p>
+                        <div class="">
+                            <ol class="ol-list-portal">
+                                <li>Passport front page</li>
+                                <li>Latest work permit/ calling visa/ SMO slip/ approval slip from JIM</li>
+                                <% if is_change_employer && @employer.is_company? %>
+                                    <li>RTK quota approval email (For RTK worker only)</li>
+                                <% end %>
+                            </ol>
+                        </div>
+                        <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB.</p>
+                    </div>
+                </div>
+                <div class="input-group custom-input-group">
+                    <div class="document-type col-md-6">
+                        <select class="form-control document-type-selector" id="foreign_worker_upl" name="foreign_worker[uploads][][category]" <%= require_upload %> onchange="upload_category_changed(this)">
+                            <option value="">Select option</option>
+                            <% if !is_change_employer %>
+                                <% ForeignWorker::DOCUMENT_TYPES.each do |index, document_type| %>
+                                    <option value="<%= index %>"><%= document_type %></option>
+                                <% end %>
+                            <% else %>
+                                <% ForeignWorker::DOCUMENT_TYPES_CHANGE_EMPLOYER.each do |index, document_type| %>
+                                    <option value="<%= index %>"><%= document_type %></option>
+                                <% end %>
+                            <% end %>
+                        </select>
+                    </div>
+                    <div class="custom-file col-md-6">
+                        <input type="file" name="foreign_worker[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled <%= require_upload %>>
+                        <label class="custom-file-label">Choose file</label>
+                    </div>
+                    <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="display:<%= display_upload %>">
+        <div class="col-md-6">
+            <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+        </div>
+    </div>
+    <div class="row" style="display:<%= display_upload %>">
+        <div class="col-md-6">
+            <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+        </div>
+    </div>
+
+    <div class="row" style="display:<%= display_upload %>">
+    <% if !is_change_employer %>
+        <div class="col-md-12">
+            <label class="col-form-label" style="margin-right:69px;">Pending Documents</label>
+                <div class="col-md-7">
+                    <textarea class="form-control" readonly="readonly" data-parsley-uploaded-documents=""
+                        data-parsley-validate-if-empty="" name="" id="worker_pending_document" rows="5"  <%= "disabled" if @foreign_worker.code.blank? or is_change_employer %>></textarea>
+                </div>
+        </div>
+    <% end %>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    // file upload
+    <%= render 'shared/fileupload_script' %>
+
+    /*
+    maid_online_changed($('#is_maid_online'))
+    $('#is_maid_online').change(function () {
+        maid_online_changed($(this))
+    });
+    */
+    max_upload_count = 2;
+
+    function maid_online_changed(cb){
+        $('select[name="foreign_worker[job_type_id]"] > option').each(function (idx, opt) {
+            //if (cb.is(':checked')) {
+            if (cb.val() == "PRAON") {
+                if (opt.getAttribute('data-name') == 'DOMESTIC') {
+                    opt.selected = true;
+                } else {
+                    opt.selected = false;
+                    opt.setAttribute('disabled', true);
+                }
+                $('#foreign_worker_pati_false').prop("checked", true);
+                $('#foreign_worker_pati_true').prop("disabled", true);
+            } else {
+                opt.removeAttribute('disabled');
+                $('#foreign_worker_pati_true').prop("disabled", false);
+            }
+
+        });
+
+        if (cb.val() == "RTK") {
+            alert("You have selected Programme Recalibration for this foreign worker.");
+        }
+    }
+
+    $('input[type="checkbox"]').on('change', function () {
+        $('input[name="programme[]"]').not(this).prop('checked', false);
+        maid_online_changed($('input[name="programme[]"]:checked'));
+    });
+
+    function upload_category_changed(sel)
+    {
+        $(sel).parents('div.custom-input-group').find(`input[name="foreign_worker[uploads][][documents]"]`).attr("disabled", $(sel).val().length == 0);
+    }
+    /**
+    * Function to duplicate document fields
+    **/
+    $('#add_more_documents').click(() => {
+        if ($('.custom-input-group').length < max_upload_count){
+            $('.custom-input-group:first')
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-1')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose file")
+
+            if ($('.custom-input-group').length == max_upload_count){
+                $('#add_more_documents').prop("disabled", true);
+            }
+        }
+    });
+
+    /**
+    * Function to remove document fields
+    **/
+    $('.removal-button').click(function(){
+        if ($('.custom-input-group').length > 1){
+            $(this).closest('.custom-input-group').remove()
+        }
+        if ($('.custom-input-group').length < max_upload_count){
+            $('#add_more_documents').prop("disabled", false);
+        }
+    });
+
+    /**
+    * Function to set file name
+    **/
+    $('.custom-file-input').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    function setUploadCategoryOption() {
+
+            var type = 'foreign_worker';
+
+            $('.document-type-selector').each(function (index, obj) {
+                $(obj).append(new Option('Select option', ''));
+                var needed_validate_documents = required_documents[type];
+
+                needed_validate_documents.forEach(function (document_type) {
+                    var document_type_label = document_types[document_type];
+                    $(obj).append(new Option(document_type_label, document_type));
+                });
+
+            });
+            // clone select option after updating the option
+            cloneSelect();
+        }
+
+        function cloneSelect() {
+            window['cloned_select'] = $('.custom-input-group:first').clone(true, true);
+        }
+
+        var clonedAttachmentInput = $('.custom-input-group').clone(true, true);
+        bindLastDocumentTypeSelectorAndFileSelector();
+        // re-sync pending documents
+
+        function syncPendingDocuments() {
+            var pending_uploads = getPendingUploads();
+
+            if (!pending_uploads) {
+                return false;
+            }
+            setPendingDocuments(pending_uploads);
+        }
+
+        function getPendingUploads() {
+
+            var type = 'foreign_worker';
+            var needed_validate_documents = required_documents[type];
+            // var pending_uploads = needed_validate_documents;
+            var pending_uploads = needed_validate_documents.slice();
+            // console.log(needed_validate_documents);
+
+            $('.custom-input-group').each(function (index, obj) {
+                var document_type = $(obj).find('.document-type-selector').val();
+                var selected_file = $(obj).find('.custom-file-input').val();
+                // check if this document needed by current employer type
+                // if yes we need to check file exist
+                if (needed_validate_documents.includes(document_type)) {
+                    // if valid upload
+                    if (selected_file) {
+                        // remove from pending uploads
+                        for( var i = 0; i < pending_uploads.length; i++){
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+            });
+            return pending_uploads;
+        }
+
+        function setPendingDocuments(pending_uploads) {
+
+            var pending_list = '';
+            pending_uploads.forEach(function (document_type) {
+                var document_type_label = document_types[document_type];
+                pending_list = pending_list + document_type_label + '\n';
+            });
+            var pending_documents = $("#worker_pending_document");
+            // reset pending list
+            pending_documents.val('');
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        var document_types = <%= ForeignWorker::DOCUMENT_TYPES.to_json.html_safe %>;
+
+        var required_documents = {
+                foreign_worker: [
+                     "PASSPORT",
+                     "WORKINGPERMIT",
+                ]
+        };
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+
+                    var pending_uploads = getPendingUploads();
+                    // if there is still pending documents, return false
+                    if (pending_uploads.length > 0) {
+                        // append to pending list
+                        setPendingDocuments(pending_uploads);
+                        // return false validation of there is documents pending
+                        return false;
+                    }
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("")
+        });
+            bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+</script>
+<% end %>

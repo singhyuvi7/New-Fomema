@@ -1,0 +1,96 @@
+<% if @has_no_overall %>
+    <% @sections.each do |section| %>
+        <% if section[:has_no] %>
+            <% 
+                _vr = section[:table] == 'visit_report_laboratory' ? @visit_report.visit_report_laboratory : @visit_report.visit_report_laboratory.try(section[:table])
+            %>
+
+            <div class="card">
+                <div class="card-header">
+                    <button class="dropdown-toggle-bar btn header-collapse-btn" data-toggle="collapse" type="button" data-target="#<%=section[:title_slug] %>" aria-expanded="false" aria-controls="<%= section[:title_slug] %>">
+                        <div><%= section[:title] %></div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="card-body collapse show" id="<%=section[:title_slug] %>">
+                    <div class="table-responsive">
+                        <% if section[:table] == 'visit_report_laboratory' %>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <% index = 0 %>
+                                    <% section[:fields].each do |field| %>
+                                        <% if field[:has_no] %>
+                                            <% index += 1 %>
+                                            <% if !field[:subtitle].blank? %>
+                                                <tr>
+                                                    <td class="font-weight-bold"><%= index %>.</td>
+                                                    <td>
+                                                    <div class="font-weight-bold"><%= field[:subtitle] %></div>
+                                                    </td>
+                                                </tr>
+                                            <% end %>
+                                            <% sub_index = 0 %>
+                                            <% field[:subfields].each do |(field_key,field_value)| %>
+                                                <% if _vr.try(field_key) == 'NO' %>
+                                                    <% sub_index += 1 %>
+                                                    <tr>
+                                                        <td class="table-index font-weight-bold"><%= "#{index}." if field[:subtitle].blank? %></td>
+                                                        <td class="table-items font-weight-bold">
+                                                            <%= "#{index}.#{sub_index}. " if !field[:subtitle].blank? %>
+                                                            <%= visit_report_laboratory.label "#{field_key}".to_sym, "#{field_value}" %>
+                                                        </td>
+                                                        <td class="text-right table-acceptable">
+                                                            <%= visit_report_laboratory.text_area "#{field_key}_comment".to_sym, class: 'form-control comment-field', placeholder: 'Remarks', required: true %>
+                                                        </td>
+                                                    </tr>
+                                                <% end %>
+                                            <% end %>
+                                        <% end %>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        <% else %>
+                            <%= visit_report_laboratory.fields_for section[:table].to_sym do |vr_lab_detail| %>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <% index = 0 %>
+                                        <% section[:fields].each do |field| %>
+                                            <% if field[:has_no] %>
+                                                <% index += 1 %>
+                                                <% if !field[:subtitle].blank? %>
+                                                    <tr>
+                                                        <td class="font-weight-bold"><%= index %>.</td>
+                                                        <td>
+                                                        <div class="font-weight-bold"><%= field[:subtitle] %></div>
+                                                        </td>
+                                                    </tr>
+                                                <% end %>
+                                                <% sub_index = 0 %>
+                                                <% field[:subfields].each do |(field_key,field_value)| %>
+                                                    <% if _vr.try(field_key) == 'NO' %>
+                                                        <% sub_index += 1 %>
+                                                        <tr>
+                                                            <td class="table-index font-weight-bold"><%= "#{sub_index}." if field[:subtitle].blank? %></td>
+                                                            <td class="table-items font-weight-bold">
+                                                                <%= "#{index}.#{sub_index}. " if !field[:subtitle].blank? %><%= vr_lab_detail.label "#{field_key}".to_sym, "#{field_value}" %>
+                                                            </td>
+                                                            <td class="text-right table-acceptable">
+                                                                <%= vr_lab_detail.text_area "#{field_key}_comment".to_sym, class: 'form-control comment-field', placeholder: 'Remarks', required: true %>
+                                                            </td>
+                                                        </tr>
+                                                    <% end %>
+                                                <% end %>
+                                            <% end %>
+                                        <% end %>
+                                    </tbody>
+                                </table>
+                            <% end %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    <% end %>
+<% else %>
+    <b><i>***This laboratory complies with all FOMEMA requirements.***</i></b>
+<% end %>

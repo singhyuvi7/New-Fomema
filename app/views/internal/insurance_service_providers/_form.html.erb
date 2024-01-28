@@ -1,0 +1,75 @@
+<div class="card-body">
+    <%= render 'shared/all_validation_flash', { model_obj: @insurance_service_provider } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true, disabled: params[:action].eql?('edit') %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :display_name, "Display Name", class: 'required' %>
+                <%= form.text_field :display_name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :payment_to_code, "Payment To Code", class: 'required' %>
+                <%= form.text_field :payment_to_code, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :active, "Active", class: 'required' %>
+                <%= form.select :active, options_for_select(InsuranceServiceProvider::ACTIVE, form.object.active), {include_blank: form_select_option_text}, class: "form-control select", required: true %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_insurance_service_providers_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+<% if ["edit", "update"].include?(params[:action]) %>
+    $('#digital_xray_provider_passphrase').change(function (e) {
+        if ($(e.target).val().length > 0) {
+            $('#digital_xray_provider_passphrase').attr('required', 'required');
+            $('#digital_xray_provider_passphrase_confirmation').attr('required', 'required');
+            $('label[for="digital_xray_provider_passphrase"]').addClass("required");
+            $('label[for="digital_xray_provider_passphrase_confirmation"]').addClass("required");
+        } else {
+            $('#digital_xray_provider_passphrase').attr('required', false);
+            $('#digital_xray_provider_passphrase_confirmation').attr('required', false);
+            $('label[for="digital_xray_provider_passphrase"]').removeClass("required");
+            $('label[for="digital_xray_provider_passphrase_confirmation"]').removeClass("required");
+        }
+    });
+<% end %>
+</script>
+<% end %>

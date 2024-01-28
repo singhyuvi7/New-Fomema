@@ -1,0 +1,154 @@
+<div class="card">
+    <div class="card-header  border-0 bg-transparent text-dark">
+        <strong> Search Worker </strong>
+        <div class="card-header-actions">
+        </div>
+    </div>
+    <div class="card-body">
+        <%=render "filter" %>
+        <%= render '/shared/all_flash' %>
+
+        <form method="post" action="<%= bulk_action_external_worker_lists_path %>">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="row mb-4">
+                <div class="col-md-6 text-left">
+                    <% if max_count = SystemConfiguration.get('MAX_ORDER_ITEM_COUNT').to_i > 0 %>
+                        <p style='color:red'><strong>You may select up to 25 workers only per transaction.</strong></p>
+                    <% end %>
+                </div>
+                <div class="col-md-6 text-right">
+                    <% if @employer.try(:employer_type_id) == 1 %>
+                        <% if site == 'PORTAL' && has_permission?("CREATE_INSURANCE_PURCHASE") %>
+                            <%= render partial: "/shared/insurance_menu", locals: {button_class: "btn btn-blue-portal dropdown-toggle"} %>
+                        <% end %>
+                        <% if has_permission?('CREATE_SPECIAL_RENEWAL_TRANSACTION') %>
+                             <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="register_transaction"><i class="fa fa-file"></i> Buy FOMEMA </button>
+                        <% elsif has_permission?("CREATE_TRANSACTION") %>
+                            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="register_transaction_no_special"><i class="fa fa-file"></i> Buy FOMEMA </button>
+                        <% end %>
+                    <% end %>
+                    <% if @employer.try(:employer_type_id) == 2 %>
+                        <% if has_permission? "CREATE_TRANSACTION" %>
+                            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="add_cart"><i class="fa fa-cart-plus" aria-hidden="true"></i> Add To List</button>
+                            <% if @cart_count > 0 %>
+                                <button class="btn btn-blue-portal " type="button" data-toggle="modal" data-target="#transaction-cart"><i class="fa fa-list" aria-hidden="true"></i>View List (<%= @cart_count %>)</button>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+
+                    <% if has_permission? "CREATE_FOREIGN_WORKER" %>
+                        <% if @employer.try(:employer_type_id) == 2 %>
+                            <a class="btn btn-blue-portal" href="<%= bulk_upload_external_worker_lists_path %>"> <i class="fa fa-upload" aria-hidden="true"></i> Bulk Upload New Worker</a>
+                        <% end %>
+                        <a class="btn btn-blue-portal" href="<%= new_external_worker_list_path %>"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Worker</a>
+                        <button type="button"
+                            data-toggle="popover"
+                            data-placement="top"
+                            data-html="true"
+                            data-content="
+                            <ul>
+                                <li>New arrival worker with new calling visa/Immigration Approval</li>
+                            </ul>
+                            <ul>
+                                <li>Worker's first registration with FOMEMA</li>
+                            </ul>"
+                            title="Add New Worker"
+                            class="btn btn-primary btn-sm"><i class="fa fa-info-circle"></i></button>
+                    <% end %>
+                    <% if has_permission? "DELETE_FOREIGN_WORKER" %>
+                        <button class="btn btn-red-portal" type="submit" name="bulk_action" value="destroy"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
+                    <% end %>
+                </div>
+            </div>
+            <table class="table table-responsive-sm table_circle">
+                <tr>
+                    <th style="width:5px"><input class="master-checkbox" type="checkbox">&nbsp; &nbsp; </th>
+                    <th>No.</th>
+                    <th>Worker Name</th>
+                    <th>Passport Number</th>
+                    <th>Country</th>
+                    <th>Worker Code</th>
+                    <% if has_permission?("EDIT_EMPLOYER_SUPPLEMENT_FOREIGN_WORKER") && @employer.has_supplement_account? %>
+                        <th>Account Name</th>
+                    <% end %>
+                    <th>Amendment Status</th>
+                    <th class="module-row-actions">Action</th>
+                </tr>
+                <tbody>
+                    <% @foreign_workers.each.with_index((@foreign_workers.current_page - 1) * get_per + 1) do |foreign_worker, index| %>
+                        <tr>
+                            <td><input class="child-checkbox" type="checkbox" name="ids[]" value="<%= foreign_worker.id %>"> &nbsp;</td>
+                            <td><%= index %></td>
+                            <td>
+                                <label><%= foreign_worker.name %></label>
+                                <% if @employer.try(:employer_type_id) == 2 %>
+                                    <% if foreign_worker.cart_selected? %>
+                                        <i class="text-success"><span class="fa fa-check"></span></i>
+                                    <% end %>
+                                <%end%>
+                            </td>
+                            <td><%= foreign_worker.passport_number %></td>
+                            <td><%= foreign_worker.country.name %></td>
+                            <td><%= foreign_worker.code %></td>
+                            <% if has_permission?("EDIT_EMPLOYER_SUPPLEMENT_FOREIGN_WORKER") && @employer.has_supplement_account? %>
+                                <td>
+                                    <% if foreign_worker.employer_supplement_id.present? %>
+                                        <%= EmployerSupplement.find_by(id: foreign_worker.employer_supplement_id).name %>
+                                    <% else %>
+                                        <%= foreign_worker.try(:employer_name) %>
+                                    <% end %>
+                                </td>
+                            <% end %>
+                            <td>
+                                <% if ["UPDATE_PENDING_APPROVAL"].include?(foreign_worker.approval_status) %>
+                                    Amendment Pending Approval
+                                <% end %>
+                                <% if ["UPDATE_REJECTED"].include?(foreign_worker.approval_status) %>
+                                    Amendment Rejected
+                                <% end %>
+                                <% if ["UPDATE_APPROVED"].include?(foreign_worker.approval_status) %>
+                                    Amendment Approved
+                                <% end %>
+                                <% if ["UPDATE_REVERTED"].include?(foreign_worker.approval_status) %>
+                                    Amendment Request Reverted
+                                <% end %>
+                            </td>
+                            <td class="module-row-actions">
+                                <% if has_any_permission?("VIEW_ALL_FOREIGN_WORKER", "VIEW_BRANCH_FOREIGN_WORKER", "VIEW_OWN_FOREIGN_WORKER") %>
+                                    <a href="<%= external_worker_list_path foreign_worker %>" class="btn btn-blue-portal">Show</a>
+                                <% end %>
+                                <% unless current_user.employer_supplement_id.present? && foreign_worker.employer_supplement_id.blank? %>
+                                    <% if has_permission?("EDIT_FOREIGN_WORKER") && foreign_worker.status == 'ACTIVE' %>
+                                        <% if (!foreign_worker.blocked? && (["NEW_APPROVED", "UPDATE_APPROVED", "UPDATE_REJECTED"].include?(foreign_worker.approval_status) or foreign_worker.approval_status.blank?)) %>
+                                            <a href="<%= edit_external_worker_list_path foreign_worker %>" class="btn btn-blue-portal">Edit</a>
+                                        <% end %>
+                                        <% if ["UPDATE_REVERTED"].include?(foreign_worker.approval_status) %>
+                                            <a href="<%= revert_external_worker_list_path foreign_worker %>" class="btn btn-blue-portal">Amendment Request Reverted</a>
+                                        <% end %>
+                                    <% end %>
+                                    <% if foreign_worker.latest_insurance_purchase_id? && foreign_worker.latest_insurance_purchase %>
+                                        <a class="btn btn-success" href="<%= external_insurance_history_path(foreign_worker.latest_insurance_purchase_id) %>" data-toggle="tooltip" data-html="true" title="Insurance Purchased<%= " (#{foreign_worker.latest_insurance_purchase&.try(:created_at).try(:strftime, get_standard_date_format)})" if foreign_worker.latest_insurance_purchase_id? %>"><i class="fa fa-heartbeat"></i></a>
+                                    <% end %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+        <div class="row external-pagination-container">
+            <%= paginate @foreign_workers %>
+        </div>
+    </div>
+</div>
+
+<%= render "bulk" %>
+<%= render "/shared/carts/index", {form_action: bulk_action_external_worker_lists_path} %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#bulk-upload-btn').click(function () {
+        $('#bulk-upload-modal').modal();
+    });
+</script>
+<% end %>

@@ -1,0 +1,150 @@
+<% @filter_params = JSON.parse(params[:filter_params]) rescue nil %>
+<div id="content">
+  <div class="dashboard-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="chard-card">
+
+          <div class="card">
+            <div class="card-header">Service Provider Split <i class="fa fa-ellipsis-h" aria-hidden="true"></i></div>
+            <div class="card-body px-0 m-0 ">
+              <div class="container-fluid">
+                <div class="row">
+
+                  <div class="col-12 col-sm-6 col-md-3 mb-2">
+                    <div class="custom-card">
+                      <%= render partial: 'dashboards/service_provider/doctor_split' %>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-sm-6 col-md-3 mb-2">
+                    <div class="custom-card ">
+                      <%= render partial: 'dashboards/service_provider/laboratory_split' %>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-sm-6 col-md-3 mb-2">
+                    <div class="custom-card">
+                      <%= render partial: 'dashboards/service_provider/xray_split' %>
+                    </div>
+                  </div>
+
+
+                  <div class="col-12 col-sm-6 col-md-3 mb-2">
+                    <div class="custom-card">
+                      <%= render partial: 'dashboards/service_provider/radiologist_split' %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="row my-1">
+
+      <div class="col-12 col-sm-6 col-md-4 my-2">
+        <div class="chard-card">
+          <div class="card">
+            <div class="card-header">Quota Usage by Doctor <i class="fa fa-ellipsis-h" aria-hidden="true"></i></div>
+            <div class="card-body p-0">
+              <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+              <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
+              <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+              <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+              <link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+              <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
+              <%= render partial: 'dashboards/service_provider/quota_usage_by_doctor' %>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-12 col-sm-6 col-md-8 my-2">
+        <div class="chard-card">
+          <div class="card">
+            <div class="card-header">Service Provider’s Performance <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+            </div>
+            <div class="card-body px-0 m-0 card-height">
+              <div class="container-fluid">
+                <div class="row">
+
+                  <div class="col-6 col-sm-12 col-md-4">
+                    <div class="custompie-cardone" id="divcertdoctor">
+                      <div class="card">
+                        <div class="card-header">Certification by
+                          Doctor<i class="fa fa-ellipsis-h" aria-hidden="true"></i></div>
+                        <div class="card-body p-0">                         
+                          <%= render partial: 'dashboards/service_provider/certification_by_doctor' %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-6 col-sm-12 col-md-4" id="divdoctortransm">
+                    <div class="custompie-cardone">
+                      <div class="card">
+                        <div class="card-header">Accuracy Result Transmission By Doctor
+                          <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                        </div>
+                        <div class="card-body p-0">
+                         <%= render partial: 'dashboards/service_provider/accuracy_result_transmission' %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="col-6 col-sm-12 col-md-4" id="divlabtrans">
+                    <div class="custompie-cardone">
+                      <div class="card">
+                        <div class="card-header">Laboratory Result
+                          Transmission<i class="fa fa-ellipsis-h" aria-hidden="true"></i></div>
+                        <div class="card-body p-0">
+                        <%= render partial: 'dashboards/service_provider/laboratory_result_transmission' %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="col-6 col-sm-12 col-md-4" id="divxraytrans">
+                    <div class="custompie-cardone">
+                      <div class="card">
+                        <div class="card-header">X-Ray Transmission <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                        </div>
+                        <div class="card-body p-0">
+                        <%= render partial: 'dashboards/service_provider/xray_transmission' %>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="col-6 col-sm-12 col-md-4" id="divxrayquality">
+                    <div class="custompie-cardone">
+                      <div class="card">
+                        <div class="card-header">X-Ray Quality Compliance
+                          <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                        </div>
+                        <div class="card-body p-0">
+                        <%= render partial: 'dashboards/service_provider/xray_quality_compliance' %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

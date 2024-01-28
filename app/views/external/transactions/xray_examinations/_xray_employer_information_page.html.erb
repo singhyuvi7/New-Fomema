@@ -1,0 +1,22 @@
+<div class="row px-4">
+    <div class="col-lg-4 p-4">
+        <h6 class="mb-4"><b>Employer Information</b></h6>
+
+        <table class="font-size-6">
+            <%
+                [
+                    ["Employer Code",         @transaction.employer&.code],
+                    ["Employer Name",         @transaction.employer&.name],
+                    ["Employer Email",   @transaction.employer&.email],
+                    ["Employer Telephone",       @transaction.employer&.phone],
+                    ["Employer Address",     @transaction.employer&.displayed_address],
+                ].each do |label, information|
+            %>
+                <tr>
+                    <th class="text-right pr-4 py-2"><%= label %></th>
+                    <td class="py-2"><%= information %></td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+</div>

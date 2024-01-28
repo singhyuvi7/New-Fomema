@@ -1,0 +1,56 @@
+<div class="visit-details">
+    <h3>Part 1: Visit & Laboratory Details</h3>
+    <div class="row">
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Visit Date</div><span class="colon"> :</span>
+            <div class="field-value d-inline"><%= @visit_report.visit_date %></div>
+        </div>
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Type Of Visit</div><span class="colon"> :</span>
+            <div class="field-value d-inline"><%= visit_report_lab.type_of_visit %></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Visit Time From</div><span class="colon"> :</span>
+            <div class="field-value d-inline"><%= @visit_report.visit_time_from.strftime("%I:%M%p") %></div>
+        </div>
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Visit Time To</div><span class="colon"> :</span>
+            <div class="field-value d-inline"><%= @visit_report.visit_time_to.strftime("%I:%M%p") %></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">FOMEMA's Officers</div><span class="colon"> :-</span>
+            <ul class="visit-details-list">
+                <% officers.each do |officer| %>
+                <li><%= officer.name %></li>
+                <% end %>
+            </ul>
+        </div>
+        <div class="col col-6 inline-field visit-details-field">
+            <div class="field-name d-inline">MOH Representative / Others</div><span class="colon"> :-</span>
+            <ul class="visit-details-list">
+                <li><%= visit_report_lab.moh_representative %></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Name & Laboratory Code</div><span class="colon"> :</span>
+            <div class="field-value d-inline"><%= "#{visit_report_lab.laboratory_name} (#{visit_report_lab.laboratory.code})" %></div>
+        </div>
+        <div class="col col-6 visit-details-field">
+            <div class="field-name d-inline">Laboratory Address</div><span class="colon"> :</span>
+            <div class="field-value d-inline">
+                <% if !visit_report_lab.address_1.blank? %><%= visit_report_lab.address_1 %><br><% end %>
+                <% if !visit_report_lab.address_2.blank? %><%= visit_report_lab.address_2 %><br><% end %>
+                <% if !visit_report_lab.address_3.blank? %><%= visit_report_lab.address_3 %><br><% end %>
+                <% if !visit_report_lab.address_4.blank? %><%= visit_report_lab.address_4 %><br><% end %>
+                <%= visit_report_lab.town.name %><br>
+                <%= "#{visit_report_lab.postcode} #{visit_report_lab.state.name}," %><br>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,142 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Audit Radiograph Letter</strong>
+    </div>
+
+    <%= form_for @letter, url: xqcc_audit_radiograph_letter_save_internal_xqcc_letters_path, method: :post, html: { class: "with-parsley" } do |f| %>
+        <%= f.hidden_field :id %>
+        <%= f.hidden_field :xray_name %>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :xray_code, "Xray Code" %>
+
+                        <div class="d-flex align-items-center">
+                            <%= f.text_field :xray_code, class: "form-control search-field", required: true, data: { parsley_errors_container: "#t_code_parsley_error" } %>
+                            <div class="btn btn-primary ml-2" id="search-button">Search</div>
+                        </div>
+
+                        <div id="t_code_parsley_error"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :panel_year, "Issued Year " %>
+                        <%= f.select :panel_year, (Date.today.year-5)..(Date.today.year+3), :selected => Time.current.year, class: "form-control", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :issuer_name, "Approver Name" %>
+                        <%= f.text_field :issuer_name, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :issuer_title, "Designation" %>
+                        <%= f.text_field :issuer_title, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :custom_ref_tag, "Reference Tag (L00XX/2020-11/XQCC/AR/TAGHERE)" %>
+                        <%= text_field_tag :custom_ref_tag, @letter.ref_tag || "EXAMPLE", class: "form-control", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <% [:xray_ref_no, :xray_address].each do |label| %>
+                    <div class="col-md-6 mb-2">
+                        <div class="form-group">
+                            <%= label_tag label, label.to_s.titleize %>
+
+                            <% if label.to_s.include?("address") %>
+                                <%= f.text_area label, class: "form-control", readonly: true, rows: 8, required: true %>
+                            <% else %>
+                                <%= f.text_field label, class: "form-control", readonly: true, required: true %>
+                            <% end %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div id="letter-placeholder"></div>
+
+        <div class="card-footer text-right submit-buttons">
+            <!-- Please note, the names of the Preview Xray Letter & Preview Employer Letter is important. It is being used in the controller -->
+            <%= f.submit "Preview Letter", class: "btn btn-sm btn-primary remove-disabled-states", formtarget: :_blank %>
+            <%= f.submit "Save", class: "btn btn-sm btn-success", data: { confirm: "You are about to save, please confirm." } %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        generateRefNumbers();
+        $('#custom_ref_tag').change(generateRefNumbers);
+
+        function generateRefNumbers() {
+            var refTag      = $('#custom_ref_tag').val().toUpperCase();
+            var today       = new Date();
+            var month       = String(today.getMonth() + 1).padStart(2, '0');
+            var year        = today.getFullYear();
+            $('#xqcc_letter_audit_radiographer_xray_ref_no').val(`L00XX/${ year }-${ month }/XQCC/AR/${ refTag }`);
+        }
+
+        $('.search-field:first').on('keypress',function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                searchTransaction();
+            }
+        });
+
+        $('#search-button').click(function(e) {
+            searchTransaction();
+        });
+
+        function searchTransaction() {
+            var btn = $('#search-button');
+            var btnState = btn.hasClass('btn-primary');
+
+            if (btnState) {
+                btn.removeClass('btn-primary').addClass('btn-secondary');
+                $('<i class="spinner-load-icon fas fa-spinner fa-spin text-primary font-size-11 ml-2"></i>').insertAfter(btn);
+
+                var xrayCode = btn.closest('.form-group').find('.search-field').val();
+
+                $.ajax({
+                    url: 'xqcc_audit_radiograph_letter_search',
+                    type: 'POST',
+                    data: { xray_code: xrayCode },
+                }).done(function(response) {
+                    $(Object.keys(response)).each(function() {
+                        $(`#${ this }`).val(response[this]);
+                    });
+
+                    btn.addClass('btn-primary').removeClass('btn-secondary');
+                    $('i.spinner-load-icon').remove();
+                });
+            }
+        };
+
+        $('.remove-disabled-states').click(function(){
+            setTimeout(function() {
+                $('.submit-buttons input').removeAttr('disabled');
+            }, 3000);
+        });
+    </script>
+<% end %>

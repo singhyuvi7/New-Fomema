@@ -1,0 +1,35 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= @title %></strong>
+    </div>
+
+    <%= form_for @updating_model, url: @submit_url, html: {class: "with-parsley"} do |form| %>
+        <div class="card-body">
+            <div class="row">
+                <% @data.each do |label, value| %>
+                    <div class="col-md-6 mb-2">
+                        <div class="form-group">
+                            <%= label_tag label, label %>
+                            <%= text_field_tag label, value, class: 'form-control', readonly: true %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :pcr, "Select PCR" %>
+                        <%= select_tag :pcr_id, options_for_select(@select_options, @selected), include_blank: form_select_option_text, class: 'form-control mb-2' %>
+                        <p class="font-size-7"><%= @displayed_msg.html_safe %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(@back_url) %>
+            <%=raw edit_save_button() %>
+        </div>
+    <% end %>
+</div>

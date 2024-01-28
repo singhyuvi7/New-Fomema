@@ -1,0 +1,48 @@
+<style>
+#submit-calculator > .card {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+
+<form method="POST" action="<%= @url %>" id="submit-calculator">
+    <div class="card">
+        <div class="card-header">
+            Worker's Insurance
+        </div>
+        <div class="card-body">
+            <div class="hidden">
+                <textarea name="param" class="no-uppercase" style="width: 100%; height: 100px"><%= InsuranceService.encrypt(@submit_data.to_json, @provider_code) %></textarea>
+                <textarea class="no-uppercase" style="width: 100%; height: 500px"><%= JSON.pretty_generate(@submit_data) %></textarea>
+            </div>
+            <% if SystemConfiguration.get("INSURANCE_SHARE_DATA_CONFIRMATION", "1") == "1" %>
+                <% if site == 'PORTAL' %>
+                    <p>To protect your worker and your investment and time, we have partnered with several insurance service providers to allow you to purchase the required insurance for your workers easily and quickly.</p>
+                    <p>When you click "Yes" below, we will share your data and your worker's information with the selected insurance service provider so that you don't have to input the same data at the insurance service provider.</p>
+                    <p>Do you wish to continue?</p>
+                <% else %>
+                    <p>Do you wish to continue?</p>
+                <% end %>
+            <% else %>
+                <p>Please wait for insurance calculator</p>
+            <% end %>
+        </div>
+        <div class="card-footer text-right">
+            <% if site == 'PORTAL' %>
+                <a href="<%= edit_external_order_path(@order, old_insurance_service_provider_id: @old_insurance_service_provider_id) %>" class="btn btn-secondary">Cancel</a>
+            <% else %>
+                <a href="<%= edit_internal_order_path(@order, old_insurance_service_provider_id: @old_insurance_service_provider_id) %>" class="btn btn-secondary">Cancel</a>
+            <% end %>
+            <button type="submit" id="submit" class="btn btn-primary">Yes</button>
+        </div>
+    </div>
+</form>
+
+<% content_for :page_end_scripts do %>
+<script>
+<% if SystemConfiguration.get("INSURANCE_SHARE_DATA_CONFIRMATION", "1") == "0" %>
+    $('#submit').click();
+<% end %>
+</script>
+<% end %>

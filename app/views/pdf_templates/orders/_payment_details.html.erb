@@ -1,0 +1,35 @@
+<table class="invoice-table payment-table table-sm">
+    <thead>
+        <tr>
+            <th colspan="5">Payment Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="text-center bold">
+            <td>Date</td>
+            <td>Payment Type</td>
+            <td>Bank</td>
+            <td>Reference No.</td>
+            <td>Amount (RM)</td>
+        </tr>
+        <% if @order.payment_method&.code == 'BANKDRAFT' %>
+            <% @order.bank_draft_allocations.each do |details| %>
+            <tr class="text-center">
+                <td><%= details.bank_draft.issue_date&.strftime('%d/%m/%Y') %></td>
+                <td><%= @order.payment_method.name %></td>
+                <td><%= details.bank_draft.bank.name %></td>
+                <td><%= details.bank_draft.number %></td>
+                <td><%= number_with_precision(details.amount, precision: 2) %></td>
+            </tr>
+            <% end %>
+        <% else %>
+            <tr class="text-center">
+                <td><%= @order.date&.strftime('%d/%m/%Y') %></td>
+                <td><%= @order.payment_method&.name %></td>
+                <td>-</td>
+                <td><%= @order.payment_method&.is_ipay? ? Ipay88Response.find_by(ipay88_request_id: @order.latest_ipay88_request.try(:id)).try(:transaction_id) : @order.payment_method&.is_swipe? ? SwipeResponse.find_by(swipe_request_id: @order.latest_swipe_request.try(:id)).try(:transaction_id) : @order.payment_method&.is_fpx? ? FpxResponse.find_by(fpx_request_id: @order.latest_fpx_request.try(:id)).try(:fpx_txn_id) : @order.payment_method&.is_boleh? ? BolehResponse.find_by(boleh_request_id: @order.latest_boleh_request.try(:id)).try(:transaction_id) : @order.latest_order_payment.try(:reference) %></td>
+                <td><%= number_with_precision(@order.amount, precision: 2) %></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>

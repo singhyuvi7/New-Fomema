@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :amount, class: 'required' %>
+            <%= form.number_field :amount, class: 'form-control', required: true, min: 0.01, step: 0.01, readonly: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :reference, class: 'required' %>
+            <%= form.text_field :reference, class: 'form-control', required: true %>
+        </div>
+    </div>
+</div>
+
+<% if @order.payment_method&.code == 'CIMB_CLICKS' %>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :issue_date,"Date of Issue", class: 'required' %>
+                <%= form.date_field :issue_date, class: 'form-control', required: true, max: Time.now.strftime('%Y-%m-%d') %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment %>
+            <%= form.text_area :comment, class: 'form-control' %>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="order_id" value="<%= @order.id %>">

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Clinics</strong> - Edit Clinic
+    </div>
+    <%= form_for @clinic, url: internal_clinic_path(@clinic) do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,42 @@
+<%= render "internal/xray_pending_decisions/shared/pending_decision_approval_history", {xray_pending_decision: xray_pending_decision} %>
+
+<div class="card border-primary">
+    <div class="card-header">
+        XQCC Pending Decision Approval
+    </div>
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th class="text-center" colspan="2">Decision</th>
+                <th>Comment</th>
+            </tr>
+            <tr>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_pending_decision[approval_decision]" type="radio" value="APPROVE" id="xray_pending_decision_approval_decision_approve"<%= " checked" if xray_pending_decision.approval_decision == 'APPROVE' %> required>
+                            Approve
+                        </label>
+                    </div>
+                </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="xray_pending_decision[approval_decision]" type="radio" value="REJECT" id="xray_pending_decision_approval_decision_reject"<%= " checked" if xray_pending_decision.approval_decision == 'REJECT' %>>
+                            Reject
+                        </label>
+                    </div>
+                </td>
+
+                <td>
+                    <textarea class="form-control" name="xray_pending_decision[approval_comment]" id="xray_pending_decision_approval_comment" rows="2" required><%= xray_pending_decision.approval_comment %></textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(approval_internal_xray_pending_decisions_path) %>
+        <%=raw edit_submit_button %>
+    </div>
+</div>

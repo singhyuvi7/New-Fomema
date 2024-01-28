@@ -1,0 +1,62 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Call Log Case Types</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_CALL_LOG_CASE_TYPE') %>
+                    <%=raw index_table_new_button(new_internal_call_log_case_type_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Description</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @call_log_case_types.blank? %>
+            <tr>
+                <td colspan="5" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @call_log_case_types.each.with_index((@call_log_case_types.current_page - 1) * get_per + 1) do |call_log_case_type, index| %>
+            <tr>
+                <td class="module-row-numbers"><%= index %></td>
+                <td><%= call_log_case_type.id %></td>
+                <td><%= call_log_case_type.code %></td>
+                <td><%= call_log_case_type.description %></td>
+                <td class="module-row-actions">
+                    <%=raw index_table_show_button(internal_call_log_case_type_path(call_log_case_type)) %>
+                    <%=raw index_table_edit_button edit_internal_call_log_case_type_path(call_log_case_type) if has_permission?('EDIT_CALL_LOG_CASE_TYPE') %>
+                    <%=raw index_table_delete_button(internal_call_log_case_type_path(call_log_case_type)) if has_permission?('DELETE_CALL_LOG_CASE_TYPE') %>
+                </td>
+            </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+        </div>
+
+        <div class="row">
+            <%= paginate @call_log_case_types %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

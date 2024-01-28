@@ -1,0 +1,243 @@
+<%
+    worker          = transaction.foreign_worker
+    employer        = transaction.employer
+    agency          = transaction.agency
+    doctor          = transaction.doctor
+    laboratory      = transaction.laboratory
+    xray            = transaction.xray_facility
+    radiologist     = transaction.radiologist
+    xray_film_type  = transaction.xray_film_type? ? transaction.xray_film_type : transaction.xray_facility&.film_type
+    limited_info    = ["Laboratory", "XrayFacility", "Radiologist", "Employer"].include?(current_user.userable_type)
+
+    information = [
+        { title: "Worker Information",                  type: "sub-title" },
+        { title: "Worker Code",                         value: transaction&.fw_code },
+        { title: "Worker Name",                         value: transaction&.fw_name },
+        { title: "Country of Origin",                   value: transaction&.fw_country&.name },
+        { title: "Date of Birth",                       value: transaction&.fw_date_of_birth&.strftime(get_standard_date_format) },
+        { title: "Passport Number",                     value: transaction&.fw_passport_number },
+        { title: "Gender",                              value: ForeignWorker::GENDERS[transaction&.fw_gender] },
+        { title: "Job Type",                            value: transaction&.fw_job_type&.name },
+        { title: "PATI",                                value: transaction&.fw_pati? ? "Yes" : "No" }
+    ]
+
+    unless limited_info
+        information += [
+            { title: "General Details",                     type: "sub-title" },
+            { title: "Transaction Code",                    value: transaction.code },
+            #{ title: "SMO Status",                         value: transaction.is_maid_online? ? "YES" : "NO" },
+            { title: "Programme",                           value: transaction.programme_indicator },
+            { title: "Transaction Status",                  value: Transaction::STATUSES[transaction.status] },
+            { title: "Certification / Final Result",        value: transaction.final_result },
+            { title: "Registered By",                       value: transaction.registered_by_display },
+            { title: "Xray Film Type",                      value: xray_film_type },
+            { title: "Registration Indicator",              value: transaction.reg_ind },
+            { title: "Medical Indicator Count",             value: transaction.med_ind_count },
+            { title: "Unsuitable Slip Download (Portal)",   value: transaction.unsuitable_slip_download? ? "ENABLED" : "DISABLED" },
+            { title: "Blood Group Benchmark",               value: transaction.is_blood_group_benchmark ? "YES" : "NO" },
+            { title: "Next Transaction Re-Medical",         value: transaction.is_next_transaction_re_medical ? "YES" : "NO" },
+        ]
+
+        if has_permission?("VIEW_PLKS_NUMBER_IN_GENERAL_INFORMATION_WORKER_INFORMATION")
+            information.insert(-2, { title: "PLKS Number", value: transaction.fw_plks_number })
+        end
+
+        if xray_film_type == "DIGITAL"
+            information += [
+                { title: "Digital Image Available",     value: "" }
+            ]
+        end
+
+        information += [
+            { title: "Employer Information",            type: "sub-title" },
+            { title: "Employer Code",                   value: employer&.code },
+            { title: "Employer Name",                   value: employer&.name },
+            { title: "Employer Email",                  value: employer&.email },
+            { title: "Employer Telephone",              value: employer&.phone },
+            { title: "Employer Address",                value: employer&.displayed_address }
+        ]
+    end
+
+    if has_permission?("VIEW_AGENCY_INFO_IN_WORKER_INFORMATION")
+        information += [
+            { title: "Agency Information",            type: "sub-title" },
+            { title: "Agency Code",                   value: agency&.code },
+            { title: "Agency Name",                   value: agency&.name },
+            { title: "Agency Email",                  value: agency&.email },
+            { title: "Agency Telephone",              value: agency&.phone },
+            { title: "Agency Address",                value: agency&.displayed_address }
+        ]
+    end
+
+    if has_permission?("VIEW_DOCTOR_INFO_IN_WORKER_INFORMATION")
+        information += [
+            { title: "Doctor Information",              type: "sub-title" },
+            { title: "Doctor Code",                     value: doctor&.code },
+            { title: "Doctor Name",                     value: doctor&.name },
+            { title: "Doctor Email",                    value: doctor&.email },
+            { title: "Doctor Telephone",                value: doctor&.phone },
+            { title: "Clinic Name",                     value: doctor&.clinic_name },
+            { title: "Doctor Address",                  value: doctor&.displayed_address }
+        ]
+    end
+
+    unless limited_info
+        if has_permission?("VIEW_LABORATORY_INFO_IN_WORKER_INFORMATION")
+            information += [
+                { title: "Laboratory Information",      type: "sub-title" },
+                { title: "Laboratory Code",             value: laboratory&.code },
+                { title: "Laboratory Name",             value: laboratory&.name },
+                { title: "Laboratory Email",            value: laboratory&.email },
+                { title: "Laboratory Telephone",        value: laboratory&.phone },
+                { title: "Company Name",                value: laboratory&.company_name },
+                { title: "Laboratory Address",          value: laboratory&.displayed_address }
+            ]
+        end
+
+        if has_permission?("VIEW_XRAY_INFO_IN_WORKER_INFORMATION")
+            information += [
+                { title: "X-Ray Facility Information",  type: "sub-title" },
+                { title: "X-Ray Facility Code",         value: xray&.code },
+                { title: "X-Ray Facility Name",         value: xray&.name },
+                { title: "X-Ray Facility Email",        value: xray&.email },
+                { title: "X-Ray Facility Telephone",    value: xray&.phone },
+                { title: "X-Ray Doctor Name",           value: xray&.license_holder_name },
+                { title: "X-Ray Facility Address",      value: xray&.displayed_address }
+            ]
+        end
+
+        if has_permission?("VIEW_RADIOLOGIST_INFO_IN_WORKER_INFORMATION")
+            information += [
+                { title: "Radiologist Information",     type: "sub-title" },
+                { title: "Radiologist Code",            value: radiologist&.code },
+                { title: "Radiologist Name",            value: radiologist&.name },
+                { title: "Radiologist Email",           value: radiologist&.email },
+                { title: "Radiologist Telephone",       value: radiologist&.phone },
+                { title: "Facility Name",               value: radiologist&.xray_facility_name },
+                { title: "Radiologist Address",         value: radiologist&.displayed_address }
+            ]
+        end
+    end
+
+    if has_permission?("VIEW_MERTS_RESULTS_AND_STATUS_IN_WORKER_INFORMATION")
+        information += [
+            { title: "MERTS Examination",               type: "sub-title" },
+            { title: "Doctor Examination Result",       value: transaction.doctor_examination&.suitability },
+            { title: "X-Ray Examination Result",        value: transaction.xray_transmit_date? ? transaction.xray_examination&.result : nil },
+            { title: "Ignore MERTS Expiry Rules",       value: transaction.ignore_expiry ? "Yes (#{ transaction.ignore_merts_expiry_at? ? transaction.ignore_merts_expiry_at.strftime(get_standard_date_format) : nil })" : "No" },
+            { title: "Ignore Reprint Rules",            value: transaction.ignore_reprint_rule ? "Yes" : "No" }
+        ]
+    end
+
+    unless limited_info
+        if has_permission?("VIEW_MEDICAL_STATUS_IN_WORKER_INFORMATION")
+            information += [
+                { title: "Medical Status",              type: "sub-title" },
+                { title: "Medical Status",              value: Transaction::MEDICAL_STATUSES[transaction.medical_status] },
+                { title: "Medical Result",              value: transaction.medical_result },
+                { title: "Pending Review Exam",         value: @medical_review.try(:displayed_status) },
+                { title: "Pending Review Exam",         value: @medical_review.try(:approved_result) },
+                { title: "TCUPI Exam Status",           value: @tcupi_review.try(:displayed_status) },
+                { title: "TCUPI Exam Result",           value: @tcupi_review.try(:approved_result) }
+            ]
+        end
+
+        # JOEY!! INCLUDE PR & TCUPI STATUS if it has been conducted yet.
+        # JOEY!! Remove Medical Status
+
+        if has_permission?("VIEW_XQCC_RESULTS_AND_STATUS_IN_WORKER_INFORMATION")
+            information += [
+                { title: "XQCC/PCR",                    type: "sub-title" },
+                { title: "XQCC/PCR Status",             value: Transaction::XRAY_STATUSES[transaction.xray_status] },
+                { title: "X-Ray Final Result",          value: transaction.xray_result }
+            ]
+        end
+    end
+
+    information += [
+        { title: "Dates",                       type: "sub-title" },
+        { title: "Registration Date",           value: transaction.transaction_date.strftime(get_standard_datetime_format) },
+        { title: "Expiry Date",                 value: transaction.expired_at? ? transaction.expired_at.strftime(get_standard_datetime_format) : nil },
+        { title: "Examination Date",            value: transaction.medical_examination_date? ? transaction.medical_examination_date.strftime(get_standard_date_format) : nil },
+        { title: "Certification Date",          value: transaction.certification_date? ? transaction.certification_date.strftime(get_standard_datetime_format) : nil },
+    ]
+
+    unless limited_info
+        imm_object  = transaction.myimms_transaction
+        appeal      = transaction.latest_medical_appeal
+
+        if appeal.present?
+            appeal_date         = appeal.created_at.strftime(get_standard_date_format) if appeal.created_at?
+            mle                 = appeal.officer_in_charge.try(:name)
+            show_appeal_date    = "#{ appeal_date } (#{ mle })"
+        end
+
+        information += [
+            { title: "X-Ray Taken Date",        value: transaction.xray_examination.try(:xray_taken_date) ? transaction.xray_examination.xray_taken_date.strftime(get_standard_date_format) : nil },
+            { title: "X-Ray Submit Date",       value: transaction.xray_transmit_date? ? transaction.xray_transmit_date.strftime(get_standard_datetime_format) : nil },
+            { title: "Laboratory Submit Date",  value: transaction.laboratory_transmit_date? ? transaction.laboratory_transmit_date.strftime(get_standard_datetime_format) : nil },
+            { title: "IMM Send Date",           value: imm_object&.is_success_failed? ? "#{ imm_object.updated_at.strftime(get_standard_datetime_format) } (#{ imm_object.displayed_status })" : nil },
+            { title: "Appeal Date",             value: show_appeal_date },
+            { title: "Transmission Expiry Date",value: transaction.transmission_expired_at? ? transaction.transmission_expired_at.strftime(get_standard_datetime_format) : nil },
+        ]
+    end
+
+    if has_permission?("VIEW_DOCUMENT_APPROVAL_IN_WORKER_INFORMATION")
+        information += [
+            { title: "Document Approval",             type: "sub-title" },
+            { title: "Approval Date",                 value: transaction&.transaction_verify_docs.last&.approval_at&.strftime(get_standard_date_format) },
+            { title: "Approval By",                   value: transaction&.transaction_verify_docs.last&.approval_user.try(:name) },
+            { title: "Comment",                       value: transaction&.transaction_verify_docs.last&.approval_comment },
+            { title: "Status",                        value: transaction&.transaction_verify_docs.last&.status },
+        ]
+    end
+
+    @col_counting = 0
+%>
+
+<div>
+    <% information.each.with_index(0) do |hash, index| %>
+        <% if hash[:type] == "sub-title" %>
+            <% @current_title_tab = hash[:title] %>
+
+            <% if index > 0 # Close row if it is a title. %>
+                <% @col_counting = 0 %>
+                </div></div>
+            <% end %>
+
+            <div class="dropdown-toggle-bar d-flex align-items-center clickable border mt-4 px-2 bg-light" data-target="<%= @current_title_tab %>">
+                <h5 class="text-primary pt-2"><%= @current_title_tab %></h5>
+                <span class="flex-grow-1"></span>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        <% else %>
+            <% if @col_counting == 0 %>
+                <div class="dropdown-toggle-display border px-2 pt-3 <%= "hidden" unless ["Worker Information"].include?(@current_title_tab) %>" data-target="<%= @current_title_tab %>">
+            <% elsif @col_counting % 2 == 0 %>
+                </div>
+            <% end %>
+
+            <% if @col_counting % 2 == 0 %>
+                <div class="row">
+                <% @col_counting += 1 %>
+            <% end %>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><b><%= hash[:title] %></b></p>
+                        </div>
+
+                        <div class="col-md-8">
+                            <% if hash[:title] == "Digital Image Available" %>
+                                <%= link_to "Check Availability", digital_xray_availability_internal_transaction_path(@transaction.id), target: :_blank, class: "btn btn-primary mb-4 font-weight-bold" %>
+                            <% else %>
+                                <p><%= hash[:value] %></p>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+        <% end %>
+    <% end %>
+
+    </div></div>
+</div>

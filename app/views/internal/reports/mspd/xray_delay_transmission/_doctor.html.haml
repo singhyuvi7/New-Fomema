@@ -1,0 +1,28 @@
+- past_year = doctor.dig(:years, 0)
+- current_year = doctor.dig(:years, 1)
+%tr
+  %td{rowspan: 4}
+    = doctor.dig(:doctor_code)
+    %br/
+    = doctor.dig(:doctor_name)
+  %td{rowspan: 4}
+    = doctor.dig(:laboratory_code)
+    %br/
+    = doctor.dig(:laboratory_name)
+  %td{rowspan: 2}= past_year
+  %td= doctor.dig(:data, past_year, :not_delay, :count)
+  %td= doctor.dig(:data, past_year, :delay, :count)
+  %td= doctor.dig(:data, past_year, :total_count)
+%tr
+  %td= number_to_percentage doctor.dig(:data, past_year, :not_delay, :percent), precision: 0
+  %td= number_to_percentage doctor.dig(:data, past_year, :delay, :percent), precision: 0
+  %td= number_to_percentage doctor.dig(:data, past_year, :total_percent), precision: 0
+%tr
+  %td{rowspan: 2}= current_year
+  %td= doctor.dig(:data, current_year, :not_delay, :count)
+  %td= doctor.dig(:data, current_year, :delay, :count)
+  %td= doctor.dig(:data, current_year, :total_count)
+%tr
+  %td= number_to_percentage doctor.dig(:data, current_year, :not_delay, :percent), precision: 0
+  %td= number_to_percentage doctor.dig(:data, current_year, :delay, :percent), precision: 0
+  %td= number_to_percentage doctor.dig(:data, current_year, :total_percent), precision: 0

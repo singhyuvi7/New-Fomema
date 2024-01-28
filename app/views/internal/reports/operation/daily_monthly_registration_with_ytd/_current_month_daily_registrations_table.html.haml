@@ -1,0 +1,104 @@
+%table{:style => "border: 0px; border-style: hidden; width: 90%"}
+  %tr
+    %td{:style => "border: 0px; border-style: hidden;"}
+      %h2 Daily (Registration) Detail For Current Month
+      %table.table.w-600.mt-3{width: 550}
+        %thead
+          %tr.text-center
+            %th Registration Date
+            %th Week day
+            %th{width: '10%'} Normal (New)
+            %th{width: '10%'} %
+            %th{width: '10%'} Normal (Renew)
+            %th{width: '10%'} %
+            %th{width: '10%'} Rekab
+            %th{width: '10%'} %
+            %th{width: '10%'} Total
+        %tbody
+          - if data.present?
+            - year = @date.to_date.year
+            - month = @date.to_date.month
+            - month_total_normal_new = 0
+            - month_total_normal_renewal = 0
+            - month_total_pati = 0
+            - month_grand_total = 0
+            - (1..@date.to_date.day).each do |day|
+              - date = Date.new(year, month, day)
+              - normal_new = data.dig([date, :normal, :new]).to_i
+              - normal_renewal = data.dig([date, :normal, :renewal]).to_i
+              -# - normal = data.dig([date, :normal]).to_i
+              - normal = normal_new + normal_renewal
+              - pati_new = data.dig([date, :pati, :new]).to_i
+              - pati_renewal = data.dig([date, :pati, :renewal]).to_i
+              -# - pati = data.dig([date, :pati]).to_i
+              - pati = pati_new + pati_renewal
+              - total = normal + pati
+              - month_total_normal_new += normal_new
+              - month_total_normal_renewal += normal_renewal
+              - month_total_pati += pati
+              - month_grand_total += total
+              - unless total.zero?
+                %tr
+                  %td= date.strftime('%d-%^b-%y')
+                  %td= date.strftime('%A')
+                  %td.text-right= normal_new
+                  %td.text-right= total.zero? ? 0 : number_to_percentage(normal_new.to_f/total.to_f * 100, unit: '', precision: 2)
+                  %td.text-right= normal_renewal
+                  %td.text-right= total.zero? ? 0 : number_to_percentage(normal_renewal.to_f/total.to_f * 100, unit: '', precision: 2)
+                  %td.text-right= pati
+                  %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+                  %td.text-right= total
+            %tr.bold{:style => "background-color: #d0d0d0"}
+              %td{:colspan => 2} Total
+
+              %td.text-right= month_total_normal_new
+              %td.text-right= month_grand_total.zero? ? 0 : number_to_percentage(month_total_normal_new.to_f/month_grand_total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= month_total_normal_renewal
+              %td.text-right= month_grand_total.zero? ? 0 : number_to_percentage(month_total_normal_renewal.to_f/month_grand_total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= month_total_pati
+              %td.text-right= month_grand_total.zero? ? 0 : number_to_percentage(month_total_pati.to_f/month_grand_total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= month_grand_total
+    %td{:style => "border: 0px; border-style: hidden;"} &nbsp;
+    %td{:style => "border: 0px; border-style: hidden;", :valign => 'top'}
+      %h2 Daily (Certification) Detail For Current Month
+      %table.table.w-600.mt-3{width: 550}
+        %thead
+          %tr.text-center
+            %th Certification Date
+            %th Week day
+            %th{width: '14%'} Normal
+            %th{width: '14%'} %
+            %th{width: '14%'} Rekab
+            %th{width: '14%'} %
+            %th{width: '14%'} Total
+        %tbody
+          - if cert_data.present?
+            - year = @date.to_date.year
+            - month = @date.to_date.month
+            - month_total_normal = 0
+            - month_total_pati = 0
+            - month_grand_total = 0
+            - (1..@date.to_date.day).each do |day|
+              - date = Date.new(year, month, day)
+              - normal = cert_data.dig([date, :normal]).to_i
+              - pati = cert_data.dig([date, :pati]).to_i
+              - total = normal + pati
+              - month_total_normal += normal
+              - month_total_pati += pati
+              - month_grand_total += total
+              - unless total.zero?
+                %tr
+                  %td= date.strftime('%d-%^b-%y')
+                  %td= date.strftime('%A')
+                  %td.text-right= normal
+                  %td.text-right= total.zero? ? 0 : number_to_percentage(normal.to_f/total.to_f * 100, unit: '', precision: 2)
+                  %td.text-right= pati
+                  %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+                  %td.text-right= total
+            %tr.bold{:style => "background-color: #d0d0d0"}
+              %td{:colspan => 2} Total
+              %td.text-right= month_total_normal
+              %td.text-right= month_grand_total.zero? ? 0 : number_to_percentage(month_total_normal.to_f/month_grand_total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= month_total_pati
+              %td.text-right= month_grand_total.zero? ? 0 : number_to_percentage(month_total_pati.to_f/month_grand_total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= month_grand_total

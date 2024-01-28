@@ -1,0 +1,223 @@
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">
+                <label>
+                    <% if @has_bulk_action %>
+                        <input type="checkbox" class="master-checkbox"> &nbsp;
+                    <% end %>
+                    #
+                </label>
+            </th>
+            <th>Worker Code</th>
+            <th>Worker Name</th>
+            <th>Gender</th>
+            <th>Date of Birth</th>
+            <th>Passport Number</th>
+            <th>Country</th>
+            <th>Job Type</th>
+            <th>Blocked</th>
+            <th>JIM Verified</th>
+            <th>Status</th>
+            <th>Requested Date (By)</th>
+            <th>Assigned/Updated</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @foreign_workers.blank? %>
+            <tr>
+                <td colspan="14" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @foreign_workers.each.with_index((@foreign_workers.current_page - 1) * get_per + 1) do |foreign_worker, index| %>
+                <tr>
+                    <td class="module-row-numbers">
+                        <label>
+                            <% if @has_bulk_action %>
+                                <input type="checkbox" class="child-checkbox" name="ids[]" id="ids_<%= foreign_worker.id %>" value="<%= foreign_worker.id %>"> &nbsp;
+                            <% end %>
+                            <%= index %>
+                        </label>
+                    </td>
+                    <td><%= foreign_worker.code %></td>
+                    <td>
+                        <%= foreign_worker.name %>
+                        <% if foreign_worker.cart_selected? %>
+                            <i class="text-success"><span class="fa fa-check"></span></i>
+                        <% end %>
+                    </td>
+                    <td><%= ForeignWorker::GENDERS[foreign_worker.gender] %></td>
+                    <td><%= foreign_worker.date_of_birth&.strftime(get_standard_date_format) %></td>
+                    <td><%= foreign_worker.passport_number %></td>
+                    <td><%= foreign_worker.country.try(:name) %></td>
+                    <td><%= foreign_worker.job_type.try(:name) %></td>
+                    <td>
+                        <% if foreign_worker.blocked %>
+                            <div>Yes</div>
+                            <!-- <div>Block Purchase Medical Form: <%= foreign_worker.is_reg_medical_blocked ? "Yes" : "No" %></div>
+                            <div>Block SP Result Transmit: <%= foreign_worker.is_sp_transmit_blocked ? "Yes" : "No" %></div>
+                            <div>Block Send to JIM: <%= foreign_worker.is_imm_blocked ? "Yes" : "No" %></div> -->
+                        <% else %>
+                            No
+                        <% end %>
+                    </td>
+                    <td><%= foreign_worker&.latest_transaction&.biodata_transaction&.status == 'SUCCESS' ? 'Yes' : 'No' %></td>
+                    <td>
+                        <div><%= ForeignWorker::STATUSES[foreign_worker.status] %></div>
+                        <%=raw "<div>Pending for Reverted Amendment</div>" if foreign_worker.approval_status.eql?("UPDATE_REVERTED") %>
+                        <%=raw "<div>Amendment Pending for Approval</div>" if foreign_worker.approval_status.eql?("UPDATE_PENDING_APPROVAL") %>
+                        <%=raw "<div>Change Employer Pending for Approval</div>" if foreign_worker.can_do_change_employer_approval? %>
+                        <%=raw "<div>Special Renewal Pending for Approval</div>" if foreign_worker.has_special_renewal_pending_approval %>
+                    </td>
+
+                    <%
+                        approval_request = ForeignWorker.approval_requests.where('foreign_workers.id = ?', foreign_worker.id)
+                        .select('approval_requests.created_at, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id, approval_requests.respond_user_id, approval_requests.approval_at')
+                        .order('approval_requests.created_at desc').first
+
+                        change_employer_request = ForeignWorker.change_employer_requests.where('foreign_workers.id = ?', foreign_worker.id)
+                        .select('fw_change_employers.created_at, fw_change_employers.decision, fw_change_employers.status, fw_change_employers.requested_by, fw_change_employers.assigned_to, fw_change_employers.approval_by, fw_change_employers.approval_at')
+                        .order('fw_change_employers.created_at desc').first
+                    %>
+                    <td>
+                        <% if !approval_request.blank? %>
+                            <p>
+                                <% requester = User.find(approval_request&.request_user_id) %>
+                                [Amendment] <br>
+                                <%= "#{approval_request&.created_at.try(:strftime, get_standard_date_format)}" %> <br>
+                                <%= ["Employer", "Agency"].include?(requester.userable_type) ? "(#{requester.userable_type})" : "(#{requester.code})" %>
+                            </p>
+                        <% end %>
+
+                        <% if !change_employer_request.blank? %>
+                            <p>
+                                <% requester = User.find(change_employer_request&.requested_by) %>
+                                [Change Employer] <br>
+                                <%= "#{change_employer_request&.created_at.try(:strftime, get_standard_date_format)}" %> <br>
+                                <%= ["Employer", "Agency"].include?(requester.userable_type) ? "(#{requester.userable_type})" : "(#{requester.code})" %>
+                            </p>
+                        <% end %>
+                    </td>
+
+                    <td>
+                        <% if !approval_request.blank? %>
+                            <p>
+                                [Amendment] <br>
+                                <%= User.find(approval_request&.assigned_to_user_id).name if !approval_request&.assigned_to_user_id.nil? %> <br>
+                                <% if !["pending"].include?(foreign_worker.approval_request&.state) %>
+                                    <strong>
+                                        <%= "Updated by #{User.find(approval_request&.respond_user_id).name}" if !approval_request&.respond_user_id.nil? %> <br>
+                                        <%= approval_request&.approval_at.try(:strftime, get_standard_date_format) if !approval_request&.approval_at.nil? %>
+                                    </strong>
+                                <% end %>
+                            </p>
+                        <% end %>
+                        <% if !change_employer_request.blank? %>
+                            <p>
+                                [Change Employer] <br>
+                                <%= User.find(change_employer_request&.assigned_to).name if !change_employer_request&.assigned_to.nil? %> <br>
+                                <% if change_employer_request&.status != 'APPROVAL' %>
+                                    <strong>
+                                        <%= "Updated by #{User.find(change_employer_request&.approval_by).name}" if !change_employer_request&.approval_by.nil? %> <br>
+                                        <%= change_employer_request&.approval_at.try(:strftime, get_standard_date_format) if !change_employer_request&.approval_at.nil? %>
+                                    </strong>
+                                <% end %>
+                            </p>
+                        <% end %>
+                    </td>
+
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker)) %>
+
+                        <% if can_request_update?(foreign_worker) %>
+                            <% if !foreign_worker.blocked and has_permission?('BLOCK_FOREIGN_WORKER') %>
+                                <%=raw index_table_danger_button block_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Block / Unblock", label: "<i class=\"fa fa-lock\"></i>" %>
+                            <% elsif foreign_worker.blocked and has_permission?('UNBLOCK_FOREIGN_WORKER') %>
+                                <%=raw index_table_primary_button block_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Block / Unblock", label: "<i class=\"fa fa-unlock\"></i>" %>
+                                <% end %>
+                        <% end %>
+
+                        <% if foreign_worker.monitoring.eql?('Y') and has_permission?('UNMONITOR_FOREIGN_WORKER') %>
+                            <%=raw index_table_primary_button unmonitor_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Remove Monitor", label: "<i class=\"fa fa-eye-slash\"></i>" %>
+                        <% elsif foreign_worker.monitoring.eql?('N') and has_permission?('MONITOR_FOREIGN_WORKER') %>
+                            <%=raw index_table_danger_button monitor_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Monitor", label: "<i class=\"fa fa-eye\"></i>" %>
+
+                        <% end %>
+
+                        <% if has_permission?("APPROVAL_FOREIGN_WORKER") && can_do_approval?(foreign_worker) %>
+                            <%= link_to '<i class="fa fa-check text-white"></i>'.html_safe, approval_internal_employer_employer_workers_path(foreign_worker.employer_id, foreign_worker), class: 'btn btn-sm btn-warning approval-fw',title: 'Amendment Approval', 'data-toggle' => 'tooltip', 'data-html' => 'true', 'data-fw-code' => foreign_worker.code, 'data-latest-transaction-unsuitable' => foreign_worker&.latest_transaction&.final_result == 'UNSUITABLE' || false %>
+                        <% end %>
+
+                        <% if has_permission?("CHANGE_EMPLOYER_APPROVAL_FOREIGN_WORKER") && foreign_worker.can_do_change_employer_approval? %>
+                            <%= link_to '<i class="fa fa-check text-white"></i>'.html_safe, approval_change_employer_internal_employer_employer_workers_path(foreign_worker.employer_id, foreign_worker), class: 'btn btn-sm btn-success approval-fw',title: 'Change Employer Approval', 'data-toggle' => 'tooltip', 'data-html' => 'true', 'data-fw-code' => foreign_worker.code, 'data-latest-transaction-unsuitable' => foreign_worker&.latest_transaction&.final_result == 'UNSUITABLE' || false %>
+                        <% end %>
+
+                        <% if has_permission?('EDIT_FOREIGN_WORKER') and can_request_update?(foreign_worker) && foreign_worker.status == 'ACTIVE' && !foreign_worker.blocked? %>
+                            <%= link_to '<i class="fa fa-edit"></i>'.html_safe, edit_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), class: 'btn btn-sm btn-primary edit-fw',title: 'Edit', 'data-toggle' => 'tooltip', 'data-html' => 'true', 'data-fw-code' => foreign_worker.code, 'data-latest-transaction-unsuitable' => foreign_worker&.latest_transaction&.final_result == 'UNSUITABLE' || false %>
+                        <% end %>
+
+                        <% if has_permission?('EDIT_FOREIGN_WORKER') and foreign_worker.approval_status.eql?("UPDATE_REVERTED") %>
+                            <%=raw index_table_edit_button(reverted_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Edit Reverted Request") %>
+                        <% end %>
+
+                        <!-- <% if has_permission?("EDIT_FOREIGN_WORKER") %>
+                            <%= link_to '<i class="fa fa-upload"></i>'.html_safe, upload_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), class: 'btn btn-sm btn-primary edit-fw',title: 'Remove/Upload Foreign Worker Image', 'data-toggle' => 'tooltip', 'data-html' => 'true' %>
+                        <% end %> -->
+
+                        <% if has_permission?("EDIT_EMPLOYER_FOREIGN_WORKER") %>
+                            <%=raw index_table_edit_button(employer_internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker), title: "Change Employer", label: "<i class=\"fa fa-user\"></i>") %>
+                        <% end %>
+
+                        <% if has_permission?('DELETE_FOREIGN_WORKER') && foreign_worker.code.blank? && (foreign_worker.created_by == current_user.id) %>
+                            <%=raw index_table_delete_button internal_employer_employer_worker_path(foreign_worker.employer_id, foreign_worker) %>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_BRANCH_TRANSACTION", "VIEW_OWN_TRANSACTION") and !foreign_worker.code.blank? %>
+                            <%=raw index_table_primary_button(internal_transactions_url(worker_code: foreign_worker.code), label: '<i class="fa fa-bars"></i>', title: 'View Transactions') %>
+                        <% end %>
+
+                        <% if foreign_worker.latest_insurance_purchase_id? && foreign_worker.latest_insurance_purchase %>
+                            <%=raw index_table_success_link(internal_insurance_history_path(foreign_worker.latest_insurance_purchase_id), title: "Insurance Purchased (#{foreign_worker.latest_insurance_purchase&.created_at.strftime(get_standard_date_format)})", label: "<i class=\"fa fa-heartbeat\"></i>") %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+
+<!-- FW Unsuitable Notice Modal -->
+<%=render '/internal/employer_workers/fw_notice_modal' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.edit-fw').click(function(e){
+    path = $(this).attr('href')
+    is_unsuitable = $(this).data('latest-transaction-unsuitable')
+    fw_code = $(this).data('fw-code')
+    unsuitable_alert(e, is_unsuitable, fw_code, path)
+});
+
+$('.approval-fw').click(function(e){
+    path = $(this).attr('href')
+    is_unsuitable = $(this).data('latest-transaction-unsuitable')
+    fw_code = $(this).data('fw-code')
+    unsuitable_alert(e, is_unsuitable, fw_code, path)
+});
+
+function unsuitable_alert(e, is_unsuitable, fw_code, path){
+    if(is_unsuitable){
+        e.preventDefault()
+        msg = "Worker '<b>"+fw_code+"</b>' status is <b class='text-danger'>unsuitable</b>."
+        $("#fwNoticeMsg").html(msg)
+        $("#fwNoticePath").attr("href",path)
+        $("#fwNoticeModal").modal("toggle")
+    }
+}
+</script>
+<% end %>

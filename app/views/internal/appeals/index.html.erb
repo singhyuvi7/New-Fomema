@@ -1,0 +1,195 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Appeals</strong>
+    </div>
+
+    <div class="card-body">
+        <%
+            if current_user.role.code == "MOH_APPROVER"
+                statuses = {
+                    "Awaiting MOH Approval" => "PENDING_MOH_APPROVAL",
+                    "Awaiting Approval" => "PENDING_APPROVAL",
+                    "Closed MOH Appeal" => "CLOSED_MOH_APPEAL",
+                }
+            else
+                statuses = {
+                    "Pending Appeals (Not including Approval or Closed Appeals)" => "EXAMINATIONS_ONLY",
+                    "Document Uploaded by Doctor/Lab" => "DOCUMENT_UPLOADED_BY_SP",
+                }.merge(MedicalAppeal::STATUSES.invert)
+            end
+
+            list = [
+                { title: "Appeal ID",           field: "appeal_id",     type: "text",           placeholder: "ID" },
+                { title: "Status",              field: "status",        type: "select",         options: statuses },
+                { title: "Worker Name/Code",    field: "worker_code",   type: "text",           placeholder: "Worker" },
+                { title: "Appeal Date",         field: "appeal_date",   type: "date-range" },
+                { title: "Doctor Name/Code",    field: "doctor_code",   type: "text",           placeholder: "Doctor" },
+                { title: "Officer Name/Code",   field: "mle1_code",     type: "text",           placeholder: "Officer" },
+                { title: "Is Specialist",       field: "is_specialist", type: "select",         options: [["Yes", :true], ["No", :false]] },
+            ]
+
+            list += [{ title: "MOH Appeal", field: "is_moh", type: "select", options: [["Yes", :true], ["No", :false]] }] if current_user.role.code != "MOH_APPROVER"
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-appeals-index", filter_link: internal_appeals_path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="text-right mb-4">
+            <%= link_to "Appeal Weekly Report", appeal_weekly_report_internal_medical_reports_path(params.to_unsafe_h.slice(:appeal_id, :status, :worker_code, :appeal_date_start, :appeal_date_end, :doctor_code, :mle1_code).merge(format: "xlsx")), class: "btn btn-success font-weight-bold mr-2" %>
+            <%= link_to "Report Summary", document_completed_report_internal_appeals_path, target: :_blank, id: "appeal-report-summary-btn", class: "btn btn-primary font-weight-bold", data: { original: document_completed_report_internal_appeals_path } %>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th>
+                                <th>ID</th>
+                                <% if current_user.role.code == "MOH_APPROVER" %>
+                                    <th>Duration MOH Appeal</th>
+                                <% else %>
+                                    <th>Duration</th>
+                                    <th>Duration MOH Appeal</th>
+                                <% end %>
+                                <th>Worker</th>
+                                <th>Appeal Date</th>
+                                <th>Is Specialist</th>
+                                <th>MOH Appeal</th>
+                                <th>Registered By</th>
+                                <th>Doctor</th>
+                                <th>Officer Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @appeals.each.with_index((@appeals.current_page - 1) * get_per + 1) do |appeal, index| %>
+                                <%
+                                    transaction      = appeal.transactionz
+                                    worker           = transaction.foreign_worker
+                                    older_than_28    = appeal.created_at < 28.days.ago
+
+                                    if appeal.employer_document_uploaded_date?
+                                        moh_older_than_28 = appeal.employer_document_uploaded_date < 28.days.ago
+                                        moh_older_than_14 = appeal.employer_document_uploaded_date < 14.days.ago
+                                    end
+                                %>
+
+                                <tr class="<%= "old-appeal" if older_than_28 %>">
+                                    <td class="module-row-numbers">
+                                        <% if appeal.status == "DOCUMENT_COMPLETED" %>
+                                            <label><input type="checkbox" class="child-checkbox" name="ids[]" value="<%= appeal.id %>"></label>
+                                        <% end %>
+                                    </td>
+
+                                    <td><%= appeal.id %></td>
+                                    <% if current_user.role.code == "MOH_APPROVER" %>
+                                        <td  class="<%= moh_older_than_28 ? 'old28-appeal' : (moh_older_than_14 ? 'old14-appeal' : 'notold-appeal') %>"><%= appeal.moh_duration_days %></td>
+                                    <% else %>
+                                        <td><%= appeal.duration_days %></td>
+                                        <td  class="<%= moh_older_than_28 ? 'old28-appeal' : (moh_older_than_14 ? 'old14-appeal' : 'notold-appeal') %>"><%= appeal.moh_duration_days %></td>
+                                    <% end %>
+                                    <td>
+                                        <%= worker&.name %><br>
+                                        <b><%= worker&.code %></b>
+                                    </td>
+
+                                    <td><%= appeal.created_at.strftime("%d/%m/%Y") %></td>
+
+                                    <td><%= appeal.is_specialist ? "YES" : "NO" %></td>
+
+                                    <td><%= appeal.is_moh ? "YES" : "NO" %></td>
+
+                                    <td>
+                                        <%= appeal.registered_by&.name %><br>
+                                        <b><%= appeal.registered_by_type == "User" ? "PIC" : appeal.registered_by_type %></b>
+                                    </td>
+
+                                    <td>
+                                        <%= appeal.doctor&.name %><br>
+                                        <b><%= appeal.doctor&.code %></b>
+                                    </td>
+
+                                    <td>
+                                        <%= appeal.officer_in_charge&.name %><br>
+                                        <b><%= appeal.officer_in_charge&.code %></b>
+                                    </td>
+
+                                    <td><%= appeal.displayed_status %></td>
+
+                                    <td>
+                                        <% if ["DOCTOR_NEW", "PENDING_TODO", "EXAMINATION", "DOCUMENT_COMPLETED", "PENDING_APPROVAL"].include?(appeal.status) %>
+                                            <%= raw index_table_primary_button(internal_appeal_path(appeal.id, p_tab: "appeal", tab: "appeal_reason"), title: "#{ has_permission?("REVIEW_APPEALS") ? "Review" : "View" } Appeal", classes: "btn btn-sm btn-primary", label: "<i class='fa fa-clipboard-list'></i>") %>
+                                        <% end %>
+
+                                        <% if has_permission?("APPROVE_APPEALS") && ["PENDING_APPROVAL"].include?(appeal.status) && appeal.officer_in_charge_id != current_user.id %>
+                                            <%= raw index_table_primary_button(appeal_approval_internal_appeal_path(appeal.id, p_tab: "appeal", tab: "appeal_reason"), title: "Appeal Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>") %>
+                                        <% end %>
+
+                                        <% if has_permission?("VIEW_APPEALS") && appeal.status == "CLOSED" %>
+                                            <%= raw index_table_primary_button(appeal_results_internal_appeal_path(appeal.id), title: "Appeal Results", classes: "btn btn-sm btn-success", label: "<i class='fas fa-history'></i>") %>
+                                        <% end %>
+
+                                        <% if ["PENDING_MOH_DOCUMENT", "PENDING_MOH_APPROVAL"].include?(appeal.status) %>
+                                            <% if has_permission?("REVIEW_MOH_APPEALS") && ["PENDING_MOH_APPROVAL"].include?(appeal.status) %>
+                                                <%= raw index_table_primary_button(internal_appeal_path(appeal.id, p_tab: "appeal", tab: "appeal_reason"), title: "MOH Appeal Approval", classes: "btn btn-sm btn-warning", label: "<i class='fa fa-clipboard-list'></i>") %>
+                                            <% else  %>
+                                                <%= raw index_table_primary_button(internal_appeal_path(appeal.id, p_tab: "appeal", tab: "appeal_reason"), title: "#{ has_permission?("REVIEW_MOH_APPEALS") ? "Review" : "View" } Appeal", classes: "btn btn-sm btn-dark", label: "<i class='fa fa-clipboard-list'></i>") %>
+                                            <% end %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @appeals.blank? %>
+                                <tr>
+                                    <td colspan="12" class="text-danger">You have no appeal cases.</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @appeals %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .old-appeal {
+        background-color: #FFDDAA !important;
+    }
+    .old14-appeal {
+        background-color: #FFDDAA !important;
+    }
+    .old28-appeal {
+        background-color: #FF2E2E !important;
+    }
+    .notold-appeal {
+        background-color: white !important;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#appeal-report-summary-btn').click(function(e) {
+            var appeals = $('.child-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            if (appeals.length === 0) {
+                alert('Please select an appeal');
+                e.preventDefault();
+            } else {
+                var ids = appeals.join(',')
+                $('#appeal-report-summary-btn').attr('href', `${ $('#appeal-report-summary-btn').attr('data-original') }?appeals=${ ids }`);
+            }
+        });
+    </script>
+<% end %>

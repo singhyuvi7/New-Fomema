@@ -1,0 +1,106 @@
+<div class="card" data-behaviour="vue" >
+
+    <visitplan_clinicprovider
+      inline-template
+      :route="'<%= internal_visit_plans_clinics_providers_path %>'"
+      :new_route="'<%= internal_visit_plans_clinics_new_path %>'"
+      :states="<%= State.select("name, id").all.to_json %>"
+      :providers="<%= @doctors.to_json %>"
+    >
+
+        <div>
+
+            <div class="card-header">
+                <strong>Doctors</strong>
+            </div>
+
+            <!-- card-body -->
+            <div class="card-body">
+
+                <%=render "/internal/visit_plans/clinics/provider_filter" %>
+
+                <%=render '/shared/all_flash' %>
+
+                <div class="row">
+                    <div class="col module-actions text-right">
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="<%= index_table_class %>">
+                                <thead>
+                                    <tr>
+                                        <th class="module-row-numbers"><input type="checkbox" v-model="selectAll" @click="select"> #</th>
+                                        <th>Doc. Code</th>
+                                        <th>Doc. Name</th>
+                                        <th>Clinic Name</th>
+                                        <th>Address</th>
+                                        <th>Town</th>
+                                        <th>Phone</th>
+                                        <th>SOP Compliance</th>
+                                        <th>Last Visit Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <% if @doctors.blank? %>
+                                    <tr>
+                                        <td colspan="10" class="text-danger">No records found.</td>
+                                    </tr>
+                                    <% else %>
+
+                                    <% @doctors.each_with_index do |doctor, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers">
+                                            <input type="checkbox" :value="<%= doctor.to_json %>" v-model="selected_providers">
+                                            <%= index + 1 %>
+                                        </td>
+                                        <td><%= doctor.code or raw '<i>N/A</i>' %></td>
+                                        <td><%= doctor.name %></td>
+                                        <td><%= doctor.clinic_name %></td>
+                                        <td>
+                                            <%= doctor.address1 %><br>
+                                            <%= doctor.address2 %><br>
+                                            <%= doctor.address3 %><br>
+                                            <%= doctor.address4 %><br>
+                                            <%= doctor&.town&.name %><br>
+                                            <%= doctor&.state&.name %>
+                                        </td>
+                                        <td><%= doctor.try(:town).try(:name) or raw '<i>N/A</i>' %></td>
+                                        <td><%= doctor.phone %></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <% end %>
+
+                                    <% end %>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-warning">
+                                        <td colspan="10">
+                                            <br>
+                                            <div class="text-center">
+                                                <button @click="generate" type="button" class="btn btn-primary">Generate</button>
+                                            </div>
+                                            <br>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                </div>
+            </div>
+            <!-- /card-body -->
+
+        </div>
+
+    </visitplan_clinicprovider>
+
+</div>

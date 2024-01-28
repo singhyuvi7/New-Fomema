@@ -1,0 +1,20 @@
+<%= nested_form_for @xray_storage, url: "" do |form| %>
+    <table data-transmit-date="<%= @transaction.xray_transmit_date.to_s %>">
+        <%= form.fields_for :xray_storage_items do |storage_items_form| %>
+            <tr class="storage-items-row">
+                <td><%= @transaction.code %></td>
+                <td><%= @transaction.xray_facility&.code %></td>
+                <td><%= @transaction.foreign_worker.code %></td>
+                <td><%= @transaction.fw_gender %></td>
+                <td><%= @transaction.foreign_worker.passport_number %></td>
+                <td><%= @transaction.foreign_worker.country.name %></td>
+            
+                <td>
+                    <%= storage_items_form.hidden_field :xray_storage_id, value: params[:xray_storage_id] %>
+                    <%= storage_items_form.hidden_field :transaction_id, value: @transaction.id %>
+                    <%= storage_items_form.link_to_remove "Remove",  id: "remove_item", class: "btn btn-danger btn-sm remove-row" %>
+                </td>      
+            </tr>
+        <% end %>
+    </table>
+<% end %>

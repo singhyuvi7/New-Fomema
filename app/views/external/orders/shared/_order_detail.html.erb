@@ -1,0 +1,68 @@
+<!-- card for order detail -->
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <label class="col-md-3 col-form-label">Payment Code</label>
+            <div class="form-control-plaintext col-md-9"><%= @order.code %></div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label">Date Created</label>
+            <div class="form-control-plaintext col-md-9"><%= @order.date&.strftime(get_standard_date_format) %></div>
+        </div>
+         <div class="row">
+            <label class="col-md-3 col-form-label">Payment Date</label>
+            <div class="form-control-plaintext col-md-9"><%= @order.paid_at.try&.strftime(get_standard_date_format) %></div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label">Amount (RM) </label>
+            <div class="form-control-plaintext col-md-9"><%= number_to_currency(@order.amount, unit: "") %></div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label">Category</label>
+            <div class="form-control-plaintext col-md-9"><%= Order::CATEGORIES[@order.category] %></div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label">Payment Status</label>
+            <div class="form-control-plaintext col-md-9"><%= @order.status %></div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label required">Payment Method
+                <button type="button"
+                    data-toggle="popover"
+                    data-placement="right"
+                    data-html="true"
+                    data-content="
+                    <ul>
+                        <li><b>FPX B2B</b> - Corporate employer (company) who require a two steps process to perform payment via Internet Banking. <br>
+                        The first person will request the payment and another person will approve the transaction.</li>
+                    </ul>
+                    <ul>
+                        <li><b>FPX B2C </b> - Employer who have direct access to their funds via Internet Banking.<br>
+                        Payment is made immediately after your confirmation without a second person to approve the transaction.</li>
+                    </ul>"
+                    title="Payment Method"
+                    class="btn btn-primary btn-sm"
+                    hidden="hidden"><i class="fa fa-info-circle"></i>
+                </button>
+            </label>
+
+            <div class="col-md-3">
+                <%= form.select :payment_method_id, options_from_collection_for_select(PaymentMethod.available_for_external_payment.order(:name), :id, :name, form.object.payment_method_id), {include_blank: form_select_option_text}, required: true, class: "form-control", onchange: "external_change_fee(this)" %>
+            </div>
+
+            <div class="col-md-3" >
+                <%
+                    display_ipay = PaymentMethod.is_ipay_active? ? 'inline' : 'none'
+                    display_swipe = PaymentMethod.is_swipe_active? ? 'inline' : 'none'
+                    display_fpx = PaymentMethod.is_fpx_active? ? 'inline' : 'none'
+                    display_boleh = PaymentMethod.is_boleh_active? ? 'inline' : 'none'
+                %>
+                <%= image_tag("logo/swipe-logo.jpg", :style => "width: 20%; display: #{display_swipe}")%>
+                <%= image_tag("logo/ipay88-logo.png", :style => "width: 20%; display: #{display_ipay}")%>
+                <%= image_tag("logo/fpx-logo.png", :style => "width: 20%; display: #{display_fpx}")%>
+                <%= image_tag("logo/boleh-logo.png", :style => "width: 20%; display: #{display_boleh}")%>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /card for order detail -->

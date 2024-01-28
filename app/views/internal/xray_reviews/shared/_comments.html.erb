@@ -1,0 +1,27 @@
+<div class="card">
+
+    <div class="card-header">
+        XQCC Comments
+    </div>
+
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Who</th>
+                <th>Comment</th>
+            </tr>
+
+            <% xray_review.xqcc_comments.each.with_index do |xqcc_comment, index| %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= xqcc_comment.created_at&.strftime(get_standard_date_format) %></td>
+                    <td><%= xqcc_comment.creator&.name %></td>
+                    <td><%= xqcc_comment.comment %></td>
+                </tr>
+            <% end %>
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,29 @@
+<form action="<%= @fpx_request.payment_url %>" method="post" id="fpx_request_form">
+    <input type="hidden" name="fpx_msgType" id="fpx_msgType" value="<%= @fpx_request.msg_type %>">
+    <input type="hidden" name="fpx_msgToken" id="fpx_msgToken" value="<%= @fpx_request.msg_token %>">
+    <input type="hidden" name="fpx_sellerExId" id="fpx_sellerExId" value="<%= @fpx_request.seller_ex_id %>">
+    <input type="hidden" name="fpx_sellerExOrderNo" id="fpx_sellerExOrderNo" value="<%= @fpx_request.seller_ex_order_no %>">
+    <input type="hidden" name="fpx_sellerTxnTime" id="fpx_sellerTxnTime" value="<%= @fpx_request.seller_txn_time %>">
+    <input type="hidden" name="fpx_sellerOrderNo" id="fpx_sellerOrderNo" value="<%= @fpx_request.seller_order_no %>">
+    <input type="hidden" name="fpx_sellerId" id="fpx_sellerId" value="<%= @fpx_request.seller_id %>">
+    <input type="hidden" name="fpx_sellerBankCode" id="fpx_sellerBankCode" value="<%= @fpx_request.seller_bank_code %>">
+    <input type="hidden" name="fpx_txnCurrency" id="fpx_txnCurrency" value="<%= @fpx_request.txn_currency %>">
+    <input type="hidden" name="fpx_txnAmount" id="fpx_txnAmount" value="<%= ActionController::Base.helpers.number_to_currency(@fpx_request.txn_amount, unit: "", delimiter: "") %>">
+    <input type="hidden" name="fpx_buyerEmail" id="fpx_buyerEmail" value="<%= @fpx_request.buyer_email %>">
+    <input type="hidden" name="fpx_checkSum" id="fpx_checkSum" value="<%= @fpx_request.checksum %>">
+    <input type="hidden" name="fpx_buyerName" id="mofpx_buyerName" value="<%= @fpx_request.buyer_name %>">
+    <input type="hidden" name="fpx_buyerBankId" id="fpx_buyerBankId" value="<%= @fpx_request.buyer_bank_id %>">
+    <input type="hidden" name="fpx_productDesc" id="fpx_productDesc" value="<%= @fpx_request.product_description %>">
+    <input type="hidden" name="fpx_version" id="fpx_version" value="<%= @fpx_request.version %>">
+    <input type="hidden" name="fpx_buyerAccNo" id="fpx_buyerAccNo" value="">
+    <input type="hidden" name="fpx_buyerBankBranch" id="fpx_buyerBankBranch" value="">
+    <input type="hidden" name="fpx_buyerIban" id="fpx_buyerIban" value="">
+    <input type="hidden" name="fpx_buyerId" id="fpx_buyerId" value="">
+    <input type="hidden" name="fpx_makerName" id="fpx_makerName" value="">
+</form>
+
+<% content_for :page_end_scripts do %>
+<script>
+    document.getElementById('fpx_request_form').submit();
+</script>
+<% end %>

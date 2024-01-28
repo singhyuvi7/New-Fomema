@@ -1,0 +1,47 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @fee } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :remark %>
+                <%= form.text_field :remark, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :amount, class: 'required' %>
+                <%= form.number_field :amount, class: 'form-control', required: true, step: 0.01 %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_fees_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

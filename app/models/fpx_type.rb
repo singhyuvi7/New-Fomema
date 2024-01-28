@@ -1,0 +1,2 @@
+class FpxType < ApplicationRecord
+end

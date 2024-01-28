@@ -1,0 +1,51 @@
+<p>
+    <b>Dear <%= @customer.name || @customer.pic_name %></b>,<br>
+    <b><i>Tuan/ Puan </i><%= @customer.name || @customer.pic_name %></b>,
+</p>
+
+<p>
+    Please be informed that we already made cancellation for your Foreign Worker with details shown below as per your request.<br>
+    <i>Dimaklumkan bahawa kami telah membuat pembatalan pekerja asing anda seperti berikut:</i>
+</p>
+
+<div>
+    Foreign Worker Information:<br>
+    <i>Maklumat pekerja asing</i><br>
+
+    Code : <%= @transaction.fw_code %><br>
+    <i>Kod</i><br>
+
+    Name : <%= @transaction.fw_name %><br>
+    <i>Nama</i><br>
+
+    Passport Number : <%= @transaction.fw_passport_number %><br>
+    <i>Nombor Pasport</i><br>
+
+    <% if !@agency.nil? %>
+        Employer Name : <%= "#{@employer.name} (#{@employer.code})" %><br>
+        <i>Nama Majikan</i><br>
+    <% elsif !@supplement_employer.nil? %>
+        Supplementary Employer Name : <%= "#{@supplement_employer.name}" %><br>
+        <i>Nama Majikan Tambahan</i><br>
+    <% end %>
+</div>
+
+<p>
+    We will process your request and refund will be credited to your account as per your registered/updated account number in our portal. <br>
+    <i>Kami akan memproses permohonan anda dan bayaran balik akan dikreditkan ke akaun yang telah didaftar/kemaskini di portal.</i>
+</p>
+
+<p>
+    You will received an email once refund successfully being credited to your account. <br>
+    <i>Anda akan menerima e-mel setelah Bayaran Balik berjaya dikreditkan ke akaun anda.</i>
+</p>
+
+<p>
+    Thank You. <br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

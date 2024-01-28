@@ -1,0 +1,127 @@
+<% has_plks_optional = false %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        Order - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: external_order_path(@order), html: {id: "order_form"} do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+            <%= render '/shared/all_flash' %>
+            <%= render "internal/orders/shared/order_detail", {order: @order, form: form} %>
+
+            <p class="plks-optional-message">
+                Please review your worker list before submission. Workers highlighted in blue indicates that medical examination is optional for upcoming period. Your may choose to go ahead and register these workers for a medical or remove the workers.
+            </p>
+
+            <% if InsuranceService.order_has_insurance?(order: @order) %>
+                <p class="order-warning-text">
+                    Changes related to insurance premium require re-calculation. Kindly click on Calculate Insurance Premium button for re-calculation.
+                </p>
+            <% end %>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Foreign Worker</th>
+                        <th>Gender</th>
+                        <th>&nbsp;</th>
+                        <th>PLKS</th>
+                        <th>Amount</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.joins("join fees on order_items.fee_id = fees.id
+                    left join foreign_workers on order_items.order_itemable_id = foreign_workers.id and order_items.order_itemable_type = 'ForeignWorker'")
+                    .select("order_items.*, case when order_items.order_itemable_type = 'ForeignWorker' then 1
+                    else 2 end as sort1, foreign_workers.name as sort2, case when fees.code in ('TRANSACTION_MALE', 'TRANSACTION_FEMALE') then 1
+                    else 2 end as sort3")
+                    .where.not("fees.code" => ["INSURANCE_SST", "INSURANCE_STAMP_DUTY", "INSURANCE_ADMINFEES", "INSURANCE_ADMINFEES_SST"])
+                    .order("sort1 asc, sort2 asc, sort3 asc").includes(:fee, :order_itemable, :insurance_purchase).each do |order_item| %>
+                        <%=render "internal/orders/special_transaction_registrations/#{order_item.fee.code.downcase}", {order_item: order_item} %>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5">&nbsp;</th>
+                        <th class="currency">
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <% if has_permission?("CREATE_INSURANCE_PURCHASE") %>
+                    <button class="btn btn-primary" type="submit" name="submit" value="addon_insurance" id="btn-addon_insurance" formnovalidate>Add-on Insurance</button>
+                <% end %>
+                <% #if @insurance_need_recalculate %>
+                    <%= render partial: "/internal/shared/calculate_insurance_menu", locals: {order: @order, button_class: "btn btn-primary dropdown-toggle"} %>
+                <% #end %>
+                <a class="btn btn-primary" href="<%= external_orders_path %>">Back</a>
+                <% if !['PAID'].include?(@order.status) %>
+                    <button class="btn btn-primary" type="submit" name="submit" id="submit_cancel" value="cancel">Cancel order</button>
+                    <button id="submit_save_and_proceed_to_payment" class="btn btn-primary" type="submit" name="submit" value="save_and_proceed_to_payment" <% if @insurance_need_recalculate %> disabled <% end %> >Save and proceed to payment</button>
+                    <!--<button class="btn btn-primary" type="submit" name="submit" id="submit_approval" value="save_and_proceed_to_approval">Save and proceed to approval</button>-->
+                <% end %>
+            </div>
+        </div>
+    <% end %>
+
+    <% @order.order_items.each do |order_item| %>
+        <% if ['ForeignWorker'].include? order_item.order_itemable_type %>
+            <%= render partial: 'internal/orders/fw_form', locals: {order_item: order_item} %>
+        <% end %>
+    <% end %>
+</div>
+
+<%=render 'etr_search_worker' %>
+
+<form action="<%= change_comment_internal_order_path(@order) %>" id="change_comment_form" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+    <input type="hidden" name="order_item_id" id="change_comment_order_item_id" value="">
+    <input type="hidden" name="comment" id="change_comment_comment" value="">
+</form>
+
+<form action="<%= change_fee_internal_order_path(@order) %>" id="change_fee_form" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+    <input type="hidden" name="order_item_id" id="change_fee_order_item_id" value="">
+    <input type="hidden" name="fee_id" id="fee_id" value="">
+</form>
+
+<style>
+.plks-optional-message {
+    display: <%= has_plks_optional ? "block" : "none" %>;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#submit_cancel').click(function () {
+        $('#order_form textarea').prop('disabled', true);
+        $('#order_form').submit();
+    });
+
+function comment_changed(ta)
+{
+    $('#change_comment_order_item_id').val(ta.getAttribute("data-order_item_id"));
+    $('#change_comment_comment').val($(ta).val());
+    $('#change_comment_form').submit();
+}
+
+function change_fee(sel)
+{
+    $('#change_fee_order_item_id').val(sel.getAttribute("data-order-item-id"));
+    $('#fee_id').val($(sel).val());
+    $('#change_fee_form').submit();
+}
+</script>
+<% end %>

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Change Doctor Reasons</strong> - Edit Change Doctor Reason
+    </div>
+    <%= form_for @change_sp_reason, url: internal_change_sp_reason_path(@change_sp_reason), html: {class: "#{params[:action]}_change_sp_reason change_sp_reason-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

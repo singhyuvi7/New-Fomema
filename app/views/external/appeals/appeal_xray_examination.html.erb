@@ -1,0 +1,114 @@
+<div class="card">
+    <div class="card-header"><strong>Appeal</strong> - <%= @appeal.id %></div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                xray: "X-ray",
+                appeal: "Appeal"
+            }
+
+            category_tabs = [
+                { type: "worker",            parent: "information",      title: "Worker Information" },
+                { type: "xray",              parent: "xray",             title: "Past Results" },
+                { type: "worker_info",       parent: "appeal",           title: "Worker Information" },
+                { type: "xray_appeal",       parent: "appeal",           title: "X-ray Results" }
+            ]
+
+            list_of_parent_tabs = category_parent_tabs.map(&:first)
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 0}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= render partial: "internal/medical/worker_information", locals: { transaction: @transaction } %>
+
+    <!-- Original Xray Examination from MERTS -->
+    <% if @transaction.xray_examination.try(:transmitted_at?) %>
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { namespacing: "original_xe", xray_examination: @transaction.xray_examination, readonly: true, skip_visited: true } %>
+        </div>
+    <% end %>
+
+    <%= form_for @transaction, url: @form_url, method: :patch, html: { class: "disable-enter-keypress" } do |form| %>
+        <div class="category-switchable" data-type="worker_info">
+            <%= render partial: "external/transactions/xray_examinations/xray_worker_information_page", locals: { form: form, readonly: @readonly || @radiologist_started_info_page || current_user.userable_type == "Radiologist" } %>
+
+            <% if @radiologist_started_info_page %>
+                <p class="px-4 py-3 border-bottom mb-0">The radiologist assigned to this worker has already begun the examination. You will not be able to update the assigned radiologist.</p>
+            <% end %>
+
+            <div class="text-center"><img id="fingerprint-image"></div>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray_appeal">
+            <!-- For Xray Facility, if the radiologist has started, and can see this form, most of the form must be readonly. -->
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { namespacing: "xe_attributes", xray_examination: @xray_examination, readonly: @readonly || !@can_view_results || (current_user.userable_type == "XrayFacility" && @radiologist_started), hide_not_done: true } %>
+        </div>
+
+        <div class="card-footer text-right">
+            <%= link_to "Back", @index_url, class: "btn btn-secondary" %>
+
+            <% if !@readonly && @radiologist_started && @can_view_results %>
+                <%= form.submit "Save and Transmit", class: "btn btn-primary", value: "Save and Transmit", id: "save-and-transmit-submit" %>
+            <% elsif !@readonly && !@xray_examination.transmitted_at? %>
+                <% if (@transaction.foreign_worker.afis_id.present? && current_user.userable.try(:fp_device) == 1 && @can_xray_bypass != true) && !@sourceable.xray_worker_identity_confirmed %>
+                    <% if has_permission?("CREATE_BYPASS_FINGERPRINT_REQUEST") %>
+                        <a class="btn btn-danger text-right" href="<%= bypass_fingerprint_external_retake_path(@xray_retake) %>">Fingerprint Error</a>
+                    <% end %>
+                    <button class="btn btn-info" type="button" id="scan">Scan Fingerprint</button>
+                <% end %>
+
+                <% if @can_abort %>
+                    <%= form.submit "Abort", class: "btn btn-danger", data: { confirm: "Aborting this examination will allow the this examination to be reassigned. Do you confirm?" } %>
+                <% end %>
+
+                <button class="btn btn-primary <%= (@transaction.foreign_worker.afis_id.present? && current_user.userable.try(:fp_device) == 1 && @can_xray_bypass != true) && !@sourceable.xray_worker_identity_confirmed ? 'd-none' : '' %>" type="submit" name="submit" value="Save" id="submit-btn">Save</button>
+
+                <% if current_user.userable_type == "Radiologist" || @can_view_results %>
+                    <%= form.submit "Save and Transmit", class: "btn btn-primary", value: "Save and Transmit", id: "save-and-transmit-submit" %>
+                <% end %>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<%= render "external/transactions/xray_examinations/xray_exam_dialogs" %>
+
+<!-- Hide the tab button, following MERTS xray rules. -->
+<% unless @xray_retake.xray_worker_identity_confirmed? && @can_view_results %>
+    <% content_for :page_end_scripts do %>
+        <script>
+            $('.category-tab[data-type="xray_appeal"]').hide();
+        </script>
+    <% end %>
+<% end %>
+
+<% if @readonly %>
+    <% content_for :page_end_scripts do %>
+        <script>
+            loadParentCategoryTabSelection();
+            loadCategoryTabSelection();
+        </script>
+    <% end %>
+<% else %>
+    <% content_for :page_end_scripts do %>
+        <script>
+            loadParentCategoryTabSelection();
+        </script>
+
+        <%= render "external/transactions/xray_examinations/xray_facility_medical_examination_script" %>
+    <% end %>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

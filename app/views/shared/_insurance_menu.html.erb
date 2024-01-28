@@ -1,0 +1,24 @@
+<%
+    button_class = local_assigns[:button_class]
+%>
+
+<% if InsuranceServiceProvider.where(active: true).count == 1 %>
+    <% InsuranceServiceProvider.where(active: true).each do |provider| %>
+        <div class="dropdown show d-inline">
+            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="purchase_insurance_<%= provider.code.downcase %>"><i class="fa fa-heartbeat"></i> Buy Insurance</button>
+        </div>
+    <% end %>
+<% elsif InsuranceServiceProvider.where(active: true).count > 0 %>
+    <div class="dropdown show d-inline">
+        <a class="<%= button_class %>" href="#" role="button" id="insuranceMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-heartbeat"></i> Buy Insurance
+        </a>
+        <div class="dropdown-menu" aria-labelledby="insuranceMenuLink">
+            <% InsuranceServiceProvider.where(active: true).each do |provider| %>
+                <button class="dropdown-item" type="submit" name="bulk_action" title="" value="purchase_insurance_<%= provider.code.downcase %>">
+                    <%= image_tag "insurances/#{provider.code.downcase}.png" %>
+                </button>
+            <% end %>
+        </div>
+    </div>
+<% end %>

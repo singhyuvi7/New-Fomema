@@ -1,0 +1,11 @@
+<tr>
+    <td>&nbsp;</td>
+    <td><%= "#{order_item.order_itemable.name} - #{order_item.fee.name} #{"(#{order_item.insurance_purchase.insurance_provider})" if order_item.insurance_purchase}" %></td>
+    <td colspan="1">&nbsp;</td>
+    <td class="currency"><%= order_item.insurance_purchase&.total_premium ? number_to_currency(order_item.insurance_purchase&.total_premium, unit: "") : '-' %></td>
+    <td class="order-item-actions">
+        <a class="btn btn-sm btn-secondary" href="<%= remove_order_item_external_order_path(order_item.order_id, order_item.id) %>">X</a>
+    </td>
+    
+</tr>
+

@@ -1,0 +1,302 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @radiologist } %>
+    <%=render "/shared/all_flash" %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :title_id, "Title" %>
+                <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :name, "Doctor Name", class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z][^0-9]*", parsley_pattern_message: "Must not begin with a special characters and no numbers are allowed" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :icno, "ICNO", class: 'required' %>
+                <%= form.text_field :icno, class: 'form-control', required: true, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "No special characters allowed" } %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :xray_facility_name, "X-Ray Facility Name" %>
+                <%= form.text_field :xray_facility_name, class: 'form-control',  data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :nationality_id, "Nationality", class:'required'%>
+                <%= form.select :nationality_id, options_from_collection_for_select(Country.order(:name).all, 'id', 'name', form.object.nationality_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true %>
+            </div>
+        </div> 
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :race_id, "Race/Ethnic", class:'required'%>
+                <%= form.select :race_id, options_from_collection_for_select(Race.order(:name).all, 'id', 'name', form.object.race_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row"> 
+        <div class="col-md-6"> 
+            <div class="form-group">
+                <%= form.label :gender,"Gender", class: "required" %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline">
+                        <%= form.radio_button(:gender, "M", class: "critical-field form-check-input", required: true) %>
+                        <label class="form-check-label" for="rad_gender_m">Male</label>
+                        &emsp;
+                        <%= form.radio_button(:gender, "F", class: "critical-field form-check-input", required: true) %>
+                        <label class="form-check-label" for="rad_gender_f">Female</label>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <!-- address -->
+    <% [:address1, :address2, :address3, :address4].each_with_index do |sym, index| %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <% if index == 0 %>
+                        <%= form.label :address, class: "required" %>
+                    <% end %>
+
+                    <%= form.text_field sym, class: "form-control", required: index == 0, data: { parsley_pattern: "[a-zA-Z0-9@.&#,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@), ampersand (&), hash (#) and slashes (/) are allowed" } %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- /address -->
+
+    <%= render 'internal/shared/form_state_postcode_town', {form: form} %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :phone, "Phone Number", class: 'required' %>
+                <%= form.text_field :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :fax_number, "Fax Number" %>
+                <%= form.text_field :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :mobile, "Mobile Number" %>
+                <%= form.text_field :mobile, class: 'form-control', required: false, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :email, class: 'required' %>
+                <%= form.email_field :email, class: 'form-control', required: true, data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :qualification, class: 'required' %>
+                <%= form.text_field :qualification, class: 'form-control', required: true, data: { parsley_maxlength: "50", parsley_maxlength_message: "Maximum length of 50 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :is_pcr, "Is PCR" %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_pcr, true, class: "form-check-input" %>
+                        <label class="form-check-label" for="radiologist_is_pcr_true">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_pcr, false, class: "form-check-input" %>
+                        <label class="form-check-label" for="radiologist_is_pcr_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :user_id, "PCR User" %>
+                <%= form.select :user_id, options_from_collection_for_select(User.where(role_id: Role.where(code: "PCR").first.id).order(:name).all, 'id', 'name', form.object.user_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :is_panel_xray_facility, "Panel X-Ray Facility" %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_panel_xray_facility, true, class: "form-check-input" %>
+                        <label class="form-check-label" for="radiologist_is_panel_xray_facility_true">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_panel_xray_facility, false, class: "form-check-input" %>
+                        <label class="form-check-label" for="radiologist_is_panel_xray_facility_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="" class="required">X-Ray Facilities</label> <button type="button" class="btn btn-sm btn-primary pull-right is-panel-xray-facility-enabled" data-toggle="modal" data-target="#panel-radiologists-modal"<%= " disabled" if !form.object.is_panel_xray_facility %>>Add</button>
+                <ul id="panel_xray_facilities" class="list-group">
+                    <% @radiologist.panel_radiologists.each do |panel_radiologist| %>
+                        <li id="panel_radiologist_<%= panel_radiologist.id %>" class="list-group-item clearfix">
+                            <input type="hidden" name="radiologist[panel_radiologists][]" value="<%= panel_radiologist.xray_facility_id %>">
+                            <%= "#{panel_radiologist.xray_facility.name} (#{panel_radiologist.xray_facility.code})" %>
+                            <button type="button" class="btn btn-sm btn-danger pull-right is-panel-xray-facility-enabled" onclick="remove_panel_radiologist(this)"<%= " disabled" if !form.object.is_panel_xray_facility %>>X</button>
+                        </li>
+                    <% end %>
+                </ul>
+                <input type="hidden" id="radiologist_panel_radiologists_list" value="<%= @radiologist.panel_radiologists.pluck(:xray_facility_id).join(',') %>" <% if @radiologist.is_panel_xray_facility? %> required <% end %>>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :apc_number, "APC Number", class: 'required' %>
+                <%= form.text_field :apc_number, class: 'form-control', required: true, maxlength: '7', data: { parsley_maxlength: "7", parsley_maxlength_message: "Maximum length of 7 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :apc_year, "APC Year", class: 'required' %>
+                <%= form.text_field :apc_year, class: 'form-control', required: true, min: 1900, max: 2099, maxlength: '4', data: { parsley_maxlength: "4", parsley_maxlength_message: "Maximum length of 4 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :nsr_number, "NSR Number", class: 'required' %>
+                <%= form.text_field :nsr_number, class: 'form-control', required: true, maxlength: '10', data: { parsley_maxlength: "10", parsley_maxlength_message: "Maximum length of 10 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :renewal_agreement_date, "Renewal Agreement Date" %>
+                <%= form.date_field :renewal_agreement_date, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :district_health_office_id, "Nearest District Health Office" %>
+                <%= form.select :district_health_office_id, options_from_collection_for_select(DistrictHealthOffice.order(:name).all, 'id', 'name', form.object.district_health_office_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :comment %>
+                <%= form.text_area :comment, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<%= render 'panel_radiologists' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+// $('#draft_submit').click(function () {
+//     $('.radiologist-form').attr('novalidate', 'novalidate').submit();
+// });
+
+$('label[for="radiologist_xray_facility_id"]')
+$('input[name="radiologist[is_panel_xray_facility]"]').click(function(){
+    if (this.value == 'true') {
+        $('#radiologist_xray_facility_id').attr('required', 'required') && $('label[for="radiologist_xray_facility_id"]').addClass("required");
+    } else {
+        $('#laboratory_xray_facility_id').attr('required', false) && $('label[for="radiologist_xray_facility_id"]').removeClass("required");
+    }
+})
+
+$('#radiologist_is_panel_xray_facility_true').click(function () {
+    $('.is-panel-xray-facility-enabled').prop('disabled', false);
+});
+$('#radiologist_is_panel_xray_facility_false').click(function () {
+    $('.is-panel-xray-facility-enabled').prop('disabled', true);
+});
+
+$('#radiologist_is_panel_xray_facility_true').bind('input', validate_panel_radiologist);
+$('#radiologist_is_panel_xray_facility_false').bind('input', validate_panel_radiologist);
+validate_panel_radiologist();
+
+function remove_panel_radiologist(ele)
+{
+    $(ele).closest('li').remove();
+    validate_panel_radiologist();
+}
+
+function add_panel_radiologist(ele)
+{
+    var xray_facility = JSON.parse(decodeURIComponent($(ele).attr('data-xray_facility')));
+    if (document.getElementById('panel_radiologist_'+xray_facility["id"])) {
+        $(ele).closest('tr').remove();
+        return;
+    }
+    $('#panel_xray_facilities').append(
+        '<li id="panel_radiologist_' + xray_facility["id"] + '" class="list-group-item clearfix">'
+        + '<input type="hidden" name="radiologist[panel_radiologists][]" value="' + xray_facility["id"] + '">'
+        + xray_facility["name"] + ' (' + xray_facility["code"] + ')'
+        + '<button type="button" class="btn btn-sm btn-danger pull-right is-panel-xray-facility-enabled" onclick="remove_panel_radiologist(this)">X</button>'
+        + '</li>'
+    );
+    $(ele).closest('tr').remove();
+    validate_panel_radiologist();
+}
+
+function validate_panel_radiologist()
+{
+    document.getElementById('radiologist_panel_radiologists_list').value = $('input[name="radiologist[panel_radiologists][]"]').map(function() {return this.value}).get().join(',');
+    if (document.getElementById('radiologist_is_panel_xray_facility_true').checked) {
+        document.getElementById('radiologist_panel_radiologists_list').required = true;
+    } else {
+        document.getElementById('radiologist_panel_radiologists_list').required = false;
+    }
+}
+
+$('#draft_submit').click(function() {
+    // $('form.with-parsley').parsley().destroy();
+    $('form.with-parsley').parsley().validate();
+});
+
+$('#approval_submit').click(function() {
+    $('form.with-parsley').parsley().validate();
+});
+
+</script>
+<% end %>

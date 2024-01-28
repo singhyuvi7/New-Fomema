@@ -1,0 +1,140 @@
+<pdfbody>
+   <div>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png", style: "float:left; height: 110px; padding-bottom: 20px;"%>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png", style: "float:right; height: 110px; padding-bottom: 20px;"%>
+        <%#= wicked_pdf_image_tag "letters/fomema_letterhead_25.png", style: "float:right; height: 110px; max-width:100%; padding-bottom: 20px;"%>
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: left;">Ruj kami: <%= @data[:letter_ref_no] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" style="text-align: left;">Tarikh: <%= Time.now.strftime(get_standard_date_format) %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" style="text-align: right; font-weight: bold;">SULIT</td>
+        </tr>
+
+        <tr>
+            <td><b><%= @data[:employer_name] %></b></td>
+            <td style="text-align: right;">E-mel: <%= @data[:employer_email].downcase %></td>
+        </tr>
+
+        <% @data[:employer_address].each do |address| %>
+            <tr>
+                <td><%= address %></td>
+            </tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">Tuan / Puan,</p>
+
+    <b>PERMOHONAN LAPORAN PERUBATAN PEKERJA ASING</b>
+    <li><b>Nama: <%= @data[:worker_name] %></b></li>
+    <li><b>No. Pasport: <%= @data[:worker_passport] %></b></li>
+    <li><b>Negara Asal: <%= @data[:worker_country] %></b></li>
+
+    <p class="letter-header-underline"></p>
+
+    <p class="paragraph-spacing text-justify">
+        Dengan hormatnya permohonan tuan/puan dan perkara di atas dirujuk.
+    </p>
+
+    <p class="paragraph-spacing text-justify">
+        2. Berikut ialah status FOMEMA pekerja asing di atas.
+        <table class="table w-100">
+            <tr>
+                <td class="title">Tarikh FOMEMA</td>
+                <td><%= @data[:medical_examination_date] %></td>
+            </tr>
+            <tr>
+                <td class="title">Status FOMEMA</td>
+                <td><%= @data[:final_result] %></td>
+            </tr>
+            <tr>
+                <td class="title">Nama Doktor Panel</td>
+                <td><%= @data[:doctor_name] %></td>
+            </tr>
+            <tr>
+                <td class="title">Nama Klinik Panel</td>
+                <td><%= @data[:clinic_name] %></td>
+            </tr>
+            <tr>
+                <td class="title">Alamat Klinik Panel</td>
+                <td>
+
+                    <% @data[:clinic_address].each do |address| %>
+                        <%= address %><br>
+                    <% end %>
+
+                </td>
+            </tr>
+            <tr>
+                <td class="title">Nombor Tel. Klinik</td>
+                <td><%= @data[:clinic_phone] %></td>
+            </tr>
+        </table>
+    </p>
+
+    <p class="paragraph-spacing text-justify">
+        3. Untuk makluman tuan/puan, laporan perubatan adalah sulit dan hanya boleh dikeluarkan oleh doktor yang memeriksa selepas mendapat kebenaran bertulis daripada pekerja asing yang berkaitan.
+    </p>
+
+    <p class="paragraph-spacing">Sekian, terima kasih.</p>
+
+    <p class="paragraph-spacing">Yang benar,</p>
+
+    <p class="paragraph-spacing">
+        Jabatan Semakan Perubatan & Rayuan<br>
+        <b><%= @data[:company_name] %></b>
+    </p>
+
+    <p class="paragraph-double-spacing" style="font-size: 0.85em; text-align: center;">***This letter is computer generated and no signature is required.***</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+
+    .title {
+        font-weight: bold;
+        width: 25%;
+    }
+
+    .table {
+        border-collapse: collapse;
+        border: 1px solid #aaa;
+    }
+
+    .table tr td {
+        border: 1px solid #aaa;
+        padding: 5px 5px;
+    }
+</style>

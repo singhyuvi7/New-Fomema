@@ -1,0 +1,118 @@
+<div class="card">
+    <div class="card-header">
+        DXLR New Registration By State
+    </div>
+
+    <div class="card-body">
+        <%=render 'internal/reports/mspd/new_dxlr/filter' %>
+
+        <%=render '/shared/all_flash' %>
+
+        <% if @doctors && @xray_facilities && @laboratories && @radiologists %>
+            <div class="row">
+                <div class="col-xl-3 col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">Doctor</div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Count</th>
+                                </tr>
+                                <% total_count = 0 %>
+                                <% @doctors.each do |row| %>
+                                    <% total_count += row.new_count %>
+                                    <tr>
+                                        <th><%= row.state_namez %></th>
+                                        <td><%= row.new_count %></td>
+                                    </tr>
+                                <% end %>
+                                <tr>
+                                    <th>Total</th>
+                                    <td><%= total_count %></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">X-Ray Facility</div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Count</th>
+                                </tr>
+                                <% total_count = 0 %>
+                                <% @xray_facilities.each do |row| %>
+                                    <% total_count += row.new_count %>
+                                    <tr>
+                                        <th><%= row.state_namez %></th>
+                                        <td><%= row.new_count %></td>
+                                    </tr>
+                                <% end %>
+                                <tr>
+                                    <th>Total</th>
+                                    <td><%= total_count %></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">Laboratory</div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Count</th>
+                                </tr>
+                                <% total_count = 0 %>
+                                <% @laboratories.each do |row| %>
+                                    <% total_count += row.new_count %>
+                                    <tr>
+                                        <th><%= row.state_namez %></th>
+                                        <td><%= row.new_count %></td>
+                                    </tr>
+                                <% end %>
+                                <tr>
+                                    <th>Total</th>
+                                    <td><%= total_count %></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">Radiologist</div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Count</th>
+                                </tr>
+                                <% total_count = 0 %>
+                                <% @radiologists.each do |row| %>
+                                    <% total_count += row.new_count %>
+                                    <tr>
+                                        <th><%= row.state_namez %></th>
+                                        <td><%= row.new_count %></td>
+                                    </tr>
+                                <% end %>
+                                <tr>
+                                    <th>Total</th>
+                                    <td><%= total_count %></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

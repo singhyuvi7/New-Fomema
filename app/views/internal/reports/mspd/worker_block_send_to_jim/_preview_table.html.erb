@@ -1,0 +1,38 @@
+<div class="w-100 py-3" style="overflow-x: auto;">
+    <table id="preview-csv-table" class="table-borders w-100">
+        <thead>
+            <tr>
+                <% @headers.each do |header| %>
+                <th><%= header %></th>
+                <% end %>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% @transactions.each.with_index(1) do |transaction, index| %>
+                <tr>
+                    <td><%= index %>.</td>
+                    <td><a href="<%= internal_employer_employer_worker_path(transaction.worker_employer_id, transaction.foreign_worker_id) if !transaction.worker_employer_id.blank? && !transaction.foreign_worker_id.blank? %>"><%= transaction.fw_name.present? ? transaction.fw_name : '-' %></a></td>
+                    <td><a href="<%= internal_employer_employer_worker_path(transaction.employer_id, transaction.foreign_worker_id) if !transaction.employer_id.blank? && !transaction.foreign_worker_id.blank? %>"><%= transaction.fw_code || '-' %></a></td>
+                    <td><%= transaction.fw_passport_number || '-' %></td>
+                    <td><%= transaction.fw_country_name || '-' %></td>
+                    <td><%= transaction.code || '-' %></td>
+                    <td><%= transaction.transaction_date.try(:strftime, get_standard_date_format) || '-' %></td>
+                    <td><%= transaction.final_result || '-'  %></td>
+                    <td><%= transaction.certification_date.try(:strftime, get_standard_date_format) || '-' %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

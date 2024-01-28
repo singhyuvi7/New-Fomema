@@ -1,0 +1,100 @@
+<pdfbody>
+    <div style="height: 2.2cm;">
+        &nbsp;
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:letter_date] %></td>
+            <td></td>
+        </tr>
+    </table><br>
+
+    <table>
+        <tr><td>FOMEMA Sdn Bhd</td></tr>
+        <tr><td>Lot 49 & 51</td></tr>
+        <tr><td>Jalan Kampung Pandan</td></tr>
+        <tr><td>55100 Kuala Lumpur</td></tr>
+    </table>
+    <br>
+    <table>
+        <tr><td><%= @data[:employer_name].titleize %>
+        <% @data[:employer_address].each do |address| %>
+            <tr><td><%= address.titleize %></td></tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">To whom it may concern,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+        Renewal of Registration for Unsuitable Foreign Worker
+    </b></p>
+
+    <p class="paragraph-spacing" style="text-align: justify;">
+        I have been informed of the current unsuitable status of the following foreign worker:
+        <br>
+        <table class="w-100" cellpadding="5" border="1">
+            <tr><td style="width: 25%">Foreign Worker's Name</td><td>&nbsp;&nbsp;<%= @data[:worker_name].titleize %></td></tr>
+            <tr><td style="width: 25%">Worker Code</td><td>&nbsp;&nbsp;<%= @data[:worker_code] %></td></tr>
+            <tr><td style="width: 25%">Passport Number</td><td>&nbsp;&nbsp;<%= @data[:worker_passport] %></td></tr>
+            <tr><td style="width: 25%">Country of Origin</td><td>&nbsp;&nbsp;<%= @data[:worker_country].titleize %></td></tr>
+        </table>
+    </p>
+    <p class="paragraph-spacing" style="text-align: justify;">
+       I understand that the foreign worker may need to undergo further investigations or
+       auditing of the chest X-ray to ensure appropriate certification. I acknowledge
+       that this process may exceed the normal 18 days period to complete the Foreign Workers' medical screening.
+       I am also aware of the consequences, if the foreign worker is found unsuitable.
+    </p>
+
+    <p class="paragraph-spacing">
+       Thank you for your assistance.<br><br>
+        Yours sincerely,<br><br><br>
+        ............................................<br>
+        <%= @data[:employer_name].titleize %>
+    </p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .paragraph-triple-spacing {
+        padding-top: 1.5em;
+    }
+
+    .paragraph-quad-spacing {
+        padding-top: 2em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    br {
+        font-size: 1.2em;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td, tr {
+        padding: 0;
+        margin: 0;
+    }
+</style>

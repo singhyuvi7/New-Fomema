@@ -1,0 +1,48 @@
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <% field_id = generate_field_id(form, :state_id) %>
+            <%= form.label :state, class: "required" %>
+            <%= form.select :state_id, options_from_collection_for_select(State.order(:name).all, "id", "name", form.object.state_id), { include_blank: form_select_option_text }, required: true, class: "form-control select2", data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <% field_id = generate_field_id(form, :town_id) %>
+            <%= form.label :town, class: "required" %>
+            <%= form.select :town_id, options_from_collection_for_select(Town.where(state_id: form.object.state_id).order(:name).all, "id", "name", form.object.town_id), { include_blank: form_select_option_text }, required: true, class: "form-control select2", data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+            <div id="select2_parsley_error__<%= field_id %>"></div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :postcode, class: "required" %>
+            <%= form.text_field :postcode, class: "form-control", required: true, maxlength: '5', data: { parsley_maxlength: "5", parsley_maxlength_message: "Maximum length of 5 characters", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        // when change state, ajax fetch towns
+        $('#<%= generate_field_id(form, :state_id) %>').change(function () {
+            // empty town and postcode
+            $('#<%= generate_field_id(form, :town_id) %>').html('<option value><%= form_select_option_text %></option>');
+            $('#<%= generate_field_id(form, :postcode) %>').val('');
+
+            if (this.value) {
+                $.ajax({
+                    url: '/states/' + this.value + '/towns.json',
+                    method: "GET",
+                }).done(function (data) {
+                    $.each(data, function (idx, town) {
+                        $('#<%= generate_field_id(form, :town_id) %>').append('<option value="'+town.id+'" data-postcode_id="'+town.postcode_id+'" data-postcode_code="'+town.postcode_code+'">'+town.name+'</option>');
+                    });
+                });
+            }
+        });
+    </script>
+<% end %>

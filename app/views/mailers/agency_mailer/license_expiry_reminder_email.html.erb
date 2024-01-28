@@ -1,0 +1,19 @@
+<p>
+    <b>Dear <%= @agency.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @agency.name %></i></b>,
+</p>
+
+<p>
+    This is a friendly reminder of your licence expiry which will be due on <%= @agency.license_expired_at.try(:strftime,'%d/%m/%Y') %>. Kindly email your new licence to cs@fomema.com.my. Failing to do so will result in your account being temporarily suspended.<br>
+    <i>Ini adalah peringatan tamat tempoh lesen yang akan luput pada <%= @agency.license_expired_at.try(:strftime,'%d/%m/%Y') %>. Sila e-mel lesen baru anda ke cs@fomema.com.my. Sekiranya gagal dibuat, akaun anda akan disekat buat sementara waktu.</i>
+</p>
+
+<p>
+    Thank you.<br> 
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

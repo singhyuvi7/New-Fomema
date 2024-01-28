@@ -1,0 +1,41 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Foreign Worker</strong> - Approval
+    </div>
+    <%= form_for @foreign_worker, url: approval_update_internal_employer_employer_workers_path(@employer, @foreign_worker), html: {class: "#{params[:action]}_foreign_worker foreign_worker-form"} do |form| %>
+
+        <div class="card-body">
+
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :block_reason, "Block Reason" %>
+                        <%= form.select :block_reason_id, options_from_collection_for_select(BlockReason.where("block_reasons.category = 'BLOCK'").order(:description).all, 'id', 'description', form.object.block_reason_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true%>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <%#=render "shared/approval_comments", { comments: @foreign_worker.approval_request.comments } if @foreign_worker.approval_request %>
+                    <% @foreign_worker.approval_request.comments.each do |comment| %>
+                        <div class="alert alert-secondary">
+                            <div class="text-right">
+                                Request by > <%= comment.user.name %>, <%= comment.created_at.strftime(get_standard_datetime_format) %>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <%=render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(internal_employer_employer_workers_path) %>
+            <%=raw approval_submit_decision_button %>
+        </div>
+    <% end %>
+</div>

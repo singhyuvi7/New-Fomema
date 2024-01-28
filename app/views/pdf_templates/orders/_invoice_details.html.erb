@@ -1,0 +1,11 @@
+<div class="invoice page-container">
+    <div class="text-center invoice-title"><b>Invoice Details</b></div>
+
+    <%= render "/pdf_templates/orders/invoice_main_details" %>
+
+    <%= render "/pdf_templates/orders/invoice_item_breakdown" %>
+
+    <div class="doc-footer">
+        <%=render '/pdf_templates/orders/special_notes' %>
+    </div>
+</div>

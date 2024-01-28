@@ -1,0 +1,50 @@
+.card
+  .card-header
+    %strong Search
+  = form_tag filter_link, method: 'get' do |form|
+    .card-body
+      .row
+        .col-md-6
+          .form-group.row
+            %label.col-sm-3.col-form-label{:for => "register_date"} Paid Date
+            .col-sm-9
+              .d-flex.align-items-center
+                = text_field_tag "start_date", params["start_date"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'register_date' }, max: Date.today.strftime("%F")
+                %span.mx-3 to
+                = text_field_tag "end_date", params["end_date"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'register_date' }, max: Date.today.strftime("%F")
+      .row
+        .col-md-6
+          .row.form-group
+            = label_tag :customer_code, 'Customer Code', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = text_field_tag :customer_code, params['customer_code'], { class: 'form-control' }
+        .col-md-6
+          .row.form-group
+            = label_tag :invoice_number, 'Invoice No', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = text_field_tag :invoice_number, params['invoice_number'], { class: 'form-control' }
+        .col-md-6
+          .row.form-group
+            = label_tag :transaction_id, 'Transaction ID', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = text_field_tag :transaction_id, params['transaction_id'], { class: 'form-control' }
+        .col-md-6
+          .row.form-group
+            = label_tag :payment_method, 'Payment Method', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = select_tag :payment_method, options_for_select(PaymentMethod.available_for_external_payment.pluck(:name, :id), params[:payment_method]), prompt: 'All', class: 'form-control'
+    .card-footer
+      .text-right
+        = raw filter_clear_button filter_link
+        - if has_permission?("FINANCE_REPORTS")
+          = link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, filter_link, class: "btn btn-sm btn-warning with-excel-format"
+          = link_to '<i class="fa fa-download" aria-hidden="true"></i> Download'.html_safe, filter_link, class: "btn btn-sm btn-secondary with-pdf-format", :target => "_blank"
+        = raw filter_button
+- content_for :page_end_scripts do
+  :javascript
+    $('.with-pdf-format').click(function(e) {
+        $(this).attr("href", this.href + ".pdf?" + $(this).closest('form').serialize());
+    });
+    $('.with-excel-format').click(function(e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });

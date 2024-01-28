@@ -1,0 +1,60 @@
+<div class="card">
+    <div class="card-header"><strong>Laboratory Certified Transaction</strong></div>
+
+    <div class="card-body">
+        <%
+            list = [
+                { title: "Certification Date", field: "certification_date", type: "date-range" }
+            ]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "laboratory-certified-transactions-index", filter_link: external_laboratory_certified_transactions_path, list: list } %>
+        <%= render '/shared/all_flash' %>
+
+        <form method="post" action="/transactions/bulk_action">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+
+            <table class="table table-responsive-sm table-striped">
+                <thead>
+                    <tr>
+                      <th>#</th>
+                        <th>Lab Code</th>
+                        <th>Transaction Code</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Gender</th>
+                        <th>Certification Date</th>
+                        <th>Amount (RM)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                  <% if @transactions.present? %>
+                    <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                       <tr>
+                          <td><%= index %></td>
+                          <td><%= transaction.lab_code %></td>
+                          <td><%= transaction.trans_code %></td>
+                          <td><%= transaction.fw_code %></td>
+                          <td><%= transaction.fw_name %></td>
+                          <td><%= transaction.fw_gender %></td>
+                          <td><%= transaction.trans_certification_date.strftime("%d/%m/%Y") %></td>
+                          <td><%= transaction.amount %></td>
+                       </tr>
+                     <% end %>
+                   <% end %>
+                </tbody>
+            </table>
+        </form>
+
+        <% if @transactions.present? %>
+          <div class="text-center">
+            <%= link_to "GENERATE CSV", params.merge(format: "csv").permit!, class: "btn btn-md btn-success" %>
+          </div>
+        <% end %>
+
+        <div class="row external-pagination-container">
+            <%= paginate @transactions if @transactions %>
+        </div>
+    </div>
+</div>

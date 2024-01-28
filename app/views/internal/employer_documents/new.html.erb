@@ -1,0 +1,158 @@
+<div class="card">
+    <div class="card-header"><strong>Documents</strong> - New Document</div>
+
+    <form id="bulk-upload-form" method="post" action="<%= internal_employer_employer_documents_path %>" enctype="multipart/form-data">
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+      <div class="card-body">
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group" id="document-input-group">
+              <label for="employer_uploads">Upload new documents</label>
+              <p id="no-input-placeholder" class="hidden">Click on "Add more documents to begin adding files"</p>
+
+              <div class="input-group custom-input-group d-flex">
+
+                <div class="custom-file flex-grow-1">
+                  <input type="file" name="employer[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple required>
+                  <label class="custom-file-label">Choose file</label>
+                </div>
+
+                <div class="flex-shrink-0">
+                  <div class="removal-button btn btn-danger font-weight-bold">Remove</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" class="btn btn-success float-right" id="add_more_documents">Add more documents</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+
+        <div class="text-right">
+          <%=raw edit_back_button(internal_employer_employer_documents_path) %>
+          <%=raw edit_save_button() %>
+        </div>
+
+      </div>
+    </form>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+
+  <script>
+
+      // uploader
+
+      function validateFiles(inputFile) {
+
+          var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+          var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+          var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+          var extName;
+          var maxFileSize = <%= 10.megabytes %>;
+          var sizeExceeded = false;
+          var extError = false;
+
+          $.each(inputFile.files, function () {
+              if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+              extName = this.name.split('.').pop();
+              if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+          });
+
+          if (sizeExceeded) {
+              window.alert(maxExceededMessage);
+              $(inputFile).val('');
+          };
+
+          if (extError) {
+              window.alert(extErrorMessage);
+              $(inputFile).val('');
+          };
+      }
+
+      /**
+       * Function to duplicate document fields
+       **/
+
+      var clonedAttachmentInput = $('.custom-input-group').clone(true, true);
+
+      $('#add_more_documents').click(() => {
+          clonedAttachmentInput
+              .clone(true, true)
+              .appendTo("#document-input-group")
+              .addClass('top-margin')
+              .find(".custom-file-input")
+              .val("");
+
+          $('.custom-input-group:last')
+              .find(".custom-file-label").html("Choose file");
+
+          bindLastDocumentTypeSelectorAndFileSelector();
+          removeAttachmentField('.removal-button:last');
+          $('#no-input-placeholder').hide();
+      });
+
+      removeAttachmentField('.removal-button:last');
+
+      function removeAttachmentField(field) {
+          $(field).click(function() {
+              $(this).closest('.custom-input-group').remove();
+
+              if ($('.custom-input-group').length === 0) {
+                  $('#no-input-placeholder').show();
+              }
+          });
+      }
+
+      bindLastDocumentTypeSelectorAndFileSelector();
+
+      // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+      function bindLastDocumentTypeSelectorAndFileSelector() {
+          $('.custom-file-input:last').change(function() {
+              let filePath = $(this).val().split("\\")
+              let fileName = filePath[filePath.length - 1]
+              if (fileName != "")
+                  $(this).siblings('.custom-file-label').html(fileName)
+              else
+                  $(this).siblings('.custom-file-label').html("Choose file")
+          });
+
+          $('.document-type-selector:last').change(function() {
+              let selectedValue = $("option:selected", this).val();
+              inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+              if (selectedValue.length > 0) {
+                  inputField.removeAttr('disabled');
+              } else {
+                  inputField.attr("disabled", "disabled")
+              }
+          });
+      }
+
+      $('.set-deletion').click(function() {
+          filenames = $(this).closest('tr').find('.filenames');
+          filenames.toggleClass('text-decoration-line-through');
+          text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+          $(this).text(text).toggleClass('btn-danger btn-primary');
+
+          ids = $('.set-deletion.btn-primary').map(function() {
+              return $(this).attr('data-id');
+          }).get().join(',');
+
+          $('#remove_uploaded_file').val(ids);
+      });
+
+      // end of uploader
+
+  </script>
+<% end %>

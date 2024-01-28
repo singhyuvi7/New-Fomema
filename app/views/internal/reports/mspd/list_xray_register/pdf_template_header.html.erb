@@ -1,0 +1,54 @@
+<script>
+function number_pages() {
+    var vars = {};
+    var x = document.location.search.substring(1).split('&');
+    for (var i in x) {
+        var z = x[i].split('=', 2);
+        vars[z[0]] = unescape(z[1]);
+    }
+    var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+    for (var i in x) {
+        var y = document.getElementsByClassName(x[i]);
+        for (var j = 0; j < y.length; ++j) y[j].textContent = vars[x[i]];
+    }
+}
+</script>
+
+<body onload="number_pages()" class="header-body">
+    <div class="header-banner">
+        <span class="float-left bold"><%= @company_name.to_s.upcase %></span>
+        <span class="page-counter float-right bold">Page: <span class="page"></span>/<span class="topage"></span>
+    </div>
+    <div class="header-line">
+        <span class="float-left header">List of X-Ray Facilities Registered ( From : <%= @start_date.to_date.strftime(get_standard_date_format)  %> To : <%= @end_date.to_date.strftime(get_standard_date_format) %> )<span class="all-state">ALL STATE</span><span class="all-state"><%= @status.presence || 'ALL' %></span></span>
+        <span class="float-right datetime">Date: <%= @date %> Time: <%= @time %></span>
+    </div>
+</body>
+
+<style>
+.header-banner {
+    border: 2px solid black;
+    padding: 5px;
+    margin-bottom: 1.5rem;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.header-line {
+    margin-bottom: 1rem;
+}
+
+.header {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.header-body {
+    padding-bottom: 1px;
+}
+.all-state {
+    padding-left: 3rem;
+}
+</style>

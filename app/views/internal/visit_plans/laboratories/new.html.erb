@@ -1,0 +1,10 @@
+<div class="card" data-behaviour="vue" v-cloak>
+  <div class="card-header">
+    <strong>Laboratory Visit Plans</strong> - New Laboratory Visit Plan
+  </div>
+
+  <div class="card-body">
+        <%= render 'internal/visit_plans/laboratories/form', { form_method: 'POST', form_action: internal_visit_plans_laboratories_create_path, index_path: internal_visit_plans_laboratories_path } %>
+  </div>
+
+</div>

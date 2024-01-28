@@ -1,0 +1,288 @@
+<%
+    certification_by_doctor_1_start_with = 1
+
+    certification_by_doctor_1 = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'YES',
+            no: 'NO'
+        },{
+            number: '',
+            name: 'HIV',
+            yes: @doctor_exam.try(:condition_hiv),
+            no: !@doctor_exam.try(:condition_hiv)
+        },{
+            number: '',
+            name: 'TUBERCULOSIS',
+            yes: @doctor_exam.try(:condition_tuberculosis),
+            no: !@doctor_exam.try(:condition_tuberculosis)
+        },
+        {
+            number: '',
+            name: 'MALARIA',
+            yes: @doctor_exam.try(:condition_malaria),
+            no: !@doctor_exam.try(:condition_malaria)
+        },
+        {
+            number: '',
+            name: 'LEPROSY',
+            yes: @doctor_exam.try(:condition_leprosy),
+            no: !@doctor_exam.try(:condition_leprosy)
+        },
+        {
+            number: '',
+            name: 'SEXUALLY TRANSMITTED DISEASES',
+            yes: @doctor_exam.try(:condition_std),
+            no: !@doctor_exam.try(:condition_std)
+        },
+        {
+            number: '',
+            name: 'HEPATITIS B',
+            yes: @doctor_exam.try(:condition_hepatitis),
+            no: !@doctor_exam.try(:condition_hepatitis)
+        },
+        {
+            number: '',
+            name: 'CANCER',
+            yes: @doctor_exam.try(:condition_cancer),
+            no: !@doctor_exam.try(:condition_cancer)
+        },
+        {
+            number: '',
+            name: 'EPILEPSY',
+            yes: @doctor_exam.try(:condition_epilepsy),
+            no: !@doctor_exam.try(:condition_epilepsy)
+        },
+        {
+            number: '',
+            name: 'PSYCHIATRIC DISORDERS',
+            yes: @doctor_exam.try(:condition_psychiatric_disorder),
+            no: !@doctor_exam.try(:condition_psychiatric_disorder)
+        },
+        {
+            number: '',
+            name: 'HYPERTENSION',
+            yes: @doctor_exam.try(:condition_hypertension),
+            no: !@doctor_exam.try(:condition_hypertension)
+        },
+        {
+            number: '',
+            name: 'HEART DISEASES',
+            yes: @doctor_exam.try(:condition_heart_diseases),
+            no: !@doctor_exam.try(:condition_heart_diseases)
+        },
+        {
+            number: '',
+            name: 'BRONCHIAL ASTHMA',
+            yes: @doctor_exam.try(:condition_bronchial_asthma),
+            no: !@doctor_exam.try(:condition_bronchial_asthma)
+        },
+        {
+            number: '',
+            name: 'DIABETES MELLITUS',
+            yes: @doctor_exam.try(:condition_diabetes_mellitus),
+            no: !@doctor_exam.try(:condition_diabetes_mellitus)
+        },
+        {
+            number: '',
+            name: 'PEPTIC ULCER',
+            yes: @doctor_exam.try(:condition_peptic_ulcer),
+            no: !@doctor_exam.try(:condition_peptic_ulcer)
+        },
+        {
+            number: '',
+            name: 'KIDNEY DISEASE',
+            yes: @doctor_exam.try(:condition_kidney_diseases),
+            no: !@doctor_exam.try(:condition_kidney_diseases)
+        },
+        {
+            number: '',
+            name: 'OTHERS (Please specify under Comments-Item 21)',
+            yes: @doctor_exam.try(:condition_other),
+            no: !@doctor_exam.try(:condition_other)
+        },
+    ]
+
+    certification_by_doctor_2 = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'POSITIVE',
+            no: 'NEGATIVE'
+        },{
+            number: '',
+            name: 'Her urine for pregnancy',
+            yes: @doctor_exam.try(:condition_urine_for_pregnant),
+            no: !@doctor_exam.try(:condition_urine_for_pregnant)
+        },{
+            number: '',
+            name: 'His/her urine for opiates (screening test)',
+            yes: @doctor_exam.try(:condition_urine_for_opiates),
+            no: !@doctor_exam.try(:condition_urine_for_opiates)
+        },{
+            number: '',
+            name: 'His/her urine for cannabis (screening test)',
+            yes: @doctor_exam.try(:condition_urine_for_cannabis),
+            no: !@doctor_exam.try(:condition_urine_for_cannabis)
+        },
+    ]
+
+    certification_by_doctor_3 = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'UNSUITABLE',
+            no: 'SUITABLE'
+        },{
+            number: '',
+            name: 'AFTER REVIEWING THE MEDICAL EXAMINATION REPORT,<br>I HEREBY CERTIFY THIS FOREIGN WORKER TO BE<br>MEDICALLY FOR EMPLOYMENT IN MALAYSIA',
+            yes: @doctor_exam.suitability == "UNSUITABLE",
+            no: @doctor_exam.suitability == "SUITABLE"
+        },{
+            type: 'text',
+            number: '',
+            name: 'Comments (refer to Part V - Item 16)',
+            value: @doctor_exam.try(:certification_comment)
+        },{
+            type: 'text',
+            number: '',
+            name: 'IF CONSIDERED NOT SUITABLE FOR EMPLOYMENT PLEASE STATE THE REASON',
+            value: @doctor_exam.try(:unsuitable_comment)
+        },
+    ]
+%>
+
+<div class="medical-results-content">
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART V: CERTIFICATION BY DOCTOR</b>
+    </div>
+
+    <div class="certified-details">
+        <div class="row">
+            <div class="label bold">I HAVE EXAMINED</div>
+            <div class="value">
+                <span class="bold"><%= @transaction.fw_name %></span>
+                <br>
+                <small>(NAME OF FOREIGN WORKER)</small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="label bold">WORKER CODE</div>
+            <div class="value">
+                <span class="bold"><%= @transaction.fw_code %></span>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left bold white-space-normal" colspan="4">AND I AM OF THE OPINION THAT THIS FOREIGN WORKER HAS THE FOLLOWING DISEASES/CONDITIONS:</th>
+            </tr>
+        </thead>
+        <tbody class="without-date">
+            <% certification_by_doctor_1.each do |disease| %>
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{certification_by_doctor_1_start_with.to_s}." %></td>
+                        <td><%= disease[:name] if !disease[:hide_name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+
+                <% if disease[:number].blank? && disease[:type].blank?
+                    certification_by_doctor_1_start_with += 1
+                    end
+                %>
+            <% end %>
+
+        </tbody>
+    </table>
+
+    <table class="certification-doctor-2-tbl">
+        <thead>
+            <tr>
+                <th class="text-left bold" colspan="4">I ALSO FIND THAT:</th>
+            </tr>
+        </thead>
+        <tbody class="without-date">
+            <% certification_by_doctor_2.each do |disease| %>
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{certification_by_doctor_1_start_with.to_s}." %></td>
+                        <td><%= disease[:name] if !disease[:hide_name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+
+                <% if disease[:number].blank? && disease[:type].blank?
+                    certification_by_doctor_1_start_with += 1
+                    end
+                %>
+            <% end %>
+
+        </tbody>
+    </table>
+
+    <div class="certification-doctor-note bold">NOTE: IF A 'YES/POSITIVE' IN ANY OF THE ABOVE COLUMNS, THE WORKER IS UNSUITABLE FOR EMPLOYMENT IN MALAYSIA.</div>
+
+    <div class="sub-title text-center">
+        <b>PART V: CERTIFICATION BY DOCTOR (cont'd)</b>
+    </div>
+
+    <table class="review-tbl">
+        <tbody class="without-date">
+            <% certification_by_doctor_3.each do |disease| %>
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                    </tr>
+                <% elsif disease[:type].present? && disease[:type] == 'text' %>
+                    <tr class="text-input">
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{certification_by_doctor_1_start_with.to_s}." %></td>
+                        <td colspan="3">
+                            <div class="label"><%= disease[:name] %><div>
+                            <div class="value"><%= disease[:value].present? ? simple_format(disease[:value]) : "-" %></>
+                        </td>
+                    </tr>
+                <% else %>
+                    <tr class="bold">
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{certification_by_doctor_1_start_with.to_s}." %></td>
+                        <td><%= raw(disease[:name]) if !disease[:hide_name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+
+                <% if (disease[:number].blank? && disease[:type].blank?) || (disease[:type].present? && disease[:type] == 'text')
+                    certification_by_doctor_1_start_with += 1
+                    end
+                %>
+            <% end %>
+
+        </tbody>
+    </table>
+</div>

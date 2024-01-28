@@ -1,0 +1,45 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Users</strong> - User Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_users_path) %>
+            <% if has_permission?('EDIT_USER') %>
+                <%=raw show_edit_button(edit_internal_user_path(@user)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,8 @@
+.card
+  .card-header
+    %strong Quality Summary Report
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+    = render 'external/quality_summary_reports/merts_quality_summary/filter', path: merts_quality_summary_external_quality_summary_reports_path
+    = render "/external/quality_summary_reports/merts_quality_summary/pdf_template"

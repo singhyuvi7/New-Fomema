@@ -1,0 +1,15 @@
+<div id="notice"><%= alert %></div>
+<div class="container" style="padding-top:50px;">
+    <div class="employer-registration-title-container bg-transparent center">
+        <h2>REGISTRATION FORM TO BE A PANEL FOMEMA OF FOMEMA SDN. BHD. (FOMEMA) </h2>
+      <div class="employer-registration-title-left-bar" >&nbsp;</div>
+        <div class="employer-registration-title-right-bar">&nbsp;</div><br>  
+    </div>
+
+    <%#= render 'shared/all_validation_flash', { model_obj: @agency } %>
+    
+    <%= form_for @agency, url: external_agencies_path, html: { multipart: true, id: 'agency-registration-form' } do |f| %>
+        <input type="hidden" name="sign_up_token" value="<%= params[:token] || params[:sign_up_token] %>">
+        <%= render 'form', f: f %>
+    <% end %>
+</div>

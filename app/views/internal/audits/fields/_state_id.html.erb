@@ -1,0 +1,5 @@
+<%
+s = State.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{s.name} (#{s.code})" if !value.blank? && s %></td>

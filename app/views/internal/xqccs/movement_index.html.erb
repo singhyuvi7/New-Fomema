@@ -1,0 +1,66 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Movement List</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "internal/xqccs/filters/movement_filter" %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label>#</label></th>
+                                <th>Batch ID</th>
+                                <th>Transaction ID</th>
+                                <th>Retake ID</th>
+                                <th>X-Ray Code</th>
+                                <th>X-Ray Facilty Name</th>
+                                <th>Worker Code</th>
+                                <th>Gender</th>
+                                <th>Passport</th>
+                                <th>Country</th>
+                                <th>X-Ray Submit Date</th>
+                                <th>X-Ray Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @transactions.present? %>
+                                <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><label><%= index %></label></td>
+                                        <td><%= transaction.xray_review&.batch_id %></td>
+                                        <td><%= link_to transaction.code, xqcc_movements_internal_transaction_path(transaction) %></td>
+                                        <td><%= transaction.xray_retake&.code %></td>
+                                        <td><%= transaction.xray_facility&.code %></td>
+                                        <td><%= transaction.xray_facility&.name %></td>
+                                        <td><%= transaction.fw_code %></td>
+                                        <td><%= ForeignWorker::GENDERS[transaction.fw_gender] %></td>
+                                        <td><%= transaction.fw_passport_number %></td>
+                                        <td><%= transaction.fw_country&.name %></td>
+                                        <td><%= transaction.xray_transmit_date&.strftime(get_standard_date_format) %></td>
+                                        <td><%= Transaction::XRAY_FILM_TYPES[transaction.xray_film_type] %></td>
+                                        <td>
+                                            <%= raw index_table_show_button xqcc_movements_internal_transaction_path(transaction) %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% else %>
+                                <tr><td colspan="14" class="text-danger">No XQCC Movement Result</td></tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @transactions if @transactions.present? %>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,241 @@
+<div class="card">
+    <div class="card-header">
+        PCR Audit Checklist - Quality
+    </div>
+
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>Parameters</th>
+                <th colspan="2" class="text-center">Status</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td><span class="condition-code">4021</span>ID</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N"<% if !pcr_review.get_condition_detail("4021") %> checked <% else %> disabled <% end %>>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4021") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4121") %></pre>
+                </td>
+            </tr>
+
+            <!-- processing -->
+            <tr>
+                <td><span class="condition-code">4022</span>Processing</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4022") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4022") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4122") %></pre>
+                </td>
+            </tr>
+            <!-- /processing -->
+
+            <!-- positioning -->
+            <tr>
+                <td><span class="condition-code">4023</span>Positioning</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4023") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4023") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4123") %></pre>
+                </td>
+            </tr>
+            <!-- /positioning -->
+
+            <!-- exposure -->
+            <tr>
+                <td><span class="condition-code">4024</span>Exposure</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4024") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4024") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4124") %></pre>
+                </td>
+            </tr>
+            <!-- /exposure -->
+
+            <!-- artifacts -->
+            <tr>
+                <td><span class="condition-code">4025</span>Artifacts</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4025") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4025") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4125") %></pre>
+                </td>
+            </tr>
+            <!-- /artifacts -->
+
+            <!-- inspiratory_effort -->
+            <tr>
+                <td><span class="condition-code">4026</span>Inspiratory Effort</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4026") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4026") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4126") %></pre>
+                </td>
+            </tr>
+            <!-- /inspiratory_effort -->
+
+            <!-- movement_breathing -->
+            <tr>
+                <td><span class="condition-code">4027</span>Movement / Breathing</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4027") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4027") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4127") %></pre>
+                </td>
+            </tr>
+            <!-- /movement_breathing -->
+
+            <!-- anatomical_marker -->
+            <tr>
+                <td><span class="condition-code">4028</span>Anatomical Marker</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4028") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4028") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4128") %></pre>
+                </td>
+            </tr>
+            <!-- /anatomical_marker -->
+
+            <!-- other_quality -->
+            <tr>
+                <td><span class="condition-code">4029</span>Others</td>
+                <td width="150" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="N" <% if !pcr_review.get_condition_detail("4029") %> checked <% else %> disabled <% end %> required>
+                            Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td width="250" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="Y" <% if pcr_review.get_condition_detail("4029") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Not Acceptable
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= pcr_review.get_condition_comment("4129") %></pre>
+                </td>
+            </tr>
+            <!-- /other_quality -->
+
+        </tbody>
+    </table>
+</div>

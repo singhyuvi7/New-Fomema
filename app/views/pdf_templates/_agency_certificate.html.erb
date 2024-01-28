@@ -1,0 +1,67 @@
+<pdfbody>
+    <div class="container">
+     <%= wicked_pdf_image_tag "logo/certbg.png", style: "height:auto; left: 0; margin: 0; min-height: 100%;   min-width: 674px;  padding: 0; position: fixed; top: 0; width: 100%; z-index: -1;" %>
+        <div class="centered">
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <span style="font-size:32px; font-weight:bold; text-shadow: 1px 1px 1px grey; font-family:arial; ">CERTIFICATE OF APPOINTMENT</span>
+                <br><br><br><br><br><br><br><br><br><br><br>
+                <span style="font-size:15px; font-family:arial; ">
+                    <b><%=@agency.name%></b><br>
+                    <% @data[:agency_address].each do |address| %>
+                        <%= address %><br>
+                    <% end %>
+                </span>
+                <br><br><br><br>
+            <span style="font-size:18px; font-family:arial; ">is hereby appointed as<br>
+                     <b>FOMEMA Registered Agency</b><br><br>and is entitled to act as an independent
+                     agent<br>to sell and market the Services according to the <br> terms and conditions until <b><%= @data [:expired_at] %> </b>
+            </span>
+            <br><br><br><br><br><br><br><br><br><br><br><br>
+            <%= wicked_pdf_image_tag "logo/signCEO.png",  style: "height: 70px; margin-left:10%;" %><br>
+            <span style="font-size:18px; font-family:arial;">
+                 <b>DR. MOHD AFIQ FARHAN BIN MD HANIF</b><br>
+            </span>
+            <span style="font-size:18px; font-family:arial;">
+                 Chief Executive Officer<br>
+                FOMEMA SDN. BHD.
+            </span>
+        </div>
+    </div>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 14px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+    .centered {
+        position: absolute;
+        top:20%;
+        left:20%;
+        transform: translate(-50%, -50%);
+    }
+    .container {
+        position: relative;
+        color: black;
+        text-align: center;
+    }
+</style>

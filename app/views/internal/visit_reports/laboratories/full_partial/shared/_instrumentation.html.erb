@@ -1,0 +1,16 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :instrumentation, 'Instrumentation' %>
+        <div class="py-2 pl-1">
+            <%= form_shared.collection_check_boxes(:instrumentation,  options, :code, :name) do |b| %>
+                <div class="form-check form-check-inline">
+                    <%= b.check_box class: 'form-check-input' %>
+                    <%= b.label class: 'form-check-label' %>
+                </div>
+            <% end %>
+        </div>
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

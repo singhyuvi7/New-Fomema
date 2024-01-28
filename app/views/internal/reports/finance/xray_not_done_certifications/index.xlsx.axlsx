@@ -1,0 +1,21 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  bold_style = s.add_style(b: true, sz: 11)
+  red_style = s.add_style(i: true, sz: 11, fg_color: 'FF0000')
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  headers = ['No.', 'X-Ray State', 'X-Ray Code', ' Doctor Name', 'X-Ray Name', 'Worker Code', 'Certification Date', 'Amount', 'Group Code']
+
+  wb.add_worksheet(name: 'xray facilities') do |sheet|
+    sheet.add_row ["X-Ray Not Done for #{@group.humanize(capitalize: false)} from #{@start_date.to_date.strftime('%d/%m/%Y')} to #{@end_date.to_date.strftime('%d/%m/%Y')}"], style: bold_style
+    sheet.add_row ['**for reference only. If found any discrepancies, kindly contact IT department immediately.'], style: red_style
+    sheet.add_row
+    sheet.add_row headers, style: header_style
+    sheet.column_info.first.width = 5
+    if @xray_facility_data.present?
+      @xray_facility_data.each_with_index do |data, index|
+        sheet.add_row([index + 1].concat(data), style: data_style)
+      end
+    end
+  end
+end

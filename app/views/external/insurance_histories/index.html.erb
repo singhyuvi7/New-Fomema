@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <!-- Insurances -->
+         <Strong> Insurance </strong>
+        <div class="card-header-actions">
+        </div>
+    </div>
+    <div class="card-body border-0 bg-transparent text-dark">
+        <%=render "filter" %>
+        <%=render "/shared/all_flash" %>
+
+       <table class="table table-responsive-sm table_circle">
+            <thead>
+                <tr>
+                    <th>Worker Name</th>
+                    <th>Worker Gender</th>
+                    <th>Worker Date Of Birth</th>
+                    <th>Worker Passport No.</th>
+                    <th>Worker Country</th>
+                    <th>Worker Code</th>
+                    <th>Insurer</th>
+                    <th>Product</th>
+                    <th>Payment Status</th>
+                    <th class="module-row-actions">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @insurance_purchases.each do |insurance_purchase| %>
+                    <tr>
+                        <td><%= insurance_purchase.fw_name %></td>
+                        <td><%= ForeignWorker::GENDERS[insurance_purchase.fw_gender] %></td>
+                        <td><%= insurance_purchase.fw_date_of_birth&.strftime("%d/%m/%Y") %></td>
+                        <td><%= insurance_purchase.fw_passport_number %></td>
+                        <td><%= insurance_purchase.fw_country&.name %></td>
+                        <td><%= insurance_purchase.fw_code %></td>
+                        <td><%= insurance_purchase.insurance_provider %> <%= "(#{insurance_purchase.insurance_service_provider.display_name})" if !insurance_purchase.insurance_service_provider.blank? %></td>
+                        <td><%= insurance_purchase.product_purchased %></td>
+                        <td><%= insurance_purchase.order&.status %></td>
+                        <td class="module-row-actions">
+                            <a href="<%= external_insurance_history_path insurance_purchase %>" class="btn btn-blue-portal">Show</a>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="row external-pagination-container">
+            <%= paginate @insurance_purchases %>
+        </div>
+    </div>
+</div>

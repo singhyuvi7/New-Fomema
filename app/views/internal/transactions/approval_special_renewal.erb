@@ -1,0 +1,629 @@
+<%= render "/shared/all_flash" %>
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Special Renewal Approval
+    </div>
+
+    <%= form_for @transaction, url: approval_internal_transaction_path(@transaction), method: 'patch', html: {id:'approvalSpecialRenewalForm', class: "#{params[:action]}_transaction transaction-form", multipart: true, class: "with-parsley" } do |form| %>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :code, "Transaction Code" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.code %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :employer %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.employer.name %> (<%= @transaction.employer.code %>)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_code, "Foreign Worker Code" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_code %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_name, "Foreign Worker Name" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_name %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_gender, "Gender" %>
+                        <p class="form-control-plaintext">
+                            <%= ForeignWorker::GENDERS[@transaction.fw_gender] %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_date_of_birth, "Date of Birth" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_date_of_birth.strftime("%d/%m/%Y") %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_passport_number, "Passport Number" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_passport_number %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_country_id, "Country" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_country.name %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :programme, "Programme" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.programme_indicator %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fw_plks_number, "PLKS No." %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.fw_plks_number %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <a href="<%= internal_transactions_path(worker_code: @transaction.foreign_worker.code) %>" target="_blank">View Transactions</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <%#= render 'internal/shared/approval_comment_decision', form: form %>
+                    <% if @transaction.organization.code != 'PT' && (@transaction.approval_request and ['pending'].include?(@transaction.approval_request.state)) %>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Please upload the following documents for verification. Please upload each document separately.</p>
+                                <div class="" id="document_employer_list">
+                                    <ol class="ol-list-portal">
+                                        <li>A copy of passport (front page)</li>
+                                        <li>Latest Work permit/ Calling Visa for New Arrival / Immigration Approval/ Special Pass</li>
+                                        <li>Employer's Authorisation letter to perform registration  <%= link_to "Download", special_renewal_authorisation_letter_internal_transaction_path(transaction_id: @transaction.id), target: :_blank, class: "btn btn-primary" %></li>
+                                    </ol>
+                                </div>
+                                <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB. </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="document-input-group" class="form-group">
+                                    <div class="input-group custom-input-group">
+                                        <div class="col-md-6 document-type">
+                                            <select class="col-md-12 form-control document-type-selector" name="transaction[uploads][][category]">
+                                                <option value="">Select option</option>
+                                                    <% ForeignWorker::DOCUMENT_TYPES_AGENCY_WORKER.each do |index, document_type| %>
+                                                    <option value="<%= index %>"><%= document_type %></option>
+                                                    <% end %>
+                                            </select>
+                                        </div>
+                                        <div class="custom-file col-md-6">
+                                            <input type="file" name="transaction[uploads][][documents]" class="custom-file-input"
+                                                onchange="validateFiles(this)" disabled>
+                                            <label class="custom-file-label"></label>
+                                        </div>
+                                        <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group row mt-6">
+                            <label class="col-form-label required" style="margin-right:69px; ">Pending Documents</label>
+                            <div class="col-md-7">
+                                <textarea class="form-control" readonly="readonly" data-parsley-uploaded-documents="" data-parsley-validate-if-empty="" name="" id="worker_pending_document" rows="5"></textarea>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="employer_uploads">Uploaded Documents</label>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Documents</th>
+                                    <th>Date Uploaded</th>
+                                    <th>Uploaded By</th>
+                                </tr>
+                                <% @transaction.uploads.each do |upload| %>
+                                    <tr>
+                                        <td class="filenames"><%= upload.category %></td>
+                                        <td class="filenames">
+                                            <% upload.documents.each do |document| %>
+                                                <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                                            <% end %>
+                                        </td>
+                                        <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                                        <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                    </tr>
+                                <% end %>
+
+                                <% if @transaction.uploads.blank? %>
+                                    <tr><td colspan="4">There are no uploaded documents</td></tr>
+                                <% end %>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="approval_history">Special Renewal Approval History</label>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>Submitted Date</th>
+                                    <th>Approval Date</th>
+                                    <th>Approval By</th>
+                                    <th>Status</th>
+                                    <th>Comment</th>
+                                </tr>
+                                <% approval_request= Transaction.approval_requests.where('transactions.id = ?', @transaction.id).select('approval_requests.created_at,approval_requests.updated_at,approval_requests.category, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id,approval_requests.approval_user_id').order('approval_requests.created_at desc').first %>
+                                <% if approval_request.blank? %>
+                                    <tr>
+                                        <td colspan="5" class="text-danger">No records found.</td>
+                                    </tr>
+                                <% else %>
+                                    <tr>
+                                        <td><%= approval_request&.created_at&.strftime(get_standard_datetime_format) %></td>
+                                        <td><%= approval_request&.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                        <td><%= User.find_by(id: approval_request&.approval_user_id)&.name %></td>
+                                        <td><%= approval_request&.approval_decision %></td>
+                                        <td>
+                                            <%
+                                                @approval_comment = @transaction.approval_items
+                                                .joins('join approval_comments on approval_items.request_id = approval_comments.request_id')
+                                                .select('approval_comments.content')
+                                                .order("approval_comments.created_at desc")
+                                                .pluck('approval_comments.content').first
+                                            %>
+                                            <%= @approval_comment %></td>
+                                    </tr>
+                                <% end %>
+                            </table>
+                        </div>
+                    </div>
+
+                    <% if (@transaction.approval_request and ['pending'].include?(@transaction.approval_request.state)) %>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <%= form.label :decision, class: 'required' %>
+                                    <div class="col-form-label">
+                                        <div class="form-check form-check-inline">
+                                            <%= radio_button_tag "approval[decision]", "APPROVE", false, class: "form-check-input approval-decision", required: true %>
+                                            <%= label_tag "approval[decision_APPROVE]", "APPROVE", class: "form-check-label" %>
+                                            &emsp;
+                                            <%= radio_button_tag "approval[decision]", "REJECT", false, class: "form-check-input approval-decision ml-5" %>
+                                            <%= label_tag "approval[decision_REJECT]", "REJECT", class: "form-check-label" %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <%= form.label :comment, for: 'approval_comment', class: 'required', id: "approval_comment" %>
+                                    <%= text_area_tag "approval[comment]", nil, class: "form-control", id: "approval_comment" %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group" id="fee">
+                                    <%= label_tag :fee_id, "Fee", class: 'required' %>
+                                    <%= select_tag :fee_id, options_from_collection_for_select(@fees, 'id', 'name', @fee_id), include_blank: form_select_option_text, class: "form-control", required: true %>
+                                </div>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transactions_path) %>
+                <% if (@transaction.approval_request and ['pending'].include?(@transaction.approval_request.state)) %>
+                    <button class="btn btn-sm btn-primary submit-decision" type="submit"><i class="icon-pencil"></i> Submit decision</button>
+                <% end %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+        $('input.approval-decision').change(function() {
+            if (this.value === 'REJECT') {
+                $('#approval_comment').prop('required', true);
+                $('#approval_comment').addClass('required',true);
+                $('#fee').show();
+            }
+            else {
+                $('#approval_comment').removeAttr('required',false);
+                $('#approval_comment').removeClass('required',false);
+                $('#fee').hide();
+            }
+        });
+
+        // check viewed attached documents
+        $('.submit-decision').on('click',function (e){
+        e.preventDefault();
+        form = $('#approvalSpecialRenewalForm')
+        submit_btn = $(this)
+        submit_btn.prop('disabled', true);
+
+        $.ajax({
+            url: `<%= check_internal_documents_path %>`,
+            method: 'GET',
+            data: {
+                type: 'Transaction',
+                id: `<%= @transaction.id %>`
+            },
+            success: function (response) {
+                if (response.has_viewed){
+                    validity = form[0].checkValidity();
+                    form[0].reportValidity();
+                    if(validity){
+                        form.submit();
+                    }
+                }else{
+                    alert('Please review all the uploaded document(s) before approval.')
+                }
+            }
+        }).done(function () {
+            submit_btn.prop('disabled', false);
+        })
+        });
+
+          $(document).ready(function() {
+            // set upload category option
+            setUploadCategoryOption();
+            // re-set pending documents
+            syncPendingDocuments();
+        });
+
+        function setUploadCategoryOption() {
+
+            var employer_type='employer';
+            $('.document-type-selector').each(function (index, obj) {
+                // clear existing option-
+                $(obj).empty();
+                // append new option based on the employer type
+                $(obj).append(new Option('Select option', ''));
+                var needed_validate_documents = required_documents[employer_type];
+                needed_validate_documents.forEach(function (document_type) {
+                    var document_type_label = document_types[document_type];
+                    $(obj).append(new Option(document_type_label, document_type));
+                });
+
+            });
+            // clone select option after updating the option
+            cloneSelect(employer_type);
+        }
+        function cloneSelect(employer_type) {
+            window['cloned_' + employer_type + '_select'] = $('.custom-input-group:first').clone(true, true);
+        }
+        // re-sync pending documents
+        function syncPendingDocuments() {
+
+            var pending_uploads = getPendingUploads();
+            if (!pending_uploads) {
+                return false;
+            }
+            setPendingDocuments(pending_uploads);
+        }
+
+        function getPendingUploads() {
+
+
+            var employer_type='employer';
+
+            var needed_validate_documents = required_documents[employer_type];
+
+            // var pending_uploads = needed_validate_documents;
+            var pending_uploads = needed_validate_documents.slice();
+
+            // console.log(needed_validate_documents);
+
+            $('.custom-input-group').each(function (index, obj) {
+
+                var document_type = $(obj).find('.document-type-selector').val();
+                var selected_file = $(obj).find('.custom-file-input').val();
+                // check if this document needed by current employer type
+                // if yes we need to check file exist
+                if (needed_validate_documents.includes(document_type)) {
+                    // if valid upload
+                    if (selected_file) {
+                        // remove from pending uploads
+                        for( var i = 0; i < pending_uploads.length; i++){
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+
+            });
+            return pending_uploads;
+        }
+
+        function setPendingDocuments(pending_uploads) {
+
+            var pending_list = '';
+
+            pending_uploads.forEach(function (document_type) {
+                var document_type_label = document_types[document_type];
+                pending_list = pending_list + document_type_label + '\n';
+            });
+
+            var pending_documents = $("#worker_pending_document");
+            // reset pending list
+
+            pending_documents.val('');
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        var document_types = <%= ForeignWorker::DOCUMENT_TYPES_AGENCY_WORKER.to_json.html_safe %>;
+        var required_documents = {
+                employer: [
+                    "PASSPORT",
+                    "WORKING_PERMIT_CALLING_VISA",
+                    "AUTHORISATION_LETTER"
+                ]
+        };
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+                    var pending_uploads = getPendingUploads();
+                    // if there is still pending documents, return false
+                    if (pending_uploads.length > 0) {
+                        // append to pending list
+                        setPendingDocuments(pending_uploads);
+                        // return false validation of there is documents pending
+                        return false;
+                    }
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+
+            $("#approvalSpecialRenewalForm").parsley({
+                errorClass: 'is-invalid text-danger',
+                errorsWrapper: '<div class="invalid-feedback"></div>',
+                errorTemplate: '<span></span>',
+                trigger: 'change'
+            });
+
+            $('.custom-file-input').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("")
+            });
+            // Function to duplicate document fields
+            // define default clone
+
+            var cloned_company_select = null;
+            var cloned_individual_select = null;
+
+            function getActiveEmployerType() {
+               return 'employer';
+            }
+            // if not yet select employer type but click Add documents
+            if (!getActiveEmployerType()) {
+                var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);
+            }
+
+            $('#add_more_documents').click(() => {
+                var employer_type = getActiveEmployerType();
+
+                if (getActiveEmployerType()) {
+                    clonedAttachmentInput = window['cloned_' + employer_type + '_select'];
+                }
+
+                clonedAttachmentInput
+                    .clone(true, true)
+                    .appendTo("#document-input-group")
+                    .addClass('mt-1')
+                    .find(".custom-file-input")
+                    .val("")
+                    .attr("disabled", "disabled")
+                $('.custom-input-group:last')
+                    .find(".custom-file-label").html("Choose file")
+                bindLastDocumentTypeSelectorAndFileSelector();
+                removeAttachmentField('.removal-button:last');
+                // $('#no-input-placeholder').hide();
+            });
+
+            removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+        $(field).click(function() {
+            $(this).closest('.custom-input-group').remove();
+             syncPendingDocuments();
+        });
+        }
+            bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+         function validateFiles(inputFile) {
+
+            var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+            var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+            var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+            var extName;
+            var maxFileSize = <%= 10.megabytes %>;
+            var sizeExceeded = false;
+            var extError = false;
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var file = inputFile.files[0];
+
+            var file_size = file.size;
+
+            // check if single file exceed max file size
+
+            if (file_size && maxFileSize && file_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            // check if combine with previous file will exceed max file size
+
+            var combine_size = (file_size + total_uploaded_size) - file_size;
+
+            if (combine_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            extName = file.name.split('.').pop().toLowerCase();
+
+            if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+
+            if (sizeExceeded) {
+                window.alert(maxExceededMessage);
+                $(inputFile).val('');
+            }
+
+            if (extError) {
+                window.alert(extErrorMessage);
+                $(inputFile).val('');
+            }
+
+            // set inline size
+
+            var file_size_label = getUploadSizeLabel(file_size);
+
+            $(inputFile).closest('div').next().find('.inline-file-size').val(file_size_label);
+
+            // set label
+
+            setTotalUploadLabel();
+
+            // sync pending documents
+
+            syncPendingDocuments();
+        }
+
+
+        function getTotalUploadedSize() {
+
+            var total_uploaded_size = 0;
+
+            $('.custom-file-input').each(function (index, obj) {
+
+                if (obj.files.length > 0) {
+                    total_uploaded_size = total_uploaded_size + parseFloat(obj.files[0].size);
+                }
+
+            });
+
+            return total_uploaded_size;
+        }
+
+        function setTotalUploadLabel() {
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var total_uploaded_label =  getUploadSizeLabel(total_uploaded_size);
+
+            $("#total_uploaded_label").text(total_uploaded_label);
+        }
+
+        function getUploadSizeLabel(upload_size) {
+
+            var total_mb = upload_size / 1000000;
+
+            total_mb = total_mb.toFixed(2);
+
+            var upload_size_label = total_mb + ' MB';
+
+            return upload_size_label;
+        }
+</script>
+<% end %>

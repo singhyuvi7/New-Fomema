@@ -1,0 +1,271 @@
+<div class="card">
+    <div class="card-header"><strong>Transaction #<%= @transaction.code %></strong> - TCUPI Review</div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                medical: "Medical History",
+                physical: "Physical Examination",
+                system: "System Exam",
+                laboratory: "Laboratory",
+                xray: "X-ray",
+                certification: "Certification",
+                review_decision: "FOMEMA Result Review & TCUPI",
+            }
+
+            category_parent_tabs[:xray_pending_review] = "Xray Pending Review" if @xray_pending_decisions.present?
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",        parent: "information",      title: "Worker Information"},
+                {type: "category_1",    parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",    parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",      parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",      parent: "system",           title: "System Exam 1"},
+                {type: "system_2",      parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",    parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",          parent: "xray",             title: "X-ray"},
+                {type: "condition",     parent: "certification",    title: "Condition"},
+                {type: "certification", parent: "certification",    title: "Certification"},
+                {type: "follow_up",     parent: "certification",    title: "Follow Up"},
+                {type: "decision",      parent: "review_decision",  title: "Medical PR"},
+                {type: "to_do_list",    parent: "review_decision",  title: "To Do List"}
+            ]
+
+            category_tabs += [{type: "xray_pr", parent: "xray_pending_review", title: "Xray Pending Review"}] if @xray_pending_decisions.present?
+            category_tabs += [{type: "unsuitable_reasons",  parent: "certification",    title: "Unsuitable Reasons"}] if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS") && on_nios?
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 0}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= nested_form_for @transaction, url: @submit_path, method: :post, html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <% doctor_examination = @transaction.medical_examination %>
+        <%= render "/shared/transactions_tab_params" %>
+        <%= render partial: "internal/medical/worker_information", locals: { transaction: @transaction } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+
+        <div class="category-switchable hidden" data-type="laboratory">
+            <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true } %>
+        </div>
+
+        <%
+            if @doctor # If Doctor, do not allow them to change conditions. Only for NIOS.
+                condition_locals            = { doctor_examination: doctor_examination, readonly: true }
+                certification_form_locals   = { doctor_examination: doctor_examination, readonly: true }
+            else
+                condition_locals            = { namespacing: "de_attributes", doctor_examination: doctor_examination, readonly: false }
+                certification_form_locals   = { namespacing: "de_attributes", doctor_examination: doctor_examination, readonly: true, comment_exception: true }
+            end
+        %>
+
+        <div class="category-switchable hidden" data-type="condition">
+            <%= render partial: "external/transactions/doctor_examinations/certification_condition_form", locals: condition_locals %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="certification">
+            <%= render partial: "external/transactions/doctor_examinations/certification_certification_form", locals: certification_form_locals %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="follow_up">
+            <%= render partial: "external/transactions/doctor_examinations/certification_follow_up_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="decision">
+            <%= form.fields_for :latest_medical_review do |review_form| %>
+                <%= render partial: "internal/medical/review_decision_approval", locals: {form: review_form, doctor_examination: doctor_examination, readonly: true } %>
+            <% end %>
+        </div>
+
+        <% if @xray_pending_decisions.present? %>
+            <div class="category-switchable hidden" data-type="xray_pr">
+                <%= render partial: "internal/transactions/pending_decision", locals: { merts: true } %>
+            </div>
+        <% end %>
+
+        <% if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS") && on_nios? %>
+            <div class="category-switchable hidden" data-type="unsuitable_reasons">
+                <%= render partial: "internal/transactions/shared/unsuitable_reasons_tab", locals: { readonly: !has_permission?("EDIT_UNSUITABLE_REASONS_FOR_TRANSACTION"), hide_save_button: true } %>
+            </div>
+        <% end %>
+
+        <div class="category-switchable hidden" data-type="to_do_list">
+            <% if on_nios? %>
+                <div class="px-4 mt-4">Your review has been set for TCUPI. To proceed with the review, you are required to complete the following TCUPI:</div>
+            <% end %>
+
+            <%= form.fields_for :latest_tcupi_review do |tcupi_review_form| %>
+                <%= render partial: "internal/medical/tcupi_review_to_do_list", locals: {form: form, tcupi_review_form: tcupi_review_form} %>
+
+                <div class="text-right py-2 px-4">
+                    <% unless @doctor %>
+                        <%= link_to "Manage To Do List", manage_tcupi_todos_internal_medical_path(@transaction), data: { confirm: 'Unsaved data will be lost. Are you sure you want to proceed?' }, class: "btn btn-success btn-sm" %>
+                    <% end %>
+
+                    <% if @transactions_list.present? %>
+                        <div id="transaction-history-list-btn" class="btn btn-success btn-sm">History</div>
+                    <% end %>
+
+                    <%= form.submit "Save", class: "btn btn-primary btn-sm", value: "Save", id: "save-submit" %>
+
+                    <% unless @doctor %>
+                        <%= form.submit "Transmit", class: "btn btn-primary btn-sm", value: "Transmit", id: "save-and-transmit-submit" %>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+
+        <div class="card-footer text-right">
+            <%= raw show_back_button(internal_transactions_path(review_status: "tcupi", field_set: "tcupi")) %>
+        </div>
+    <% end %>
+</div>
+
+<div id="dialog-done-fill" class="hidden" title="Please mark as done">
+    <p>All to do lists must be marked as "Test done" before transmitting.</p>
+</div>
+
+<div id="dialog-comments-fill" class="hidden" title="Please fill all the comment boxes">
+    <p>All comment boxes must be filled before transmitting.</p>
+</div>
+
+<div id="dialog-date-fill" class="hidden" title="Please include dates">
+    <p>All to do lists dates must be filled before transmitting.</p>
+</div>
+
+<div id="dialog-decision-fill" class="hidden" title="Please select review decision">
+    <p>Please review if this foreign worker is <b>SUITABLE</b> or <b>UNSUITABLE</b> to work in Malaysia.</p>
+</div>
+
+<div id="dialog-justification-fill" class="hidden" title="Please include your justification for this decision">
+    <p>A justification based on your review decision is needed for approval.</p>
+</div>
+
+<div id="dialog-doctor-comments-fill" class="hidden" title="Comments needed">
+    <p>All comment boxes need to be filled before saving</p>
+</div>
+
+<% if @transactions_list.present? %>
+    <%= render partial: "/internal/medical/transaction_history_list_modal", locals: { transactions: @transactions_list } %>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        loadParentCategoryTabSelection();
+        loadCategoryTabSelection();
+        initializeToggleableFields('mle 2 approval');
+
+        $('#save-and-transmit-submit').click(function(e) {
+            unfinishedTests = $('[name*="tcupi_test_done["][value="false"]');
+            reviewDecision  = $('#transaction_latest_tcupi_review_attributes_medical_mle1_decision').val();
+            justification   = $('#transaction_latest_tcupi_review_attributes_medical_mle1_comment').val().trim();
+
+            unfinishedComments = $('[name*="tcupi_comment["]').map(function() {
+                if ($(this).val().trim().length < 1) {
+                    return this;
+                }
+            });
+
+            unfilledDates = $('.test-dates').filter(function() {
+                return $(this).val().trim() === '';
+            }).map(function() {
+                return $(this).closest('.todo-parent')[0];
+            });
+
+            if (unfinishedTests.length > 0) {
+                openDialogAndPreventSubmit('#dialog-done-fill', e);
+
+                $('#dialog-done-fill').on('dialogclose', function(event, ui) {
+                    $('.category-parent-tab[data-type="tcupi"]').click();
+                    scrollToElement($(unfinishedTests[0]), 500);
+                    highlightElement(unfinishedTests, '#facf7f', 'slow');
+                    delayedHighlightField(unfinishedTests, '#fff', 'slow', 5000);
+                });
+            } else if (unfinishedComments.length > 0) {
+                openDialogAndPreventSubmit('#dialog-comments-fill', e);
+
+                $('#dialog-comments-fill').on('dialogclose', function(event, ui) {
+                    $('.category-parent-tab[data-type="tcupi"]').click();
+                    scrollToElement($(unfinishedComments[0]), 500);
+                    highlightElement(unfinishedComments, '#facf7f', 'slow');
+                    delayedHighlightField(unfinishedComments, '#fff', 'slow', 5000);
+                });
+            } else if (unfilledDates.length > 0) {
+                openDialogAndPreventSubmit('#dialog-date-fill', e);
+
+                $('#dialog-date-fill').on('dialogclose', function(event, ui) {
+                    $('.category-parent-tab[data-type="tcupi"]').click();
+                    scrollToElement($(unfilledDates[0]), 500);
+                    highlightElement(unfilledDates, '#facf7f', 'slow');
+                    delayedHighlightField(unfilledDates, '#fff', 'slow', 5000);
+                });
+            } else if (!reviewDecision) {
+                reviewContainer = $('#review-decision-container');
+                openDialogAndPreventSubmit('#dialog-decision-fill', e);
+
+                $('#dialog-decision-fill').on('dialogclose', function(event, ui) {
+                    $('.category-parent-tab[data-type="tcupi"]').click();
+                    scrollToElement(reviewContainer, 500);
+                    highlightElement(reviewContainer, '#facf7f', 'slow');
+                    delayedHighlightField(reviewContainer, '#fff', 'slow', 5000);
+                });
+            } else if (justification.length === 0) {
+                justificationContainer = $('#review-justification-container');
+                openDialogAndPreventSubmit('#dialog-justification-fill', e);
+
+                $('#dialog-justification-fill').on('dialogclose', function(event, ui) {
+                    $('.category-parent-tab[data-type="tcupi"]').click();
+                    scrollToElement(justificationContainer, 500);
+                    highlightElement(justificationContainer, '#facf7f', 'slow');
+                    delayedHighlightField(justificationContainer, '#fff', 'slow', 5000);
+                });
+            }
+        });
+    </script>
+<% end %>
+
+<% if @doctor %>
+    <% content_for :page_end_scripts do %>
+        <script>
+            $('#save-submit').click(function(e) {
+                commentBoxes = $('[name*="tcupi_comment["]').map(function() {
+                    if ($(this).val().trim().length < 1) {
+                        return this;
+                    }
+                });
+
+                if (commentBoxes.length > 0) {
+                    openDialogAndPreventSubmit('#dialog-doctor-comments-fill', e);
+
+                    $('#dialog-doctor-comments-fill').on('dialogclose', function(event, ui) {
+                        $('.category-parent-tab[data-type="tcupi"]').click();
+                        scrollToElement($(commentBoxes[0]), 500);
+                        highlightElement(commentBoxes, '#facf7f', 'slow');
+                        delayedHighlightField(commentBoxes, '#fff', 'slow', 5000);
+                    });
+                }
+            });
+        </script>
+    <% end %>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

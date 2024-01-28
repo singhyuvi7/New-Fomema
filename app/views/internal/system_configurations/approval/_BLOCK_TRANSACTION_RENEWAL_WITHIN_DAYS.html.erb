@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "BLOCK_TRANSACTION_RENEWAL_WITHIN_DAYS" %>"><%= @system_configurations["BLOCK_TRANSACTION_RENEWAL_WITHIN_DAYS"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "BLOCK_TRANSACTION_RENEWAL_WITHIN_DAYS", @system_configurations["BLOCK_TRANSACTION_RENEWAL_WITHIN_DAYS"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["BLOCK_TRANSACTION_RENEWAL_WITHIN_DAYS"].value %></p>
+</div>

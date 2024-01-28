@@ -1,0 +1,69 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @refund } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :customerable_type, "Type", class: "required" %>
+                <%= form.select :customerable_type, options_for_select({
+                    'Employer' => 'Employer',
+                    'Doctor' => 'Doctor',
+                    'Laboratory' => 'Laboratory',
+                    'XrayFacility' => 'X-Ray Facility',
+                    'Radiologist' => 'Radiologist'
+                }, form.object.customerable_type), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, disabled: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :customerable_id, "Refund To", class: "required" %>
+                <%= form.hidden_field :customerable_id %>
+                <%= text_field_tag :customerable_code, form.object.customerable.code, readonly: true, class: "form-control" %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :category, class: "required" %>
+                <%= form.select :category, options_for_select({"MANUAL" => "Manual"}.invert, form.object.category), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, disabled: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :amount, class: "required" %>
+                <%= form.number_field :amount, readonly: true, required: true, class: "form-control" %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :payment_method_id, "Payment Method", class: "required" %>
+                <%= form.select :payment_method_id, options_from_collection_for_select(PaymentMethod.where(:code => 'BANKDRAFT'), :id, :name, form.object.payment_method_id), {include_blank: false}, class: 'form-control select2' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :comment %>
+                <%= form.text_area :comment, class: "form-control" %>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<!-- /.card-body -->
+
+<div class="card-footer text-right">
+    <%=raw edit_back_button(internal_bank_drafts_path) %>
+    <%=raw edit_save_button() %>
+</div>

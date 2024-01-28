@@ -1,0 +1,4 @@
+<% @notifications.each do |notification| %>
+  <% model_name = notification.notifiable_type.eql?('Approval::Item') ? 'Approval' : notification.notifiable_type %>
+  <p> New notification for <%= link_to notification.notifiable_type, send("internal_#{model_name.tableize.singularize}_path", notification.notifiable) %></p>
+<% end %>

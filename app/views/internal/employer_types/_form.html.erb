@@ -1,0 +1,23 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @employer_type } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_employer_types_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

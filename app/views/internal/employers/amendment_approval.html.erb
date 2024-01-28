@@ -1,0 +1,99 @@
+<div class="card">
+    <div class="card-header"><strong>Employers</strong> - Employer Amendment Detail</div>
+    <div class="card-body">
+        <%= render '/internal/employers/shared/employer_detail' %>
+    </div>
+</div>
+
+<div class="card bg-light">
+    <div class="card-header"><strong>Employers</strong> - Employer Amendment Approval</div>
+    <div class="card-body">
+
+        <%= render 'shared/all_validation_flash', { model_obj: @employer } %>
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag amendment_approval_internal_employer_path(@employer), method: 'patch', id: 'amendmentApprovalForm' do |form| %>
+            <div class="form-group">
+                Assigned To: <%= "#{ User.find_by(id: @employer&.assigned_to)&.name }" %>
+            </div>
+            <div class="form-group">
+                <label class="required" for="">Decision</label>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input approval-decision" id="approval_decision_APPROVE" type="radio" value="APPROVE"
+                            name="approve_action" required>
+                        <label class="form-check-label" for="approval_decision_APPROVE">APPROVE</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input approval-decision" id="approval_decision_REJECT" type="radio" value="REJECT"
+                            name="approve_action" required>
+                        <label class="form-check-label" for="approval_decision_REJECT">REJECT</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="required" for="">Comment</label>
+                <textarea class="form-control" name="amendment_comment" id="amendment_comment" rows="3" ></textarea>
+                <small id="" class="form-text text-muted">Comment is required when you Reject Employer Amendment</small>
+            </div>
+
+            <% if has_permission?("APPROVAL_EMPLOYER_CRITICAL_INFO") %>
+                <div class="text-right">
+                    <%=raw edit_back_button(internal_employers_path) %>
+                    <button class="btn btn-sm btn-primary submit-decision" type="submit"><i class="icon-pencil"></i> Submit decision</button>
+                </div>
+            <% end %>
+
+        <% end %>
+
+    </div>
+</div>
+<%= render "search_employer" %>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // when decision changed, we conditionally required comment
+    $('input[type=radio][name=approve_action]').change(function() {
+
+        if (this.value === 'REJECT') {
+            $('#amendment_comment').prop('required', true);
+        }
+        else {
+            $('#amendment_comment').prop('required', false);
+        }
+    });
+
+    // check viewed attached documents
+    $('.submit-decision').on('click',function (e){
+        e.preventDefault();
+        form = $('#amendmentApprovalForm')
+        submit_btn = $(this)
+        submit_btn.prop('disabled', true);
+
+        $.ajax({
+            url: `<%= check_internal_documents_path %>`,
+            method: 'GET',
+            data: {
+                type: 'Employer',
+                id: `<%= @employer.id %>`
+            },
+            success: function (response) {
+                if (response.has_viewed){
+                    validity = form[0].checkValidity();
+                    form[0].reportValidity();
+                    if(validity){
+                        form.submit();
+                    }
+                }else{
+                    alert('Please review all the uploaded document(s) before approval.')
+                }
+            }
+        }).done(function () {
+            submit_btn.prop('disabled', false);
+        })
+    });
+
+</script>
+<% end %>

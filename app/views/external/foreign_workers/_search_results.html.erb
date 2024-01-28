@@ -1,0 +1,176 @@
+<div class="card">
+    <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="timeline-steps aos-init aos-animate" data-aos="fade-up">
+                        <div class="timeline-step">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> You have yet to select the clinic for FOMEMA medical examination.<br />Please go to “Registration History” and select clinic.</p>" data-html="true"  data-original-title="<b>Pending Select Clinic</b>">
+                                <p class="numbering"><b>1</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>Pending Select Clinic</b></p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> You have yet to go to the clinic for FOMEMA medical examination.<br /> Please proceed to the selected clinic to undergo FOMEMA medical examination.</p>" data-html="true" data-original-title="<b>Pending Examination</b>">
+                                <p class="numbering"><b>2</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>Pending Examination</b></p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> No result transmitted from Laboratory or X-ray facility.</p>"  data-html="true" data-original-title="<b>Pending for Lab/ X-ray Transmission</b>">
+                                <p class="numbering"><b>3</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>Pending for Lab/ X-ray Transmission</b></p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> Medical clinic (GP) is yet to transmit the result to FOMEMA.</p>" data-html="true" data-original-title="<b>Pending for Certification</b>">
+                                <p class="numbering"><b>4</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>Pending for Certification</b></p>
+                            </div>
+                        </div>
+                        <div class="timeline-step mb-0">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> FOMEMA is in the process of reviewing the result before it is released to the Immigration Department of Malaysia.<br/> Please expect the final results within 3-5 working days after the certification date.</p>" data-html="true" data-original-title="<b>FOMEMA Review</b>">
+                                <p class="numbering"><b>5</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>FOMEMA Review</b></p>
+                            </div>
+                        </div>
+                        <div class="timeline-step mb-0">
+                            <div class="timeline-content" data-toggle="popover" data-trigger="hover" data-placement="top" title="" data-content="<p class=timeline> <b>Suitable</b>-Worker is fit for employment in Malaysia.<br /> <b>Unsuitable</b>-Worker is not fit for employment in Malaysia.</p>" data-html="true" data-original-title="<b>Suitable/Unsuitable</b>">
+                                <p class="numbering"><b>6</b></p>
+                                <div class="inner-circle"></div>
+                                <p class="h6 mt-3 mb-1"></p>
+                                <p><b>Suitable/Unsuitable</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="card-header">
+        <span class="float-right">The medical result of the foreign worker will not be displayed for the transaction made more than a year.
+                        <br><i class="fas fa-info"></i>
+                         Expired status indicates that the foreign worker’s medical result had exceed 180 days from the examination
+                         <br> date OR validity of medical examination form has expired.
+        </span>
+
+        <strong>Search Results</strong>
+    </div>
+
+    <div class="card-body">
+        <table class="table table_circle table-responsive-sm table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Worker Name / Code</th>
+                    <th>Passport Number / Country</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Registration Code</th>
+                    <th>Examination Date</th>
+                    <th>Certification Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <% foreign_workers.each.with_index(1) do |row, index| %>
+                    <tr>
+                        <td><%= index %></td>
+
+                        <% row.each do |column| %>
+                            <td><%= raw column %></td>
+                        <% end %>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class= "text-right">
+    <a class="btn btn-blue-portal" href="<%= external_worker_lists_path %>">Back</a>
+</div>
+
+<%# css only for time line %>
+<style>
+    body{margin-top:20px;}
+    .timeline-steps {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .timeline-steps .timeline-step {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        margin: 1rem;
+    }
+
+    .timeline{
+        font-size: 13px;
+    }
+
+    .numbering{
+        font-size: 15px;
+    }
+
+    @media (min-width:768px) {
+        .timeline-steps .timeline-step:not(:last-child):after {
+            content: "";
+            display: block;
+            border-top: .25rem solid;
+            border-color: green;
+            width: 8.5rem;
+            position: absolute;
+            left: 7.5rem;
+            top: 40px;
+        }
+        .timeline-steps .timeline-step:not(:first-child):before {
+            content: "";
+            display: block;
+            border-top: .25rem solid;
+            border-color: green;
+            width: 8.5rem;
+            position: absolute;
+            right: 7.5rem;
+            top: 40px;
+        }
+    }
+
+    .timeline-steps .timeline-content {
+        width: 10rem;
+        text-align: center
+    }
+
+    .timeline-steps .timeline-content .inner-circle {
+        border-radius: 1.5rem;
+        height: 1rem;
+        width: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: black;
+    }
+
+    .timeline-steps .timeline-content .inner-circle:before {
+        content: "";
+        background:  green;
+        display: inline-block;
+        height: 2rem;
+        width: 2rem;
+        min-width: 2rem;
+        border-radius: 1.5rem;
+        opacity: .5
+    }
+</style>

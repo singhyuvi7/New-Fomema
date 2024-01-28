@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://fomema.dbixelabs.com" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://fomema.dbixelabs.com">
+    <wsdl:documentation>
+		Please Type your service description here
+	</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://fomema.dbixelabs.com">
+            <xs:element name="SubmitLabTransaction">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="worker_code" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="specimen_receive_date" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="specimen_taken_date" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="blood_barcode_no" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="urine_barcode_no" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="blood_group" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="blood_group_others" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="blood_rh" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="hiv" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="hbsag" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="vdrl" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tpha" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="malaria" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="bfmp" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="opiates" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cannabis" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="pregnancy" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="serum_beta_hcg" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="sugar" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="sugar_milimoles" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="albumin" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="albumin_gram" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="abnormal_reason" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="confirmation_lab_results" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="lab_code" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="passphrase" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="application_id" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="SubmitLabTransactionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RetrieveWorkerInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="worker_code" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="trans_id" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="lab_code" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="passphrase" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="application_id" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RetrieveWorkerInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="SubmitLabTransactionRequest">
+        <wsdl:part name="parameters" element="ns:SubmitLabTransaction"/>
+    </wsdl:message>
+    <wsdl:message name="SubmitLabTransactionResponse">
+        <wsdl:part name="parameters" element="ns:SubmitLabTransactionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="RetrieveWorkerInfoRequest">
+        <wsdl:part name="parameters" element="ns:RetrieveWorkerInfo"/>
+    </wsdl:message>
+    <wsdl:message name="RetrieveWorkerInfoResponse">
+        <wsdl:part name="parameters" element="ns:RetrieveWorkerInfoResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="LabTransactionWSPortType">
+        <wsdl:operation name="SubmitLabTransaction">
+            <wsdl:input message="ns:SubmitLabTransactionRequest" wsaw:Action="urn:SubmitLabTransaction"/>
+            <wsdl:output message="ns:SubmitLabTransactionResponse" wsaw:Action="urn:SubmitLabTransactionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="RetrieveWorkerInfo">
+            <wsdl:input message="ns:RetrieveWorkerInfoRequest" wsaw:Action="urn:RetrieveWorkerInfo"/>
+            <wsdl:output message="ns:RetrieveWorkerInfoResponse" wsaw:Action="urn:RetrieveWorkerInfoResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="LabTransactionWSSoap11Binding" type="ns:LabTransactionWSPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="SubmitLabTransaction">
+            <soap:operation soapAction="urn:SubmitLabTransaction" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RetrieveWorkerInfo">
+            <soap:operation soapAction="urn:RetrieveWorkerInfo" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="LabTransactionWSSoap12Binding" type="ns:LabTransactionWSPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="SubmitLabTransaction">
+            <soap12:operation soapAction="urn:SubmitLabTransaction" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RetrieveWorkerInfo">
+            <soap12:operation soapAction="urn:RetrieveWorkerInfo" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="LabTransactionWSHttpBinding" type="ns:LabTransactionWSPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="SubmitLabTransaction">
+            <http:operation location="SubmitLabTransaction"/>
+            <wsdl:input>
+                <mime:content type="application/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="application/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RetrieveWorkerInfo">
+            <http:operation location="RetrieveWorkerInfo"/>
+            <wsdl:input>
+                <mime:content type="application/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="application/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="LabTransactionWS">
+        <wsdl:port name="LabTransactionWSHttpSoap11Endpoint" binding="ns:LabTransactionWSSoap11Binding">
+            <soap:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="LabTransactionWSHttpsSoap11Endpoint" binding="ns:LabTransactionWSSoap11Binding">
+            <soap:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="LabTransactionWSHttpSoap12Endpoint" binding="ns:LabTransactionWSSoap12Binding">
+            <soap12:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="LabTransactionWSHttpsSoap12Endpoint" binding="ns:LabTransactionWSSoap12Binding">
+            <soap12:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="LabTransactionWSHttpEndpoint" binding="ns:LabTransactionWSHttpBinding">
+            <http:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpEndpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="LabTransactionWSHttpsEndpoint" binding="ns:LabTransactionWSHttpBinding">
+            <http:address location="<%= "#{ ENV["APP_URL_LABWS"] }" %>LabTransactionWS/services/LabTransactionWS.LabTransactionWSHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Refunds</strong> - Approval
+    </div>
+    <%= form_for @refund, url: approval_internal_refund_path(@refund), method: :patch, html: {class: "#{params[:action]}_refund refund-form"} do |form| %>
+
+        <div class="card-body">
+            <%= render "/shared/all_flash" %>
+
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_refunds_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

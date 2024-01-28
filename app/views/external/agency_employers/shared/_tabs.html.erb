@@ -1,0 +1,8 @@
+<%
+active_tab = local_assigns[:active_tab]
+%>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+       <a class="btn btn-blue-portal" <%= ' active show' if active_tab.eql?('workers') %>" href="<%= external_agency_workers_path employer_id: @employer.id %>">Foreign Workers</a>
+    </li>
+</ul>

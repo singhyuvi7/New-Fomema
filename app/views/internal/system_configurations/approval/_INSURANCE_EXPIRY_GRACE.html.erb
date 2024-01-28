@@ -1,0 +1,6 @@
+<% code = "INSURANCE_EXPIRY_GRACE" %>
+<label class="col-md-4 col-form-label" for="<%= code %>"><%= @system_configurations[code].name %></label>
+<div class="col-md-8">
+    <%= text_field_tag code, @system_configurations[code].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations[code].value %></p>
+</div>

@@ -1,0 +1,19 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Doctors') do |sheet|
+    sheet.merge_cells("A1:I1")
+    sheet.add_row ["FULL QUOTA GPs (UP TO #{@current.strftime(get_standard_date_format)})"]
+    sheet.add_row ["DOCTOR_CODE", "DOCTOR_NAME", "CLINIC_NAME", "GP_STATUS", "STATE_NAME", "TOWN_NAME", "CURRENT_USAGE","#{Time.current.prev_year.strftime('%Y')}_USAGE","#{Time.current.years_ago(2).strftime('%Y')}_USAGE"]
+    @doctors.find_each do |doctor|
+        sheet.add_row [
+            doctor.code,
+            doctor.name,
+            doctor.clinic_name,
+            doctor.status,
+            doctor.state.try(:name),
+            doctor.town.try(:name),
+            doctor.quota_used,
+            doctor.previous_year,
+            doctor.previous_two_year
+        ]
+    end
+end

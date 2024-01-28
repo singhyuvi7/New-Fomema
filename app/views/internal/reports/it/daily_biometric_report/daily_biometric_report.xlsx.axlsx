@@ -1,0 +1,40 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+    title_style = s.add_style :alignment => { :horizontal=> :center, :vertical=> :center}, :border=>Axlsx::STYLE_THIN_BORDER, :bg_color => "63c2de"
+    data_style = s.add_style :border=>Axlsx::STYLE_THIN_BORDER
+    note_style = s.add_style :fg_color => 'FF0000', :i => true
+    wb.add_worksheet(:name => "Custom Styles") do |sheet|
+
+        sheet.add_row ['Daily Biometric Report']
+        sheet.add_row @biometric_title, :style => title_style
+        @daily_biometrics.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+        sheet.add_row ['**Note: All the figures in this report are accurate as of the report date and time'], :style => note_style
+        sheet.column_widths 2
+        sheet.add_row []
+
+        sheet.add_row ["Biometric Report from #{@start_date_of_system.strftime("%B %Y")} until #{@report_end_date.strftime("%d-%b-%Y")}"]
+        sheet.add_row @biometric_start_to_current_title, :style => title_style
+        @biometric_start_to_current.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+        sheet.add_row []
+
+        sheet.add_row ["Biometric Report by Month for Year #{@current_year}"]
+        sheet.add_row @biometric_title, :style => title_style
+        @biometric_by_month_current_year.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+        sheet.add_row []
+
+        sheet.add_row ["Biometric Report by Month for Year #{@last_year}"]
+        sheet.add_row @biometric_title, :style => title_style
+        @biometric_by_month_last_year.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+        sheet.add_row []
+
+    end
+end

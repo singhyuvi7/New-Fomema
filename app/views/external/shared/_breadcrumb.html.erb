@@ -1,0 +1,48 @@
+<% load_external_breadcrumb_items %>
+
+<ol class="breadcrumb">
+    <% @breadcrumb_items.each do |hash| %>
+        <%= link_to hash[:title], hash[:path], class: "breadcrumb-item #{ "active" if hash[:active] }" %>
+    <% end %>
+
+    <li class="breadcrumb-menu d-md-down-none">
+        <div class="btn-group" role="group" aria-label="Button group">
+            <% if has_permission?("SEND_ARL_REQUEST") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_arl_emails_path %>">
+                    <i class="fas fa-envelope mr-2"></i>Request ARL
+                 </a>
+            <% end %>
+            <% if has_permission?("VIEW_FAVOURITE_RADIOLOGIST") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_favourite_radiologists_path %>">
+                    <i class="fas fa-user-friends mr-2"></i>Favourite Radiologists
+                </a>
+            <% end %>
+
+            <% if has_any_permission?("DELETE_DIGITAL_XRAY_IMAGE_FROM_SALINEE") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_xray_images_path %>">
+                    <i class="fas fa-eraser mr-2"></i>Delete Images
+                </a>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_MERTS_XRAY_TO_RADIOLOGIST_REPORTED_CASES", "VIEW_MERTS_RADIOLOGIST_TO_XRAY_REPORTED_CASES") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_reported_cases_path %>">
+                    <i class="far fa-file-pdf mr-2"></i>Reported Cases
+                </a>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_QUALITY_SUMMARY_REPORTS") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_quality_summary_reports_path %>">
+                    <i class="far fa-file-pdf mr-2"></i>Quality Summary Report
+                </a>
+            <% end %>
+
+            <% if has_permission?("VIEW_LABORATORY_CERTIFIED_TRANSACTIONS") %>
+                <a class="text-primary font-weight-bold px-3" href="<%= external_laboratory_certified_transactions_path %>">
+                    <i class="fas fa-file-csv mr-2">
+                        Certified Transactions
+                    </i>
+                </a>
+            <% end %>
+        </div>
+    </li>
+</ol>

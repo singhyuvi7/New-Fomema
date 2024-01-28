@@ -1,0 +1,478 @@
+<div class="card-body">
+    <%= render 'shared/all_validation_flash', { model_obj: @employer} %>
+    <%= render "/shared/all_flash" %>
+
+    <% if has_permission?("EDIT_NON_FINANCE_INFO_EMPLOYER") %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label :employer_type_id, "Employer Type", class: "required" %>
+                    <%= form.select :employer_type_id, options_from_collection_for_select(EmployerType.order(:name).all, "id", "name", form.object.employer_type_id), {include_blank: form_select_option_text}, required: true, class: "form-control" %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group w-100">
+                    <%= form.label :name, class: "required" %>
+                    <%= form.text_field :name, class: "form-control", required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :business_registration_number, "Business Registration Number", class: "required" %>
+                    <%= form.text_field :business_registration_number, class: "form-control", required: true, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "Only alphabets and numbers" } %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :ic_passport_number, "IC / Passport Number", class: "required" %>
+                    <%= form.text_field :ic_passport_number, class: "form-control", required: true, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "Only alphabets and numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :pic_name, "Name (Person In Charge)", class: "required" %>
+                    <%= form.text_field :pic_name, class: "form-control", required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Name must not begin with a special characters" } %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :pic_phone, "Contact Details (Person In Charge)", class: "required" %>
+                    <%= form.text_field :pic_phone, class: "form-control", required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <% [:address1, :address2, :address3, :address4].each_with_index do |sym, index| %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <% if index == 0 %>
+                            <%= form.label :address, class: "required", maxlength: '50' %>
+                        <% end %>
+
+                        <%= form.text_field sym, class: "form-control", required: index == 0, maxlength: '50', data: { parsley_pattern: "[a-zA-Z0-9@&.,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@), ampersand (&) and slashes (/) are allowed" } %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <%= render "internal/shared/form_state_postcode_town", { form: form } %>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= form.label :phone, "Telephone Number", class: "required" %>
+                    <%= form.text_field :phone, class: "form-control", required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= form.label :fax, "Fax Number" %>
+                    <%= form.text_field :fax, class: "form-control", data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <%= form.label :email, "Email Address", class: "required" %>
+                    <%= form.email_field :email, class: "form-control", required: true, data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <% if ["edit", "update"].include?(params[:action]) %>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :status, class: "required" %>
+                        <%= form.select :status, options_for_select(Employer::STATUSES.invert, form.object.status), {include_blank: form_select_option_text}, {class: 'form-control', required: true} %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :problematic, class: "required" %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= form.radio_button :problematic, true, class: "form-check-input" %>
+                                <label class="form-check-label" for="employer_problematic_true">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= form.radio_button :problematic, false, class: "form-check-input" %>
+                                <label class="form-check-label" for="employer_problematic_false">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 disableable-fields">
+                    <div class="form-group">
+                        <%= form.label :document_verified, class: "required" %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= form.radio_button :document_verified, true, class: "form-check-input" %>
+                                <label class="form-check-label" for="employer_document_verified_true">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= form.radio_button :document_verified, false, class: "form-check-input" %>
+                                <label class="form-check-label" for="employer_document_verified_false">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="employer_comment_logs">Comment</label>
+                        <textarea id="employer_comment_logs" name="employer[comment_logs]" rows="5" class= "form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    <% end %>
+    
+    <% if has_permission?("EDIT_FINANCE_INFO_EMPLOYER") %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_payment_id, "Bank Payment ID" %>
+                    <%= form.text_field :bank_payment_id, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :bank_id) %>
+                    <%= form.label :bank_id %>
+                    <%= form.select :bank_id, options_from_collection_for_select(Bank.where(status: 'ACTIVE').where.not(routing: [nil, '']).order(:name).all, 'id', 'name', form.object.bank_id), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_account_number, "Bank Account Number" %>
+                    <%= form.text_field :bank_account_number, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if has_permission?("EDIT_FINANCE_EMPLOYER_CORPORATE") %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :is_corporate, 'Corporate' %>
+                    <%= form.select :is_corporate, options_for_select(Employer::IS_CORPORATE, form.object.is_corporate), {include_blank: false}, {class: 'form-control'} %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if has_permission?("EDIT_NON_FINANCE_INFO_EMPLOYER") %>
+        <div class="row">
+            <div class="col-md-12">
+                <label for="employer_uploads">Uploaded Documents</label>
+                <%= hidden_field_tag :remove_uploaded_file, "" %>
+
+                <table class="table">
+                    <tr>
+                        <th>Category</th>
+                        <th>Documents</th>
+                        <th>Date Uploaded</th>
+                        <th></th>
+                    </tr>
+
+                    <% @employer.uploads.each do |upload| %>
+                        <tr>
+                            <td class="filenames"><%= upload.category %></td>
+
+                            <td class="filenames">
+                                <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                <% end %>
+                            </td>
+
+                            <td>
+                                <%= upload.created_at&.strftime(get_standard_date_format) %>
+                            </td>
+
+                            <td style="width: 150px;">
+                                <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                            </td>
+                        </tr>
+                    <% end %>
+
+                    <% if @employer.uploads.blank? %>
+                        <tr><td colspan="4">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group" id="document-input-group">
+                    <label for="employer_uploads">Upload new documents</label>
+                    <p id="no-input-placeholder" class="hidden">Click on "Add more documents to begin adding files"</p>
+
+                    <div class="input-group custom-input-group d-flex">
+                        <div class="document-type flex-grow-1 p-0">
+                            <select class="form-control document-type-selector border-0" name="employer[uploads][][category]">
+                                <option value="">Select option</option>
+                                <% Employer::NIOS_DOCUMENT_TYPES.each do |document_type, index| %>
+                                    <option value="<%= index %>"><%= document_type %></option>
+                                <% end %>
+                            </select>
+                        </div>
+
+                        <div class="custom-file flex-grow-1">
+                            <input type="file" name="employer[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled required>
+                            <label class="custom-file-label">Choose file</label>
+                        </div>
+
+                        <div class="flex-shrink-0">
+                            <div class="removal-button btn btn-danger font-weight-bold">Remove</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right mb-3', type: 'button' %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<div class="card-footer">
+    <div class="text-right">
+        <%= raw edit_back_button(internal_employers_path) %>
+        <%= raw edit_save_button %>
+    </div>
+</div>
+
+<style>
+    .custom-input-group {
+        /* border: 2px solid #337ab7; */
+        border: 1px solid #e4e7ea;
+        border-radius: 5px;
+        padding: 0;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+removeAttachmentField('.removal-button:last');
+var clonedAttachmentInput = $('.custom-input-group').clone(true, true);
+removeAttachmentField('.removal-button:last');
+bindLastDocumentTypeSelectorAndFileSelector();
+employer_type_disable_field($('#employer_employer_type_id').val());
+var employerId = <%= @employer.id %>
+
+function validateFiles(inputFile) {
+    var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+    var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+    var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+    var extName;
+    var maxFileSize = <%= 10.megabytes %>;
+    var sizeExceeded = false;
+    var extError = false;
+
+    $.each(inputFile.files, function () {
+        if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+        extName = this.name.split('.').pop().toLowerCase();
+        if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+    });
+    if (sizeExceeded) {
+        window.alert(maxExceededMessage);
+        $(inputFile).val('');
+    };
+
+    if (extError) {
+        window.alert(extErrorMessage);
+        $(inputFile).val('');
+    };
+}
+$('#employer_employer_type_id').change(function () {
+    employer_type_disable_field(this.value)
+});
+
+function employer_type_disable_field(employer_type){
+    if (employer_type == ''){
+            $('#employer_business_registration_number').prop('disabled', true);
+            $('#employer_pic_name').prop('disabled', true);
+            $('#employer_pic_phone').prop('disabled', true);
+            $('#employer_ic_passport_number').prop('disabled', true);
+            $('#employer_bank_payment_id').prop('disabled', true);
+    }else{
+        if (employer_type == 1 || employer_type == 3) {
+            $('#employer_business_registration_number').prop('disabled', true);
+            $('#employer_pic_name').prop('disabled', true);
+            $('#employer_pic_phone').prop('disabled', true);
+            $('#employer_ic_passport_number').prop('disabled', false);
+            $('#employer_bank_payment_id').prop('disabled', true);
+        } else if (employer_type == 2) {
+            $('#employer_business_registration_number').prop('disabled', false);
+            $('#employer_pic_name').prop('disabled', false);
+            $('#employer_pic_phone').prop('disabled', false);
+            $('#employer_ic_passport_number').prop('disabled', true);
+            $('#employer_bank_payment_id').prop('disabled', false);
+        }
+    }
+}
+
+// Function to duplicate document fields
+$('#add_more_documents').click(() => {
+    clonedAttachmentInput
+        .clone(true, true)
+        .appendTo("#document-input-group")
+        .addClass('mt-3 col-md-12')
+        .find(".custom-file-input")
+        .val("")
+        .attr("disabled", "disabled")
+    $('.custom-input-group:last')
+        .find(".custom-file-label").html("Choose file")
+    bindLastDocumentTypeSelectorAndFileSelector();
+    removeAttachmentField('.removal-button:last');
+    $('#no-input-placeholder').hide();
+});
+
+function removeAttachmentField(field) {
+    $(field).click(function() {
+        $(this).closest('.custom-input-group').remove();
+
+        if ($('.custom-input-group').length === 0) {
+            $('#no-input-placeholder').show();
+        }
+    });
+}
+
+// Function to re-enable form input after selecting dom type & to set file name after selecting in input
+function bindLastDocumentTypeSelectorAndFileSelector() {
+    $('.custom-file-input:last').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    $('.document-type-selector:last').change(function() {
+        let selectedValue = $("option:selected", this).val();
+        inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+        if (selectedValue.length > 0) {
+            inputField.removeAttr('disabled');
+        } else {
+            inputField.attr("disabled", "disabled")
+        }
+    });
+}
+
+$('.set-deletion').click(function() {
+    filenames = $(this).closest('tr').find('.filenames');
+    filenames.toggleClass('text-decoration-line-through');
+    text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+    $(this).text(text).toggleClass('btn-danger btn-primary');
+
+    ids = $('.set-deletion.btn-primary').map(function() {
+        return $(this).attr('data-id');
+    }).get().join(',');
+
+    $('#remove_uploaded_file').val(ids);
+});
+
+$('form#new_employer').submit(function(e) {
+    var email = $('#employer_email').val().trim();
+
+    $.ajax({
+        url: '/shared/check_for_user_account',
+        type: 'POST',
+        data: {email: email},
+        async: false
+    })
+    .done(function(response) {
+        if (response) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert(`The email address ${email} is already in use. Please use another email.`);
+        }
+    });
+});
+
+$('#employer_status').change(function () {
+    if ($(this).val() == 'INACTIVE') {
+        $('.employer-form').attr('novalidate', 'novalidate');
+        $('.employer-form').parsley().destroy();
+    } else {
+        $('.employer-form').removeAttr('novalidate');
+        $('.employer-form').parsley({
+            errorClass: 'is-invalid text-danger border-danger',
+            errorsWrapper: '<div class="invalid-feedback d-block"></div>',
+            errorTemplate: '<span></span>',
+            trigger: 'change',
+            excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]"
+        });
+    }
+});
+
+$($('input[name="employer[problematic]"]')).on('change', function () {
+    if ($(this).val() == "true") {
+        $("label[for='employer_comment_logs']").addClass('required');
+        $('#employer_comment_logs').attr('required', 'required');
+    } else {
+        $("label[for='employer_comment_logs']").removeClass('required');
+        $('#employer_comment_logs').removeAttr('required');
+    }
+});
+
+$('#edit_employer_' + employerId).on('submit', function(e) {
+    //get previously uploaded count
+    var hasAttachment = <%= @employer.has_document_uploaded? %>;
+    var attachmentCount = <%= @employer.document_uploaded.count %>;
+
+    //get removed count
+    var removedArray = [];
+    var removedAttachment = $('#remove_uploaded_file').val().trim();
+    if (removedAttachment != '') {
+        removedArray = removedAttachment.split(',');
+    }
+
+    //get new file count
+    var newAttachmentCount = 0;
+    $('input[type=file]').each(function(i, obj) {
+        if (obj.files.length > 0) {
+            newAttachmentCount += 1;
+        }
+    });
+
+    var documentVerified = $('input[name="employer[document_verified]"]:checked').val();
+    finalCount = attachmentCount + newAttachmentCount - removedArray.length;
+
+    if (finalCount <= 0 && documentVerified == 'true') {
+        e.preventDefault();
+        e.stopPropagation();
+        alert(`Document Verified field is set to YES but there is no document available. Please upload document(s).`);
+    }
+});
+</script>
+<% end %>

@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "COMPANY_REGNO" %>"><%= @system_configurations["COMPANY_REGNO"].name %></label>
+<div class="col-md-8">
+    <%= text_field_tag "COMPANY_REGNO", @system_configurations["COMPANY_REGNO"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["COMPANY_REGNO"].value %></p>
+</div>

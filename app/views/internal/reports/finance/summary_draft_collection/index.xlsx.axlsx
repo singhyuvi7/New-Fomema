@@ -1,0 +1,43 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  currency_data_style = s.add_style(num_fmt: 4, sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  currency_total_style = s.add_style(num_fmt: 4, sz: 11)
+
+  wb.add_worksheet(name: 'drafts') do |sheet|
+      sheet.add_row ["#{@company_name.to_s.upcase} - #{@date}"], style: title_style
+      sheet.add_row ["SUMMARY DRAFT COLLECTION REPORT FROM #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} TO #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL STATE'}"], style: title_style
+      sheet.add_row
+  
+    if @bank_drafts.present?
+      @bank_drafts.each.with_index do |(branch, collection), index|
+        sheet.add_row [branch]
+        sheet.add_row @headers, style: header_style
+
+        total_net_amount = 0
+        total_gst_amount = 0
+        total_processing_fee = 0
+        total_draft_amount = 0
+
+        collection&.each do |bank_draft|
+          _, _, net_amount, gst_amount, processing_fee, draft_amount = bank_draft
+          total_net_amount += net_amount
+          total_gst_amount += gst_amount
+          total_processing_fee += processing_fee
+          total_draft_amount += draft_amount
+          bank_draft.delete_at(1)
+          sheet.add_row bank_draft, style: [data_style, currency_data_style, currency_data_style, currency_data_style, currency_data_style]
+        end
+        sheet.add_row ['Total', total_net_amount, total_gst_amount, total_processing_fee, total_draft_amount], style: [nil, currency_total_style, currency_total_style, currency_total_style, currency_total_style]
+        2.times { sheet.add_row } if index != (@bank_drafts.size - 1)
+      end
+    end
+
+    if @grand_total.present?
+      sheet.add_row []
+      sheet.add_row ['Grand Total', *@grand_total], style: [nil, currency_total_style, currency_total_style, currency_total_style, currency_total_style]
+    end
+  end
+end

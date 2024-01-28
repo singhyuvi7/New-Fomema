@@ -1,0 +1,35 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+      <strong></strong>
+    </div>
+    <form action="/refunds" method="get" id="order-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Payment Code</label>
+                <div class="col-sm-3">
+                    <input type="text" name="code" id="filter_name" value="<%= params[:code] %>" id="code" class="form-control">
+                </div>
+                  <label for="refund_status" class="col-sm-2 col-form-label">Payment Status</label>
+                <div class="col-sm-3">
+                 <%= select_tag :refund_status, options_for_select(Refund::STATUSES_EMPLOYER.invert, params[:refund_status]), include_blank: form_select_option_text, class: 'form-control' %>
+                </div>         
+            </div>
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Payment From</label>
+                <div class="col-sm-3">
+                    <input type="date" name="start_date" id="filter_start_date" value="<%= params[:start_date] %>" id="start_date" class="form-control">
+                </div>
+               
+                  <label for="filter_name" class="col-sm-2 col-form-label">Payment To</label>
+                <div class="col-sm-3">
+                    <input type="date" name="end_date" id="filter_end_date" value="<%= params[:end_date] %>" id="end_date" class="form-control">
+                </div>                
+            </div>
+        </div>
+        <div class="card-footer border-0 bg-transparent text-dark text-right">
+           <a href="<%= external_refunds_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+            <button type="submit" form="order-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+        </div>
+    </form>
+</div>

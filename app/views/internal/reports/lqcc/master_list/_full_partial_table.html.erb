@@ -1,0 +1,71 @@
+<table class="<%= index_table_class %>">
+
+    <thead>
+        <tr class="font-weight-bold text-nowrap">
+            <th>#</th>
+            <th>Visit Report ID</th>
+            <th>Visit Date</th>
+            <th>Lab. Name</th>
+            <th>Type of facilities (CC/Partial/Full)</th>
+            <th>Lab. code</th>
+            <th>Address</th>
+            <th>Town</th>
+            <th>State</th>
+            <th>FOMEMA Officer</th>
+            <th>Type of Visit</th>
+            <th>Conclusion (Satisfactory - Yes/No)</th>
+            <th>Letter Reference #</th>
+            <th>Date of NC Letter</th>
+            <th>Date of Reminder Letter</th>
+            <th>Date of Committee Meeting</th>
+            <th>Date of Warning Letter</th>
+
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if @visit_reports.blank? %>
+            <tr>
+                <td colspan="18" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+            <% @visit_reports.each.with_index(1) do |visit_report, index| %>
+                <% 
+                    vr_lab = visit_report.visit_report_laboratory 
+                    if vr_lab.satisfactory == 'YES'
+                        letter_reference = ''
+                        date_nc_letter = ''
+                        date_warning_letter = ''
+                    else
+                        letter_reference = visit_report&.last_lqcc_letter&.explanation_letter_reference
+                        date_nc_letter = visit_report&.last_lqcc_letter&.explanation_letter_date.try(:strftime,'%d/%m/%Y')
+                        date_warning_letter = visit_report&.last_lqcc_letter&.warning_letter_date.try(:strftime,'%d/%m/%Y')
+                    end
+                %>
+                <tr>
+                    <td class="text-center"><%= index %></td>
+                    <td><a target="_blank" href="<%= internal_visit_report_laboratory_show_path(visit_report.id) %>"><%= visit_report.code %></a></td>
+                    <td><%= visit_report.visit_date.strftime('%d/%m/%Y') %></td>
+                    <td><%= vr_lab.laboratory_name %></td>
+                    <td><%= LaboratoryType::LABORATORY_TYPES[visit_report&.laboratory_type_id] %></td>
+                    <td><%= vr_lab.laboratory.code %></td>
+                    <td><%= [vr_lab.address_1, vr_lab.address_2, vr_lab.address_3, vr_lab.address_4].reject(&:blank?).join(", ") %></td>
+                    <td><%= vr_lab.town.name %></td>
+                    <td><%= vr_lab.state.name %></td>
+                    <td><%= visit_report.visit_report_visitors.pluck(:name).join(',') %></td>
+                    <td><%= vr_lab.type_of_visit %></td>
+                    <td><%= vr_lab.satisfactory %></td>
+                    <td><%= letter_reference %></td>
+                    <td><%= date_nc_letter %></td>
+                    <td><%= visit_report&.letter_reminder_date.try(:strftime, '%d/%m/%Y') %></td>
+                    <td><%= visit_report&.committee_meeting_date.try(:strftime, '%d/%m/%Y') %></td>
+                    <td><%= date_warning_letter %></td>
+
+                    <td class="module-row-actions">
+                        <a class="btn btn-sm btn-primary edit-btn" data-toggle="tooltip" data-html="true" title="Edit" data-original-title="Edit" href="<%= edit_master_list_internal_lqcc_reports_path(visit_report) %>"><i class="fa fa-edit"></i></a>
+                    </td>
+                </tr>
+            <% end %>
+        <% end %>
+    </tbody>
+</table>

@@ -1,0 +1,80 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Call Logs</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_CALL_LOG') %>
+                    <%=raw index_table_new_button(new_internal_call_log_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="table-responsive">
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Case ID</th>
+            <th>Call Time</th>
+            <th>Type</th>
+            <th>Code</th>
+            <th>Creator</th>
+            <th>Follow Up By</th>
+            <th>Case Type</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @call_logs.blank? %>
+            <tr>
+                <td colspan="10" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @call_logs.each.with_index((@call_logs.current_page - 1) * get_per + 1) do |call_log, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= call_log.id %></td>
+                    <td><%= call_log.called_at&.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                    <td><%= CallLog::CALLABLE_TYPES[call_log.callable_type] %></td>
+                    <td><%= call_log.callable&.id ? "#{call_log.callable&.name} (#{call_log.callable&.code})" : "" %></td>
+                    <td><%= call_log.created_by ? "#{call_log.creator.name}" : "" %></td>
+                    <td><%= call_log.call_log_follow_ups.last&.creator&.name %></td>
+                    <td><%= call_log.call_log_case_type&.description %></td>
+                    <td><%= CallLog::STATUSES[call_log.status] %></td>
+
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_call_log_path(call_log)) %>
+                        <% if has_permission?('EDIT_CALL_LOG') and !call_log.status.eql?("CLOSE") %>
+                            <%=raw index_table_edit_button edit_internal_call_log_path(call_log) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_CALL_LOG') %>
+                            <%=raw index_table_delete_button(internal_call_log_path(call_log)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+
+        </div>
+        <!-- /.table-responsive -->
+
+        <div class="row">
+            <%= paginate @call_logs %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

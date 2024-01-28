@@ -1,0 +1,32 @@
+<%= form_with url: create_master_list_internal_inspectorate_reports_path, html: {class: "with-parsley"}, local: true do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Inspectorate</strong> - Generate Master List
+        </div>
+        <div class="card-body">
+        
+                <%= render "/shared/all_flash" %>
+
+                <div class="form-group row">
+                    <label for="batch_date" class="col-sm-2 col-form-label required">Visit Date</label>
+                    <div class="col-sm-5">
+                        <%= text_field_tag "start_date", params[:start_date], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'batch_date' }, max: Date.today.strftime("%F"), :required => true %>
+                    </div>
+                    <div class="col-sm-5">
+                        <%= text_field_tag "end_date", params["end_date"], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'batch_date' }, max: Date.today.strftime("%F"), :required => true %>
+                    </div>
+                </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(master_list_internal_inspectorate_reports_path) %>
+                <%= form.submit 'Generate', id: 'generate_submit', class: 'btn btn-sm btn-primary' %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

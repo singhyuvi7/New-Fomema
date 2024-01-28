@@ -1,0 +1,75 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Unblock Foreign Worker</div>
+        <%= form_for @foreign_worker, {url: unblock_internal_employer_employer_worker_path(@employer, @foreign_worker), html: {multipart: true}} do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :unblock_reason, "Unblock Reason", class: 'required' %>
+                            <select name="foreign_worker[unblock_reason_id]" id="foreign_worker_unblock_reason_id" class="form-control select2" onchange="unblock_reason_id_changed(this)">
+                                <option value=""><%= form_select_option_text %></option>
+                                <% BlockReason.where(category: "UNBLOCK").each do |block_reason| %>
+                                    <option value="<%= block_reason.id %>" data-code="<%= block_reason.code %>"<%= " selected" if block_reason.id == form.object.unblock_reason_id %>><%= block_reason.description %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :unblock_comment, "Comment", class: 'required', id: "label_foreign_worker_unblock_comment" %>
+                            <%= form.text_area :unblock_comment, class: 'form-control', required: form.object.unblock_reason&.code.eql?("OTHER") %>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /card-body -->
+
+            <div class="card-footer">
+
+                <div class="text-right">
+                    <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                    <%=raw edit_submit_for_approval_button() %>
+                </div>
+            
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <% 
+        transaction_verify_doc = TransactionVerifyDoc.where(transaction_id: @foreign_worker&.latest_transaction_id, category: "AGENCY_TRANSACTION_REGISTRATION").order(id: :desc).first
+        if !transaction_verify_doc.nil? && ['APPROVAL','INCOMPLETE'].include?(transaction_verify_doc.status)
+    %>
+            <script>
+                $('#foreign_worker_is_imm_blocked_true').prop('disabled', true)
+                $('#foreign_worker_is_imm_blocked_false').prop('disabled', true)
+                $('#foreign_worker_is_imm_blocked_comment').prop('disabled', true)
+            </script>
+    <% 
+        end 
+    %>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+function unblock_reason_id_changed(sel)
+{
+    if ($('#foreign_worker_unblock_reason_id > option:selected').attr('data-code') == 'OTHER') {
+        $('#foreign_worker_unblock_comment').prop('required', true);
+        $('#label_foreign_worker_unblock_comment').addClass('required');
+    } else {
+        $('#foreign_worker_unblock_comment').removeAttr('required');
+        $('#label_foreign_worker_unblock_comment').removeClass('required');
+    }
+}
+</script>
+<% end %>

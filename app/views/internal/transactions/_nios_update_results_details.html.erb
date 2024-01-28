@@ -1,0 +1,43 @@
+<div class="px-4 pt-4">
+    <h3><u>Update Result</u></h3>
+</div>
+
+<% @result_updates.each_with_index do |result_update, index| %>
+    <div class="border border-dark mx-4 mb-4 p-4 rounded bg-light">
+        <div class="d-flex">
+            <b class="w-em-14">Updated at</b>
+            <p class="mb-0"><%= result_update.created_at.strftime("%d/%m/%Y") %></p>
+        </div>
+
+        <div class="d-flex">
+            <b class="w-em-14">Wrong transmission for</b>
+            <p class="mb-0"><%= result_update.wrong_transmissions %></p>
+        </div>
+
+        <label class="mt-3">Issues</label>
+
+        <div class="border border-secondary mb-4 px-2 pt-2">
+            <%= simple_format result_update.amendment_reason %>
+        </div>
+
+        <% if result_update.amended_conditions.present? %>
+            <label class="mt-3">Conditions</label>
+
+            <div class="border border-secondary mb-4 px-2 pt-2 pb-2">
+                <% result_update.amended_conditions.each do |condition| %>
+                    <div class="d-flex">
+                        <b class="w-em-13"><%= DoctorExamination::certification_conditions_consolidated[condition[0].to_sym] %></b> Changed to <i class="ml-1"><b><%= condition[1] == "true" ? "YES" : "NO" %></b></i>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+
+        <% if result_update.amended_comment.present? %>
+            <label class="mt-3">Comments (for any abnormalities detected in PART IV):</label>
+
+            <div class="border border-secondary mb-4 px-2 pt-2">
+                <%= simple_format result_update.amended_comment %>
+            </div>
+        <% end %>
+    </div>
+<% end %>

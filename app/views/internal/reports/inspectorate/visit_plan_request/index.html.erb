@@ -1,0 +1,74 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Plan Request</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+        <%=render 'internal/reports/inspectorate/visit_plan_request/filter', { filter_link: visit_plan_request_internal_inspectorate_reports_path} %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <%=raw index_table_new_button(new_visit_plan_request_internal_inspectorate_reports_path) %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Date of request</th>
+                                <th>Urgent</th>
+                                <th>Facility Code</th>
+                                <th>Facility Name</th>
+                                <th>Prepared By</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @visit_plan_requests.blank? %>
+                                <tr>
+                                    <td colspan="10" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @visit_plan_requests.each.with_index((@visit_plan_requests.current_page - 1) * get_per + 1) do |visit_plan_request, index| %>
+                                    <tr>
+                                        <td class="text-center"><%= index %></td>
+                                        <td><%= visit_plan_request.date_of_request %></td>
+                                        <td><%= visit_plan_request.is_urgent %></td>
+                                        <td><%= visit_plan_request&.spable&.code %></td>
+                                        <td><%= visit_plan_request.facility_name %></td>
+                                        <td><%= visit_plan_request.prepared_by %></td>
+
+                                        <td class="module-row-actions">
+                                            <%= raw index_table_show_button(show_visit_plan_request_internal_inspectorate_reports_path(visit_plan_request)) %>
+                                            <%= raw(index_table_edit_button(edit_visit_plan_request_internal_inspectorate_reports_path(visit_plan_request))) %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_plan_requests %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function (e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

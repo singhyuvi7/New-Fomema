@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :operation_type, class: 'required' %>
+            <div class="input-group">
+                <%= form.select :operation_type, options_for_select(LqccLetter::OPERATION_TYPES.invert, form.object.operation_type), {include_blank: form_select_option_text}, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%
+=begin%>
+ <%=render 'explanation_signature_modal', {form: form} %> 
+<%
+=end%>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.flatpickr-timepicker').flatpickr({
+        locale: null,
+        altInput: true,
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i"
+    });
+</script>
+<% end %>

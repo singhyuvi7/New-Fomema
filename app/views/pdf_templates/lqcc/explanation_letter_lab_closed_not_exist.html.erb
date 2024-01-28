@@ -1,0 +1,73 @@
+<!-- for debug -->
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css' %>
+<!-- end debug -->
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/visit_report_explanation_letter" %>
+
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+
+    visit_report_details = @visit_report.visit_report_doctor
+    vr_lab = @visit_report.visit_report_laboratory
+    service_provider = @visit_report&.visitable
+    operating_hour = @visit_report.operating_hour
+%>
+
+<div class="explanation-letter page-container">
+    <% if @is_preview %>
+        <div id="previewBg">Preview</div>
+    <% end %>
+
+    <div class="header">
+        <div><span class="label">Our Ref.</span>: <%= @letter.explanation_letter_reference %></div>
+        <div><span class="label">Date</span>: <%= Date.today.strftime('%d.%m.%Y') %></div>
+    </div>   
+    <br>
+    <br>
+    <div class="letter-to">
+        <div class="sp-name-code bold"><%= service_provider&.code %></div>
+        <div class="sp-facility-name bold"><%= vr_lab&.laboratory_name %></div>
+        <div class="address"><%= vr_lab&.address_1 if !vr_lab&.address_1.blank? %></div>
+        <div class="address"><%= vr_lab&.address_2 if !vr_lab&.address_2.blank? %></div>
+        <div class="address"><%= vr_lab&.address_3 if !vr_lab&.address_3.blank? %></div>
+        <div class="address"><%= vr_lab&.address_4 if !vr_lab&.address_4.blank? %></div>
+        <div class="address"><%= vr_lab&.town&.name %></div>
+        <div class="address"> <%= "#{vr_lab&.postcode} #{vr_lab&.state&.name}" %></div>
+    </div>
+
+    <div class="content">
+        <div>Dear Sir/Madam,</div>
+        <br>
+        <p class="letter-title bold">LQCC VISIT FINDINGS</p>
+        <p>We refer to the above matter.</p>
+        <p>
+            Our LQCC team visited your <%= ['COLLECTION'].include?(@visit_report.laboratory_type&.name) ? 'collection centre' : 'laboratory' %> located at the aforesaid address on the <%= @visit_report.visit_date.try(:strftime,'%d.%m.%Y') %> at <%= @visit_report.visit_time_from.strftime("%I:%M%p") %> and was found to be <%= LqccLetter::OPERATION_TYPES[@letter.operation_type] %>.
+        </p>
+
+        <% if ['CLOSED'].include?(@letter.operation_type) %>
+            <p>The operation hours of your laboratory stated in our system is as follows:</p>  
+            <%=render 'pdf_templates/lqcc/operating_hour', { operating_hour: operating_hour} %>
+            <br>
+        <% end %>
+
+        <p>Kindly provide a written explanation and the measures taken to resolve the matter <b>within (7) seven days</b> from the date of this letter.</p>
+        <p>Your understanding and cooperation on this matter is very much appreciated.</p>
+
+    </div>
+    
+    <!-- closings -->
+    <div class="closings">
+        <p>Thank you.</p>
+
+        <div class="signature">
+            <div>Yours faithfully,</div>
+            <div class="bold"><%= @company_name %></div>
+            <!-- <%= image_tag @letter.explanation_signature, class: "signature-img" if !@letter.explanation_signature.blank? %> -->
+            <div class="signature-space"></div>
+            <div><%= @signee_name %></div>
+            <div><%= @signee_position %></div>
+            <div>Inspectorate, LQCC & KMC Department</div>
+        </div>
+    </div>
+</div>

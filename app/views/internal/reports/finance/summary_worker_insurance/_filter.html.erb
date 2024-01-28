@@ -1,0 +1,59 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag summary_worker_insurance_internal_finance_reports_path, method: 'get' do |form| %>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="register_date" class="col-sm-3 col-form-label">Date</label>
+                    <div class="col-sm-9">
+                        <div class="d-flex align-items-center">
+                            <%= text_field_tag "start_date", params["start_date"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'register_date' }, max: Date.today.strftime("%F"), required: true %>
+                            <span class="mx-3">to</span>
+                            <%= text_field_tag "end_date", params["end_date"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'register_date' }, max: Date.today.strftime("%F"), required: true %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="branch" class="col-sm-3 col-form-label">Branch</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="branch" name="branch">
+                            <option value="">ALL</option>
+                            <% @branches.each do |branch| %>
+                            <option value="<%= branch.id %>" <%= 'selected' if params['branch'] == branch.id.to_s %>><%= branch.name %></option>
+                            <% end %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <!-- <%=raw filter_clear_button summary_worker_insurance_internal_finance_reports_path %> -->
+            <% if has_permission?("FINANCE_REPORTS","INSURANCE_REPORTS") %>
+                <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, summary_worker_insurance_internal_finance_reports_path(format: :xlsx, params: params.permit!), class: "btn btn-sm btn-warning with-excel-format" %>
+            <% end %>
+            <%=raw filter_button %> 
+        </div>
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-pdf-format').click(function(e) {
+        $(this).attr("href", this.href + ".pdf?" + $(this).closest('form').serialize());
+    });
+    $('.with-excel-format').click(function(e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Users</strong> - New User
+    </div>
+    <%= form_for @user, url: internal_users_path do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

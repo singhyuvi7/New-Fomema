@@ -1,0 +1,157 @@
+<% has_plks_optional = false %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        Order - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: internal_order_path(@order) do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render '/shared/all_flash' %>
+
+            <%=render partial: '/internal/orders/shared/order_detail', locals: {form: form} %>
+
+            <p class="plks-optional-message">
+                Please review your worker list before submission. Workers highlighted in blue indicates that medical examination is optional for upcoming period. Your may choose to go ahead and register these workers for a medical or remove the workers.
+            </p>
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th>Foreign Worker</th>
+                        <th>Gender</th>
+                        <th>PLKS</th>
+                        <th>Amount</th>
+                        <th class="text-right"><button type="button" class="btn btn-sm btn-secondary etr-add">+</button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                    @order.order_items.each do |order_item|
+                        foreign_worker = order_item.order_itemable
+                        foreign_worker.assign_attributes(order_item.additional_information["foreign_worker"]) if !order_item.additional_information.blank? and order_item.additional_information.key?("foreign_worker")
+                        has_plks_optional = true if order_item.order_itemable.plks_optional?
+                    %>
+                        <tr class="<%= "plks-optional" if order_item.order_itemable.plks_optional? %>">
+                            <td>
+                                <a href="<%= internal_employer_employer_worker_path(foreign_worker.employer, foreign_worker) %>" target="_blank"><%= foreign_worker.name %></a>
+                                <button class="btn btn-sm btn-warning" type="button" style="float: right;" data-toggle="modal" data-target="#modal-fw-<%= order_item.order_itemable_id %>">Edit</button>
+                            </td>
+                            <td><%= ForeignWorker::GENDERS[foreign_worker.gender] %></td>
+                            <td><%= order_item.order_itemable.plks_number.to_i %></td>
+                            <td>
+                                <% if has_permission?("CREATE_FOC_TRANSACTION") %>
+                                    <%= select_tag("fee", options_from_collection_for_select(Fee.select("id, name || ' (' || amount || ')' as label").where("code in (?)", ["TRANSACTION_#{ForeignWorker::GENDERS[foreign_worker.gender]}", "FOC"]), :id, :label, order_item.fee_id), class: "form-control", onchange: "change_fee(this)", data: {order_item_id: order_item.id}) %>
+                                <% else %>
+                                    <%= number_to_currency(order_item.amount, unit: "") %>
+                                <% end %>
+                            </td>
+                            <td class="text-right">
+                                <input type="hidden" name="foreign_worker_ids[]" value="<%= order_item.order_itemable_id %>" class="etr-foreign_workers" data-amount="<%= order_item.amount %>">
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="etr_remove(this)" data-foreign_worker_id="<%= order_item.order_itemable_id %>">X</button>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="card conditional-renewal-disclaimer">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label><input type="checkbox" id="chk-conditional-renewal"> I hereby confirm that I have checked with the employer that no medical examination has been carried out for the following worker(s):</label>
+                            <% index_c = 1 %>
+                            <% @order.order_items.joins(:fee).where("fees.code" => ["TRANSACTION_MALE", "TRANSACTION_FEMALE"]).each do |order_item| %>
+                                <% @has_conditional_renewal = if order_item.order_itemable.conditional_renewal? %> 
+                                    <%=render "external/orders/shared/conditional_renewal", {order_item: order_item, index: index_c} %>
+                                    <% index_c += 1 %>
+                                <% end %>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <a class="btn btn-primary" href="<%= internal_orders_path %>">Back</a>
+                <% if !['PAID'].include?(@order.status) %>
+                    <button id="submit_cancel" class="btn btn-primary" type="submit" name="submit" value="cancel">Cancel order</button>
+                    <!--<button id="submit_save" class="btn btn-primary" type="submit" name="submit" value="save">Save</button>-->
+                    <button id="submit_save_and_proceed_to_payment" class="btn btn-primary" type="submit" name="submit" value="save_and_proceed_to_payment" <% if @insurance_need_recalculate %> disabled <% end %> >Save and proceed to payment</button>
+                <% end %>
+            </div>
+        </div>
+    <% end %>
+    <!-- /order form -->
+
+    <% @order.order_items.each do |order_item| %>
+        <%= render partial: 'internal/orders/fw_form', locals: {order_item: order_item} %>
+    <% end %>
+</div>
+
+<%=render 'etr_search_worker' %>
+
+<form action="<%= change_fee_internal_order_path(@order) %>" id="change_fee_form" method="post">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+    <input type="hidden" name="order_item_id" id="change_fee_order_item_id" value="">
+    <input type="hidden" name="fee_id" id="fee_id" value="">
+</form>
+
+<style>
+.plks-optional-message {
+    display: <%= has_plks_optional ? "block" : "none" %>;
+}
+.conditional-renewal-disclaimer {
+    display: <%= @has_conditional_renewal ? "block" : "none" %>;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#submit_cancel').click(function (e) {
+    if (window.confirm("Confirm cancel?")) {
+        $('#edit_order_<%= @order.id %>').attr('novalidate', 'novalidate');
+    } else {
+        return false;
+    }
+});
+
+$('.etr-add').click(function () {
+    $('#search-worker-modal').modal();
+});
+
+<% if @has_conditional_renewal %>
+    $('#chk-conditional-renewal').attr('required', true);
+<% end %>
+
+function etr_remove(btn)
+{
+    // $(btn).closest('tr').remove();
+    document.location = '<%= remove_fw_internal_order_path(@order.id) %>?foreign_worker_id='+btn.getAttribute('data-foreign_worker_id');
+}
+
+function change_fee(sel)
+{
+    $('#change_fee_order_item_id').val(sel.getAttribute("data-order-item-id"));
+    $('#fee_id').val($(sel).val());
+    $('#change_fee_form').submit();
+}
+</script>
+<% end %>

@@ -1,0 +1,87 @@
+<div class="modal fade" id="search-employer-modal" tabindex="-1" role="dialog" aria-labelledby="search-employer" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Search employer</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-employer-form">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="code" id="code">
+                                </div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="name" id="name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="button" id="search-employer-search-button" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table id="search-employer-table" class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Search employer</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#search-employer-search-button').click(function () {
+    var data = {
+        code: $('#code').val(),
+        name: $('#name').val(),
+    };
+    if ($('#code').val().length < 1 && $('#name').val().length < 1) {
+        alert('Please key in code or name');
+        return;
+    }
+    $.ajax({
+        url: '<%= internal_employers_path %>.json',
+        method: 'GET',
+        data: data,
+        success: function (response) {
+            $('#search-employer-table tbody').html('');
+            for (var i=0, j = response.length; i < j; i ++){
+                $('#search-employer-table tbody').append('<tr><td>' + response[i].code + '</td><td>' + response[i].name + '</td><td class="text-right"><button type="button" class="btn btn-primary" data-employer="' + encodeURIComponent(JSON.stringify(response[i])) + '" onclick="select_employer(this)">Select</button></td></tr>');
+            }
+        },
+    });
+});
+
+function select_employer(btn)
+{
+    var employer = JSON.parse(decodeURIComponent($(btn).attr('data-employer')));
+    $('#foreign_worker_employer_id').val(employer.id);
+    $('#foreign_worker_employer_display').html(employer.name + " (" + employer.code + ")");
+    $('#search-employer-modal').modal('toggle');
+}
+</script>
+<% end %>

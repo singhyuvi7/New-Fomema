@@ -1,0 +1,234 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Bank Drafts</strong> - Bank Draft Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payerable_type">Payer Type</label>
+                    <p class="form-control-plaintext">
+                        <%= BankDraft::PAYERABLE_TYPES[@bank_draft.payerable_type] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payerable_code">Payer Code</label>
+                    <p class="form-control-plaintext">
+                        <a href="<%= send("internal_#{@bank_draft.payerable.class.name.snakecase}_path", @bank_draft.payerable) %>"><%= @bank_draft.payerable.code %></a><br>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="number">Bank Draft Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.number %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_id">Bank</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.bank&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Creation Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.created_at&.strftime(get_standard_date_format) %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Date of Issue</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.issue_date&.strftime(get_standard_date_format) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_place">Place of Issue</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.issue_place %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_draft_code">Place of Issue (Zone)</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.zone&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="amount">Branch</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.organization&.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <p class="form-control-plaintext">
+                        <%= number_to_currency(@bank_draft.amount, unit: "") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="holded">Holded</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.holded ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_draft_code">Bad</label>
+                    <p class="form-control-plaintext">
+                        <%= @bank_draft.bad ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%  if !@bank_draft.replacement_id.blank? %>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Replaced By :</label>
+                    <p class="form-control-plaintext">
+                        <%= link_to @bank_draft.replacement&.number, internal_bank_draft_path(@bank_draft.replacement_id) %>
+                    </p>
+                </div>
+            </div>
+            <% end %>
+            <%
+            replaced_bank_draft = BankDraft.find_by(replacement_id: @bank_draft.id)
+            if !replaced_bank_draft.blank?
+            %>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Replaced :</label>
+                    <p class="form-control-plaintext">
+                        <%= link_to replaced_bank_draft.number, internal_bank_draft_path(replaced_bank_draft.id) %>
+                    </p>
+                </div>
+            </div>
+            <% end %>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Allocations</div>
+            <div class="card-body">
+                <table class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Code / ID</th>
+                            <th>Amount</th>
+                            <th>Created At</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if @bank_draft.bank_draft_allocations.blank? %>
+                            <tr>
+                                <td colspan="5" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+                            <% @bank_draft.bank_draft_allocations.each do |bank_draft_allocation| %>
+                                <tr>
+                                    <td><%= bank_draft_allocation.allocatable_type %></td>
+                                    <td><a href="<%= send("internal_#{bank_draft_allocation.allocatable.class.name.snakecase}_path", bank_draft_allocation.allocatable) %>"><%= bank_draft_allocation.allocatable&.code || bank_draft_allocation.allocatable_id %></a></td>
+                                    <td><%= number_to_currency(bank_draft_allocation.amount, unit: "") %></td>
+                                    <td><%= bank_draft_allocation.created_at&.strftime(get_standard_date_format) %></td>
+                                    <td><%= bank_draft_allocation.creator&.name %></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Hold Logs</div>
+            <div class="card-body">
+                <table class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Hold By</th>
+                            <th>Hold At</th>
+                            <th>Hold Reason</th>
+                            <th>Unhold By</th>
+                            <th>Unhold At</th>
+                            <th>Unhold Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if @bank_draft.bank_draft_hold_logs.blank? %>
+                            <tr>
+                                <td colspan="6" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+                            <% @bank_draft.bank_draft_hold_logs.each do |bank_draft_hold_log| %>
+                                <tr>
+                                    <td><%= "#{bank_draft_hold_log.holder&.name} (#{bank_draft_hold_log.holder&.userable&.name})" if !bank_draft_hold_log.holded_by.nil? %></td>
+                                    <td><%= bank_draft_hold_log.holded_at&.strftime(get_standard_date_format) %></td>
+                                    <td><pre><%= bank_draft_hold_log.hold_comment %></pre></td>
+                                    <td><%= "#{bank_draft_hold_log.unholder&.name} (#{bank_draft_hold_log.unholder&.userable&.name})" if !bank_draft_hold_log.unholded_by.nil? %></td>
+                                    <td><%= bank_draft_hold_log.unholded_at&.strftime(get_standard_date_format) %></td>
+                                    <td><pre><%= bank_draft_hold_log.unhold_comment %></pre></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_bank_drafts_path) %>
+            <% if has_permission?('EDIT_BANK_DRAFT') && @bank_draft.sync_date.blank? && !@bank_draft.bad %>
+                <%=raw show_edit_button(edit_internal_bank_draft_path(@bank_draft)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,2 @@
+<th>Requested By</th>
+<td><%= User.find(value)&.name.try(:titleize) if !value.blank? %></td>

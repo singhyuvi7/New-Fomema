@@ -1,0 +1,419 @@
+<%= render "/shared/all_flash" %>
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Bypass Fingerprint Approval
+    </div>
+
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                Transaction's Information
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Transaction Code</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.code %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Employer</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.employer.name %> (<%= @transaction.employer.code %>)</p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Worker Name</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.name %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Worker Code</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.code %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Gender</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= ForeignWorker::GENDERS[@transaction.fw_gender] %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Date of Birth</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.date_of_birth.strftime('%d/%m/%Y') %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Passport Number</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.passport_number %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Country of Origin</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.country.name %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Doctor</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.doctor.name %> (<%= @transaction.doctor.code %>)</p>
+                    </div>
+                    <label class="col-md-2 col-form-label">X-ray Facility</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.xray_facility.name %> (<%= @transaction.xray_facility.code %>)</p>
+                    </div>
+                </div>
+
+                <% if @transaction.latest_xray_retake.present? %>
+                    <div class="form-group mb-0 row">
+                        <label class="col-md-2 col-form-label">Latest Retake Code</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @transaction.latest_xray_retake.code %></p>
+                        </div>
+                        <label class="col-md-2 col-form-label">Latest Retake X-ray Facility</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @transaction.latest_xray_retake.xray_facility.name %> (<%= @transaction.latest_xray_retake.xray_facility.code %>)</p>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+
+    <%
+        bypass_request = @transaction.transaction_verify_docs.where(id: params[:transaction_verify_docs_id]).first
+    %>
+
+    <%= form_for @transaction, url: bypass_fingerprint_approval_update_internal_transaction_path(@transaction), html: {multipart: true}, method: 'patch' do |form| %>
+        <div class="card-body">
+            <div class="form-group mb-0 row">
+                <div class="col">
+                    <label for="employer_uploads">Uploaded Documents</label>
+                    <%= hidden_field_tag :remove_uploaded_file, "" %>
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                            <th>Date Uploaded</th>
+                            <th>Uploaded By</th>
+                            <th>Action(s)</th>
+                        </tr>
+                            <% @transaction.uploads.order(id: :desc).each do |upload| %>
+                                <tr>
+                                    <td class="filenames" width="20%">
+                                        <%
+                                            category_description = upload.category
+                                            Transaction::BYPASS_FP_VERIFICATION_DOCUMENT_TYPES.each do |document_code, document_desc|
+                                                if document_code == upload.category
+                                                    category_description =  document_desc
+                                                end
+                                            end
+                                        %>
+                                        <%= category_description %>
+                                    </td>
+
+                                    <td class="filenames" width="30%">
+                                        <% upload.documents.each do |document| %>
+                                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                        <% end %>
+                                    </td>
+                                    <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                    <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                    <td>
+                                        <% if has_permission?("DELETE_BYPASS_FINGERPRINT_TRANSACTION_DOCUMENT") %>
+                                            <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @transaction.uploads.blank? %>
+                                <tr><td colspan="5">There are no uploaded documents</td></tr>
+                            <% end %>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="document-input-group" class="form-group">
+                        <label for="bypass_fingerprint_uploads">Upload new documents</label>
+                        <div class="input-group custom-input-group d-flex">
+                            <div class="document-type flex-grow-1 p-0">
+                                <select class="form-control document-type-selector border-1" name="transaction[uploads][][category]">
+                                    <option value="">Select option</option>
+                                    <% Transaction::BYPASS_FP_VERIFICATION_DOCUMENT_TYPES.each do |index, document_type| %>
+                                        <option value="<%= index %>"><%= document_type %></option>
+                                    <% end %>
+                                </select>
+                            </div>
+
+                            <div class="custom-file flex-grow-1">
+                                <input type="file" name="transaction[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled required>
+                                <label class="custom-file-label">Choose file</label>
+                            </div>
+
+                            <div class="flex-shrink-0">
+                                <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right mb-3', type: 'button' %>
+                </div>
+            </div>
+
+            <div class="form-group mb-0 row">
+                <div class="col">
+                    <label for="approval_history">Approval History</label>
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>Submitted Date</th>
+                            <th>Submitted By</th>
+                            <th>Approval Date</th>
+                            <th>Approval By</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                        </tr>
+                        <% if @transaction.transaction_verify_docs.blank? %>
+                            <tr>
+                                <td colspan="6" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+                            <% @transaction.transaction_verify_docs.order(id: :desc).each do |transaction| %>
+                                <tr>
+                                    <td><%= transaction.submitted_at.strftime(get_standard_datetime_format) %></td>
+                                    <td><%= "#{transaction.submit_user.try(:name)} (#{transaction.submit_user.try(:code)})" %></td>
+                                    <td><%= transaction.approval_at&.strftime(get_standard_datetime_format) %></td>
+                                    <td><%= transaction.approval_user.try(:name) %></td>
+                                    <td><%= transaction.status %></td>
+                                    <td><%= transaction.approval_comment %></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group mb-0 row">
+                <label for="employer_uploads" class="col-md-2 col-form-label">Bypass Reason</label>
+                <div class="col-md-4">
+                    <% if has_permission?("APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && bypass_request&.status == "APPROVAL" %>
+                        <select class="col-md-12 form-control" id="transaction_bypass_reason" name="transaction_bypass_reason">
+                            <% BypassFingerprintReason.order(:description).each do |reason| %>
+                                <% if reason.code == bypass_request&.additional_information["bypass_fingerprint_reason"] %>
+                                    <option value="<%= reason.code %>" selected><%= reason.description %></option>
+                                <% else %>
+                                    <option value="<%= reason.code %>"><%= reason.description %></option>
+                                <% end %>
+                            <% end %>
+                        </select>
+                    <% else %>
+                        <p class="form-control-plaintext"><%= BypassFingerprintReason.find_by(code: bypass_request&.additional_information["bypass_fingerprint_reason"]).description %></p>
+                    <% end %>
+                </div>
+                <label for="employer_uploads" class="col-md-2 col-form-label">Clinic's Alternate Contact Number</label>
+                <div class="col-md-4">
+                    <p class="form-control-plaintext"><%= bypass_request&.additional_information["phone"] %></p>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="transaction_verify_docs_id" name="transaction_verify_docs_id" value="<%= params[:transaction_verify_docs_id] %>">
+
+        <% if has_permission?("APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && bypass_request&.status == "APPROVAL" %>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="required">Decision</label>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-5">
+                            <input class="form-check-input approval-decision" id="approval_decision_APPROVE" type="radio" value="APPROVE" name="approval_decision" required>
+                            <label class="form-check-label" for="approval_decision_APPROVE">APPROVE</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-5">
+                            <input class="form-check-input approval-decision" id="approval_decision_REJECT" type="radio" value="REJECT" name="approval_decision" required>
+                            <label class="form-check-label" for="approval_decision_REJECT">REJECT</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" id="suspected_biometric_fraud" name="suspected_biometric_fraud">
+                    <label for="suspected_biometric_fraud">
+                        Suspected Biometric Fraud <small class="text-muted">(If ticked, the worker unable to purchase new medical form and the medical result will be blocked from sending to JIM.)</small>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for='approval_comment'>Comment</label>
+                    <textarea class="form-control" name="approval_comment" id="approval_comment" rows="3" ></textarea>
+                    <small class="form-text text-muted">Comment is required when you select REJECT</small>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transactions_path) %>
+                <%=raw approval_submit_decision_button if has_permission?("APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && bypass_request&.status == "APPROVAL" %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+        // file upload
+        <%= render 'shared/fileupload_script' %>
+
+        $('input.approval-decision').click(function () {
+            if (this.value == 'REJECT') {
+                $('#approval_comment').prop('required', true);
+                $("label[for='approval_comment']").addClass("required");
+            } else {
+                $('#approval_comment').prop('required', false);
+                $("label[for='approval_comment']").removeClass("required");
+            }
+        });
+
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose File")
+        });
+
+        // Function to duplicate document fields
+        var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);
+
+        $('#add_more_documents').click(() => {
+            clonedAttachmentInput
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-3 ')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose File")
+            bindLastDocumentTypeSelectorAndFileSelector();
+            removeAttachmentField('.removal-button:last');
+            $('#no-input-placeholder').hide();
+        });
+
+        removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                $(this).closest('.custom-input-group').remove();
+                if ($('.custom-input-group').length === 0) {
+                    $('#no-input-placeholder').show();
+                }
+            });
+        }
+
+        bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+
+        // Function to re-enable form input after selecting dom type
+        $(".document-type-selector").change(function() {
+            let selectedValue = $("option:selected", this).val()
+
+            if (selectedValue.length > 0)
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+            else
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+        });
+
+        // Function to remove document fields
+        $('.removal-button').click(function(){
+            if ($('.custom-input-group').length > 1){
+                $(this).closest('.custom-input-group').remove()
+            }
+        });
+
+$('.set-deletion').click(function() {
+        filenames = $(this).closest('tr').find('.filenames');
+        filenames.toggleClass('text-decoration-line-through');
+        text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+        $(this).text(text).toggleClass('btn-danger btn-primary');
+
+        ids = $('.set-deletion.btn-primary').map(function() {
+            return $(this).attr('data-id');
+        }).get().join(',');
+
+        var i = $('#remove_uploaded_file').val(ids);
+
+        if (i != null){
+            $('#foreign_worker_amendment_reasons').prop('required',false);
+            $('#fee_id').prop('required',false);
+        }else{
+            $('#foreign_worker_amendment_reasons').prop('required',true);
+            $('#fee_id').prop('required',true);
+        }
+
+    });
+
+        // check viewed attached documents
+        $('.submit-decision').on('click',function (e){
+            e.preventDefault();
+            form = $('#registrationApprovalForm')
+            submit_btn = $(this)
+            submit_btn.prop('disabled', true);
+
+            $.ajax({
+                url: `<%= check_internal_documents_path %>`,
+                method: 'GET',
+                data: {
+                    type: 'Transaction',
+                    id: `<%= @transaction.id %>`
+                },
+                success: function (response) {
+                    if (response.has_viewed){
+                        validity = form[0].checkValidity();
+                        form[0].reportValidity();
+                        if(validity){
+                            form.submit();
+                        }
+                    }else{
+                        alert('Please review all the uploaded document(s) before approval.')
+                    }
+                }
+            }).done(function () {
+                submit_btn.prop('disabled', false);
+            })
+        });
+
+    </script>
+<% end %>

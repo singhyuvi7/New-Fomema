@@ -1,0 +1,70 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Towns</strong> - Town Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="town_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @town.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="town_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @town.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="town_state_id">State</label>
+                    <p class="form-control-plaintext">
+                        <%= @town.state&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_states_path) %>
+            <% if has_permission?('EDIT_TOWN') %>
+                <%=raw show_edit_button(edit_internal_town_path(@town)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_TOWN") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_town_audits_path(@town) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

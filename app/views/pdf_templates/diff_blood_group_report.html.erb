@@ -1,0 +1,88 @@
+<pdfbody>
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="font-size: 1.3em;"><b><%= @data[:header] %></b></td>
+            <td valign="top" style="text-align: right;"><%= "Date: #{ @data[:date_today] } Time: #{ @data[:time_today] }" %> </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table id="main-table" class="w-100 collapsed-borders">
+        <thead>
+            <tr class="grey-border" style="background-color: #d3d3d3;">
+                <td valign="top" rowspan="2"><b>No.</b></td>
+                <td valign="top" rowspan="2"><b>Worker Code</b></td>
+                <td valign="top" rowspan="2"><b>Name</b></td>
+                <td valign="top" colspan="2" class="text-center"><b>ME1</b></td>
+                <td valign="top" colspan="2" class="text-center"><b>ME2</b></td>
+                <td valign="top" colspan="2" class="text-center"><b>ME3</b></td>
+            </tr>
+
+            <tr class="grey-border" style="background-color: #d3d3d3;">
+                <td valign="top" class="text-center"><b><%= @data[:user_type] %> Code</b></td>
+                <td valign="top" class="text-center"><b>Blood Group</b></td>
+                <td valign="top" class="text-center"><b><%= @data[:user_type] %> Code</b></td>
+                <td valign="top" class="text-center"><b>Blood Group</b></td>
+                <td valign="top" class="text-center"><b><%= @data[:user_type] %> Code</b></td>
+                <td valign="top" class="text-center"><b>Blood Group</b></td>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% @rows.each.with_index(1) do |row, index| %>
+                <tr class="grey-border">
+                    <td class="text-center"><%= index %></td>
+
+                    <% row.values.each.with_index do |column, col_i| %>
+                        <td class="<%= "text-center" if col_i > 1 %>"><%= column %></td>
+                    <% end %>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 12px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    tr.grey-border td {
+        border-bottom: 1px solid grey;
+        border-right: 1px solid grey;
+        margin: 0;
+    }
+
+    table.collapsed-borders {
+        border: 1px solid black;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+    table.collapsed-borders td {
+        padding: 5px;
+    }
+
+    table, tr, td, th, tbody, thead, tfoot {
+        page-break-inside: avoid;
+    }
+
+    tbody tr td:nth-child(1) {
+        width: 2.5em;
+    }
+
+    tbody tr td:nth-child(2) {
+        width: 9em;
+    }
+
+    tbody tr td:nth-child(4) {
+        width: 9em;
+    }
+
+    /*thead { display: table-row-group }*/
+</style>

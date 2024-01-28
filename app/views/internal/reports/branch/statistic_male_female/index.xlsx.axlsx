@@ -1,0 +1,33 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'c8ced3', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:vertical=> :center, :horizontal=> :center})
+
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  total_style = s.add_style(sz: 11, b: true)
+
+  wb.add_worksheet(name: 'daily collection') do |sheet|
+    sheet.add_row ["STATISTIC MALE VS FEMALE REPORT FROM #{@start_date.strftime('%d-%b-%Y')} TO #{@end_date.strftime('%d-%b-%Y')} (#{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL STATE'})"], style: title_style
+    sheet.column_widths 10
+
+    sheet.add_row
+
+    sheet.add_row ['','MALE','','FEMALE','','TOTAL',''], style: header_style
+    sheet.merge_cells "B3:C3"
+    sheet.merge_cells "D3:E3"
+    sheet.merge_cells "F3:G3"
+
+    sheet.add_row ['STATE','REGISTRATION','AMOUNT','REGISTRATION','AMOUNT','REGISTRATION','AMOUNT'], style: header_style
+
+    if @order_items.present?
+      @order_items.each do |order_item|
+        total_count = order_item.male_count+order_item.female_count
+        total_amount = order_item.male_amount+order_item.female_amount
+
+        sheet.add_row [order_item.branch_name, order_item.male_count, order_item.male_amount, order_item.female_count, order_item.female_amount, total_count, total_amount], style: data_style
+      end
+    end
+
+    sheet.add_row ['TOTAL:',@grand_male_count, @grand_male_amount, @grand_female_count, @grand_female_amount, @grand_total_count, @grand_total_amount], style: total_style
+  end
+end

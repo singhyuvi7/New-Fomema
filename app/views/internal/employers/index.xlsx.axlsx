@@ -1,0 +1,82 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+  wrap = style.add_style alignment: {wrap_text: true}
+  
+    wb.add_worksheet(name: 'Employers') do |sheet|
+        sheet.merge_cells "A1:A1"
+        sheet.merge_cells "A2:A2"
+        # sheet.add_row([@company_name], style: [title_style])
+        # sheet.add_row([""])
+        sheet.add_row([
+            "Employer Code",
+            "Employer Name",
+            "Employer Type",
+            "ROC No. / IC No.",
+            "Status",
+            "Problematic",
+            "Document Verified",
+            "Comment Date",
+            "Comment By",
+            "Comment"
+        ], 
+        style: [
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style
+            ]
+        )
+        
+        my_types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string
+        ]
+        
+        my_styles = [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil
+            #wrap
+        ]
+        @employers.find_each do |employer|
+
+            sheet.add_row([
+                employer.code,
+                employer.name,
+                employer.employer_type.name,
+                employer.business_registration_number || employer.ic_passport_number,
+                employer.status,
+                employer.problematic == true ? 'Yes' : 'No',
+                employer.document_verified == true ? 'Yes' : 'No',
+                #Employer.get_comment_logs(employer.id).try(:join,"\n\n")
+                employer.log_created_at&.strftime(get_standard_date_format),
+                User.find_by_id(employer.log_created_by)&.name,
+                employer.log_comment
+            ], types: my_types, style: my_styles)
+        end
+    end
+end

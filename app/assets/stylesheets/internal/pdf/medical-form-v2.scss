@@ -1,0 +1,321 @@
+body {
+  margin: 0;
+  padding-left: 0;
+  font-family: Helvetica;
+  color: #010101;
+  font-size: 14px;
+}
+
+div.pdf-container {
+  //margin-left: -20px;
+  padding-bottom: 50px;
+}
+
+.table {
+  table-layout: fixed;
+}
+
+.table td, .table th {
+  border-top: 0;
+  // border: 1px solid black;
+  vertical-align: top;
+}
+
+.table.form-header-table td, .table.form-header-table th {
+  padding-top: 20px;
+}
+
+.table.form-table td, .table.form-table th {
+  padding: 0;
+}
+
+.form-verifier .table td, .form-verifier .table th {
+  padding: 0;
+}
+
+.form-verifier {
+  border: 1px solid black;
+  width: 260px;
+  font-size: 12px;
+  position: absolute;
+  right: 10px;
+}
+
+.form-label {
+  width: 140px;
+}
+
+.form-label-b {
+  width: 150px;
+}
+
+.form-label-split {
+  width: 90px;
+}
+
+.form-label-eng {
+  font-style: italic;
+  display: block;
+}
+
+.form-value {
+  color: #646464;
+}
+
+.form-value-b {
+  width: 100px;
+  color: #646464;
+}
+
+.form-value-c {
+  width: 150px;
+  color: #646464;
+}
+
+td.copy-section-logo {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+  vertical-align: middle;
+}
+
+td.copy-section-logo-blank {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+  vertical-align: middle;
+}
+
+.copy-section-logo img {
+  width: 20px;
+  margin-top: 20px;
+  margin-bottom: auto;
+}
+
+.section-divider-image {
+  margin-top: -21px;
+  margin-bottom: 5px;
+}
+
+.section-divider-image img {
+  width: 960px;
+}
+
+.section-header-image img {
+  width: 220px;
+  margin-left: -20px;
+}
+
+tr.spacer {
+  height: 20px;
+}
+
+td.first-col {
+  width: 420px;
+  min-width: 420px;
+  max-width: 420px;
+}
+
+td.first-col-b {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  // overflow: hidden;
+}
+
+td.second-col {
+  width: 460px;
+  min-width: 460px;
+  max-width: 460px;
+}
+
+td.second-col-b {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  // overflow: hidden;
+}
+
+td.third-col-b {
+  border-left: 1px solid black;
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
+
+td.logo-col {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+}
+
+td.logo-col-b {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+}
+
+td.header-col {
+  width: 440px;
+  min-width: 440px;
+  max-width: 440px;
+}
+
+td.verifier-col {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+}
+
+.company-logo img {
+  width: 70%;
+}
+
+// form header section
+
+.form-header {
+  text-align: center;
+}
+
+.form-header .page-counter {
+  font-size: 12px;
+}
+
+.page-counter.procedure-counter {
+  margin-top: 42px;
+}
+
+.form-header .title {
+  font-size: 16px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-header .subtitle {
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.valid-until {
+  font-size: 14px;
+  position: absolute;
+  top: 80px;
+  left: 95px;
+}
+
+// end of form header section
+
+.barcode-section {
+  position: absolute;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  left: 20px;
+}
+
+.barcode-serial {
+  position: absolute;
+  top: 0;
+  left: 60px;
+}
+
+.barcode-transaction-code {
+  color: #646464;
+}
+
+.barcode-transaction-code .label {
+  color: #010101;
+}
+
+.barcode-worker-code {
+  color: #646464;
+}
+
+.barcode-worker-code .label {
+  color: #010101;
+}
+
+.barcode-worker-name {
+  color: #646464;
+}
+
+.barcode-worker-name .label {
+  color: #010101;
+}
+
+.maid-online {
+  border: 1px solid black;
+  padding: 2px;
+  position: absolute;
+}
+
+.maid-online.first {
+  top:  80px;
+  right: 10px;
+}
+
+.maid-online.second {
+  top:  0;
+  right: 10px;
+}
+
+.maid-online.third {
+  top:  0;
+  right: 200px;
+}
+
+.parent {
+  position: relative;
+}
+
+.procedure {
+  padding-left: 30px;
+  font-size: 15px;
+}
+
+.procedure-company-logo {
+  margin-left: -23px;
+}
+
+.procedure-company-logo img {
+  width: 200px;
+}
+
+ul.important-note li {
+  margin-bottom: 5px;
+}
+
+p.important-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+div.procedure-header-section {
+  width: 340px;
+  margin: 0 auto;
+}
+
+p.procedure-header {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+ol.procedure-list li {
+  margin-bottom: 16px;
+}
+
+ol.procedure-list.english-list {
+  font-style: italic;
+}
+
+ul.procedure-nested-list {
+  list-style-type: disc;
+}
+
+ul.procedure-nested-list li {
+  margin-bottom: 0px;
+}
+
+.text-center {
+  text-align: center;
+}

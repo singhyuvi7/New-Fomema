@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_lqcc_letters_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="visit_report_code" class="col-sm-2 col-form-label">Visit Report Code</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="visit_report_code" id="visit_report_code" value="<%= params[:visit_report_code] %>">
+                        </div>
+                        <label for="laboratory_code" class="col-sm-2 col-form-label">Laboratory Code</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="laboratory_code" id="laboratory_code" value="<%= params[:laboratory_code] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%= raw filter_clear_button internal_lqcc_letters_path %>
+                <%= raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

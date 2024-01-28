@@ -1,0 +1,86 @@
+<div class="p-4 border-bottom">
+    <h3><u>Xray To Do Tasks</u></h3>
+</div>
+
+<div class="px-4 py-4 border-bottom">
+    <table class="table-borders w-100">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">No.</th>
+                <th class="py-1 px-2">To Do</th>
+                <th class="py-1 px-2">Submitted Date</th>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @xray_todos.each_with_index do |todo, index| %>
+                <% todo_code = todo.appeal_todo %>
+
+                <tr>
+                    <td class="py-1 px-2"><%= index + 1 %></td>
+                    <td class="py-1 px-2"><%= todo_code.description %></td>
+                    <td class="py-1 px-2"><%= @appeal.current_xray_retake.try(:completed_at?) ? @appeal.current_xray_retake.completed_at.strftime("%d/%m/%Y") : nil %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="flex-grow-1 mb-0">Please specify the facility that will conduct the To Do Tasks</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <% lab = @appeal.xray_facility %>
+        <%= appeal_form.hidden_field :xray_facility_id, value: lab.try(:id) %>
+        <p id="selected-xray-name-code" class="mb-0 mr-3 clickable text-primary"><%= lab.try(:name) %> (<b><%= lab.present? ? lab.try(:code) : "No X-Ray Facility Selected" %></b>)</p>
+
+        <% if !@appeal.xray_facility_id? %>
+            <div class="btn btn-success" data-toggle="modal" data-target="#change-xray-facility-modal" data-type="xray_facility">Select X-Ray Facility</div>
+        <% end %>
+    </div>
+</div>
+
+<div id="dialog-selected-xray-facility" class="hidden" title="X-ray Facility Details">
+    <% xray = @appeal.xray_facility %>
+    <p>X-Ray Facility Information</p>
+
+    <table>
+        <tr>
+            <th class="pr-4">Code</th>
+            <td data-type="code"><%= xray&.code %></td>
+        </tr>
+
+        <tr>
+            <th class="pr-4">Name</th>
+            <td data-type="name"><%= xray&.name %></td>
+        </tr>
+
+        <tr>
+            <th class="pr-4">Email</th>
+            <td data-type="email"><%= xray&.email %></td>
+        </tr>
+
+        <tr>
+            <th class="pr-4">Telephone</th>
+            <td data-type="phone"><%= xray&.phone %></td>
+        </tr>
+
+        <tr>
+            <th class="pr-4">License Holder Name</th>
+            <td data-type="license_holder_name"><%= xray&.license_holder_name %></td>
+        </tr>
+
+        <tr>
+            <th class="pr-4">Address</th>
+            <td data-type="address"><%= xray&.displayed_address %></td>
+        </tr>
+    </table>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#selected-xray-name-code').click(function() {
+            openDialog({target: '#dialog-selected-xray-facility', type: 'primary'});
+        });
+    </script>
+<% end %>

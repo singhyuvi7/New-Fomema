@@ -1,0 +1,112 @@
+<div class="pending_review_form">
+    <div class="card border-primary">
+    
+        <div class="card-header">
+            Pending Review Decision
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Audit & Comparison</label>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input audit_comparison" name="xray_pending_review[is_audit_comparison]" type="radio" id="comparison_no" value="NO" <% if xray_pending_review.is_audit_comparison == 'NO' || xray_pending_review.is_audit_comparison.nil? %> checked <% end %>>
+                            No
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input audit_comparison" name="xray_pending_review[is_audit_comparison]" type="radio" id="comparison_yes" value="YES" <% if xray_pending_review.is_audit_comparison == 'YES' %> checked <% end %>>
+                            Yes
+                            <button type="button" id="compare-modal-toggle" class="btn btn-primary btn-sm py-0 ml-1" <% if xray_pending_review.is_audit_comparison != 'YES' %> disabled <% end %>><i class="fa fa-search"></i></button>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <%= render "internal/xray_pending_reviews/shared/compare_form", {xray_pending_review: xray_pending_review} %>
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Decision</label>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" name="xray_pending_review[decision]" type="radio" id="xray_pending_review_decision_RADIOGRAPHER_REVIEW" value="RADIOGRAPHER_REVIEW" <% if xray_pending_review.decision == 'RADIOGRAPHER_REVIEW' %> checked <% end %> data-parsley-errors-container="#xray_pending_review_decision_errors" data-parsley-error-message="Decision is required" required>
+                            Radiographer Review
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" name="xray_pending_review[decision]" type="radio" id="xray_pending_review_decision_PCR_AUDIT" value="PCR_AUDIT" <% if xray_pending_review.decision == 'PCR_AUDIT' %> checked <% end %>>
+                            PCR Audit
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" name="xray_pending_review[decision]" type="radio" id="xray_pending_review_decision_MANUAL_AUDIT" value="MANUAL_AUDIT" <% if xray_pending_review.decision == 'MANUAL_AUDIT' %> checked <% end %><%= " disabled" unless xray_pending_review.transactionz&.previous_transaction&.xray_film_type == 'ANALOG' || (xray_pending_review.is_audit_comparison == 'NO' || xray_pending_review.is_audit_comparison.nil?) %>>
+                            Manual Audit
+                        </label>
+                    </div>
+                    <div id="xray_pending_review_decision_errors"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Comment</label>
+                    <textarea required name="xray_pending_review[comment]" class="form-control" id="" cols="" rows="2"><%= xray_pending_review.comment %></textarea>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(internal_xray_pending_reviews_path) %>
+            <%=raw edit_submit_button %>
+        </div>
+    
+    </div>
+    <!-- /.card -->
+</div>
+<!-- /.pending_review_form -->
+
+<% content_for :page_end_scripts do %>
+<script>
+$("#compare-modal-toggle").click(function () {
+    $('#filter-compare-modal').modal('show');
+});
+
+$(".audit_comparison").change(function () {
+    if ($(this).val().toLowerCase() == 'yes') {
+        $('#compare-modal-toggle').prop('disabled', false);
+        $("#compares-container").show();
+        $("#compare-transaction-code").prop("disabled", false);
+        $("#xray_pending_review_decision_RADIOGRAPHER_REVIEW").prop('disabled', true);
+        $('#xray_pending_review_decision_MANUAL_AUDIT').prop('disabled', true);
+        $("#xray_pending_review_decision_PCR_AUDIT").prop('disabled', false);
+        $("#xray_pending_review_decision_PCR_AUDIT").prop('checked', true);
+        $('#xray_pending_review_compares_transaction_ids').prop('required', true);
+    } else {
+        $('#compare-modal-toggle').prop('disabled', true);
+        $("#compares-container").hide();
+        $("#compare-transaction-code").prop("disabled", true);
+        $("#xray_pending_review_decision_RADIOGRAPHER_REVIEW").prop('disabled', false);
+        $('#xray_pending_review_decision_MANUAL_AUDIT').prop('disabled', false);
+        $("#xray_pending_review_decision_PCR_AUDIT").prop('disabled', false);
+        $("#xray_pending_review_decision_RADIOGRAPHER_REVIEW").prop('checked', true);
+        $('#xray_pending_review_compares_transaction_ids').prop('required', false);
+    }
+});
+
+$(document).on("click", ".delete_compare", function() {
+    $(this).closest('tr').remove();
+    refresh_compare_ids();
+});
+
+function refresh_compare_ids()
+{
+    arr = [];
+    $('#compares-table input[name="xray_pending_review_compare[transaction_id][]"]').each(function (ind, inp) {
+        arr.push(inp.value);
+    });
+    $("#xray_pending_review_compares_transaction_ids").val(arr.length > 0 ? JSON.stringify(arr) : "");
+}
+</script>
+<% end %>

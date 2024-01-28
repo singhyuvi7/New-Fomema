@@ -1,0 +1,81 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<%= form_for @user, url: internal_profile_update_path, method: :PUT do |form| %>
+
+    <div class="card">
+        <div class="card-header">
+            <strong>Profile</strong>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title" %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :name, 'Name', class: 'col-form-label' %>
+                        <%= form.text_field :name, class: 'form-control', disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email, 'Email', class: 'col-form-label' %>
+                        <%= form.text_field :email, class: 'form-control', disabled: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :username, 'Username', class: 'col-form-label' %>
+                        <%= form.text_field :username, class: 'form-control', disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :userable_type, 'Userable Type', class: 'col-form-label' %>
+                        <%= form.text_field :userable_type, class: 'form-control', disabled: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :userable, 'Userable', class: 'col-form-label' %>
+                        <%= form.text_field :userable, class: 'form-control', disabled: true, value: @user.userable.name %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :role, 'Role', class: 'col-form-label' %>
+                        <%= form.text_field :role, class: 'form-control', disabled: true, value: @user.role.name %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <a class="btn btn-sm btn-secondary" href="#"><i class="fa fa-history"></i> Back</a>
+            <button class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="" data-original-title="Save" type="submit" name="submit" value="Save" data-disable-with="Save"><i class="icon-pencil"></i> Save</button>
+        </div>
+    </div>
+<% end %>

@@ -1,0 +1,31 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'c8ced3', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  total_style = s.add_style(sz: 11, b: true)
+
+  wb.add_worksheet(name: 'daily collection') do |sheet|
+    sheet.add_row ["DAILY COLLECTION ON #{@date.strftime('%d-%b-%Y')} (#{Organization.find(@branch)&.name})"], style: title_style
+    sheet.column_widths 10
+
+    sheet.add_row
+
+    sheet.add_row @headers, style: header_style
+
+    if @bank_drafts.present?
+      @bank_drafts.each do |bank_draft|
+        sheet.add_row ['Bank Draft', '', bank_draft.total_count, bank_draft.total_amount || 0], style: data_style
+      end
+    end
+
+    if @order_payments.present?
+      @order_payments.each do |order_payment|
+        sheet.add_row [order_payment.name, '', order_payment.total_count, order_payment.total_amount], style: data_style
+      end
+    end
+
+    sheet.add_row ['','Total:',@grand_total_count,@grand_total_amount], style: total_style
+  end
+end

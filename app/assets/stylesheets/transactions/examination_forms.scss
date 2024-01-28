@@ -1,0 +1,29 @@
+.toggle-boolean-field-btn,
+.boolean-field-btn-dummy {
+    width: 80px;
+    border-radius: 0;
+    border-color: lightgrey;
+}
+
+[readonly] {
+    background-color: #fff !important;
+}
+
+[disabled] {
+    background-color: #e4e7ea !important;
+}
+
+.category-tab,
+.category-parent-tab {
+	border-radius: 0;
+	border-right: 1px solid #d3d3d3;
+	border-bottom: 1px solid #d3d3d3;
+	font-weight: bold;
+}
+
+label.row-index {
+	margin-bottom: 0 !important;
+	margin-right: 1.5em !important;
+	flex-shrink: 0 !important;
+	width: 3em !important;
+}

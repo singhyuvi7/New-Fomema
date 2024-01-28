@@ -1,0 +1,33 @@
+<div class="modal fade" id="labPersonnelModal" tabindex="-1" role="dialog" aria-labelledby="labPersonnel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Laboratory's Personnel</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form.fields_for :visit_report_laboratory do |visit_report_laboratory| %>
+            <h3 class="text-center">E-Signature</h3>
+            <h5 class="text-center">Laboratory’s Personnel Acknowledgement</h5>
+            <div class="wrapper">
+                <%= visit_report_laboratory.signature_field :lab_personnel_signature %>
+                <%= image_tag @visit_report.visit_report_laboratory.lab_personnel_signature, class: "signature-img" if !@visit_report.visit_report_laboratory.lab_personnel_signature.blank? %>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap personnel-acknowledge-details text-center">
+                <%= visit_report_laboratory.text_field :lab_personnel_name, class: 'form-control personnel-detail-input', placeholder: 'Full Name' %>
+                <%= visit_report_laboratory.text_field :lab_personnel_designation, class: 'form-control personnel-detail-input', placeholder: "Laboratory's Personnel Designation" %>
+            </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+        <button type="button" class="btn btn-warning signature-clear-btn">Clear</button>
+        <button type="button" class="btn btn-warning signature-cancel-edit-btn">Cancel</button>
+        <button type="button" class="btn btn-warning signature-edit-btn">Edit</button>
+        <button type="submit" class="btn btn-primary signature-save-btn" name="submit_action" value="summary_with_personnel_signature" formnovalidate>Save</button>
+      </div>
+    </div>
+  </div>
+</div>

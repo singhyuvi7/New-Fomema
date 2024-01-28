@@ -1,0 +1,60 @@
+.w-100.pb-3{:style => "margin-top: 2rem;"}
+  %table.table.w-100
+    %thead
+      %tr
+        - @headers.each.with_index do |header, index|
+          %th= header
+    %tbody
+      - if @orders.present?
+        - @orders.each.with_index do |order, index|
+          %tr
+            %td= index + 1
+            %td= order.latest_payment_date
+            %td= order.latest_payment_method
+            %td= order.creator.code
+            %td= order.creator.name
+            %td= order.latest_fpx_transaction_id
+            %td= order.code
+            %td= number_to_currency(order.subtotal, unit: '')
+            %td= number_to_currency(order.conv_fee, unit: '')
+            %td= number_to_currency(order.total_amount, unit: '')
+        %tr.bold
+          %td{ style: 'border: none' }
+          %td{ style: 'border: none' }
+          %td{ style: 'border: none' }
+          %td{ style: 'border: none' }
+          %td{ style: 'border: none' }
+          %td{ style: 'border: none' }
+          %td Total
+          %td= @orders.map(&:subtotal).sum
+          %td= @orders.map(&:conv_fee).sum
+          %td= @orders.map(&:total_amount).sum
+:css
+  th { text-align: left }
+
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #d0d0d0;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

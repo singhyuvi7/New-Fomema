@@ -1,0 +1,36 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<%= form_for @user, url: external_profile_update_path, method: :PUT do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Profile</strong>
+        </div>
+        <div class="card-body">
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :name, 'Name', class: 'col-form-label required' %>
+                        <%= form.text_field :name, class: 'form-control', required: true %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer text-right">
+            <a class="btn btn-primary" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit" name="submit" value="Save">Save</button>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

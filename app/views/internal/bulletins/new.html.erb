@@ -1,0 +1,14 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bulletins</strong> - New Bulletin
+    </div>
+    <%= form_for @bulletin, url: internal_bulletins_path, html: { multipart: true, class: "with-parsley" } do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+
+    <%=render partial: "filter_doctor_audience" %>
+    <%=render partial: "filter_laboratory_audience" %>
+    <%=render partial: "filter_xray_facility_audience" %>
+    <%=render partial: "filter_employer_audience" %>
+    <%=render partial: "filter_agency_audience" %>
+</div>

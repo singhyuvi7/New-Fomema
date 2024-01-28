@@ -1,0 +1,5 @@
+<%
+et = EmployerType.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{et.name}" if !value.blank? && et %></td>

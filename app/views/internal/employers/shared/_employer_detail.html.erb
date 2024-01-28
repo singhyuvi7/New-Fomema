@@ -1,0 +1,155 @@
+<div class="row">
+    <div class="form-group col">
+        <label for="">Employer Type</label>
+        <input type="text" value="<%= @employer.employer_type.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<% if @employer.employer_type.name === 'INDIVIDUAL' || @employer.employer_type.name === 'MAID ONLINE' %>
+
+    <div class="row">
+        <div class="form-group col">
+            <label for="">ICNO / Passport number</label>
+            <input type="text" value="<%= @employer.ic_passport_number %>" class="form-control" readonly="readonly" id="">
+            <% if @employer.ic_passport_number_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= @employer.ic_passport_number_was %></p>
+            <% end %>
+        </div>
+    </div>
+
+<% end %>
+
+<div class="row">
+    <div class="form-group col">
+
+        <% if @employer.employer_type.name === 'COMPANY' %>
+            <label for="">Employer / Company Name</label>
+        <% else %>
+            <label for="">Name</label>
+        <% end %>
+
+        <input type="text" value="<%= @employer.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<% if @employer.employer_type.name === 'COMPANY' %>
+
+    <div class="row">
+        <div class="form-group col">
+            <label for="">Business Registration Number</label>
+            <input type="text" value="<%= @employer.business_registration_number %>" class="form-control" readonly="readonly" id="">
+            <% if @employer.business_registration_number_changed? %>
+                <p class="form-control-plaintext approval-previous-value"><%= @employer.business_registration_number_was %></p>
+            <% end %>
+        </div>
+
+        <div class="form-group col">
+            <label for="">Person In Charge Name</label>
+            <input type="text" value="<%= @employer.pic_name %>" class="form-control" readonly="readonly" id="">
+        </div>
+
+        <div class="form-group col">
+            <label for="">Person In Charge Contact</label>
+            <input type="text" value="<%= @employer.pic_phone %>" class="form-control" readonly="readonly" id="">
+        </div>
+    </div>
+
+<% end %>
+
+<div class="row">
+
+    <div class="form-group col">
+        <label for="">Address</label>
+        <input type="text" value="<%= @employer.address1 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @employer.address2 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @employer.address3 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="form-group col">
+        <input type="text" value="<%= @employer.address4 %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="form-group col">
+        <label for="">State</label>
+        <input type="text" value="<%= @employer&.state&.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Postcode</label>
+        <input type="text" value="<%= @employer.postcode %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Town</label>
+        <input type="text" value="<%= @employer&.town&.name %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<div class="row">
+    <div class="form-group col">
+        <label for="">Phone</label>
+        <input type="text" value="<%= @employer.phone %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Fax</label>
+        <input type="text" value="<%= @employer.fax %>" class="form-control" readonly="readonly" id="">
+    </div>
+
+    <div class="form-group col">
+        <label for="">Email</label>
+        <input type="text" value="<%= @employer.email %>" class="form-control" readonly="readonly" id="">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <label for="employer_uploads">Uploaded Documents</label>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Category</th>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+            </tr>
+
+            <% @employer.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames"><%= upload.category %></td>
+
+                        <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                    <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                </tr>
+            <% end %>
+
+            <% if @employer.uploads.blank? %>
+                <tr><td colspan="3">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>

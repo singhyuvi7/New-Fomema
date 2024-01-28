@@ -1,0 +1,29 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong> Delete Examination Date</strong> - <%= @transaction.code %>
+    </div>
+
+        <div class="card-body">
+            <%=render '/shared/all_flash' %>
+
+            <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+
+            <div class="alert alert-info">
+                <p> You are about to delete the examination date in MERTS for <b><%= @transaction.fw_code %></b>.<br>
+                    Please specify whether this is to be considered as Wrong Transmission for Doctor <b><%= @transaction.doctor&.code %></b>.<br>
+                </p>
+            </div>
+            <label>Issues</label>
+            <%= form_for @transaction, url: remove_exam_date_external_transaction_path(@transaction), html: { multipart: true, class: "with-parsley" } do |form| %>
+
+                <%= text_area_tag :medical_revert_issues, "", rows: 5, placeholder: "Example: Case of wrongly transmitted examination date as 3.3.2020", class: "form-control" ,required: "true" %>
+
+                <div class="card-footer border-0 bg-transparent text-dark text-right">
+                    <a class="btn btn-blue-portal" href="<%= external_transactions_path %>">Back</a>
+                    <%= button_tag 'Submit', type: 'submit', class: 'btn btn-success', data: { disable_with: "Submiting..."} %>
+                </div>
+            <% end %>
+        </div>
+        <p class="error-placeholder text-danger"></p>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+.card
+  .card-header
+    %strong MSPD - Suspended Doctor List
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render '/internal/reports/mspd/filter_daterange_branch', filter_link: suspended_doctors_internal_mspd_reports_path
+      = render '/internal/reports/mspd/suspended_doctors/pdf_template'

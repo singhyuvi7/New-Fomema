@@ -1,0 +1,68 @@
+<div class="row margin-top-10">
+  <div class="col-4">
+    <div class="form-group">
+      <%= form.label :country %>
+      <%= form.select :country_id, options_for_select(Country.order(:name).pluck(:name, :id), form.object.try(:country_id)), {include_blank: 'Select Option'}, { required: true, class: 'form-control'} %>
+    </div>
+  </div>
+
+  <div class="col-4">
+    <div class="form-group">
+      <%= form.label :state_id %>
+      <%= form.select :state_id, options_for_select(State.where(country_id: form.object.try(:country_id)).pluck(:name, :id), form.object.try(:state_id)), {include_blank: 'Select Option'}, { class: 'form-control'}%>
+    </div>
+  </div>
+
+  <div class="col-4">
+    <div class="form-group">
+      <%= form.label :area_id %>
+      <%= form.select :area_id, options_for_select(Area.where(state_id: form.object.try(:state_id)).pluck(:name, :id), form.object.try(:area_id)), {include_blank: 'Select Option'}, { class: 'form-control'}%>
+    </div>
+  </div>
+
+</div>
+
+<script>
+    <% object = form.object.class.to_s.underscore %>
+    $('#<%= object %>_country_id').select2({ theme: 'bootstrap' });
+    $('#<%= object %>_state_id').select2({ theme: 'bootstrap' });
+    $('#<%= object %>_area_id').select2({ theme: 'bootstrap' });
+
+    $('#<%= object %>_country_id').change(function () {
+        $('#<%= object %>_state_id').html('<option value="">Select Option</option>');
+        $('#<%= object %>_area_id').html('<option value="">Select Option</option>');
+        if ($('#<%= object %>_country_id').val()) {
+            $.ajax({
+                url: "/countries/" + $('#<%= object %>_country_id').val() + "/states.json",
+            }).done(function (data) {
+                var result = $.map(data, function (obj) {
+                    obj.text = obj.name;
+                    var opt = document.createElement('option');
+                    opt.setAttribute('value', obj.id);
+                    opt.innerHTML = obj.name;
+                    $('#<%= object %>_state_id').append(opt);
+                    return obj;
+                });
+            });
+        }
+    });
+
+    $('#<%= object %>_state_id').change(function () {
+        $('#<%= object %>_area_id').html('<option value="">Select Option</option>');
+        if ($('#<%= object %>_state_id').val()) {
+            $.ajax({
+                url: "/states/" + $('#<%= object %>_state_id').val() + "/areas.json",
+            }).done(function (data) {
+                var result = $.map(data, function (obj) {
+                    obj.text = obj.name;
+                    var opt = document.createElement('option');
+                    opt.setAttribute('value', obj.id);
+                    opt.innerHTML = obj.name;
+                    $('#<%= object %>_area_id').append(opt);
+                    return obj;
+                });
+            });
+        }
+    });
+
+</script>

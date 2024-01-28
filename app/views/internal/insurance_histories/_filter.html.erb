@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="card-header">
+        Filter
+    </div>
+    <form action="/insurance_histories" method="get" id="insurance_histories-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="fw_name" class="col-sm-1 col-form-label">Worker Name</label>
+                <div class="col-sm-5">
+                    <input type="text" name="fw_name" id="fw_name" value="<%= params[:fw_name] %>" class="form-control">
+                </div>
+                <label for="fw_code" class="col-sm-1 col-form-label">Worker Code</label>
+                <div class="col-sm-5">
+                    <input type="text" name="fw_code" id="fw_code" value="<%= params[:fw_code] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="fw_passport_number" class="col-sm-1 col-form-label">Worker Passport</label>
+                <div class="col-sm-5">
+                    <input type="text" name="fw_passport_number" id="fw_passport_number" value="<%= params[:fw_passport_number] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="employer_name" class="col-sm-1 col-form-label">Employer Name</label>
+                <div class="col-sm-5">
+                    <input type="text" name="employer_name" id="employer_name" value="<%= params[:employer_name] %>" class="form-control">
+                </div>
+                <label for="employer_code" class="col-sm-1 col-form-label">Employer Code</label>
+                <div class="col-sm-5">
+                    <input type="text" name="employer_code" id="employer_code" value="<%= params[:employer_code] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="order_code" class="col-sm-1 col-form-label">Order Code</label>
+                <div class="col-sm-5">
+                    <input type="text" name="order_code" id="order_code" value="<%= params[:order_code] %>" class="form-control">
+                </div>
+                <label for="order_status" class="col-sm-1 col-form-label">Order Status</label>
+                <div class="col-sm-5">
+                    <%= select_tag :order_status, options_for_select(Order::STATUSES.invert, params[:order_status]), include_blank: "Select Option", class: 'form-control' %>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="order_code" class="col-sm-1 col-form-label">Branch</label>
+                <div class="col-sm-5">
+                    <%= select_tag :branch_id, options_for_select(Organization.where(:org_type => 'BRANCH').order(:name).pluck(:name, :id), params[:branch_id]), include_blank: "Select Option", class: 'form-control' %>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="start_date" class="col-sm-1 col-form-label">Paid Date From</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_paid_start_date" id="filter_paid_start_date" value="<%= params[:filter_paid_start_date] %>" class="form-control">
+                </div>
+                <label for="end_date" class="col-sm-1 col-form-label">Paid Date To</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_paid_end_date" id="filter_paid_end_date" value="<%= params[:filter_paid_end_date] %>" class="form-control">
+                </div>
+            </div>
+
+<%
+=begin %>
+            <div class="form-group row">
+                <label for="filter_policy_date_start" class="col-sm-1 col-form-label">Policy From</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_policy_date_start" id="filter_policy_date_start" value="<%= params[:filter_policy_date_start] %>" class="form-control">
+                </div>
+                <label for="filter_policy_date_end" class="col-sm-1 col-form-label">Policy To</label>
+                <div class="col-sm-5">
+                    <input type="date" name="filter_policy_date_end" id="filter_policy_date_end" value="<%= params[:filter_policy_date_end] %>" class="form-control">
+                </div>
+            </div>
+<%
+=end %>
+        </div>
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button internal_insurance_histories_path %>
+            <%=raw filter_button %>
+        </div>
+    </form>
+</div>

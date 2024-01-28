@@ -1,0 +1,99 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Review</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+        <%=render 'shared/all_validation_flash', { model_obj: @xray_review} %>
+
+        <div class="form-row">
+            <div class="col-md-8">
+                <%=render 'internal/xqccs/shared/transaction_worker_info', {
+                    transaction_model: @xray_review.transactionz
+                } %>
+            </div>
+            <div class="col-md-4">
+                <%=render 'internal/xqccs/shared/perform_by_info', {
+                    name: @xray_review.radiographer&.name,
+                    code: @xray_review.radiographer&.name,
+                    label: 'Radiographer'
+                } %>
+                <%=render 'internal/xqccs/shared/related_transaction', {
+                    transaction: @xray_review.transactionz
+                } %>
+            </div>
+        </div>
+
+        <!-- tab menu -->
+        <ul class="nav nav-tabs" role="tablist">
+
+            <% @xray_review.transactionz.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <li class="nav-item">
+                    <a class="nav-link<% if index == 1 %> active<% end %>" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_examination.id %>-content">
+                        <% if xray_examination.sourceable_type == 'XrayRetake' %>Retake <% end %>X-Ray Report
+                        <%= xqcc_result_badge(xray_examination.result) %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% @xray_review.transactionz.xray_pending_reviews.order(:created_at).each.with_index(1) do |xray_pending_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_review-<%= xray_pending_review.id %>-content">XQCC Pending Review <%= xqcc_result_badge(xray_pending_review.decision) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_review.transactionz.xray_reviews.where.not(id: @xray_review.id).order(:created_at).each.with_index(1) do |xray_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= xray_review.id %>-content">XQCC Review <%= xqcc_result_badge(xray_review.result) %></a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= @xray_review.id %>-content">XQCC Review</a>
+            </li>
+        </ul>
+        <!-- end of tab menu -->
+
+        <!-- tab content -->
+        <div class="tab-content">
+            <% @xray_review.transactionz.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade<% if index == 1 %> show active<% end %>" role="tabpanel" id="xray_examination-<%= xray_examination.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% @xray_review.transactionz.xray_pending_reviews.order(:created_at).each.with_index(1) do |xray_pending_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_pending_review-<%= xray_pending_review.id %>-content">
+                    <%=render 'internal/xray_pending_reviews/xray_pending_review', { xray_pending_review: xray_pending_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_review.transactionz.xray_reviews.where.not(id: @xray_review.id).order(:created_at).each.with_index(1) do |xray_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= xray_review.id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: xray_review } %>
+                </div>
+            <% end %>
+
+            <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= @xray_review.id %>-content">
+                <%= form_for @xray_review, url: internal_xray_review_path(@xray_review), method: "patch", html: {class: 'xray_review_form with-parsley'} do |form| %>
+                    <%=render 'internal/xray_reviews/form', {
+                        xray_review: @xray_review,
+                        form: form,
+                    } %>
+                <% end %>
+                <% # need to place outside of xray_review form %>
+                <%=render 'internal/xray_reviews/shared/identical_xray_modal' %>
+            </div>
+        </div>
+        <!-- end of tab content -->
+
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+var can_retake = <%= @can_retake %>;
+</script>
+<% end %>

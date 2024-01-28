@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>TCUPI Todos</strong> - Edit TCUPI Todo
+    </div>
+    <%= form_for @tcupi_todo, url: internal_tcupi_todo_path(@tcupi_todo), html: {class: "#{params[:action]}_tcupi_todo tcupi_todo-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,320 @@
+
+<%= form.fields_for :visit_report_laboratory do |visit_report_laboratory| %>
+    <div class="table-responsive operating-hours">
+        <table class="table table-sm">
+            <tbody>
+                <tr>
+                    <td class="table-items">
+                        <div class="pl-1">
+                            <%= visit_report_laboratory.label :open_during_operation_hour_comment, 'Open During Operation Hours / Exist at Registered Address' %>
+                            <%= visit_report_laboratory.text_area :open_during_operation_hour_comment, class: 'form-control operation-hour-comment', placeholder: 'If NO, please specify' %>
+                        </div>
+                    </td>
+                    <td class="text-right table-acceptable">
+                        <div class="btn-group btn-group-toggle w-75 operation-hour-group-btn" data-toggle="buttons" data-group-name="operation_hour">
+                            <label class="btn btn-outline-success">
+                                <%= visit_report_laboratory.radio_button :open_during_operation_hour, 'YES', class: 'operation-hour' %> Yes
+                            </label>
+                            <label class="btn btn-outline-danger">
+                                <%= visit_report_laboratory.radio_button :open_during_operation_hour, 'NO', class: 'operation-hour operation-hour-close-btn' %> No
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<% end %>
+
+<%= form.fields_for :operating_hour do |operating_hour| %>
+    <label>Operation Hours</label>
+    <div class="operating-hours">
+        <div class="form-group form-row">
+            <div class="col-1 text-center">Weekday</div>
+            <div class="col-1 text-center">Closed</div>
+            <div class="col-1 text-center">Open 24Hrs</div>
+            <div class="col-6 text-center">Operation Hours</div>
+            <div class="col-3 text-center text-nowrap">Break Hour</div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- monday -->
+            <div class="col-1 text-center">Mon</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :monday_is_close, value: false %>
+                <%= operating_hour.check_box :monday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :monday_is_24_hour, value: false%>
+                <%= operating_hour.check_box :monday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :monday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :monday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :monday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- tuesday -->
+            <div class="col-1 text-center">Tues</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :tuesday_is_close, value: false %>
+                <%= operating_hour.check_box :tuesday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :tuesday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :tuesday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :tuesday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :tuesday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :tuesday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- wednesday -->
+            <div class="col-1 text-center">Wed</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :wednesday_is_close, value: false %>
+                <%= operating_hour.check_box :wednesday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :wednesday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :wednesday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :wednesday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :wednesday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :wednesday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- thursday -->
+            <div class="col-1 text-center">Thurs</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :thursday_is_close, value: false %>
+                <%= operating_hour.check_box :thursday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :thursday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :thursday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :thursday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :thursday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :thursday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- friday -->
+            <div class="col-1 text-center">Fri</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :friday_is_close, value: false %>
+                <%= operating_hour.check_box :friday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :friday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :friday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :friday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :friday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :friday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- saturday -->
+            <div class="col-1 text-center">Sat</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :saturday_is_close, value: false %>
+                <%= operating_hour.check_box :saturday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :saturday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :saturday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :saturday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :saturday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :saturday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- sunday -->
+            <div class="col-1 text-center">Sun</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :sunday_is_close, value: false %>
+                <%= operating_hour.check_box :sunday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :sunday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :sunday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :sunday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :sunday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :sunday_break, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- public_holiday -->
+            <div class="col-1 text-center">Public Holiday</div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :public_holiday_is_close, value: false %>
+                <%= operating_hour.check_box :public_holiday_is_close, {}, true, false %>
+            </div>
+            <div class="col-1 text-center form-check">
+                <%= operating_hour.hidden_field :public_holiday_is_24_hour, value: false %>
+                <%= operating_hour.check_box :public_holiday_is_24_hour, {}, true, false %>
+            </div>
+            <div class="col-6 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :public_holiday_start, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <%= operating_hour.time_field :public_holiday_end, class: 'flatpickr-timepicker form-control' %>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary clear-input-time" type="button"><i class="icon-close"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 text-center">
+                <%= operating_hour.text_area :public_holiday_break, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+<% end %>

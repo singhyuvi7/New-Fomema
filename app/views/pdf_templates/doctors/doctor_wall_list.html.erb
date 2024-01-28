@@ -1,0 +1,55 @@
+<%= wicked_pdf_stylesheet_link_tag "pdf/doctor_wall_list" %>
+
+<div class="wall-list w-100">
+        <% @doctors.each.with_index(1) do |doctor, index| 
+                xray_facility = doctor.xray_facility
+            %>
+        <% if index.odd? %>
+            <div class="row">
+        <% end %>
+            <div class="col-6">
+                <div class="details-box">
+                    <div class="numbering bold"><%= index %></div>
+                    <div class="details">
+                        <div class="doctor">
+                            <div class="clinic-name bold"><%= doctor.clinic_name %></div>
+                            <div class="code"><%= doctor.code %></div>
+                            <div class="name"><%= doctor.name %></div>
+                            <div class="address"><%= doctor.address1 %></div>
+                            <div class="address"><%= doctor.address2 %></div>
+                            <div class="address"><%= doctor.address3 %></div>
+                            <div class="address"><%= doctor.address4 %></div>
+                            <div class="address phone-number nowrap">
+                                <span><%= "#{doctor.postcode}, #{doctor.town&.name}, #{doctor.state&.name}" %></span>
+                                <span class="float-right bold">PH: <%= doctor.phone %> <%= doctor.fax %></span>
+                            </div>
+                        </div>
+
+                        <div class="allocation">
+                            <div class="title bold">
+                                <span class="line">Allocated Xray Facility</span>
+                                <span
+                                    class="float-right"><%= "(#{XrayFacility::FILM_TYPES[xray_facility&.film_type]} X-Ray" %><%= " Online Transmission" if xray_facility&.film_type.eql?('DIGITAL') %>)</span>
+                            </div>
+                            <div class="code"><%= xray_facility&.code %></div>
+                            <div class="name"><%= xray_facility&.name %></div>
+                            <div class="address"><%= xray_facility&.address1 %></div>
+                            <div class="address"><%= xray_facility&.address2 %></div>
+                            <div class="address"><%= xray_facility&.address3 %></div>
+                            <div class="address"><%= xray_facility&.address4 %></div>
+                            <div class="address phone-number nowrap">
+                                <span><%= "#{xray_facility&.postcode}, #{xray_facility&.town&.name}, #{xray_facility&.state&.name}" %></span>
+                                <span class="float-right bold">PH: <%= xray_facility&.phone %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% if index.even? %>
+                </div>
+            <% end %>
+            <% if index%8 == 0 %>
+                <div style="page-break-before: always;"></div>
+            <% end %>
+        <% end %>
+</div>

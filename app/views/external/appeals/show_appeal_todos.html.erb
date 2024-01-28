@@ -1,0 +1,211 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Appeal</strong> - <%= @appeal.id %>
+    </div>
+
+    <%
+        indexing = 0
+        doctor_todos        = @appeal.medical_appeal_todos.to_a.select {|todo| !todo.secondary_type?}
+        laboratory_todos    = @appeal.medical_appeal_todos.to_a.select {|todo| todo.secondary_type == "Laboratory"}
+        xray_todos          = @appeal.medical_appeal_todos.to_a.select {|todo| todo.secondary_type == "Xray"}
+        appeal_retakes      = @appeal.xray_retakes.order(:id).includes(:pcr_reviews)
+        appeal_retakes      = [XrayRetake.new] if appeal_retakes.blank?
+        transaction         = @appeal.transactionz
+        foreign_worker      = transaction.foreign_worker
+        doctor              = @appeal.doctor
+
+        if xray_todos.present?
+            pcr_review      = @appeal.pcr_reviews.order(id: :desc).limit(1).first
+            retake          = @appeal.current_xray_retake
+
+            if pcr_review.present?
+                xray_results           = @appeal.pcr_result
+                xray_completed_date    = pcr_review.transmitted_at.strftime("%d/%m/%Y") if pcr_review.transmitted_at?
+            elsif retake.present?
+                xray_results           = @appeal.xray_result
+                xray_completed_date    = retake.completed_at.strftime("%d/%m/%Y") if retake.completed_at?
+            end
+        end
+    %>
+
+    <div class="px-4 py-4 border-bottom no-selected-placeholder">
+        <h3><u>Appeal To Do List</u></h3>
+        <label>Worker Information</label>
+            <div class="row">
+                <div class="col">
+                    <p><b>Worker Code : </b><%= transaction&.fw_code %> <br>
+                    <b>Worker Name : </b><%= transaction&.fw_name %> <br>
+                    <b>Country of Origin : </b><%= transaction&.fw_country&.name %></p>
+                </div>
+                <div class="col">
+                    <p><b>Passport Number : </b><%= transaction&.fw_passport_number %> <br>
+                    <b>Date of Birth : </b><%= transaction&.fw_date_of_birth&.strftime(get_standard_date_format) %> <br>
+                    <b>Gender : </b><%= ForeignWorker::GENDERS[transaction&.fw_gender] %> </p>
+                </div>
+            </div>
+            <b>Kindly refer to clinic for further investigation </b>
+            <br><br><label>Doctor Information</label>
+            <div class="row">
+                <div class="col">
+                    <p><b>Doctor Code : </b><%= doctor.code %> <br>
+                    <b>Doctor Email : </b><%= doctor.email %> <br>
+                    <b>Clinic Name : </b><%= doctor.clinic_name %>
+                </p>
+               </div>
+                    <div class="col">
+                        <p><b>Doctor Name: </b><%= doctor.name %> <br>
+                        <b>Doctor Telephone : </b><%= doctor.phone %><br>
+                        <b>Doctor Address: </b><%= doctor&.displayed_address %></p>
+                    </div>
+            </div>
+    </div>
+
+    <div class="px-4 py-4 border-bottom no-selected-placeholder <%= "hidden" if doctor_todos.present? || laboratory_todos.present? || xray_todos.present? %> ">
+        <p class="text-danger mb-0">No available to do list.</p>
+    </div>
+
+    <div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if doctor_todos.blank? %>" data-type="doctor">
+        <label>Doctor To Do List</label>
+
+        <% doctor_todos.each do |todo| %>
+            <div class="selected-todo-container my-3 d-flex" data-id="<%= todo.appeal_todo_id %>">
+                <div class="flex-grow-1">
+                    <p class="mb-1"><%= todo.appeal_todo.description %></p>
+                    <p class="mb-1"><b>Status: </b><%= todo.completed_at? ? "Done (#{ todo.completed_at.strftime("%d/%m/%Y") })" : "Not Done" %></p>
+
+                    <% if todo.comment? %>
+                        <b>Remarks: </b>
+
+                        <div class="border-left pt-2">
+                            <%= simple_format "#{ todo.comment }", class: "pl-3" %>
+                        </div>
+                    <% else %>
+                        <b>Remarks: </b><i>N/A</i>
+                    <% end %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+    <div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if laboratory_todos.blank? %>" data-type="laboratory">
+        <label>Laboratory To Do List</label>
+
+        <% laboratory_todos.each do |todo| %>
+            <div class="selected-todo-container my-3 d-flex" data-id="<%= todo.appeal_todo_id %>">
+                <div class="flex-grow-1">
+                    <p class="mb-1"><%= todo.appeal_todo.description %></p>
+                    <p class="mb-1"><b>Status: </b><%= todo.completed_at? ? "Done (#{ todo.completed_at.strftime("%d/%m/%Y") })" : "Not Done" %></p>
+
+                    <% if todo.comment? %>
+                        <b>Remarks: </b>
+
+                        <div class="border-left pt-2">
+                            <%= simple_format "#{ todo.comment }", class: "pl-3" %>
+                        </div>
+                    <% else %>
+                        <b>Remarks: </b><i>N/A</i>
+                    <% end %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+    <div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if xray_todos.blank? %>" data-type="xray">
+        <label>X-ray To Do List</label>
+
+        <div class="pb-4">
+            <% appeal_retakes.each.with_index(1) do |xray_retake, index| %>
+                <div class="border p-4 mb-4 bg-light">
+                    <%= render partial: "internal/appeals/appeal_pcr_retake_information", locals: { numbering: index, xray_retake: xray_retake } %>
+                </div>
+            <% end %>
+
+            <div class="py-2 d-flex flex-wrap justify-content-end align-items-center">
+                <label class="text-primary flex-grow-1 mb-0">Select X-Ray Facility</label>
+
+                <div class="d-flex flex-shrink-0 align-items-center">
+                    <% lab = @appeal.xray_facility %>
+                    <%= hidden_field_tag :selected_xray_facility_id, lab.try(:id) %>
+
+                    <p id="selected-xray-name-code" class="mb-0 mr-3 text-primary"><%= lab.try(:name) %> (<b><%= lab.present? ? lab.try(:code) : "No X-Ray Facility Selected" %></b>)</p>
+
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mt-2">
+                <label class="text-primary flex-grow-1">X-ray Retake Options</label>
+
+                <% if @xray_retake&.status == "CLOSED" %>
+                    <% if @pcr_review_count > 0 && @pcr_review_count < 3 %>
+                        <div id="open-dialog-2nd-3rd-opinion" class="btn btn-primary ml-2">Request <%= @pcr_review_count == 2 ? "3rd" : "2nd" %> Opinion</div>
+                    <% end %>
+
+                    <div id="open-dialog-repeat-xray" class="btn btn-warning ml-2">Repeat X-Ray</div>
+                <% else %>
+                    <label>Pending retake completion</label>
+                <% end %>
+            </div>
+        </div>
+
+        <% xray_todos.each do |todo| %>
+            <div class="selected-todo-container my-2 d-flex" data-id="<%= todo.appeal_todo_id %>">
+                <div class="flex-grow-1">
+                    <p class="mb-1"><%= todo.appeal_todo.description %></p>
+
+                    <%
+                        xray_appeal_todo_status =
+                            case @xray_retake&.status
+                            when "CLOSED"
+                                "Done"
+                            when "PCR_REVIEW"
+                                "Pending PCR Audit"
+                            else
+                                "Pending Examination"
+                            end
+                    %>
+
+                    <p class="mb-1"><b>Status: </b><%= xray_appeal_todo_status %></p>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+    <div class="px-4 py-4 border-bottom">
+        <div>
+            <label>Comments</label>
+        </div>
+
+        <table class="table-borders" style="width: calc(100% - 5em);">
+            <thead>
+                <tr>
+                    <th class="py-1 px-2">No.</th>
+                    <th class="py-1 px-2">Date</th>
+                    <th class="py-1 px-2">MLE Name</th>
+                    <th class="py-1 px-2">Comments</th>
+                </tr>
+            </thead>
+
+            <tbody id="appeal-comment-body">
+                <% @appeal_comments.each_with_index do |comment, index| %>
+                    <tr>
+                        <td class="py-1 px-2" valign="top"><%= index + 1 %></td>
+                        <td class="py-1 px-2" valign="top"><%= comment.created_at.strftime("%d/%m/%Y") %></td>
+                        <td class="py-1 px-2" valign="top"><%= comment.user.name %></td>
+                        <td class="py-1 px-2"><%= simple_format comment.comment %></td>
+                    </tr>
+                <% end %>
+
+                <% if @appeal_comments.blank? %>
+                    <tr>
+                        <td colspan="5" class="text-center py-1 px-2">There are no comments</td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer text-right">
+        <a class="btn btn-blue-portal" href="<%= external_appeals_path %>">Back</a>
+    </div>
+
+</div>

@@ -1,0 +1,419 @@
+<div class="card">
+<div class="card-header">
+    <div class="row">
+        <div class="col">
+            PART IV. CERTIFICATION BY DOCTOR
+        </div>
+    </div>
+</div>
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of HIV -->
+            <tr>
+                <td width="100">1</td>
+                <td>HIV</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_hiv %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_hiv %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of HIV -->
+
+            <!-- Start of Tuberculosis -->
+            <tr>
+                <td width="100">2</td>
+                <td>Tuberculosis</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_tuberculosis %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_tuberculosis %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Tuberculosis -->
+
+            <!-- Start of Malaria -->
+            <tr>
+                <td width="100">3</td>
+                <td>Malaria</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="orm-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_malaria %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="orm-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_malaria %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Malaria -->
+
+            <!-- Start of Leprosy -->
+            <tr>
+                <td width="100">4</td>
+                <td>Leprosy</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_leprosy %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_leprosy %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Leprosy -->
+
+            <!-- Start of Sexually Transmitted Diseases -->
+            <tr>
+                <td width="100">5</td>
+                <td>Sexually Transmitted Diseases</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_std %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_std %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Sexually Transmitted Diseases -->
+
+            <!-- Start of Hepatitis B -->
+            <tr>
+                <td width="100">6</td>
+                <td>Hepatitis B</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="\form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_hepatitis %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="\form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_hepatitis %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Hepatitis B -->
+
+            <!-- Start of Cancer -->
+            <tr>
+                <td width="100">7</td>
+                <td>Cancer</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_cancer %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_cancer %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Cancer -->
+
+            <!-- Start of Epilepsy -->
+            <tr>
+                <td width="100">8</td>
+                <td>Epilepsy</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_epilepsy %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_epilepsy %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Epilepsy -->
+
+            <!-- Start of Psychiatric Disorder -->
+            <tr>
+                <td width="100">9</td>
+                <td>Psychiatric Disorder</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_psychiatric_disorder %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_psychiatric_disorder %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Psychiatric disorder -->
+
+            <!-- Start of Hypertension -->
+            <tr>
+                <td width="100">10</td>
+                <td>Hypertension</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_hypertension %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_hypertension %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Hypertension -->
+
+            <!-- Start of Heart Diseases -->
+            <tr>
+                <td width="100">11</td>
+                <td>Heart Diseases</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_heart_diseases %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_heart_diseases %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Heart Diseases -->
+
+            <!-- Start of Bronchial Asthma -->
+            <tr>
+                <td width="100">12</td>
+                <td>Bronchial Asthma</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_bronchial_asthma %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_bronchial_asthma %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Bronchial Asthma -->
+
+            <!-- Start of Diabetes Mellitus -->
+            <tr>
+                <td width="100">13</td>
+                <td>Diabetes Mellitus</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_diabetes_mellitus %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_diabetes_mellitus %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Diabetes Mellitus -->
+
+            <!-- Start of Peptic Ulcer -->
+            <tr>
+                <td width="100">14</td>
+                <td>Peptic Ulcer</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_peptic_ulcer %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_peptic_ulcer %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Peptic Ulcer -->
+
+            <!-- Start of Kidney Disease -->
+            <tr>
+                <td width="100">15</td>
+                <td>Kidney Disease</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_kidney_diseases %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_kidney_diseases %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Kidney Disease -->
+
+            <!-- Start of Other -->
+            <tr>
+                <td width="100">16</td>
+                <td>Other</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_other %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_other %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Other -->
+
+            <!-- Start of Urine for pregnant -->
+            <tr>
+                <td width="100">17</td>
+                <td>Her urine for pregnancy</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_urine_for_pregnant %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_urine_for_pregnant %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Urine for pregnant -->
+
+            <!-- Start of Kidney Disease -->
+            <tr>
+                <td width="100">18</td>
+                <td>His/her urine for opiates (screening test)</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_urine_for_opiates %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_urine_for_opiates %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!--End of Kidney Disease -->
+
+            <!-- Start of Urine for cannabis -->
+            <tr>
+                <td width="100">19</td>
+                <td>His/her urine for cannabis (screening test)</td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="YES"
+                        <% if doctor_examination.condition_urine_for_cannabis %> checked <% else %> disabled <% end %>>
+                        YES
+                    </label>
+                </td>
+                <td width="50" class="text-center">
+                    <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO"
+                        <% if !doctor_examination.condition_urine_for_cannabis %> checked <% else %> disabled <% end %>>
+                        NO
+                    </label>
+                </td>
+            </tr>
+            <!-- End of Urine for cannabis -->
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,71 @@
+<div class="card">
+
+
+  <div class="card-header">
+      <strong>Template Variables</strong> - Template Variable Details
+  </div>
+
+  <div class="card-body">
+
+    <%=render '/shared/all_flash' %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="template_variable_code">Code</label>
+                <p class="form-control-plaintext">
+                    <%= @template_variable.code %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="template_variable_description">Description</label>
+                <p class="form-control-plaintext">
+                    <%= @template_variable.description %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="template_variable_name"><%= @template_variable.name %></label>
+                <p class="form-control-plaintext">
+                    <%= @template_variable.value %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_template_variables_path) %>
+            <% if has_permission?('EDIT_TEMPLATE_VARIABLE') %>
+              <%=raw show_edit_button(edit_internal_template_variable_path(@template_variable)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_TEMPLATE_VARIABLE") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_template_variable_audits_path(@template_variable) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

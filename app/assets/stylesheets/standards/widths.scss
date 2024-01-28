@@ -1,0 +1,67 @@
+/*
+	Widths Manifest
+	1. .w-em-1 to .w-em-100
+		.w-em-25 {
+			width: 25em !important;
+		}
+
+	2. All the above can be used to be exclusive to large or small screens
+		Example:
+		a. Large screens
+			@media screen and (min-width: 1024px) {
+				.max-w-lg-em-25 {
+					max-width: 25em !important;
+				}
+			}
+
+		b. Small screens
+			@media screen and (max-width: 1023px) {
+				.w-sm-em-25 {
+					width: 25em !important;
+				}
+			}
+*/
+
+@mixin widths_in_em($i, $screen) {
+	.w#{$screen}-em-#{$i} {
+		width: #{$i}em !important;
+	}
+
+	.max-w#{$screen}-em-#{$i} {
+		max-width: #{$i}em !important;
+	}
+
+	.min-w#{$screen}-em-#{$i} {
+		min-width: #{$i}em !important;
+	}
+}
+
+@mixin auto_width($screen) {
+	.w#{$screen}-auto {
+		width: auto !important;
+	}
+}
+
+@for $i from 1 through 40 {
+	@include widths_in_em($i, null);
+}
+
+@include auto_width(null);
+
+/* Large screen sizes - 1024px and above */
+@media screen and (min-width: 1024px) {
+	@for $i from 1 through 40 {
+		@include widths_in_em($i, -lg);
+	}
+
+	@include auto_width(-lg);
+}
+
+/* Small screen sizes - 1023px and below */
+@media screen and (max-width: 1023px) {
+	@for $i from 1 through 40 {
+		@include widths_in_em($i, -sm);
+	}
+
+	@include auto_width(-sm);
+}

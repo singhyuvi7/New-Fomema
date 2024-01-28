@@ -1,0 +1,7 @@
+<tr>
+    <td>&nbsp;</td>
+    <td><%= order_item.order_itemable.name %></td>
+    <td><%= ForeignWorker::GENDERS[order_item&.gender] %></td>
+    <td class="currency item-amount" data-amount="<%= order_item.amount %>"><%= number_to_currency(order_item.amount, unit: "") %></td>
+    <td>&nbsp;</td>
+</tr>

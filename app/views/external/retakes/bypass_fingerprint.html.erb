@@ -1,0 +1,336 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bypass Fingerprint Request</strong> - <%= @xray_retake.code %>
+    </div>
+
+    <%= form_for @xray_retake, url: bypass_fingerprint_update_external_retake_path(@xray_retake), html: { multipart: true, class: "with-parsley" } do |form| %>
+        <div class="card-body">
+            <div class="card">
+                <div class="card-header">
+                    Worker's Information
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-0 row">
+                        <label class="col-md-2 col-form-label">Worker Name</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @xray_retake.foreign_worker.name %></p>
+                        </div>
+                        <label class="col-md-2 col-form-label">Worker Code</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @xray_retake.foreign_worker.code %></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-0 row">
+                        <label class="col-md-2 col-form-label">Gender</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= ForeignWorker::GENDERS[@xray_retake.foreign_worker.gender] %></p>
+                        </div>
+                        <label class="col-md-2 col-form-label">Date of Birth</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @xray_retake.foreign_worker.date_of_birth.strftime('%d/%m/%Y') %></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-0 row">
+                        <label class="col-md-2 col-form-label">Passport Number</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @xray_retake.foreign_worker.passport_number %></p>
+                        </div>
+                        <label class="col-md-2 col-form-label">Country of Origin</label>
+                        <div class="col-md-4">
+                            <p class="form-control-plaintext"><%= @xray_retake.foreign_worker.country.name %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <%=render '/shared/all_flash' %>
+            <%= render 'shared/all_validation_flash', { model_obj: @xray_retake } %>
+
+            <div class="row">
+                <label class="col-md-2  col-form-label">
+                    <label for="bypass_reason" class='required'>Bypass Reason</label>
+                </label>
+                <div class="col-md-2 col-form-label">
+                    <select class="col-md-12 form-control" id="transaction_bypass_reason" name="transaction_bypass_reason">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% BypassFingerprintReason.where(code: ['OTHER', 'BT', 'MNF']).order(:description).each do |reason| %>
+                            <option value="<%= reason.code %>"><%= reason.description %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" id="div_phone" style="display:none">
+                <label class="col-md-2  col-form-label">
+                    <label for="phone">Clinic's Alternate Contact Number</label>
+                </label>
+                <div class="col-md-2 col-form-label">
+                    <%= text_field_tag "phone", "", class: 'form-control', data: { parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed"} %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                <label for="bypass_fingerprint_uploads" class='required'>Upload documents</label>
+                    <p>Please upload the following documents for verification. Please upload each document separately.</p>
+                    <div class="" id="agency_document_list">
+                        <ol class="ol-list-portal">
+                            <li>
+                                Passport front page
+                                <button type="button" data-toggle="popover" data-placement="right" data-html="true" data-content='<%= image_tag("fingerprint_guide/sample_passport.png", :style => "width: 400px;")%>' title="" class="btn btn-info btn-sm">
+                                    <i class="fa fa-info-circle"></i>
+                                </button>
+                            </li>
+                            <li>
+                                Image of error message
+                                <button type="button" data-toggle="popover" data-placement="right" data-html="true" data-content='<%= image_tag("fingerprint_guide/error_xray.png", :style => "width: 850px;")%>' title="" class="btn btn-info btn-sm">
+                                    <i class="fa fa-info-circle"></i>
+                                </button>
+                            </li>
+                        </ol>
+                    </div>
+                    <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB. </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="document-input-group" class="form-group">
+                        <div class="input-group custom-input-group">
+                            <div class="col-md-6 document-type">
+                                <select class="col-md-12 form-control document-type-selector" name="transaction[uploads][][category]">
+                                    <option value="">Select option</option>
+                                    <% Transaction::BYPASS_FP_VERIFICATION_DOCUMENT_TYPES.each do |index, document_type| %>
+                                        <option value="<%= index %>"><%= document_type %></option>
+                                    <% end %>
+                                </select>
+                            </div>
+                            <div class="custom-file col-md-6">
+                                <input type="file" name="transaction[uploads][][documents]" class="custom-file-input" onchange="validateFilesWithSyncPendingDocuments(this)" disabled>
+                                <label class="custom-file-label">Choose File</label>
+                            </div>
+                            <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="col-form-label" style="margin-right:69px;">Pending Documents</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control" readonly="readonly" data-parsley-uploaded-documents="" data-parsley-validate-if-empty="" name="" id="transaction_pending_document" rows="5"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <a class="btn btn-secondary" href="<%= external_retakes_path %>">Back</a>
+            <%= button_tag 'Submit', type: 'submit', class: 'btn btn-primary', data: { disable_with: "Submiting..."} %>
+        </div>
+    <% end %>
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+        // file upload
+        <%= render 'shared/fileupload_script' %>
+
+        $(document).ready(function() {
+            syncPendingDocuments();
+
+            $('#transaction_bypass_reason').change(function() {
+                selected_reason = this.value;
+                // alert(selected_reason);
+                if (selected_reason == "OTHER" || selected_reason == null || selected_reason == "") {
+                    $('#phone').prop("required", true);
+                    $("label[for='phone']").addClass("required");
+                    $('#div_phone').show();
+                } else {
+                    $('#phone').prop("required", false);
+                    $("label[for='phone']").removeClass("required");
+                    $('#div_phone').hide();
+                }
+            });
+        });
+
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose File")
+        });
+
+        // Function to duplicate document fields
+        var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);
+
+        $('#add_more_documents').click(() => {
+            clonedAttachmentInput
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-3 ')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose File")
+            bindLastDocumentTypeSelectorAndFileSelector();
+            removeAttachmentField('.removal-button:last');
+            $('#no-input-placeholder').hide();
+        });
+
+        removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                $(this).closest('.custom-input-group').remove();
+                if ($('.custom-input-group').length === 0) {
+                    $('#no-input-placeholder').show();
+                }
+                // sync pending documents
+                syncPendingDocuments();
+            });
+        }
+
+        bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+
+        // Function to re-enable form input after selecting dom type
+        $(".document-type-selector").change(function() {
+            let selectedValue = $("option:selected", this).val()
+
+            if (selectedValue.length > 0)
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+            else
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+        });
+
+        function validateFilesWithSyncPendingDocuments(inputFile) {
+            validateFiles(inputFile)
+            // sync pending documents
+            syncPendingDocuments();
+        }
+
+        // re-sync pending documents
+        function syncPendingDocuments() {
+            var pending_uploads = getPendingUploads();
+            if (!pending_uploads) {
+                return false;
+            }
+            setPendingDocuments(pending_uploads);
+        }
+
+        // get pending uploads
+        function getPendingUploads() {
+            var type = 'doctor';
+            var needed_validate_documents = required_documents[type];
+            var pending_uploads = needed_validate_documents.slice();
+
+            $('.custom-input-group').each(function (index, obj) {
+                var document_type = $(obj).find('.document-type-selector').val();
+                var selected_file = $(obj).find('.custom-file-input').val();
+
+                // check if this document needed
+                // if yes we need to check file exist
+                if (needed_validate_documents.includes(document_type)) {
+                    // if valid upload
+                    if (selected_file) {
+                        // remove from pending uploads
+                        for( var i = 0; i < pending_uploads.length; i++){
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+            });
+            return pending_uploads;
+        }
+
+        // set pending documents list
+        function setPendingDocuments(pending_uploads) {
+            var pending_list = '';
+
+            pending_uploads.forEach(function (document_type) {
+                var document_type_label = document_types[document_type];
+                pending_list = pending_list + document_type_label + '\n';
+            });
+
+            var pending_documents = $("#transaction_pending_document");
+
+            // reset pending list
+            pending_documents.val('');
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        var document_types = <%= Transaction::BYPASS_FP_VERIFICATION_DOCUMENT_TYPES.to_json.html_safe %>;
+
+        var required_documents = {
+            doctor: [
+                "BYPASS_FPV_PASSPORT",
+                "BYPASS_FPV_ERROR_MESSAGE",
+            ]
+        };
+
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+
+                    var pending_uploads = getPendingUploads();
+                    // if there is still pending documents, return false
+                    if (pending_uploads.length > 0) {
+                        // append to pending list
+                        setPendingDocuments(pending_uploads);
+                        // return false validation of there is documents pending
+                        return false;
+                    }
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+    </script>
+<% end %>

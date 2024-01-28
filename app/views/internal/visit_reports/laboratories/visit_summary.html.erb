@@ -1,0 +1,45 @@
+<%= stylesheet_link_tag "inspectorate/lqcc" %>
+
+<%
+    visit_report_lab = @visit_report.visit_report_laboratory
+    form_path = ['approval'].include?(params[:action]) ? internal_visit_report_laboratory_approve_report_path(@visit_report) : internal_visit_report_laboratory_update_path(@visit_report)
+%>
+<%= @has_no_overall %>
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Report</strong> - LQCC Visit <%= @title %> (Visit Summary)
+    </div>
+
+    <%= form_for @visit_report, url: form_path, html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+        <input type="hidden" id="currentSubmitBtn" value="">
+        <div class="card-body">
+            <% if !@visit_report.status.blank? %>
+                <div class="alert alert-info" role="alert">
+                    LATEST STATUS: <b><%= VisitReport::STATUSES[@visit_report.status] %></b>
+                </div>
+            <% end %>
+
+            <% if @visit_report.status == 'REJECTED' %>
+                <div class="alert alert-danger" role="alert">
+                    <% rejection_comment = @visit_report.level_1_approval_decision == 'REJECT' ? @visit_report.level_1_approval_comment : @visit_report.level_2_approval_comment  %>
+                    COMMENT ON REJECTION: <b><%= rejection_comment %></b>
+                </div>
+            <% end %>
+
+            <%=render 'internal/visit_reports/laboratories/visit_summary/summary', { form: form } %>
+            <%=render 'internal/visit_reports/laboratories/lab_personnel_modal', { form: form } %>
+            <%=render 'internal/visit_reports/laboratories/fomema_officer_modal', { form: form } %>
+            <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false  if params[:action] == 'approval' %>
+
+        </div>
+        <%=render 'internal/visit_reports/laboratories/card_footer' %>
+
+    <% end %>
+</div>
+
+<%=render 'internal/visit_reports/laboratories/laboratory_email_modal' %>
+
+<% content_for :page_end_scripts do %>
+    <!-- [NOTE]*** custom signature script due to library canvas only has 1 id resulting in multiple signature canvas not working -->
+    <%= render "internal/visit_reports/laboratories/signature_script" %>
+<% end %>

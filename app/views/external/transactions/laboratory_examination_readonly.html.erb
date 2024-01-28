@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong> - Laboratory Medical Examination</div>
+
+    <%= nested_form_for @transaction, url: "" do |form| %>
+        <% laboratory_examination = @transaction.laboratory_examination %>
+
+        <div class="p-4 border-bottom">
+            <h3><u>Laboratory Results - SUBMITTED</u></h3>
+        </div>
+
+        <%= render partial: "laboratory_examination_form", locals: { laboratory_examination: laboratory_examination, readonly: true } %>
+
+        <div class="card-footer text-right">
+            <%= link_to "Back", external_transactions_path, class: "btn btn-secondary" %>
+        </div>
+    <% end %>
+</div>
+
+<% if flash[:sp_completed].present? %>
+    <div id="dialog-sp-success" class="hidden" title="Report submitted" data-path="<%= external_transactions_path %>">
+        <p><%= flash[:sp_completed] == "Laboratory" ? "Laboratory" : "Chest X-ray" %> report for <b><%= flash[:sp_completed_worker] %></b> has been successfully transmitted.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-sp-success', type: 'success'});
+
+            $('#dialog-sp-success').on('dialogbeforeclose', function(event, ui) {
+                window.location = $('#dialog-sp-success').attr('data-path');
+            });
+        </script>
+    <% end %>
+<% end %>

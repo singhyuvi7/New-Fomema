@@ -1,0 +1,20 @@
+<tr class="filter-table-search-results">
+    <% if show_checkbox %>
+        <td>
+            <input type="checkbox" class="transaction_ids" name="transaction_ids[]" value="<%= transaction.id %>" />
+        </td>
+    <% end %>
+    <td>
+        <input type="hidden" name="xray_pending_review_compare[transaction_id][]" value="<%= transaction.id %>">
+        <a target="_blank" href="<%= internal_transaction_path(transaction.id) %>"><%= transaction.code %></a>
+    </td>
+    <td><%= transaction.xray_facility.code %></td>
+    <td><%= transaction.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{transaction.foreign_worker&.code}"  %></td>
+    <td><%= transaction.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{transaction.foreign_worker&.name}"  %></td>
+    <td><%= transaction.final_result %></td>
+    <% if show_remove %>
+        <td>
+            <button type='button' class='btn btn-danger btn-sm delete_compare' data-transaction_id='<%= transaction.id %>'><i class='fa fa-trash'></i></button>
+        </td>
+    <% end %>
+</tr>

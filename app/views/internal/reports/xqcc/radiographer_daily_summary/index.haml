@@ -1,0 +1,36 @@
+.card
+  .card-header
+    %strong Radiographer Daily Summary Report
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: radiographer_daily_summary_internal_xqcc_reports_path, method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :date, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :date, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"}, max: DateTime.current, value: params[:date]
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :radiographer_id, 'Radiographer Name', class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.collection_select :radiographer_id, @radiographers, :id, :name, { prompt: true, selected: params[:radiographer_id] }, { required: true, class: 'form-control select2'}
+          .card-footer
+            - if has_permission?("XQCC_REPORTS")
+              .text-right
+                = link_to radiographer_daily_summary_internal_xqcc_reports_path, class: 'btn btn-sm btn-danger mx-1' do
+                  %i.icon-trash
+                  Clear
+                = link_to radiographer_daily_summary_internal_xqcc_reports_path(format: :pdf, params: params.permit!), class: 'btn btn-sm btn-secondary mx-1' do
+                  %i.fa.fa-download
+                  Download
+                = form.button :filter, class: 'btn btn-primary btn-sm' do
+                  %i.icon-magnifier
+                  View
+    = render 'internal/reports/xqcc/radiographer_daily_summary/pdf_template'

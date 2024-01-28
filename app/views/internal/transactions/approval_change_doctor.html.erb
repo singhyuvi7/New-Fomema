@@ -1,0 +1,165 @@
+<%= render "/shared/all_flash" %>
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Change Clinic Approval
+    </div>
+
+    <%= form_for @transaction, url: approval_internal_transaction_path(@transaction), method: 'patch', html: {class: "#{params[:action]}_transaction transaction-form"} do |form| %>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :code, class: '' %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.try(:code) %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :employer, class: 'required' %>
+                        <%= form.select :employer_id, options_from_collection_for_select(Employer.where(id: form.object.employer_id), 'id', 'name', form.object.employer_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+                        <% if form.object.employer_id_changed? %>
+                            <p class="form-control-plaintext approval-previous-value"><%= form.object.employer_id_was.nil? ? '* EMPTY' : Employer.find(form.object.employer_id_was).try(:name) %></p>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                       <%= form.label :foreign_worker, "Foreign Worker", class: 'required' %>
+                        <%= form.select :foreign_worker_id, options_from_collection_for_select(ForeignWorker.where(id: form.object.foreign_worker_id), 'id', 'name', form.object.foreign_worker_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+                        <% if form.object.foreign_worker_id_changed? %>
+                            <p class="form-control-plaintext approval-previous-value"><%= form.object.foreign_worker_id_was.nil? ? '* EMPTY' : ForeignWorker.find(form.object.foreign_worker_id_was).try(:name) %></p>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :doctor, class: 'required' %>
+                        <%= form.select :doctor_id, options_from_collection_for_select(Doctor.order(:name).all, 'id', 'name', form.object.doctor_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', disabled: true %>
+                        <% if form.object.doctor_id_changed? %>
+                            <p class="form-control-plaintext approval-previous-value"><%= form.object.doctor_id_was.nil? ? '* EMPTY' : Doctor.find(form.object.doctor_id_was).try(:name) %></p>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :change_doctor_reason do %>
+                            Change Doctor Reason
+                        <% end %>
+                        <p class="form-control-plaintext">
+                            <%= form.object.transaction_change_sps.where(status: "APPROVAL").order(created_at: :desc).first&.change_sp_reason&.description %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :change_doctor_reason do %>
+                            Change Doctor Reason Comment
+                        <% end %>
+                        <p class="form-control-plaintext">
+                            <%= form.object.transaction_change_sps.where(status: "APPROVAL").order(created_at: :desc).first&.requester_comment || raw('<i>N/A</i>') %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- <div><%= @transaction.approval_request.category %></div> -->
+                    <%#= render 'internal/shared/approval_comment_decision', form: form %>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :decision, class: 'required' %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline">
+                    <%= radio_button_tag "approval[decision]", "APPROVE", false, class: "form-check-input approval-decision", required: true %>
+                    <%= label_tag "approval[decision_APPROVE]", "APPROVE", class: "form-check-label" %>
+                    &emsp;
+                    <%= radio_button_tag "approval[decision]", "REJECT", false, class: "form-check-input approval-decision ml-5" %>
+                    <%= label_tag "approval[decision_REJECT]", "REJECT", class: "form-check-label" %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <%
+=begin%>
+ <div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= label_tag :do_refund, "Refund", class: 'required' %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline">
+                    <%= radio_button_tag "do_refund", "Y", false, class: "form-check-input do-refund", required: true, checked: @do_refund.eql?('Y'), disabled: true %>
+                    <%= label_tag "do_refund_Y", "Yes", class: "form-check-label" %>
+                    &emsp;
+                    <%= radio_button_tag "do_refund", "N", false, class: "form-check-input do-refund ml-5", checked: @do_refund.eql?('N'), disabled: true %>
+                    <%= label_tag "do_refund_N", "No", class: "form-check-label" %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%
+=end%>
+
+<input type="hidden" name="do_refund" value="Y">
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment, for: 'approval_comment' %>
+            <%= text_area_tag "approval[comment]", nil, class: "form-control" %>
+        </div>
+    </div>
+</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transactions_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('input.approval-decision').click(function () {
+    if (this.value == 'REJECT') {
+        $('#approval_comment').attr('required', 'required');
+        $('.do-refund').removeAttr('disabled');
+    } else {
+        $('#approval_comment').attr('required', false);
+        $('.do-refund').prop('disabled', true);
+    }
+});
+</script>
+<% end %>

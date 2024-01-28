@@ -1,0 +1,14 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @order } %>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_orders_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

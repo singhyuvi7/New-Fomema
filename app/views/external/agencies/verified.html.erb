@@ -1,0 +1,49 @@
+<h1>this is agency registration page</h1>
+
+<%= render 'shared/all_validation_flash', { model_obj: @agency } %>
+
+<%= form_with(model: @agency, local: true, url: external_agency_registers_path) do |form| %>
+   
+  <div class="field">
+    <%= form.label :agency_primary_id, "Business Registration No" %>
+    <%= form.text_field :agency_primary_id %>
+  </div>
+
+  <% [:name, :address1, :address2, :address3, :address4, :postcode, :phone, :email].each do |field| %>
+    <div class="field">
+      <%= form.label field %>
+      <%= form.text_field field %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :country_id %>
+    <%= form.select :country_id, options_for_select(Country::order(:name).pluck(:name, :id), form.object.try(:country).try(:id)), {include_blank: "Select Option"} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :state_id %>
+    <%= form.select :state_id, options_for_select(State::order(:name).pluck(:name, :id), form.object.try(:state).try(:id)), {include_blank: "Select Option"} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :district_id %>
+    <%= form.select :district_id, options_for_select(District::order(:name).pluck(:name, :id), form.object.try(:district).try(:id)), {include_blank: "Select Option"} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :area_id %>
+    <%= form.select :area_id, options_for_select(Area::order(:name).pluck(:name, :id), form.object.try(:area).try(:id)), {include_blank: "Select Option"} %>
+  </div>
+
+  <div class="field">
+    <%= form.file_field :documents, multiple: true, class: "form-control-file" %>
+    <%= form.file_field :documents, multiple: true, class: "form-control-file" %>
+  </div>
+
+  <div class="actions">
+    <a href="<%= external_root_path %>" class="btn">Cancel</a>
+    <%= form.submit "Register" %>
+  </div>
+
+<% end %>

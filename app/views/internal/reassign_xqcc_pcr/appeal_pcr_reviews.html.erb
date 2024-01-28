@@ -1,0 +1,98 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Reassign Appeal PCR Reviews</strong>
+    </div>
+
+    <div class="card-body">
+        <%
+            statuses = {"Pending Appeals (Not including Approval or Closed Appeals)" => "EXAMINATIONS_ONLY"}.merge(MedicalAppeal::STATUSES.invert)
+
+            list = [
+                { title: "Retake Code",         field: "retake_code",   type: "text",   placeholder: "Code" },
+                { title: "Foreign Worker Code", field: "worker_code",   type: "text",   placeholder: "Worker Code" },
+                { title: "Status",              field: "status",        type: "select", options: ["PCR_REVIEW", "PCR_POOL"], remove_blank: true },
+            ]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-appeals-reassigns-index", filter_link: appeal_pcr_reviews_internal_reassign_xqcc_pcr_index_path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <% if params[:status] == "PCR_POOL" %>
+                    <p class="font-size-7">Displaying cases still in pcr pool (status: <b>PCR_POOL</b>).</p>
+                <% else %>
+                    <p class="font-size-7">Displaying assigned pcr review cases before results are transmitted (status: <b>PCR_REVIEW</b>).</p>
+                <% end %>
+
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th><%= params[:status] == "PCR_POOL" ? "Pool" : "Review" %> ID</th>
+                                <th>Appeal ID</th>
+                                <th>Retake Code</th>
+                                <th>Foreign Worker</th>
+                                <th>X-Ray Facility</th>
+                                <th>PCR</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @appeal_pcrs.each.with_index((@appeal_pcrs.current_page - 1) * get_per + 1) do |appeal_pcr, index| %>
+                                <% retake = params[:status] == "PCR_POOL" ? appeal_pcr.xray_retake : appeal_pcr.poolable&.xray_retake %>
+
+                                <tr>
+                                    <td><%= appeal_pcr.id %></td>
+                                    <td><%= appeal_pcr.medical_appeal_id %></td>
+                                    <td><%= retake&.code %></td>
+
+                                    <td>
+                                        <b><%= appeal_pcr.medical_appeal&.transactionz&.fw_code %></b><br>
+                                        <%= appeal_pcr.medical_appeal&.transactionz&.fw_name %>
+                                    </td>
+
+                                    <td>
+                                        <b><%= retake&.xray_facility&.code %></b><br>
+                                        <%= retake&.xray_facility&.name %>
+                                    </td>
+
+                                    <td>
+                                        <% if params[:status] == "PCR_POOL" %>
+                                            <b>Unassigned</b>
+                                        <% else %>
+                                            <b><%= appeal_pcr.pcr_user&.name %></b><br>
+                                            <%= appeal_pcr.pcr_user&.code %>
+                                        <% end %>
+                                    </td>
+
+                                    <td><%= appeal_pcr.status %></td>
+
+                                    <td>
+                                        <% if params[:status] == "PCR_POOL" %>
+                                            <%= raw index_table_primary_button(appeal_pcr_pool_internal_reassign_xqcc_pcr_path(id: appeal_pcr.id), title: "Assign", classes: "btn btn-sm btn-primary", label: "<i class='fa fa-edit'></i>") %>
+                                        <% else %>
+                                            <%= raw index_table_primary_button(appeal_pcr_review_internal_reassign_xqcc_pcr_path(id: appeal_pcr.id), title: "Reassign", classes: "btn btn-sm btn-primary", label: "<i class='fa fa-edit'></i>") %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @appeal_pcrs.blank? %>
+                                <tr>
+                                    <td colspan="10" class="text-danger">No pending pcr reviews.</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @appeal_pcrs %>
+        </div>
+    </div>
+</div>

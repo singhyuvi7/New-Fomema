@@ -1,0 +1,96 @@
+%br
+%table{:style => "border: 0px; border-style: hidden; width: 90%"}
+  %tr
+    %td{:style => "border: 0px; border-style: hidden;"}
+      %table.table.w-600.mt-3{width: 550}
+        %thead
+          %tr.text-center
+            %th{width: '30%'} Month/Year
+            %th{width: '10%'} Normal (New)
+            %th{width: '10%'} %
+            %th{width: '10%'} Normal (Renew)
+            %th{width: '10%'} %
+            %th{width: '10%'} Rekab
+            %th{width: '10%'} %
+            %th{width: '10%'} Total
+        %tbody
+          - if data.present?
+            - year = @date.to_date.year
+            - months = (1..@date.to_date.month)
+
+            - (1..@date.to_date.month).each do |month|
+              - normal_new = data.dig([month, :normal, :new]).to_i
+              - normal_renewal = data.dig([month, :normal, :renewal]).to_i
+              -# - normal = data.dig([month, :normal]).to_i
+              - normal = normal_new + normal_renewal
+              - pati_new = data.dig([month, :pati, :new]).to_i
+              - pati_renewal = data.dig([month, :pati, :renewal]).to_i
+              -# - pati = data.dig([month, :pati]).to_i
+              - pati = pati_new + pati_renewal
+              - total = normal + pati
+              %tr
+                %td #{Date::ABBR_MONTHNAMES[month]} #{year}
+                %td.text-right= normal_new
+                %td.text-right= total.zero? ? 0 : number_to_percentage(normal_new.to_f/total.to_f * 100, unit: '', precision: 2)
+                %td.text-right= normal_renewal
+                %td.text-right= total.zero? ? 0 : number_to_percentage(normal_renewal.to_f/total.to_f * 100, unit: '', precision: 2)
+                %td.text-right= pati
+                %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+                %td.text-right= total
+          - if total_data.present?
+            - normal_new = total_data.dig([:normal, :new]).to_i
+            - normal_renewal = total_data.dig([:normal, :renewal]).to_i
+            -# - normal = total_data.dig(:normal).to_i
+            - normal = normal_new + normal_renewal
+            - pati_new = total_data.dig([:pati, :new]).to_i
+            - pati_renewal = total_data.dig([:pati, :renewal]).to_i
+            -# - pati = total_data.dig(:pati).to_i
+            - pati = pati_new + pati_renewal
+            - total = normal + pati
+            %tr.bold{:style => "background-color: #d0d0d0"}
+              %td Total for Year #{year}
+              %td.text-right= normal_new
+              %td.text-right= total.zero? ? 0 : number_to_percentage(normal_new.to_f/total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= normal_renewal
+              %td.text-right= total.zero? ? 0 : number_to_percentage(normal_renewal.to_f/total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= pati
+              %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= total
+    %td{:style => "border: 0px; border-style: hidden;"} &nbsp;
+    %td{:style => "border: 0px; border-style: hidden;"}
+      %table.table.w-600.mt-3{width: 550}
+        %thead
+          %tr.text-center
+            %th Month/Year
+            %th{width: '14%'} Normal
+            %th{width: '14%'} %
+            %th{width: '14%'} Rekab
+            %th{width: '14%'} %
+            %th{width: '14%'} Total
+        %tbody
+          - if cert_data.present?
+            - year = @date.to_date.year
+            - months = (1..@date.to_date.month)
+
+            - (1..@date.to_date.month).each do |month|
+              - normal = cert_data.dig([month, :normal]).to_i
+              - pati = cert_data.dig([month, :pati]).to_i
+              - total = normal + pati
+              %tr
+                %td #{Date::ABBR_MONTHNAMES[month]} #{year}
+                %td.text-right= normal
+                %td.text-right= total.zero? ? 0 : number_to_percentage(normal.to_f/total.to_f * 100, unit: '', precision: 2)
+                %td.text-right= pati
+                %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+                %td.text-right= total
+          - if total_data.present?
+            - normal = cert_total_data.dig(:normal).to_i
+            - pati = cert_total_data.dig(:pati).to_i
+            - total = normal + pati
+            %tr.bold{:style => "background-color: #d0d0d0"}
+              %td Total for Year #{year}
+              %td.text-right= normal
+              %td.text-right= total.zero? ? 0 : number_to_percentage(normal.to_f/total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= pati
+              %td.text-right= total.zero? ? 0 : number_to_percentage(pati.to_f/total.to_f * 100, unit: '', precision: 2)
+              %td.text-right= total

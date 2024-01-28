@@ -1,0 +1,149 @@
+
+<%= form_for @fin_batch, url: internal_payments_batch_create_path do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Service Provider Payment</strong> - Generate Payment Batch
+        </div>
+        <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="service_provider" class="col-sm-3 col-form-label required">Service Provider</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="service_provider" id="service_provider">
+                                    <option value="">Select Option</option>
+                                    <% FinBatch::SERVICE_PROVIDER_TYPES.each do |type, index| %>
+                                        <option value="<%= type %>"><%= index %></option> "
+                                    <% end %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="batch_code" class="col-sm-3 col-form-label required">Batch</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" id="batch" name="fin_batch[code]">
+                                    <option value="">Select Option</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col module-actions text-right">
+                        <%= form.hidden_field :start_date %>
+                        <%= form.hidden_field :end_date %>
+                    </div>
+                </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_payments_path) %>
+                <%= form.submit 'Generate', id: 'generate_submit', class: 'btn btn-sm btn-primary' %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $(document).ready(function () {
+            defaultFormat = 'YYYYMM'
+            str_format = "DD/MM/YYYY"
+
+            // change service provider
+            envDate = '<%= ENV["FIN_BATCH_START_DATE"] %>'
+            current_month = '<%= Time.now.strftime("%Y%m") %>'
+            lastMonth = moment(current_month,defaultFormat).subtract(1,'months')
+            thisMonth = moment(current_month,defaultFormat)
+
+            formatedMonth = moment(current_month,defaultFormat).format('MM')
+            formatedYear = moment(current_month,defaultFormat).format('YYYY')
+
+
+            $('#service_provider').change(function(value){
+                batches = []
+                $('#batch').html('<option value="">Select Option</option>');
+                if(this.value){
+                
+                    defaultStartDate = moment(envDate,defaultFormat)
+
+                            //generate all batch date starting from the date stated at env
+                            while (thisMonth >= defaultStartDate) {
+                                month_first_date = moment(defaultStartDate).startOf('month')
+                                month_last_date = parseInt(moment(defaultStartDate).endOf("month").format('D'));
+    
+                                rangeArr = [[1,6],[7,12],[13,18],[19,24],[25,month_last_date]]
+                                
+                                if(formatedYear == moment(defaultStartDate,defaultFormat).format('YYYY') && formatedMonth == moment(defaultStartDate,defaultFormat).format('MM')){
+                                    today = '<%= Time.now.strftime("%d") %>'
+
+                                    // this month by weekly
+                                    $.each(rangeArr, function(index, range ){
+                                        if(range[1] < today){
+                                            range_first_day = moment(month_first_date).add(range[0]-1,'days').format(str_format)
+                                            range_last_day = moment(month_first_date).add(range[1]-1,'days').format(str_format)
+                                            batch_code = moment(range_first_day,str_format).format('YMM') + (index+1).toString().padStart(2, "0");
+                                        }else{
+                                            return;
+                                        }
+
+                                        batches.push({batch_code: batch_code,first_date : range_first_day, last_date : range_last_day})
+                                    })
+                                }else{
+                                    $.each(rangeArr, function(index, range ){
+                                        range_first_day = moment(month_first_date).add(range[0]-1,'days').format(str_format)
+                                        range_last_day = moment(month_first_date).add(range[1]-1,'days').format(str_format)
+                                        batch_code = moment(range_first_day,str_format).format('YMM') + (index+1).toString().padStart(2, "0");
+        
+                                        batches.push({batch_code: batch_code,first_date : range_first_day, last_date : range_last_day})
+                                    });
+                                }
+                                defaultStartDate = moment(defaultStartDate,defaultFormat).add(1, 'months')
+                            }
+
+                        $.ajax({
+                            url: "/payments/get_batches",
+                            method: "GET",
+                            data: { 
+                                service_provider: this.value, 
+                                batches: batches
+                            },
+                            success: function (response) {
+                                console.log(response)
+                                if(response.length != 0){
+                                    response.forEach(function (row, index) {
+                                        $('#batch').append('<option value="' + row.batch_code + '" data-first-date="' + row.first_date + '" data-last-date="' + row.last_date + '">' + row.batch_code + ' (' + row.first_date + ' - ' + row.last_date + ')</option>');
+                                    });
+                                }
+                            }
+                        });
+                }
+            })
+    
+            $('#batch').change(function(value) {
+                first_date = $('option:selected', this).attr('data-first-date')
+                last_date = $('option:selected', this).attr('data-last-date')
+                $('#fin_batch_start_date').val(moment(first_date,str_format).startOf('day').format("YYYY-MM-DD HH:mm:ss"))
+                $('#fin_batch_end_date').val(moment(last_date,str_format).endOf('day').format("YYYY-MM-DD HH:mm:ss"))
+            });
+            $( "#generate_submit" ).click(function( event ) {
+                event.preventDefault();
+                // check if date are selected
+                if (!$('#batch').val()){
+                    alert('Please select a service provider and a batch before proceeding')
+                }else{
+                    $(this).attr("disabled", true);
+                    $("#new_fin_batch").submit();
+                }
+            });
+        });
+        function inRange(n, nStart, nEnd)
+        {
+            if(n>=nStart && n<=nEnd) return true;
+            else return false;
+        }
+    </script>
+    <% end %>

@@ -1,0 +1,10 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Call Log Case Types</strong> - Edit Call Log Case Type
+    </div>
+    <%= form_for @call_log_case_type, url: internal_call_log_case_type_path(@call_log_case_type), html: {class: "#{params[:action]}_call_log_case_type call_log_case_type-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+    
+</div>

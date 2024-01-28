@@ -1,0 +1,50 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  ## non compliance xray
+  wb.add_worksheet(name: "Non Compliance Xray") do |sheet|
+    sheet.add_row ["INSPECTORATE VISIT FINDINGS ON X-RAY - #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+    sheet.add_row ['FINDINGS','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC','TOTAL'], style: header_style
+
+    jan = feb = mar = apr = may = jun = july = aug = sept = oct = nov = dec = total = 0
+
+    VisitReportXrayFacility::NON_COMPLIANCES.each do |key, value|
+      data = @xray_non_compliances[key]
+      sheet.add_row [value, data&.jan || 0,
+      data&.feb || 0,
+      data&.mar || 0,
+      data&.apr || 0,
+      data&.may || 0,
+      data&.jun || 0,
+      data&.july || 0,
+      data&.aug || 0,
+      data&.sept || 0,
+      data&.oct || 0,
+      data&.nov || 0,
+      data&.dec || 0,
+      data&.total || 0], style: data_style
+
+      jan += data&.jan || 0
+      feb += data&.feb || 0
+      mar += data&.mar || 0
+      apr += data&.apr || 0
+      may += data&.may || 0
+      jun += data&.jun || 0
+      july += data&.july || 0
+      aug += data&.aug || 0
+      sept += data&.sept || 0
+      oct += data&.oct || 0
+      nov += data&.nov || 0
+      dec += data&.dec || 0
+      total += data&.total || 0
+    end
+
+    sheet.add_row ['Total', jan, feb, mar, apr, may, jun, july, aug, sept, oct, nov, dec, total], style: data_style
+  end  
+end

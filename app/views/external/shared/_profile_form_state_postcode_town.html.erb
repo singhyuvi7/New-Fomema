@@ -1,0 +1,53 @@
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :state_id, class: 'col-form-label required' %>
+                        <%= collection_select(:userable, :state_id, State.all, :id, :name, {include_blank: 'Select option'}, class: 'form-control select2', required: true, disabled: true) %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :town_id, class: 'col-form-label required' %>
+                        <%= collection_select(:userable, :town_id, Town.where(state_id: form.object.userable.state_id).order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control select2', required: true, disabled: true) %>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :postcode, class: 'col-form-label required' %>
+                        <%= text_field :userable, :postcode, { class: 'form-control', required: true, disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // when change state, ajax fetch towns
+
+    $('#userable_state_id').change(function () {
+        
+        // empty town and postcode
+
+        $('#userable_town_id').html('<option value><%= form_select_option_text %></option>');
+        $('#userable_postcode').val('');
+
+        if (this.value) {
+            
+            $.ajax({
+                url: '/states/' + this.value + '/towns.json',
+                method: "GET",
+            }).done(function (data) {
+                $.each(data, function (idx, town) {
+                    $('#userable_town_id').append('<option value="'+town.id+'" data-postcode_id="'+town.postcode_id+'" data-postcode_code="'+town.postcode_code+'">'+town.name+'</option>');
+                });
+            });
+
+        }
+
+    });
+
+</script>
+<% end %>

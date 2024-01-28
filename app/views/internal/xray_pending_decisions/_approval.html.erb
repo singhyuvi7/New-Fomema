@@ -1,0 +1,36 @@
+<div class="card border-primary">
+    <div class="card-header">
+        XQCC Pending Decision Approval
+    </div>
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th class="text-center" colspan="2">Decision</th>
+                <th>Comment</th>
+            </tr>
+            <tr>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="APPROVE" <% if xray_pending_decision.approval_decision == 'APPROVE' %> checked <% else %> disabled <% end %>>
+                            Approve
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="REJECT" <% if xray_pending_decision.approval_decision == 'REJECT' %> checked <% else %> disabled <% end %>>
+                            Reject
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= xray_pending_decision.approval_comment %></pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="card-footer text-right">
+    </div>
+</div>

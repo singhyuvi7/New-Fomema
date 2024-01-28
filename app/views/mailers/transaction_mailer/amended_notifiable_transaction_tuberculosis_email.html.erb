@@ -1,0 +1,175 @@
+<p>
+   <%= simple_format @doctor_address %>
+</p>
+<p>
+    Dear Doctor,
+</p>
+<p>
+<% if ( @notifiable_type == 'Doctor' || @notifiable_type == 'XrayFacility' ) && @xray_result == 'NORMAL' %>
+    <u><b>Notifying on Misread of Chest X-ray Image by X-ray Facility</b></u><br>
+<% elsif @notifiable_type == 'Doctor' && @xray_result == 'ABNORMAL' %>
+    <u><b>Notifying on Chest X-ray Image Reported Abnormal by X-ray Facility</b></u><br>
+<% end %>
+</p>
+
+<% if @notifiable_type == 'Doctor' && @xray_result == 'NORMAL' %>
+    <p>
+    Please be informed that there was a misread of the chest X-ray report for the below case:
+    <br>
+    <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+        <tr>
+            <th style="background-color: #D3D3D3;">Exam Date</th>
+            <th style="background-color: #D3D3D3;">X-ray Taken Date</th>
+            <th style="background-color: #D3D3D3;">Certification Date</th>
+            <th style="background-color: #D3D3D3;">Foreign Worker Name</th>
+            <th style="background-color: #D3D3D3;">Worker Code</th>
+            <th style="background-color: #D3D3D3;">Passport Number</th>
+        </tr>
+        <tr>
+            <th><%= @exam_date.try(:strftime,'%d/%m/%Y') %></th>
+            <th><%= @xray_taken_date %></th>
+            <th><%= @certification_date.try(:strftime,'%d/%m/%Y') %></th>
+            <th><%= @fw_name %></th>
+            <th><%= @fw_code %></th>
+            <th><%= @fw_passport_number %></th>
+        </tr>
+    </table>
+    <p>
+    The details of X-ray facility as below:
+        <%= simple_format @doctor_info %> </p>
+        <br>
+        The chest X-ray audit findings is as below:<br>
+        <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+            <tr>
+                <th style="background-color: #D3D3D3;">FOMEMA Audit Report</th>
+                <th><%= @xray_pending_decision_comment %></th>
+            </tr>
+        </table>
+    </p>
+
+    <p>
+    As the reason of unsuitability is due to the presence of infectious diseases (Hepatitis B/ HIV/ Syphilis/tuberculosis/ Malaria/ Leprosy),
+    you are required to notify the case via <b>MOH e-notification system </b>(preferably) or by using <b>'Borang Notifikasi Penyakit Berjangkit Revision 2010'</b>
+    which can be downloaded from MOH website soonest possible. You are also advised to refer the case to the nearest District Health Office
+    or Klinik Kesihatan for further management.<br>
+    </p>
+
+    <p>
+    As this worker was found with Tuberculosis signs in his/her chest X-ray, kindly include the above
+    FOMEMA Audit Report findings when notifying this case through the Infectious Disease Information
+    System (Sistem eNotifikasi) at http://enotifikasi.moh.gov.my or manually notify this case to the nearest
+    District Health Office by using 'Borang Notifikasi Penyakit Berjangkit' which can be downloaded from
+    Ministry of Health (MOH) website.
+    <br>
+    </p>
+    <p>
+    Your assistance in notifying this case is crucial to allow the nearest District Health Office to conduct
+    prompt investigation and control activity within the stipulated time to prevent the spread of the disease.
+    </p>
+
+<% elsif  @notifiable_type == 'XrayFacility' && @xray_result == 'NORMAL' %>
+    <p>
+        This is with reference to the chest X-ray that was reported by you as NORMAL for the case below:
+        <br>
+        <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+            <tr>
+                <th style="background-color: #D3D3D3;">Exam Date</th>
+                <th style="background-color: #D3D3D3;">X-ray Taken Date</th>
+                <th style="background-color: #D3D3D3;">Certification Date</th>
+                <th style="background-color: #D3D3D3;">Foreign Worker Name</th>
+                <th style="background-color: #D3D3D3;">Worker Code</th>
+                <th style="background-color: #D3D3D3;">Passport Number</th>
+            </tr>
+            <tr>
+                <th><%= @exam_date.try(:strftime,'%d/%m/%Y') %></th>
+                <th><%= @xray_taken_date %></th>
+                <th><%= @certification_date.try(:strftime,'%d/%m/%Y') %></th>
+                <th><%= @fw_name %></th>
+                <th><%= @fw_code %></th>
+                <th><%= @fw_passport_number %></th>
+            </tr>
+        </table>
+        </p>
+        <p>
+        However, after the subsequent auditing of the worker’s chest X-ray by our consultant radiologist, the
+        initial report has been classified as a misread case and the final chest X-ray findings are as below:<br>
+        <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+            <tr>
+                <th style="background-color: #D3D3D3;">FOMEMA Audit Report</th>
+                <th><%= @xray_pending_decision_comment %></th>
+            </tr>
+        </table>
+        </p>
+        <p>
+        Please be informed that in accordance with the Standard Operating Procedure (SOP), the
+        radiologist/doctor reporting the chest X-ray is responsible for the quality of the radiograph and the
+        accuracy of the reporting.
+        </p>
+        <p>
+        The chest X-ray examination of the foreign worker is important for Tuberculosis screening. Your
+        assistance in notifying the above case is highly appreciated and crucial to allow the nearest District
+        Health Office to conduct prompt investigation and control activity within the stipulated time to prevent
+        the spread of the disease.</p>
+        <p>You may notify this case yourself through the Infectious Disease Information System (Sistem
+        eNotifikasi) at http://enotifikasi.moh.gov.my or manually notify this case to the nearest District Health
+        Office by using 'Borang Notifikasi Penyakit Berjangkit' which can be downloaded from Ministry of Health
+        (MOH) website, or you may inform the initial examining doctor on the misread report and request the
+        examining doctor to do the necessary notification.</p>
+
+<p>
+The details of the examining doctor as below:
+<%= simple_format @doctor_info %> </p>
+
+<% elsif  @notifiable_type == 'Doctor' && @xray_result == 'ABNORMAL' %>
+    <p>
+        Please be informed that the chest X-ray was reported abnormal for the below case:
+        <br>
+        <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+            <tr>
+                <th style="background-color: #D3D3D3;">Exam Date</th>
+                <th style="background-color: #D3D3D3;">X-ray Taken Date</th>
+                <th style="background-color: #D3D3D3;">Certification Date</th>
+                <th style="background-color: #D3D3D3;">Foreign Worker Name</th>
+                <th style="background-color: #D3D3D3;">Worker Code</th>
+                <th style="background-color: #D3D3D3;">Passport Number</th>
+            </tr>
+            <tr>
+                <th><%= @exam_date.try(:strftime,'%d/%m/%Y') %></th>
+                <th><%= @xray_taken_date %></th>
+                <th><%= @certification_date.try(:strftime,'%d/%m/%Y') %></th>
+                <th><%= @fw_name %></th>
+                <th><%= @fw_code %></th>
+                <th><%= @fw_passport_number %></th>
+            </tr>
+        </table>
+        <p>
+            The details of the examining doctor as below:
+            <p><%= simple_format @doctor_info %></p>
+        <p>
+        The chest X-ray audit findings is as below:
+        <br>
+        <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+            <tr>
+                <th style="background-color: #D3D3D3;">FOMEMA Audit Report</th>
+                <th><%= @xray_pending_decision_comment %></th>
+            </tr>
+        </table>
+        </p>
+        <p>
+        As this worker was found with Tuberculosis signs in his/her chest X-ray, kindly include the above FOMEMA Audit Report findings
+        when notifying this case through the Infectious Disease Information System (Sistem eNotifikasi) at http://enotifikasi.moh.gov.my
+        or manually notify this case to the nearest District Health Office by using 'Borang Notifikasi Penyakit Berjangkit'
+        which can be downloaded from Ministry of Health (MOH) website.
+        </p>
+        <p>Your assistance in notifying this case is crucial to allow the nearest District Health Office to conduct prompt investigation and control activity within the stipulated time to prevent the spread of the disease.</p>
+  <% end %>
+<p>
+Thank you for your kind attention and cooperation.<br>
+</p>
+<p>
+FOMEMA Sdn. Bhd.
+</p>
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***Email dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

@@ -1,0 +1,72 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        Order - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: internal_order_path(@order) do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render '/shared/all_flash' %>
+
+            <%=render partial: '/internal/orders/shared/order_detail', locals: {form: form} %>
+
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th>Items</th>
+                        <th>Gender</th>
+                        <th>Fee</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.each do |order_item| %>
+                        <tr>
+                            <% if order_item.order_itemable.class.name == 'ForeignWorker' %>
+                                <td><%= order_item.order_itemable.try(:name) %></td>
+                            <% else %>
+                                <td><%= order_item.order_itemable.class.name %></td>
+                            <% end %>
+                            <td><%= order_item.gender %></td>
+                            <td><%= order_item.fee.name %></td>
+                            <td><%= number_to_currency(order_item.amount, unit: "") %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <a class="btn btn-sm btn-primary" href="<%= internal_orders_path %>">Back</a>
+                <% if ['TRANSACTION_REGISTRATION','SPECIAL_RENEWAL_TRANSACTION_REGISTRATION'].include?(@order.category) && !['PAID'].include?(@order.status) %>
+                    <button id="submit_cancel" class="btn btn-sm btn-primary" type="submit" name="submit" value="cancel">Cancel order</button>
+                <% end %>
+                <button id="submit_save_and_proceed_to_payment" class="btn btn-sm btn-primary" type="submit" name="submit" value="save_and_proceed_to_payment">Save and proceed to payment</button>
+            </div>
+        </div>
+    <% end %>
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+$('#submit_cancel').click(function (e) {
+    if (window.confirm("Confirm cancel?")) {
+        $('#edit_order_<%= @order.id %>').attr('novalidate', 'novalidate');
+    } else {
+        return false;
+    }
+});
+</script>
+<% end %>

@@ -1,0 +1,45 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag filter_link, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="date" class="col-sm-3 col-form-label">Date</label>
+                        <div class="col-sm-9">
+                            <div class="d-flex align-items-center">
+                                <%= text_field_tag "date", params["date"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Date", max: Date.today.strftime("%F") %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button filter_link %>
+                <%= link_to '<i class="fa fa-download" aria-hidden="true"></i> Export To Excel'.html_safe, filter_link, class: "btn btn-sm btn-secondary with-xlsx-format", id: "export_to_excel" %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $("#export_to_excel").click(function(e) {
+            service_provider = $('#service_provider').val()
+            date = $('#date').val()
+            if(date == ''){
+                e.preventDefault()
+                alert('Please select a date before exporting the report')
+            }else{
+                export_url = $('form').attr('action')+".xlsx?"+ $('form').serialize() 
+                $(this). attr("href", export_url);  
+            }
+        });
+    </script>
+<% end %>

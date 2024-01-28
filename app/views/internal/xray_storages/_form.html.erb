@@ -1,0 +1,248 @@
+<div class="card-body">
+    
+    <%= render 'shared/all_validation_flash', { model_obj: @xray_storage } %>
+
+    <div class="row">
+    <% if @action == "edit" %>
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, "Batch Number", class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', readonly: true %>
+            </div>
+        </div>
+    <% end %>
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :organization_id, "Location", class: 'required' %>
+                <%= form.select :organization_id, options_from_collection_for_select(Organization.where(org_type: ["WAREHOUSE"]).all, :id, :name, form.object.organization_id), {include_blank: form_select_option_text}, required: true, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :disposal_date, "Disposal Date" %>
+                <%= form.date_field :disposal_date, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status, "Status" %>
+                <%= form.select :status, options_for_select(['Stored', 'Disposed'], form.object.status), {include_blank: form_select_option_text}, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+            <%= form.label :category, "Type", class: 'required' %>
+            <label class="text-danger" id="warning-text2"></label>
+            <% XrayStorage::CATEGORIES.each do |key, label| %>
+                <div class="form-check checkbox">
+                    <input type="checkbox" class="form-check-label" name="xray_storage[categories][]" id="xray_storage_categories_<%= key.downcase %>" value="<%= key %>"<%= ' checked' if @xray_storage.current_categories.include? key %>>
+                    <label class="form-check-label" for="xray_storage_categories_<%= key.downcase %>"><%= label %></label>
+                </div>
+            <% end %>
+            </div>
+        </div>
+    </div>
+
+    <!-- xray_storage_items -->
+    <div class="card">
+        <div class="card-header">
+            Storage Items
+            &nbsp;
+            <label class="text-danger" id="warning-text"></label>
+        </div>
+
+        <div class="card-body">
+            <div>
+                <input type="hidden" name="film_count_storage" id="film_count_storage" value=<%= form.object.xray_storage_items.count %> />
+            </div>
+
+            <% if @action == "edit" || @action == "new" %>
+                <div class="card-body-actions">
+                    <label>Transaction Code: </label> 
+                    <input type="text" class="" name="trans_code_storage" id="trans_code_storage">
+                    <button type="button" id="storage_add_item_button" class="btn btn-sm btn-secondary" data-id="<%= @xray_storage.id %>" onclick="storage_add_item()">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            <% end %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th>Transaction Code</th>
+                                <th>Xray Code</th>
+                                <th>Worker Code</th>
+                                <th>Sex</th>
+                                <th>Passport</th>
+                                <th>Country</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id = "myListStorage">
+                            <%= form.fields_for :xray_storage_items do |storage_items_form| %>
+                                <!--  -->
+
+                                <% transaction = @transactions.to_a.find {|transaction| transaction.id == storage_items_form.object.transaction_id.to_i} %>
+
+                                <% if transaction.present? %>
+                                    <tr class="storage-items-row">
+                                        <td><%= transaction.code %></td>
+                                        <td><%= transaction.xray_facility.code %></td>
+                                        <td><%= transaction.foreign_worker.code %></td>
+                                        <td><%= transaction.fw_gender %></td>
+                                        <td><%= transaction.foreign_worker.passport_number %></td>
+                                        <td><%= transaction.foreign_worker.country.name %></td>
+                                    
+                                        <% if @action == "edit" || @action == "new" %>
+                                            <td>
+                                                <%= storage_items_form.hidden_field :xray_storage_id %>
+                                                <%= storage_items_form.hidden_field :transaction_id %>
+                                                <%= storage_items_form.link_to_remove "Remove", class: "btn btn-danger btn-sm remove-row", onclick: "$(this).closest('.storage-items-row').hide();" %>
+                                            </td>      
+                                        <% else %>
+                                            <td></td>
+                                        <% end %>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> 
+    </div>
+    <!-- /xray_storage_items -->
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_xray_storages_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+
+<script>
+var film_count_storage = parseInt($('#film_count_storage').val());
+var trx_arr = [];
+
+function storage_add_item() 
+{
+    $('#xray_storage_film_count_storage').val(film_count_storage);
+    $('#xray_storage_received_count').val(film_count_storage);
+    code    = $('#trans_code_storage').val();
+    id      = $('#storage_add_item_button').attr('data-id');
+    if (code == null || code == '') {
+        alert("Please enter transaction code");
+        return;
+    }
+
+    $.ajax({
+        url: `/transactions/${ code }/transaction_by_code_storage`,
+        data: { xray_storage_id: id },
+        method: "GET",
+    }).done(function (response) {
+        date = $(response).find('table').attr('data-transmit-date');
+
+        if (response.error !== undefined) {
+            alert("Transaction not found");
+            $('#trans_code_storage').val("");
+            return;
+        }
+        if (trx_arr.indexOf(code) > -1) {
+            alert("Transaction exists!");
+            $('#trans_code_storage').val("");
+            return;
+        }
+        if (date.length === 0) {
+            alert("Transaction does not have transmit date")
+            $('#trans_code_storage').val("");
+            return;
+        }
+        trx_arr.push(code);
+        date        = new Date();
+        mSec        = date.getTime(); 
+        replaceName = response.replace(/(\[xray_storage_items_attributes\]\[0\])/g, `[xray_storage_items_attributes][${mSec}]`);
+        replaceId   = replaceName.replace(/(xray_storage_items_attributes_0)/g, `xray_storage_items_attributes_${mSec}`);
+        row         = $(replaceId).find('tr');
+        $('#myListStorage').append(row);
+        film_count_storage += 1;
+        $('#xray_storage_film_count_storage').val(film_count_storage);
+        $('#xray_storage_received_count').val(film_count_storage);
+        $('#trans_code_storage').val("");
+
+        row.find('.remove-row').click(function() {
+            $(this).closest('.storage-items-row').remove();
+            film_count_storage -= 1;
+            trx_arr = [];
+            $("#myListStorage tr").each(function(){
+                trx_arr.push($(this).find("td:first").text());
+            });
+            $('#xray_storage_film_count_storage').val(film_count_storage);
+            $('#xray_storage_received_count').val(film_count_storage);
+        });
+    });
+}
+
+$(document).ready(function(){
+    $('#trans_code_storage').on("keypress", function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            storage_add_item();
+            $(this).val("");
+            return false;
+        }
+    });
+
+    $('.remove-row').click(function() {
+        film_count_storage -= 1;
+        trx_arr = [];
+        $("#myListStorage tr:visible").each(function(){
+            trx_arr.push($(this).find("td:first").text());
+        });
+        $('#xray_storage_film_count_storage').val(film_count_storage);
+        $('#xray_storage_received_count').val(film_count_storage);
+    });
+
+    $("#myListStorage tr").each(function(){
+        trx_arr.push($(this).find("td:first").text());
+    });
+
+    $("form").submit(function(e) {
+        var rowCount = $('#myListStorage tr:visible').length;
+        var checkboxChecked = $('input[name="xray_storage[categories][]"]:checked').length;
+        if (checkboxChecked == 0) {
+            $("#warning-text2").html("At least 1 type needs to be selected!");
+            return false;
+        } else {
+            $("#warning-text2").html("");
+        }
+
+        if (rowCount == 0) {
+            $("#warning-text").html("At least 1 film needs to be submitted!");
+            return false;
+        } else {
+            $("#warning-text").html("");
+        }
+
+    });
+
+});
+</script>
+
+<% end %>

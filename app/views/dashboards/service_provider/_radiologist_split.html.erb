@@ -1,0 +1,32 @@
+<div class="card radiologistcard">
+  <div class="card-header">Radiologist</div>
+  <div class="card-body  p-0">
+    <% if has_permission?('DASHBOARD_SP_RADIOLOGIST') %>
+      <ul class="card-ul">
+        <li class="card-li dropdown-toggle" type="button" id="div_doctor" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span> Active</span> <span style="font-weight: bold;">
+                  <div id='radioactive'>
+          <%= @radiologistactive %>
+                  </div>
+        </span>
+          <div class="listcard-ul dropdown-menu" aria-labelledby="div_doctor">
+            <div style="background: #0032AB; color: #DDE7FF;width: 100%; float: left;">
+              <span style="width: 50%;float: left;padding: 0px 7px;">State  </span>
+              <span style="width: 50%;float: left;text-align: center;padding: 0px 10px 0px 37px;">Doctor</span>
+            </div>
+            <ul id="radioStatesList">
+              <% @radiologiststates.each do |key, value| %>
+                <li><span><%= key %> </span> <span id="<%= key %>Count"><%= value %></span></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+
+        <li><span> New</span> <span id="newradioCount" ><%= @radiologistnew %></span></li>
+        <li><span> Withdrawal</span > <span id="withdrawalradioCount" ><%= @radiologistwithdrawl %></span></li>
+        <li><span> Demised</span> <span id="demisedradioCount" ><%= @radiologistdemised %></span></li>
+        <li><span> Non-compliance</span> <span id="noncompradioCount"><%= @radiologistnoncomp %></span></li>
+      </ul>
+    <% end %>
+  </div>
+</div>

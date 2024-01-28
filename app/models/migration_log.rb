@@ -1,0 +1,2 @@
+class MigrationLog < ApplicationRecord
+end

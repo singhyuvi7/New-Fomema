@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Block Reasons</strong> - New Block Reason
+    </div>
+    <%= form_for @block_reason, url: internal_block_reasons_path, html: {class: "#{params[:action]}_block_reason block_reason-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

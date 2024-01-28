@@ -1,0 +1,22 @@
+<div class="card">
+    <div class="card-header">
+        <strong>IT - Daily Fingerprint Tested</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+
+        <div class="row-fluid">
+            <%=render "/internal/reports/it/daily_fingerprint_tested/filter", filter_link: daily_thumbprint_tested_internal_it_reports_path %>
+            <%=render "/internal/reports/it/daily_fingerprint_tested/preview_table" if !@response_by_dates.blank? && !@response_by_states.blank? %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+    </script>
+<% end %>

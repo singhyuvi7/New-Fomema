@@ -1,0 +1,199 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Doctors</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <% if has_permission?("MSPD_REPORTS") %>
+                <div class='col'>
+                    <%= link_to(internal_doctors_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-primary') do %>
+                        <i class='fa fa-download'></i>Export
+                    <% end %>
+                </div>
+            <% end %>
+            <div class="col module-actions text-right">
+                <% if has_permission?("BULK_ASSIGN_QUOTA_DOCTOR") %>
+                    <button type="button" class="btn btn-primary btn-sm modal-trigger-quota-assignment" data-toggle="modal" data-target="#quota-assignment-modal">Assign Quota</button>
+                <% end %>
+
+                <% if has_permission?("CREATE_DRAFT_DOCTOR") %>
+                    <%= raw index_table_new_button(new_internal_doctor_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <% if has_any_permission?("VIEW_DOCTOR","MSPD_REPORTS") %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th>
+            <th class="module-row-numbers">#</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Facility Name</th>
+            <th>Address</th>
+            <th>Postcode</th>
+            <th>Town</th>
+            <th>State</th>
+            <th>Quota</th>
+            <th>Quota available</th>
+            <% if has_permission?("VIEW_INSPECTORATE_DETAILS") %>
+                <th>No. Of Worker Allocated</th>
+                <th>No. Of Worker Certified</th>
+            <% end %>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @doctors.blank? %>
+            <tr>
+                <td colspan="15" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @doctors.each.with_index((@doctors.current_page - 1) * get_per + 1) do |doctor, index| %>
+                <tr>
+                    <td class="module-row-numbers">
+                        <label>
+                            <input type="checkbox" class="child-checkbox" name="doctor_ids[]" value="<%= doctor.id %>">
+                        </label>
+                    </td>
+
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td class="modal-data-column" data-type="code"><%= doctor.code or raw "<i>N/A</i>" %></td>
+                    <td class="modal-data-column" data-type="name"><%= doctor.name %></td>
+                    <td><%= doctor.clinic_name %></td>
+                    <td><%= raw doctor.doctor_address.present? ? doctor.doctor_address : "<i>N/A</i>" %></td>
+                    <td><%= raw doctor.postcode? ? doctor.postcode : "<i>N/A</i>" %></td>
+                    <td><%= raw doctor.try(:town).try(:name) || "<i>N/A</i>" %></td>
+                    <td><%= raw doctor.try(:state).try(:name) || "<i>N/A</i>" %></td>
+                    <td class="modal-data-column" data-type="quota"><%= doctor.displayed_quota %></td>
+                    <td class="modal-data-column" data-type="available"><%= doctor.available_quota %></td>
+
+                    <% if has_permission?("VIEW_INSPECTORATE_DETAILS") %>
+                        <td><%= doctor.quota_used %></td>
+                        <td><%= Transaction.have_assigned_doctor(doctor.id).by_year('certification_date',Date.current.year).count %></td>
+                    <% end %>
+
+                    <td>
+                        <div><%= Doctor::STATUSES[doctor.status] %></div>
+                        <div class="font-italic"><small><%= doctor.status_display %></small></div>
+                    </td>
+
+                    <td class="module-row-actions">
+                        <%= raw index_table_show_button(internal_doctor_path(doctor)) %>
+
+                        <% if can_request_update?(doctor) and has_any_permission?("EDIT_NON_FINANCE_INFO_DOCTOR", "EDIT_FINANCE_INFO_DOCTOR") %>
+                            <%= raw index_table_edit_button edit_internal_doctor_path(doctor) %>
+                        <% end %>
+
+                        <% if can_continue_draft?(doctor, any_user: true) %>
+                            <% if has_permission?("EDIT_NON_FINANCE_INFO_DOCTOR") %>
+                                <%= raw index_table_draft_button(draft_internal_doctor_path(doctor)) %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if can_cancel_approval?(doctor) %>
+                            <%= raw index_table_cancel_button(cancel_internal_doctors_path(doctor)) %>
+                        <% end %>
+
+                        <% if can_do_approval?(doctor) %>
+                            <% if has_permission?("APPROVAL_DOCTOR") %>
+                                <%= raw index_table_approval_button(approval_internal_doctors_path(doctor)) %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if can_do_approval2?(doctor) %>
+                            <% if has_permission?("CONCUR_DOCTOR") %>
+                                <%= raw index_table_approval_button(concur_internal_doctors_path(doctor), title: "Concur") %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if has_permission?("DELETE_DOCTOR") %>
+                            <%= raw index_table_delete_button(internal_doctor_path(doctor)) %>
+                        <% end %>
+
+                        <% if has_permission?("CREATE_ORDER") && doctor.biometric_device_paid? && !doctor.paid_biometric_device %>
+                            <%=raw index_table_primary_button buy_biometric_device_internal_doctor_path(doctor), title: "Create Biometric Device Order", label: "<i class=\"fas fa-cart-plus\"></i>" %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <%= paginate @doctors %>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<div id="dialog-select-doctor" class="hidden" title="Please select a doctor">
+    <p>You will need to select at least one doctor.</p>
+</div>
+
+<%= render "quota_assignment_modal" %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.modal-trigger-quota-assignment').click(function (e) {
+        checked = $('.child-checkbox:checked');
+
+        if (checked.length === 0) {
+            openDialog({
+                target: '#dialog-select-doctor',
+                type: 'warning'
+            });
+            return false;
+        }
+
+        tableBody = $('#quota-assignment-table tbody');
+        tableBody.empty();
+
+        checked.each(function () {
+            rows = $(this).closest('tr').find('.modal-data-column').map(function () {
+                return `<td>${ $(this).text() }</td>`;
+            }).get().join('');
+
+            tableBody.append(`<tr>${ rows }</tr>`);
+        });
+
+        doctorIds = checked.map(function () {
+            return $(this).val();
+        }).get().join(',');
+
+        $('#quota_doctor_ids').val(doctorIds);
+    });
+
+    $('#download_wall_list').click(function(e) {
+        if ($('#state_id').val())
+            $(this).attr("href", this.href + '?' + $('#filter_form').serialize());
+        else {
+            e.preventDefault();
+            alert('Please select state before downloading wall list.')
+        }
+    });
+</script>
+<% end %>

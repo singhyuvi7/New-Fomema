@@ -1,0 +1,53 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_group_schedules_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Type</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :sp_schedulable_type, options_for_select(SpGroupSchedule::SP_SCHEDULEABLE_TYPES.invert, params[:sp_schedulable_type]), include_blank: "Select Option", class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Service Provider Code</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :sp_schedulable_code, params[:sp_schedulable_code], class: 'form-control', disabled: params[:sp_schedulable_type].blank? %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Service Provider Group</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :service_provider_group, options_from_collection_for_select(ServiceProviderGroup.order(:name).all, :id, :name, params[:service_provider_group]), include_blank: form_select_option_text, class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%= raw filter_clear_button internal_group_schedules_path %>
+                <%= raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#sp_schedulable_type').change(function () {
+    $('#sp_schedulable_code').prop("disabled", $(this).val().length == 0);
+});
+</script>
+<% end %>

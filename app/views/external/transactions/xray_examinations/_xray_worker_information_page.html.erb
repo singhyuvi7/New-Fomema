@@ -1,0 +1,206 @@
+<h5 class="px-4 py-3 border-bottom mb-0">X-Ray film assignment <%= "(Conducted by Radiologist)" if current_user.userable_type == "XrayFacility" && @sourceable.xray_reporter_type == "RADIOLOGIST" %></h5>
+
+<% if @xray_retake.present? && @xray_retake.retake_reason&.name.present? %>
+    <div class="p-4">
+        <p class="alert alert-info">
+            RETAKE REASON : <%= @xray_retake.retake_reason&.name %><br>
+            COMMENT : <%= @xray_retake.comment %>
+        </p>
+    </div>
+<% end %>
+
+<% unless readonly || @sourceable.xray_worker_identity_confirmed %>
+    <div class="p-4">
+        <% if @transaction.foreign_worker.afis_id.present? && current_user.userable.try(:fp_device) == 1 && @can_xray_bypass != true %>
+            <p class="alert alert-info">PLEASE VERIFY FINGERPRINT. <span id="instruction"></span></p>
+        <% else %>
+            <p class="alert alert-info">PROCEED WITH PASSPORT VERIFICATION.</p>
+        <% end %>
+
+        <!-- for fingerprint script alert -->
+        <p class="alert alert-success d-none"></p>
+        <p class="alert alert-danger device-alert d-none">
+            <span class="error-msg"></span>
+            <br>PLEASE CAPTURE THE ERROR MESSAGE AND THE FULL FRONT PAGE OF THE PASSPORT FOR THE SPECIFIED WORKER. THEN, CLICK ON THE "<b>FINGERPRINT ERROR</b>" BUTTON TO SUBMIT A REQUEST TO BYPASS THE FINGERPRINT VERIFICATION.
+            <button type="button" data-toggle="popover" data-placement="right" data-html="true" data-content='<%= image_tag("fingerprint_guide/sample_passport.png", :style => "width: 200px;")%><br><br><%= image_tag("fingerprint_guide/error_xray.png", :style => "width: 250px;")%>' title="" class="btn btn-danger btn-sm">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </p>
+        <p class="alert alert-danger init-alert d-none"></p>
+        <!-- end for -->
+    </div>
+<% end %>
+
+<%
+    worker_identity_confirmed   = @sourceable.xray_worker_identity_confirmed
+    radiologist_reporter_type   = @sourceable.xray_reporter_type == "RADIOLOGIST"
+    radiologist_id              = @sourceable.radiologist_id
+    radiologists                = @sourceable.radiologists
+    radiologist_name            = Radiologist.find_by(id: radiologist_id).try(:name)
+    is_disabled                 = !radiologist_reporter_type
+    disable_radiologist         = readonly || !@is_digital # Do not allow radiologist selection if it is an analog film.
+%>
+
+<div class="row px-4">
+    <div class="col-lg-4 p-4">
+        <h6 class="mb-4"><b>Foreign Worker Information</b></h6>
+
+        <table class="font-size-6">
+            <%
+                [
+                    ["Worker Name",         @transaction.fw_name],
+                    ["Worker Code",         @transaction.fw_code],
+                    ["Country Of Origin",   @transaction.fw_country.name],
+                    ["Date Of Birth",       @transaction.fw_date_of_birth? ? @transaction.fw_date_of_birth.strftime('%d/%m/%Y') : nil],
+                    ["Passport Number",     @transaction.fw_passport_number],
+                    ["Gender",              ForeignWorker::GENDERS[@transaction.fw_gender]],
+                    ["Job Type",            @transaction.fw_job_type&.name],
+                    ["Employer Code",       @transaction.employer&.code],
+                    ["Doctor Code",         @transaction.doctor&.code]
+                ].each do |label, information|
+            %>
+                <tr>
+                    <th class="text-right pr-4 py-2"><%= label %></th>
+                    <td class="py-2"><%= information %></td>
+                </tr>
+            <% end %>
+
+            <% if readonly || ([nil,''].include?(@transaction.foreign_worker.afis_id) or current_user.userable.try(:fp_device) != 1 or @can_xray_bypass === true) %>
+                <tr>
+                    <th class="text-right pr-4 py-2">Confirm Worker Identity</th>
+
+                    <td class="boolean-field-parent">
+                        <%= form.hidden_field :xray_worker_identity_confirmed, value: worker_identity_confirmed, class: "boolean-field" %>
+
+                        <div class="d-flex">
+                            <%= raw boolean_field_button(active_color: "danger", active: !worker_identity_confirmed, readonly: readonly, value: "false", placeholder: "No") %>
+                            <%= raw boolean_field_button(active_color: "success", active: worker_identity_confirmed, readonly: readonly, value: "true", placeholder: "Yes") %>
+                        </div>
+                    </td>
+                </tr>
+            <% else %>
+                <%= form.hidden_field :xray_worker_identity_confirmed, class: "boolean-field", value: true %>
+            <% end %>
+
+            <% if @transaction.previous_transaction_remedical&.is_next_transaction_re_medical == true %>
+                <tr>
+                    <th class="text-right pr-4 py-2">Confirm Worker Image</th>
+                    <td class="boolean-field-parent">
+                        <input type="hidden" name="transaction[xray_worker_image_confirmed]" id="transaction_xray_worker_image_confirmed_false" value="false">
+                        <div class="d-flex">
+                            <%= check_box "transaction", "xray_worker_image_confirmed", checked_value: true, unchecked_value: false, class: "form-check-input", required: true %>
+                            <%= label "transaction", "xray_worker_image_confirmed", "Yes, Worker's Image confirmed ", class: "form-check-label" %>
+                            <% @transaction.foreign_worker.uploads.where(category: "FOREIGN_WORKER_IMAGE").limit(1).order(created_at: :desc).each do |upload| %>
+                                <% document= upload.documents.each do |document| %>
+                                    <% if upload.category == 'FOREIGN_WORKER_IMAGE' %>
+                                        &nbsp;(<%= link_to "View Worker Image",  rails_blob_url(document), target: "_blank" , id: "view-image-link" %> )
+                                    <% end %>
+                                <% end %>
+                            <% end %>
+                        </div>
+                    </td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+
+    <div class="col-lg-8 p-4">
+        <h6 class="mb-4"><b>X-Ray Film Assigment</b></h6>
+
+        <table class="font-size-6">
+            <tr>
+                <th class="text-right pr-4">X-ray examination not done</th>
+
+                <td class="boolean-field-parent py-1">
+                    <%= hidden_field_tag :front_page_xray_not_done, "" %>
+                    <%= hidden_field_tag :front_page_xray_not_done_impression, "" %>
+                    <% value = @xray_examination.try(:xray_examination_not_done) == "YES" %>
+
+                    <div class="d-flex">
+                        <% if @xray_examination.digital_xray_available === true %>
+                            <button class="w-em-16 font-weight-bold w-em-8 btn btn-secondary" disabled>Yes</button>
+                        <% else %>
+                            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: "Yes", placeholder: "Yes", classes: "toggle_xray_not_done w-em-16") %>
+                        <% end %>
+                        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: "No", placeholder: "No", classes: "toggle_xray_not_done w-em-16") %>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="text-right pr-4">X-Ray Submission</th>
+
+                <td class="boolean-field-parent py-1">
+                    <%= form.hidden_field :xray_film_type, value: @is_digital ? "DIGITAL" : "ANALOG", class: "boolean-field" %>
+
+                    <div class="d-flex">
+                        <%= raw boolean_field_button(active_color: "primary", active: !@is_digital, readonly: true, value: "ANALOG", placeholder: "Analogue / Physical Film", classes: "w-em-16") %>
+                        <%= raw boolean_field_button(active_color: "primary", active: @is_digital, readonly: true, value: "DIGITAL", placeholder: "Digital Online Transmission", classes: "w-em-16") %>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="text-right pr-4">Self report or assign to a radiologist</th>
+
+                <td class="boolean-field-parent py-1">
+                    <%= form.hidden_field :xray_reporter_type, value: radiologist_reporter_type ? "RADIOLOGIST" : "SELF", class: "boolean-field" %>
+
+                    <div class="d-flex">
+                        <%= raw boolean_field_button(active_color: "danger", active: !radiologist_reporter_type, readonly: disable_radiologist, value: "SELF", placeholder: "Self", classes: "w-em-16") %>
+                        <%= raw boolean_field_button(active_color: "success", active: radiologist_reporter_type, readonly: disable_radiologist, value: "RADIOLOGIST", placeholder: "Radiologist", classes: "w-em-16 radiologist-image-check") %>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="text-right pr-4">Select radiologist</th>
+
+                <td class="boolean-field-parent py-1">
+                    <% if disable_radiologist %>
+                        <%= text_field_tag :radiologist_id, radiologist_name, placeholder: "Radiologist", class: "form-control rounded-0 w-em-32", readonly: true %>
+                    <% else %>
+                        <%= form.select :radiologist_id, options_from_collection_for_select(radiologists, :id, :name, radiologist_id), { include_blank: form_select_option_text }, class: "w-em-32 form-control select2", disabled: is_disabled %>
+                    <% end %>
+                </td>
+            </tr>
+
+            <% if @is_digital %>
+                <tr>
+                    <th class="text-right pr-4 my-2">Digital X-Rays Status</th>
+
+                    <td class="boolean-field-parent py-1">
+                        <% has_date_and_available = @xray_examination.digital_xray_available? && @xray_examination.xray_taken_date? %>
+
+                        <div class="text-primary d-flex align-items-center my-2" id="xray-exam-loader-status" data-status="<%= has_date_and_available %>">
+                            <% if has_date_and_available %>
+                                <b class="text-success">Available</b>
+                            <% else %>
+                                <i class="fas fa-spinner fa-spin font-size-12 text-center mr-2"></i> Checking
+                            <% end %>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="text-right pr-4">View Digital X-Rays</th>
+
+                    <td class="boolean-field-parent py-1">
+                        <%= link_to view_xray_image_shared_index_path(xray_exam_id: @xray_examination.id, user_id: current_user.id), id: "view_salinee_xray_image", class: "btn btn-primary px-4", target: :_blank do %>
+                            View <i class="fa fa-external-link-alt ml-2"></i>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+</div>
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#transaction_xray_worker_image_confirmed').change(function() {
+            if($("#transaction_xray_worker_image_confirmed").is(':checked')){
+                document.getElementById("view-image-link").click();
+            }
+        });
+    </script>
+<% end %>

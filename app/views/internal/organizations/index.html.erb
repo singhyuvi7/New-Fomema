@@ -1,0 +1,82 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Organizations</strong>
+        <%= link_to internal_organizations_path, :method => :get, class: 'btn btn-sm btn-primary' do %>
+            Table View
+        <% end %>
+        <%= link_to internal_organizations_path + '/tree', :method => :get, class: 'btn btn-sm btn-secondary' do %>
+            Tree View
+        <% end %>
+        <%= link_to internal_organizations_path + '/chart', :method => :get, class: 'btn btn-sm btn-secondary' do %>
+            Chart View
+        <% end %>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_ORGANIZATION') %>
+                    <%=raw index_table_new_button(new_internal_organization_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @organizations.blank? %>
+            <tr>
+                <td colspan="7" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @organizations.each.with_index((@organizations.current_page - 1) * get_per + 1) do |organization, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= organization.id %></td>
+                    <td><%= organization.code %></td>
+                    <td><%= organization.name %></td>
+                    <td><%= organization.org_type %></td>
+                    <td><%= Organization::STATUSES[organization.status] %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_organization_path(organization)) %>
+                        <% if has_permission?('EDIT_ORGANIZATION') %>
+                            <%=raw index_table_edit_button edit_internal_organization_path(organization) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_ORGANIZATION') %>
+                            <%=raw index_table_delete_button(internal_organization_path(organization)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @organizations %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

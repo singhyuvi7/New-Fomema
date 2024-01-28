@@ -1,0 +1,61 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Approval Approvers</strong> - Approval Approver Detail
+    </div>
+
+    <div class="card-body">
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <p class="form-control-plaintext">
+                        <%= ApprovalApprover::CATEGORIES[@approval_approver.category] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_local_bank">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= ApprovalApprover::STATUSES[@approval_approver.status] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="bank_status">User</label>
+                    <p class="form-control-plaintext">
+                        <%= User.find(@approval_approver.user_id).name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_approval_approvers_path) %>
+            <% if has_permission?('EDIT_APPROVAL_APPROVER') %>
+                <%=raw show_edit_button(edit_internal_approval_approver_path(@approval_approver)) %>
+            <% end %>
+        </div>
+    </div>
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_APPROVAL_APPROVER") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_approval_approver_audits_path(@approval_approver) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

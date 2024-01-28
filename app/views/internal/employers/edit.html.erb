@@ -1,0 +1,15 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Employers</strong> - Editing Employer
+    </div>
+    <%= form_for @employer, {
+        url: internal_employer_path(@employer), 
+        html: {
+            multipart: true, 
+            class: "#{@employer.status == 'INACTIVE' ? '' : 'with-parsley'} employer-form",
+            novalidate: @employer.status.eql?("INACTIVE")
+        }
+    } do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

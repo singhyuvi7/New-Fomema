@@ -1,0 +1,38 @@
+<div class="modal fade" id="bulk-upload-modal" tabindex="-1" role="dialog" aria-labelledby="bulk-upload" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bulk upload worker</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bulk-upload-form" method="post" action="<%= bulk_upload_external_worker_lists_path %>" enctype="multipart/form-data">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                    <div class="card">
+                        <div class="card-header text-right">
+                            <a href="<%= bulk_upload_template_external_worker_lists_path %>" target="_blank" class="btn btn-secondary">Download bulk upload template</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <!--<label class="col-md-3 col-form-label">CSV file</label>-->
+                                <div class="col-md-6">
+                                    <input name="file" id="file" type="file" required>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>

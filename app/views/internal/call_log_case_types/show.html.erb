@@ -1,0 +1,56 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Call Log Case Types</strong> - Call Log Case Type Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="call_log_case_type_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @call_log_case_type.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="call_log_case_type_code">Description</label>
+                    <p class="form-control-plaintext">
+                        <%= @call_log_case_type.description %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_call_log_case_types_path) %>
+            <%=raw show_edit_button(edit_internal_call_log_case_type_path(@call_log_case_type)) if has_permission?('EDIT_CALL_LOG_CASE_TYPE') %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_CALL_LOG_CASE_TYPE") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_call_log_case_type_audits_path(@call_log_case_type) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

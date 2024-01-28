@@ -1,0 +1,91 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        In regards to the above matter, it has come to our notice that your facility has not complied with our
+        Standard Operating Procedure (SOP) for Radiologists/Doctors on-chest X-ray medical examination
+        of foreign workers for analogue & digital system.
+    </p>
+    <p class="text-justify">
+        We would like to highlight that upon subsequent audit of the foreign workers' chest X-ray, it has been found that the foreign workers' medical examination is done without proper verification. As such, please provide a written explanation within 3 working days
+        from the date of this letter. Details of the worker are as below:
+    </p>
+    <table  class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+        <tr>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">FOREIGN WORKER NAME</td>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">WORKER CODE</td>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">PASSPORT NUMBER</td>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">X-RAY TAKEN DATE</td>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">AUDITED DATE</td>
+            <td valign="top" style="font-weight: bold; width: 8em; background-color: #D3D3D3;">EMPLOYER</td>
+
+        </tr>
+        <tr>
+          <td><%= @letter.worker_name %></td>
+          <td><%= @letter.worker_code %></td>
+          <td><%= @letter.worker_passport %></td>
+          <td><%= @letter.xray_date&.strftime("%d/%m/%Y") %></td>
+          <td><%= @letter.audit_date&.strftime("%d/%m/%Y") %></td>
+          <td><%= @letter.employer_name %></td>
+        </tr>
+    </table>
+
+    <p class="text-justify">
+        We would like to emphasize that FOMEMA SOP (<b>Clause 8.1</b>) states that the radiologist/ doctor/ radiographer
+        is responsible for the verification of the identity of the foreign worker through his/her passport
+        or the biometric identification and shall not proceed with the X-ray examination
+        if the original passport is not made available or the biometric identification is not carried out / not accepted.
+        The original passport and the FOMEMA Medical Form shall be made available throughout the X-ray examination.
+        If at any stage, the foreign worker&apos; identity cannot be verified or ascertained, the radiologist/doctor/radiographer shall not proceed with the examination,
+        and the foreign worker shall be rejected and referred by the X-ray facility to FOMEMA for further action.
+    </p>
+
+        Your cooperation in this matter is much appreciated.<br><br>
+        Thank you.<br><br>
+        Yours sincerely,<br><br><br><br><br>
+
+        <b><%= @letter.issuer_name %></b><br>
+        <%= @letter.issuer_title %>
+
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

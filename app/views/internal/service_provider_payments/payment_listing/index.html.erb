@@ -1,0 +1,236 @@
+<div class="card">
+    <div class="card-header"><strong>Payment Listing</strong></div>
+
+    <div class="card-body">
+        <%
+
+            payment_type = [
+                ["ALL", "all"],
+                ["AUTO", "auto"],
+                ["MANUAL", "manual"]
+            ]
+
+            list = [
+                { title: "Service Provider",            field: "service_provider",            type: "select", options: FinBatch::SERVICE_PROVIDER_TYPES.invert},
+                { title: "Service Provider Code",       field: "service_provider_code",       type: "text",   placeholder: "Service Provider Code" },
+                { title: "Group",                       field: "group",                       type: "select", options: []},
+                { title: "Certification Date",          field: "certification_date",          type: "date-range" },
+                { title: "Payment Type",                field: "payment_type",                type: "select", options: payment_type},
+                { title: "Payment Date",                field: "payment_date",                type: "date-range" },
+            ]
+
+            empty_colspan   = 13
+            headers         = ["Code", "Name", "Clinic Name", "Address", "Worker Code", "Worker Name", "Certified Date", "Payment Date", "Gender","Amount","Payment Type","Group Code"]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-transactions-index", filter_link: internal_payment_listing_view_payment_listing_path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <a href="#" class="btn btn-sm btn-primary" id="export"><i class="fas fa-download"></i> Export</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table id="internal-transactions-index-table" class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label>#</label></th>
+
+                                <% headers.each do |header| %>
+                                    <th><%= header %></th>
+                                <% end %>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @transactions.blank? %>
+                                <tr>
+                                    <td colspan="<%= empty_colspan %>" class="text-danger">No records found.</td>
+                                </tr>
+                            <% end %>
+
+                            <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                                <%
+                                    service_provider_details = transaction.send(@service_provider.constantize.model_name.param_key)
+                                    if transaction.sp_fin_batch_item.empty?
+                                        # manual payment
+                                        item = transaction.sp_transactions_payments.where(:service_providable_type => @service_provider).first
+                                        next if item.nil?
+                                        group_code =  item.service_provider_group_id.present? ? item.service_provider_group.code : 'NON-GROUP'
+                                        payment_type = "MANUAL"
+                                        payment_date = item.pay_at.strftime("%d/%m/%Y")
+                                    else
+                                        item = transaction.sp_fin_batch_item.where(:itemable_type => @service_provider).first
+                                        if item.nil? or item.sp_fin_batch.nil?
+                                            next
+                                        end
+                                        group_code = item.sp_fin_batch.batchable_type == ServiceProviderGroup.to_s ? item.sp_fin_batch.batchable.code : 'NON-GROUP'
+                                        payment_type = "AUTO"
+                                        payment_date = item.created_at.strftime("%d/%m/%Y")
+                                    end
+                                %>
+
+                                <tr>
+                                    <td class="module-row-numbers"><label><%= index %></label></td>
+                                    <td><%= service_provider_details.code %></td>
+                                    <% if @service_provider == Doctor.to_s %>
+                                        <td><%= service_provider_details.company_name.present? ? service_provider_details.company_name : service_provider_details.name %></td>
+                                    <% else %>
+                                        <td><%= service_provider_details.name %></td>
+                                    <% end %>
+
+                                    <td><%= @service_provider == Doctor.to_s ? service_provider_details.clinic_name : '-' %></td>
+
+                                    <td>
+                                        <%= service_provider_details.address1 %><% if service_provider_details.address1.present? %><br><% end %>
+                                        <%= service_provider_details.address2 %><% if service_provider_details.address2.present? %><br><% end %>
+                                        <%= service_provider_details.address3 %><% if service_provider_details.address3.present? %><br><% end %>
+                                        <%= service_provider_details.address4 %><% if service_provider_details.address4.present? %><br><% end %>
+                                        <%= service_provider_details.town.name %><br>
+                                        <%= service_provider_details.postcode %><br>
+                                        <%= service_provider_details.state.name %>
+                                    </td>
+                                    <td><%= transaction&.fw_code %></td>
+                                    <td><%= transaction&.fw_name %></td>
+                                    <td><%= transaction.certification_date.present? ? transaction.certification_date.strftime("%d/%m/%Y") : '-' %></td>
+                                    <td><%= payment_date %></td>
+                                    <td><%= ForeignWorker::GENDERS[transaction&.fw_gender] %></td>
+                                    <td><%= item&.amount %></td>
+                                    <td><%= payment_type %></td>
+                                    <td><%= group_code %></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @transactions %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .scrollable-menu-box {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        z-index: 1;
+        border: none;
+        opacity: 0.9;
+        padding: 0;
+        background-color: #f3f3f3;
+    }
+
+    th {
+        vertical-align: middle !important;
+        text-align: center;
+    }
+
+    .comment-reader {
+        width: 200px;
+    }
+
+    .old-tcupi {
+        background-color: #FFDDAA !important;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $(document).ready(function () {
+
+            $( "<small class='text-danger'>To list all service provider under same group, leave the 'Service Provider Code' empty</small>" ).insertAfter( "#service_provider_code" );
+            $( "<small class='text-danger'>To list manual payment for non-certified transactions as well, leave the 'Certification Date' empty</small>" ).insertAfter( $( "#certification_date_start" )
+            .closest( ".d-flex" ) );
+
+            tableHeight = $('.table-responsive').height() - 10;
+            setMaxHeight = Math.min(tableHeight, 320);
+            dropdownMenus = $('.dropdown-menu.in-table-dropdown').css('max-height', setMaxHeight);
+
+            $('.dropdown-menu.in-table-dropdown').map(function() {
+                menuHeight = $(this).height();
+                contentHeight = $(this).find('')
+            });
+
+            if (setMaxHeight < 320) {
+                $('.dropdown-menu.in-table-dropdown').scroll(function() {
+                    if (this.scrollTop > 0) {
+                        $(this).find('.scrollable-menu-box').hide();
+                    } else {
+                        $(this).find('.scrollable-menu-box').show();
+                    }
+                });
+            }
+
+            // update group dropdown
+            var service_provider = '<%= @service_provider %>'
+            var group = '<%= params[:group] %>'
+            if(service_provider)
+                generateGroup(service_provider)
+
+            $('#service_provider').change(function(value){
+                generateGroup(this.value)
+            });
+
+            $('form').submit(function(event) {
+                if (isInvalid()){
+                    event.preventDefault()
+                }
+            });
+
+            $('#export').click(function(e) {
+                if (isInvalid()){
+                    e.preventDefault();
+                }else{
+                    export_url = "<%= internal_payment_listing_export_payment_listing_path + '.csv?' %>"+ $('form').serialize()
+                    $(this). attr("href", export_url);
+                }
+            });
+
+            function generateGroup(value){
+                $('#group').html('<option value="">Non-Group</option>');
+                $.ajax({
+                    url: "/service_provider_groups.json?category=" + value,
+                    method: "GET",
+                    success: function (response) {
+                        response.forEach(function (row, index) {
+                            $('#group').append('<option value="' + row.id + '" '+(group == row.id ? 'selected' : '')+'>'+row.name+'</option>');
+                        });
+                    }
+                });
+            }
+
+            function isInvalid(){
+                if (!$('#service_provider').val() || !$('#payment_type').val()){
+                    alert("Please select a service provider and payment type before submit.")
+                    return true
+                }
+
+                if ($('#certification_date_start').val() || $('#certification_date_end').val()){
+                    if (!$('#certification_date_start').val() || !$('#certification_date_end').val()){
+                        alert("Please fill in the range of the certification date")
+                        return true
+                    }
+                }
+
+                if ($('#payment_date_start').val() || $('#payment_date_end').val()){
+                    if (!$('#payment_date_start').val() || !$('#payment_date_end').val()){
+                        alert("Please fill in the range of the payment date")
+                        return true
+                    }
+                }
+
+                return false
+            }
+        });
+    </script>
+<% end %>

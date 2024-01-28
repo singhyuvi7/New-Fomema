@@ -1,0 +1,86 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Refunds</strong> - Refund Detail
+    </div>
+
+    <div class="card-body">
+
+        <!-- card for refund detail -->
+        <div class="card">
+            <div class="card-body">
+                <%= render "refund_info" %>
+            </div>
+        </div>
+        <!-- /card for refund detail -->
+
+        <% if @refund_items.count > 0 %>
+            <table class="table" id="etr-table">
+                <thead>
+                    <% if lookup_context.template_exists?("#{@refund_items.first.refund_itemable_type.downcase}_header", "internal/refunds/items", true) %>
+                        <%= render "internal/refunds/items/#{@refund_items.first.refund_itemable_type.downcase}_header" %>
+                    <% else %>
+                        <tr>
+                            <th>Type</th>
+                            <th>&nbsp;</th>
+                            <th>Amount</th>
+                        </tr>
+                    <% end %>
+                </thead>
+                <tbody>
+                    <% @refund_items.each do |refund_item| %>
+                        <% if lookup_context.template_exists?("#{refund_item.refund_itemable_type.downcase}", "internal/refunds/items", true) %>
+                            <%= render "internal/refunds/items/#{refund_item.refund_itemable_type.downcase}", refund_item: refund_item %>
+                        <% else %>
+                            <tr>
+                                <td><%= refund_item.refund_itemable_type %></td>
+                                <td><%= refund_item.refund_itemable.try(:code) || refund_item.refund_itemable.try(:number) %></td>
+                                <td><%= number_to_currency(refund_item.amount, unit: "") %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="<%= (@column_count || 3) - 1 %>">&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@refund.amount, unit: "") %></div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        <% end %>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_refunds_path) %>
+            <% if has_permission?('REPROCESS_REFUND') && ["PAYMENT_FAILED"].include?(@refund.status) %>
+                <%= link_to '<i class="fas fa-arrow-right" aria-hidden="true"></i> Re-process Failed Payment'.html_safe, reprocess_internal_refund_path(@refund), class: "btn btn-sm btn-warning",title: "Re-process Failed Payment", data: {toggle: "tooltip", html: "true"}, method: :post %>
+            <% end %>
+        </div>
+
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_REFUND") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_refund_audits_path(@refund) %>
+                </li>
+            <% end %>
+            <% if has_permission?("PRINT_CREDIT_NOTE") %>
+                <li class="list-group-item">
+                    <%= link_to "Credit Note", credit_note_internal_refund_path(@refund), target: "_blank" %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

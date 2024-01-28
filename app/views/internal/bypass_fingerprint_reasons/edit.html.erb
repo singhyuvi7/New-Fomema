@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bypass Fingerprint Reasons</strong> - Edit Bypass Fingerprint Reason
+    </div>
+    <%= form_for @bypass_fingerprint_reason, url: internal_bypass_fingerprint_reason_path(@bypass_fingerprint_reason), html: {class: "#{params[:action]}_bypass_fingerprint_reason bypass_fingerprint_reason-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

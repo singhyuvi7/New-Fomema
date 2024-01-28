@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+* CoreUI - Free Bootstrap Admin Template
+* @version v2.1.6
+* @link https://coreui.io
+* Copyright (c) 2018 creativeLabs Łukasz Holeczek
+* Licensed under MIT (https://coreui.io/license)
+-->
+<html lang="en">
+
+<head>
+    <base href="./">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <title><%= site %></title>
+    <meta name="robots" content="noindex" />
+    <meta name="google-site-verification" content="d3W-wiiqd7ubYClb235-3wyQhhtu4Bu2KanjCJVs8VE" />
+    <!-- Icons-->
+    <link href="/vendors/@coreui/icons/css/coreui-icons.min.css" rel="stylesheet">
+    <link href="/vendors/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
+    <link href="/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/vendors/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+    <!-- Main styles for this application-->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= stylesheet_link_tag    'external/application', media: 'all' %>
+
+    <script type='text/javascript'>
+        (function(){
+        var widget_id = 's5pHxAJbOx';var d=document;var w=window;
+        function l(){
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = '//code.jivosite.com/script/widget/'+widget_id;
+        var ss = document.getElementsByTagName('script')[0];
+        ss.parentNode.insertBefore(s, ss);}if(d.readyState=='complete'){l();}else{if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+	</script>
+</head>
+
+ <body class="app align-items-center bg-portal">
+    <div class="" style="width:100%;">
+
+        <%= yield %>
+        <div class="footer" style="margin-top: 10px">
+            <!-- <ul class="nav justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link active" href="http://fomema.com.my/index.php/about-us">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://fomema.com.my/index.php/contact-us">Contact Us</a>
+                </li>
+            </ul> -->
+            <div class="footer-copyright text-center">
+                <div class="container-fluid footer-revamp">
+                    <div class="mb-3">
+                        <img src="<%= image_path('sirim-logo-compressed.png') %>" class="img-responsive" style="max-height: 120px;"/>
+                    </div>
+                    <div class="text-bold text-white">
+                        Copyright &copy; <%= Date.current.year %> <%= @company_name %> All Rights Reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CoreUI and necessary plugins-->
+    <script src="/vendors/jquery/js/jquery.min.js"></script>
+    <script src="/vendors/popper.js/js/popper.min.js"></script>
+    <script src="/vendors/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/vendors/pace-progress/js/pace.min.js"></script>
+    <script src="/vendors/select2/js/select2.min.js"></script>
+    <script src="/vendors/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
+    <script src="/vendors/@coreui/coreui/js/coreui.min.js"></script>
+    <!-- Plugins and scripts required by this view-->
+    <script src="/vendors/chart.js/js/Chart.min.js"></script>
+    <script src="/vendors/@coreui/coreui-plugin-chartjs-custom-tooltips/js/custom-tooltips.min.js"></script>
+    <script src="/vendors/parsley/js/parsley.min.js"></script>
+    <%= javascript_include_tag 'application' %>
+    <%= javascript_include_tag 'external/application' %>
+    <%= yield :page_end_scripts %>
+    <%= render "/layouts/browser_compatibility_modal" %>
+</body>
+
+</html>

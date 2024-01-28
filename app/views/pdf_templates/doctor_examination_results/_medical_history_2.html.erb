@@ -1,0 +1,86 @@
+<%
+    category_2_number   = '2.'
+
+    category_2_diseases = [
+        [:history_hypertension, "HYPERTENSION"],
+        [:history_heart_diseases, "HEART DISEASES"],
+        [:history_bronchial_asthma, "BRONCHIAL ASTHMA"],
+        [:history_diabetes_mellitus, "DIABETES MELLITUS"],
+        [:history_peptic_ulcer, "PEPTIC ULCER"],
+        [:history_kidney_diseases, "KIDNEY DISEASES"],
+        [:history_other, "OTHERS"],
+        [:history_taken_drug_recently, "MEDICATION TAKEN WITHIN THE LAST 2 WEEKS?"],
+    ].map do |key, value|
+        date = @doctor_exam.try("#{ key }_date")
+
+        {
+            number: key == :history_taken_drug_recently ? "3." : "",
+            name:   value,
+            yes:    @doctor_exam.try(key),
+            no:     !@doctor_exam.try(key),
+            date:   date.present? ? date.strftime("%d/%m/%Y") : "",
+        }
+    end
+%>
+
+<div class="medical-results-content medical-history">
+    <div class="sub-title text-center subtitle-top-margin">
+    </div>
+    <table>
+        <thead>
+            <tr class="with-date">
+                <th class="text-left bold head-index"><%= category_2_number %></th>
+                <th class="text-left bold head-title underline">CATEGORY 2 DISEASES</th>
+                <th class="head-checkbox"></th>
+                <th class="head-checkbox"></th>
+                <th class="head-date"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="text-center bold">YES</td>
+                <td class="text-center bold">NO</td>
+                <td class="text-center bold">DATE (DD/MM/YYYY)</td>
+            </tr>
+            <% category_2_diseases.each.with_index(1) do |disease, index| %>
+                <tr>
+                    <td><%= disease[:number].present? ? disease[:number] : "#{category_2_number+index.to_s}" %></td>
+                    <td><%= disease[:name] %></td>
+                    <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= disease[:date] %></td>
+                </tr>
+            <% end %>
+            <tr>
+                <td>4.</td>
+                <td colspan="4">Comments (refer to Part II-Medical History.)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4" class="white-space-normal"><%= @doctor_exam.try(:history_comment).present? ? simple_format(@doctor_exam.try(:history_comment)) : "-" %></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="note-table">
+        <thead>
+            <tr>
+                <th class="text-left head-index"></th>
+                <th class="text-left head-note">Note:</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td>
+                    <ul class="note-list">
+                        <li>Foreign Workers with a medical history of incurable or chronic diseases/conditions needing<br>
+                        <span class="bold underline">prolonged and extensive</span> treatment may also be found unsuitable for employment in Malaysia</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

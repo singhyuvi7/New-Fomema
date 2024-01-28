@@ -1,0 +1,2 @@
+<%= label_tag :area_id %>
+<%= collection_select(collection_object.singularize.to_sym, :area_id, areas, :id, :name, {include_blank: 'Select Option'}, {class: 'form-control'}) %>

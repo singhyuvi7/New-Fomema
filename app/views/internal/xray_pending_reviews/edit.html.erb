@@ -1,0 +1,173 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Review</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+        <%=render 'shared/all_validation_flash', { model_obj: @xray_pending_review} %>
+
+        <%=render 'internal/xray_pending_reviews/shared/xray_pending_review_type', { xray_pending_review: @xray_pending_review } %>
+
+        <div class="row">
+            <div class="col-md-8">
+                <%=render 'internal/xray_pending_reviews/shared/transaction_summary', { transaction: @transaction } %>
+            </div>
+
+            <div class="col-md-4">
+                <%=render 'internal/xqccs/shared/related_transaction', {
+                    transaction: @transaction
+                } %>
+            </div>
+        </div>
+
+        <!-- tab menu -->
+        <ul class="nav nav-tabs" role="tablist">
+
+            <% if @previous_transaction.present? %>
+                <!--
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#doctor_examination-<%#= @previous_transaction.doctor_examination&.id %>-content">Previous Doctor Certification <%#= xqcc_result_badge(@previous_transaction.doctor_examination.suitability) %></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#laboratory_examination-<%#= @previous_transaction.laboratory_examination&.id %>-content">Previous Laboratory Report <%#= xqcc_result_badge(@previous_transaction.laboratory_examination.result) %></a>
+                </li>
+                -->
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= @previous_transaction.xray_examination&.id %>-content">
+                        Previous X-Ray Report
+                        <%= xqcc_result_badge(@previous_transaction.xray_examination&.result) %>
+                    </a>
+                </li>
+
+                <% if @previous_transaction.xray_review.present? %>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= @previous_transaction.xray_review&.id %>-content">Previous XQCC Review <%= xqcc_result_badge(@previous_transaction.xray_review.result) %></a>
+                    </li>
+                <% end %>
+
+                <% if @previous_transaction.pcr_review.present? %>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= @previous_transaction.pcr_review&.id %>-content">Previous PCR Review <%= xqcc_result_badge(@previous_transaction.pcr_review&.result) %></a>
+                    </li>
+                <% end %>
+            <% end %>
+            <!-- /previous transaction -->
+
+            <!--
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#doctor_examination-<%#= @transaction.doctor_examination&.id %>-content">Doctor Certification <%#= xqcc_result_badge(@transaction.doctor_examination.suitability) %></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#laboratory_examination-<%#= @transaction.laboratory_examination&.id %>-content">Laboratory Report <%#= xqcc_result_badge(@transaction.laboratory_examination.result) %></a>
+            </li>
+            -->
+
+            <% @transaction.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_examination.id %>-content">
+                        <% if xray_examination.sourceable_type == "XrayRetake" %>Retake <% end %>X-Ray Report
+                        <%= xqcc_result_badge(xray_examination.result) %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% @transaction.pcr_reviews.order(:created_at).each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">PCR Review <%= xqcc_result_badge(pcr_review.result) %> <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button> <% end %></a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#xray_pending_review">XQCC Pending Review</a>
+            </li>
+
+        </ul>
+        <!-- /.nav-tabs -->
+
+        <div class="tab-content">
+
+            <% if @previous_transaction.present? %>
+
+                <!--
+                <div class="tab-pane fade" role="tabpanel" id="doctor_examination-<%#= @previous_transaction.doctor_examination&.id %>-content">
+                    <%#=render 'internal/doctor_examinations/doctor_examination', { doctor_examination: @previous_transaction.doctor_examination } %>
+                </div>
+
+                <div class="tab-pane fade" role="tabpanel" id="laboratory_examination-<%#= @previous_transaction.laboratory_examination&.id %>-content">
+                    <%#=render 'internal/laboratory_examinations/laboratory_examination', { laboratory_examination: @previous_transaction.laboratory_examination } %>
+                </div>
+                -->
+
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= @previous_transaction.xray_examination&.id %>-content">
+                    <%=render 'internal/xray_pending_reviews/shared/transaction_summary', { transaction: @previous_transaction } %>
+
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: @previous_transaction.xray_examination } %>
+                </div>
+
+                <% if @previous_transaction.xray_review.present? %>
+                    <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= @previous_transaction.xray_review&.id %>-content">
+                        <div class="previous_xqcc_review_form">
+                            <%=render 'internal/xray_reviews/xray_review', { xray_review: @previous_transaction.xray_review } %>
+                        </div>
+                    </div>
+                <% end %>
+
+                <% if @previous_transaction.pcr_review.present? %>
+                    <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= @previous_transaction.pcr_review&.id %>-content">
+                        <div class="pcr_review_form">
+                            <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: @previous_transaction.pcr_review } %>
+                        </div>
+                    </div>
+                <% end %>
+
+            <% end %>
+
+            <!--
+            <div class="tab-pane fade" role="tabpanel" id="doctor_examination-<%#= @transaction.doctor_examination&.id %>-content">
+                <%#=render 'internal/doctor_examinations/doctor_examination', { doctor_examination: @transaction.doctor_examination } %>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="laboratory_examination-<%#= @transaction.laboratory_examination&.id %>-content">
+                <%#=render 'internal/laboratory_examinations/laboratory_examination', { laboratory_examination: @transaction.laboratory_examination } %>
+            </div>
+            -->
+
+            <% @transaction.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% @transaction.pcr_reviews.each.with_index(1) do |pcr_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review&.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <div class="tab-pane fade show active" role="tabpanel" id="xray_pending_review">
+                <%= form_for @xray_pending_review, url: internal_xray_pending_review_path(@xray_pending_review), method: "patch", html: {class: 'with-parsley' } do |form| %>
+                    <%=render 'internal/xray_pending_reviews/form', {xray_pending_review: @xray_pending_review, form: form} %>
+                <% end %>
+                <% # need to place outside of xray_review form %>
+                <%=render 'internal/xray_pending_reviews/shared/filter_compare_modal', { xray_pending_review: @xray_pending_review } %>
+            </div>
+
+        </div>
+        <!-- /.tab-content -->
+
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <a class="btn btn-warning btn-sm" href="<%= merts_result_index_internal_xqccs_path(foreign_worker_id: @transaction.foreign_worker_id, except_transaction_id: @transaction.id, pending_review: @xray_pending_review.id) %>"><i class="fa fa-history"></i> History</a>
+            <%=raw edit_back_button(internal_xray_pending_reviews_path) %>
+        </div>
+    </div>
+
+</div>

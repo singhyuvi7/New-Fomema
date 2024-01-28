@@ -1,0 +1,99 @@
+<div class="card">
+    <div id="filter-transactions-toggle" class="card-header d-flex align-items-center clickable">
+        <strong class="mb-0">Filter</strong>
+        <span class="flex-grow-1"></span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <%= form_tag internal_xray_pending_decisions_path, method: 'get', id: "filter-transactions-form" do |form| %>
+    <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Transaction ID</label>
+
+                        <div class="col-sm-9">
+                            <%= text_field_tag :transaction_code, params[:transaction_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Worker Code</label>
+
+                        <div class="col-sm-9">
+                                <%= text_field_tag :worker_code, params[:worker_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Review Status</label>
+
+                        <div class="col-sm-9">
+
+                            <select class="col-md-12 form-control select2" name="review_status">
+                                <option value="ALL" <% if params[:review_status] == "ALL" %> selected <% end %>>ALL</option>
+                                <option value="XQCC_PENDING_DECISION" <% if params[:review_status] == "XQCC_PENDING_DECISION" || params[:review_status].nil? %> selected <% end %>>PENDING DECISION</option>
+                                <option value="REQUESTED" <% if params[:review_status] == "REQUESTED" %> selected <% end %>>REQUESTED</option>
+                                <option value="PENDING_DECISION_AUDITED" <% if params[:review_status] == "PENDING_DECISION_AUDITED" %> selected <% end %>>PENDING DECISION - AUDITED</option>
+                                <option value="SUITABLE" <% if params[:review_status] == "SUITABLE" %> selected <% end %>>SUITABLE</option>
+                                <option value="UNSUITABLE" <% if params[:review_status] == "UNSUITABLE" %> selected <% end %>>UNSUITABLE</option>
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Passport Number</label>
+
+                        <div class="col-sm-9">
+                                <%= text_field_tag :passport_number, params[:passport_number], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Certify Date</label>
+
+                        <div class="col-sm-8">
+                            <div class="d-flex align-items-center">
+                                <%= text_field_tag "certify_start", params["certify_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'certify_start' }, max: Date.today.strftime("%F") %>
+                                <span class="mx-3">to</span>
+                                <%= text_field_tag "certify_end", params["certify_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'certify_end' }, max: Date.today.strftime("%F") %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_xray_pending_decisions_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+        
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#filter-transactions-toggle').click(function() {
+        $('#filter-transactions-toggle i.fas').toggleClass('fa-chevron-down fa-chevron-left');
+        $('#filter-transactions-form').slideToggle();
+    });
+</script>
+<% end %>

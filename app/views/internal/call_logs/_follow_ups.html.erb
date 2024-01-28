@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header">
+        Follow Up
+        <% if !@call_log.status.eql?("CLOSE") %>
+            <a href="<%= new_internal_call_log_call_log_follow_up_path(@call_log) %>" class="btn btn-sm btn-primary float-right">Add</a>
+        <% end %>
+    </div>
+    <div class="card-body">
+
+        <table class="<%= index_table_class %>">
+            <thead>
+                <tr>
+                    <th>Follow Up Date</th>
+                    <th>Follow Up By</th>
+                    <th>Follow Up Comment</th>
+                    <th class="module-row-actions">Action(s)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if @call_log.call_log_follow_ups.blank? %>
+                    <tr>
+                        <td colspan="4" class="text-danger">No records found.</td>
+                    </tr>
+                <% else %>
+                    <% @call_log.call_log_follow_ups.order(:created_at, :id).each.with_index do |call_log_follow_up, index| %>
+                        <tr>
+                            <td><%= call_log_follow_up.created_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                            <td><%= call_log_follow_up.creator&.name %></td>
+                            <td><pre><%= call_log_follow_up.comment %></pre></td>
+                            <td class="module-row-actions">
+                                <%=raw index_table_show_button(internal_call_log_call_log_follow_up_path(@call_log, call_log_follow_up)) %>
+                                <% if has_permission?('EDIT_FOLLOW_UP_CALL_LOG') and !@call_log.status.eql?("CLOSE") %>
+                                    <%=raw index_table_edit_button edit_internal_call_log_call_log_follow_up_path(@call_log, call_log_follow_up) %>
+                                <% end %>
+                                <% if has_permission?('DELETE_FOLLOW_UP_CALL_LOG') and !@call_log.status.eql?("CLOSE") %>
+                                    <%=raw index_table_delete_button(internal_call_log_call_log_follow_up_path(@call_log, call_log_follow_up)) %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                <% end %>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

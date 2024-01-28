@@ -1,0 +1,394 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong> - Laboratory Medical Examination</div>
+
+    <%= nested_form_for @transaction, url: medical_examination_external_transactions_path(@transaction), html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <% laboratory_examination = @transaction.laboratory_examination %>
+
+        <div class="p-4 border-bottom">
+            <h3><u>Laboratory Results</u></h3>
+        </div>
+
+        <%= render partial: "laboratory_examination_form", locals: { namespacing: "le_attributes", laboratory_examination: laboratory_examination } %>
+
+        <div class="card-footer text-right">
+            <%= form.submit "Save", class: "btn btn-primary hidden", value: "Save", id: "save-submit" %>
+            <%= form.submit "Save and Transmit", class: "btn btn-primary", value: "Save and Transmit", id: "save-and-transmit-submit" %>
+        </div>
+    <% end %>
+</div>
+
+<div id="dialog-specimen-taken-fill" class="hidden" title="Include specimen taken date">
+    <p>Please include <b>Date of specimen taken</b> before transmitting.</p>
+</div>
+
+<div id="dialog-specimen-received-fill" class="hidden" title="Include specimen received date">
+    <p>Please include <b>Date of specimen received</b> before transmitting.</p>
+</div>
+
+<div id="dialog-blood-barcode-fill" class="hidden" title="Include blood specimen barcode">
+    <p>Please include <b>Barcode of blood specimen</b> before transmitting.</p>
+</div>
+
+<div id="dialog-urine-barcode-fill" class="hidden" title="Include urine specimen barcode">
+    <p>Please include <b>Barcode of urine specimen</b> before transmitting.</p>
+</div>
+
+<div id="dialog-visited-fill" class="hidden font-size-8" title="Please mark as viewed">
+    <p>Please ensure that you have marked <b>YES</b> for the section <b>I confirm the laboratory findings for this foreign worker</b> before transmitting.</p>
+</div>
+
+<div id="dialog-sugar-fill" class="hidden font-size-8" title="Please indicate sugar measurement">
+    <p>Please indicate sugar measurement if is marked as <b>PRESENT</b>.</p>
+</div>
+
+<div id="dialog-sugar-abnormal" class="hidden font-size-8" title="Sugar measurement is within normal range">
+    <p>Sugar measurement must be equal or more than 15 mmol/l if is marked as <b>PRESENT</b>.</p>
+</div>
+
+<div id="dialog-albumin-fill" class="hidden font-size-8" title="Please indicate albumin measurement">
+    <p>Please indicate albumin measurement if is marked as <b>PRESENT</b>.</p>
+</div>
+
+<div id="dialog-albumin-abnormal" class="hidden font-size-8" title="Albumin measurement is within normal range">
+    <p>Albumin measurement must be equal or more than 1 g/l if is marked as <b>PRESENT</b>.</p>
+</div>
+
+<div id="dialog-blood-group-fill" class="hidden font-size-8" title="Please complete blood group">
+    <p>Please ensure that the blood group section is properly filled up.</p>
+</div>
+
+<div id="dialog-abnormal-fill" class="hidden font-size-8" title="Please state abnormal reason">
+    <p>You have indicated at least one test to be abnormal. Please specify the reasons for the abnormalities.</p>
+</div>
+
+<div id="dialog-abnormal-fill-not-done" class="hidden font-size-8" title="Please state abnormal reason">
+    <p>You have marked the exam as <b>Not Done</b>. Please specify the reasons for the abnormalities.</p>
+</div>
+
+<div id="dialog-measurement-range-transmit" class="hidden" title="Invalid range">
+    <label></label>
+    <p>The normal value range for this field is: <span></span>. Please recheck this field.</p>
+</div>
+
+<div id="dialog-specimen-dates" class="hidden" title="Invalid dates chosen">
+    <p>The Date & Time of the <b>specimen received</b> cannot be earlier than <b>specimen taken</b>.</p>
+</div>
+
+<div id="dialog-abo-discrepancy" class="hidden" title="ABO(Rh) group discrepancy found">
+    <p><b>ABO(Rh) group discrepancy</b> between current ABO(Rh) group with previous ABO(Rh) group. Please verify the result before transmit.</p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        initializeToggleableFields('laboratory examination');
+
+        $('.select-blood-type').click(function(e) {
+            $('.select-blood-type').removeClass('btn-primary').addClass('btn-default');
+            $(this).addClass('btn-primary').removeClass('btn-default');
+            type = $(this).attr('data-type');
+            $('#le_attributes_blood_group').val(type);
+            bloodOther = $('#le_attributes_blood_group_other');
+
+            if (type !== 'OTHER') {
+                toggleDisabledAttr(bloodOther, true);
+                bloodOther.val('');
+                $(".select-rhesus-type").css('pointer-events','auto');
+                $(".select-rhesus-type").attr("disabled", false);
+            } else {
+                toggleDisabledAttr(bloodOther, false);
+                $('.select-rhesus-type').removeClass('btn-primary').addClass('btn-default');
+                $(".select-rhesus-type").css('pointer-events','none');
+                $(".select-rhesus-type").attr("disabled", true);
+                $('#le_attributes_blood_group_rhesus').val('');
+                bloodRhesusOther = $('#le_attributes_blood_group_rhesus_other');
+                toggleDisabledAttr(bloodRhesusOther, true);
+                bloodRhesusOther.val('');
+            }
+
+            if ($('#le_attributes_is_blood_group_benchmark').val() == 'true') {
+                checkBloodGroupDiscrepancy(e);
+            }
+        });
+
+        $('.select-rhesus-type').click(function(e) {
+            $('.select-rhesus-type').removeClass('btn-primary').addClass('btn-default');
+            $(this).addClass('btn-primary').removeClass('btn-default');
+            type = $(this).attr('data-type');
+            $('#le_attributes_blood_group_rhesus').val(type);
+            bloodRhesusOther = $('#le_attributes_blood_group_rhesus_other');
+
+            if (type !== 'OTHER') {
+                toggleDisabledAttr(bloodRhesusOther, true);
+                bloodRhesusOther.val('');
+            } else {
+                toggleDisabledAttr(bloodRhesusOther, false);
+            }
+
+            if ($('#le_attributes_is_blood_group_benchmark').val() == 'true') {
+                checkBloodGroupDiscrepancy(e);
+            }
+        });
+
+        function checkBloodGroupDiscrepancy(selector, e) {
+            bloodGroup                = $('#le_attributes_blood_group').val().trim();
+            bloodGroupRhesus          = $('#le_attributes_blood_group_rhesus').val().trim();
+            previousBloodGroup        = $('#le_attributes_previous_blood_group').val().trim();
+            previousBloodGroupRhesus  = $('#le_attributes_previous_blood_group_rhesus').val().trim();
+
+            if(bloodGroup && bloodGroupRhesus && previousBloodGroup && previousBloodGroupRhesus) {
+                if (previousBloodGroup != bloodGroup || previousBloodGroupRhesus != bloodGroupRhesus) {
+                    openDialogAndPreventSubmit('#dialog-abo-discrepancy', e);
+                }
+            }
+
+            focusField = selector.closest('.boolean-field-parent');
+            $('#dialog-abo-discrepancy').on('dialogclose', function(event, ui) {
+                scrollToElement(focusField, 500);
+                highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+            });
+        }
+
+        $('.measurement-range-check-lab').change(function(e) {
+            type    = $(this).attr('data-type');
+            value   = $(this).val();
+
+            if (!value.trim()) {
+                return false;
+            }
+
+            parameters = {
+                sugar_value: {name: 'SUGAR', min: 0.01, max: 999.99, decimal_places: 3},
+                albumin_value: {name: 'ALBUMIN', min: 0.01, max: 99.99, decimal_places: 2}
+            }[type]
+
+            $(this).val(parseFloat(value).toFixed(parameters.decimal_places));
+            focusField      = $(this).closest('.boolean-field-parent');
+            floatedValue    = parseFloat($(this).val());
+
+            if (floatedValue < parameters.min || parameters.max < floatedValue) {
+                $('#dialog-measurement-range-transmit label').text(`${parameters.name}: ${floatedValue}`);
+                $('#dialog-measurement-range-transmit span').text(`${parameters.min} - ${parameters.max}`);
+                openDialogAndPreventSubmit('#dialog-measurement-range-transmit', e);
+                $(this).val('');
+
+                $('#dialog-measurement-range-transmit').on('dialogclose', function(event, ui) {
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            }
+        });
+
+        $('form').submit(function(e) {
+            takenDate       = $('#le_attributes_specimen_taken_date').val();
+            receivedDate    = $('#le_attributes_specimen_received_date').val();
+
+            if (takenDate && receivedDate) {
+                parsedTakenDate     = returnNewDateObject(takenDate);
+                parsedReceivedDate  = returnNewDateObject(receivedDate);
+
+                if (parsedTakenDate > parsedReceivedDate) {
+                    openDialogAndPreventSubmit('#dialog-specimen-dates', e);
+
+                    $('#dialog-specimen-dates').on('dialogclose', function(event, ui) {
+                        focusField = $('.lab-specimen-date-parents:first');
+                        scrollToElement(focusField, 500);
+                        highlightElement($('.lab-specimen-date-parents'), '#facf7f', 'slow');
+                        delayedHighlightField($('.lab-specimen-date-parents'), '#fff', 'slow', 5000);
+                    });
+                }
+            }
+        });
+
+        function returnNewDateObject(string) {
+            split   = string.split(' ');
+            date    = split[0].split('-');
+            time    = split[1].split(':');
+            return new Date(date[0], date[1], date[2], time[0], time[1], '00')
+        }
+
+        $('#save-and-transmit-submit').click(function(e) {
+            sugar                     = $('#le_attributes_sugar').val() === 'true';
+            sugarValue                = $('#le_attributes_sugar_value').val().trim();
+            albumin                   = $('#le_attributes_albumin').val() === 'true';
+            albuminValue              = $('#le_attributes_albumin_value').val().trim();
+            bloodGroup                = $('#le_attributes_blood_group').val().trim();
+            bloodRhesus               = $('#le_attributes_blood_group_rhesus').val().trim();
+            bloodOther                = $('#le_attributes_blood_group_other').val().trim();
+            bloodRhesusOther          = $('#le_attributes_blood_group_rhesus_other').val().trim();
+            bloodIncomplete           = !bloodGroup || (bloodGroup === 'OTHER' && !bloodOther) || (bloodGroup != 'OTHER' && !bloodRhesus) || (bloodRhesus === 'OTHER' && !bloodRhesusOther);
+            dateReceivedFilled        = $('#le_attributes_specimen_received_date').val().trim();
+            dateTakenFilled           = $('#le_attributes_specimen_taken_date').val().trim();
+            barcodeBloodFilled        = $('#le_attributes_blood_specimen_barcode').val().trim();
+            barcodeUrineFilled        = $('#le_attributes_urine_specimen_barcode').val().trim();
+            visited                   = $('#visited_laboratory').val() === 'true';
+            abnormality               = $('#le_attributes_abnormal_reason').val().trim();
+            examDone                  = $('#le_attributes_laboratory_test_not_done').val() === 'NO';
+
+            sugarAbnormalBenchmark = 15;    // abnormal if >= 15 mmol/l
+            albuminAbnormalBenchmark = 1;   // abnormal if >= 1 g/l
+
+            anyAbnormal         = $('.check-abnormal-status').map(function() {
+                return $(this).val() === 'true';
+            }).get().includes(true);
+
+            if (examDone && sugar && !sugarValue) {
+                openDialogAndPreventSubmit('#dialog-sugar-fill', e);
+
+                $('#dialog-sugar-fill').on('dialogclose', function(event, ui) {
+                    focusField = $('#le_attributes_sugar_value').closest('.boolean-field-parent');
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (parseFloat(sugarValue) < sugarAbnormalBenchmark) {
+                openDialogAndPreventSubmit('#dialog-sugar-abnormal', e);
+
+                $('#dialog-sugar-abnormal').on('dialogclose', function(event, ui) {
+                    focusField = $('#le_attributes_sugar_value').closest('.boolean-field-parent');
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && albumin && !albuminValue) {
+                openDialogAndPreventSubmit('#dialog-albumin-fill', e);
+
+                $('#dialog-albumin-fill').on('dialogclose', function(event, ui) {
+                    focusField = $('#le_attributes_albumin_value').closest('.boolean-field-parent');
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (parseFloat(albuminValue) < albuminAbnormalBenchmark) {
+                openDialogAndPreventSubmit('#dialog-albumin-abnormal', e);
+
+                $('#dialog-albumin-abnormal').on('dialogclose', function(event, ui) {
+                    focusField = $('#le_attributes_albumin_value').closest('.boolean-field-parent');
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && bloodIncomplete) {
+                openDialogAndPreventSubmit('#dialog-blood-group-fill', e);
+
+                $('#dialog-blood-group-fill').on('dialogclose', function(event, ui) {
+                    focusField = $('#le_attributes_blood_group_other').closest('.boolean-field-parent');
+                    scrollToElement(focusField, 500);
+                    highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && !dateTakenFilled) {
+                dateField = $('#le_attributes_specimen_taken_date');
+                openDialogAndPreventSubmit('#dialog-specimen-taken-fill', e);
+
+                $('#dialog-specimen-taken-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(dateField, 500);
+                    highlightElement(dateField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(dateField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && !dateReceivedFilled) {
+                dateField = $('#le_attributes_specimen_received_date');
+                openDialogAndPreventSubmit('#dialog-specimen-received-fill', e);
+
+                $('#dialog-specimen-received-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(dateField, 500);
+                    highlightElement(dateField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(dateField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && !barcodeBloodFilled) {
+                dateField = $('#le_attributes_blood_specimen_barcode');
+                openDialogAndPreventSubmit('#dialog-blood-barcode-fill', e);
+
+                $('#dialog-blood-barcode-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(dateField, 500);
+                    highlightElement(dateField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(dateField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && !barcodeUrineFilled) {
+                dateField = $('#le_attributes_urine_specimen_barcode');
+                openDialogAndPreventSubmit('#dialog-urine-barcode-fill', e);
+
+                $('#dialog-urine-barcode-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(dateField, 500);
+                    highlightElement(dateField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(dateField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (examDone && anyAbnormal && !abnormality) {
+                textField = $('#le_attributes_abnormal_reason');
+                openDialogAndPreventSubmit('#dialog-abnormal-fill', e);
+
+                $('#dialog-abnormal-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(textField, 500);
+                    highlightElement(textField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(textField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (!examDone && !abnormality) {
+                textField = $('#le_attributes_abnormal_reason');
+                openDialogAndPreventSubmit('#dialog-abnormal-fill-not-done', e);
+
+                $('#dialog-abnormal-fill-not-done').on('dialogclose', function(event, ui) {
+                    scrollToElement(textField, 500);
+                    highlightElement(textField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                    delayedHighlightField(textField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                });
+            } else if (!visited) {
+                visitedParent = $('#visited_laboratory').closest('.boolean-field-parent');
+                openDialogAndPreventSubmit('#dialog-visited-fill', e);
+
+                $('#dialog-visited-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(visitedParent, 500);
+                    highlightElement(visitedParent, '#facf7f', 'slow');
+                    delayedHighlightField(visitedParent, '#fff', 'slow', 5000);
+                });
+            }
+        });
+
+        $('#le_attributes_specimen_taken_date').change(function() {
+            var options     = datetimepickerDefault();
+            var startDate   = moment($(this).val());
+            startDate.add(1, 'minute');
+            options.minDate = startDate.format('YYYY/MM/DD HH:mm');
+            options.maxDate = moment().format('YYYY/MM/DD HH:mm');
+            $('#le_attributes_specimen_received_date').flatpickr(options);
+        });
+
+        $('.lab-exam-sugar-albumin-wipe').change(function() {
+            var value = $(this).val();
+
+            if (value === 'false') {
+                $(`#${ $(this).attr('id') }_value`).val('');
+            }
+        });
+
+        $('#le_attributes_vdrl').change(function() {
+            if ($(this).val() === 'false') {
+                var field       = $('#le_attributes_tpha');
+                var parent      = $(field).closest('.boolean-field-parent');
+                field.val('false');
+                parent.find('.toggle-boolean-field-btn[data-type="true"]').removeClass('btn-danger');
+                parent.find('.toggle-boolean-field-btn[data-type="false"]').addClass('btn-success');
+            }
+        });
+
+        $('#le_attributes_malaria').change(function() {
+            if ($(this).val() === 'false') {
+                var field       = $('#le_attributes_bfmp');
+                var parent      = $(field).closest('.boolean-field-parent');
+                field.val('false');
+                parent.find('.toggle-boolean-field-btn[data-type="true"]').removeClass('btn-danger');
+                parent.find('.toggle-boolean-field-btn[data-type="false"]').addClass('btn-success');
+            }
+        });
+
+        $('#le_attributes_pregnancy').change(function() {
+            if ($(this).val() === 'false') {
+                var field       = $('#le_attributes_pregnancy_serum_beta_hcg');
+                var parent      = $(field).closest('.boolean-field-parent');
+                field.val('false');
+                parent.find('.toggle-boolean-field-btn[data-type="true"]').removeClass('btn-danger');
+                parent.find('.toggle-boolean-field-btn[data-type="false"]').addClass('btn-success');
+            }
+        });
+    </script>
+<% end %>

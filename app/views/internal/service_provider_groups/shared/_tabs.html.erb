@@ -1,0 +1,8 @@
+<%
+active_tab = local_assigns[:active_tab]
+%>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link<%= ' active show' if active_tab.eql?('service_provider_groups') %>" href="<%= members_internal_service_provider_group_path @service_provider_group.id %>">Members</a>
+    </li>
+</ul>

@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Branch - Total Daily Collection</strong>
+    </div>
+    <div class="card-body">
+        <%= render "internal/reports/branch/branch_collection/filter" %>
+        <%= render "/shared/all_flash" %>
+
+        <%= render "internal/reports/branch/branch_collection/preview" %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

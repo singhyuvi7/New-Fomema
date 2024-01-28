@@ -1,0 +1,158 @@
+<%
+    worker          = transaction.foreign_worker
+    employer        = transaction.employer
+    agency          = transaction.agency
+    limited_info    = ["Employer"].include?(current_user.userable_type)
+
+    information = [
+        { title: "Worker Information",                  type: "sub-title" },
+        { title: "Worker Code",                         value: transaction&.fw_code },
+        { title: "Worker Name",                         value: transaction&.fw_name },
+        { title: "Country of Origin",                   value: transaction&.fw_country&.name },
+        { title: "Date of Birth",                       value: transaction&.fw_date_of_birth&.strftime(get_standard_date_format) },
+        { title: "Passport Number",                     value: transaction&.fw_passport_number },
+        { title: "Gender",                              value: ForeignWorker::GENDERS[transaction&.fw_gender] },
+        { title: "Job Type",                            value: transaction&.fw_job_type&.name },
+        { title: "PATI",                                value: transaction&.fw_pati? ? "Yes" : "No" }
+    ]
+
+    unless limited_info
+        information += [
+            { title: "General Details",                     type: "sub-title" },
+            { title: "Transaction Code",                    value: transaction.code },
+            { title: "Programme",                           value: transaction.programme_indicator },
+            { title: "Transaction Status",                  value: Transaction::STATUSES[transaction.status] },
+            { title: "Registration Indicator",              value: transaction.reg_ind },
+            { title: "Medical Indicator Count",             value: transaction.med_ind_count },
+        ]
+
+        if has_permission?("VIEW_PLKS_NUMBER_IN_GENERAL_INFORMATION_WORKER_INFORMATION")
+            information.insert(-2, { title: "PLKS Number", value: transaction.fw_plks_number })
+        end
+
+        information += [
+            { title: "Employer Information",            type: "sub-title" },
+            { title: "Employer Code",                   value: employer&.code },
+            { title: "Employer Name",                   value: employer&.name },
+            { title: "Employer Email",                  value: employer&.email },
+            { title: "Employer Telephone",              value: employer&.phone },
+            { title: "Employer Address",                value: employer&.displayed_address }
+        ]
+    end
+    
+    if has_permission?("VIEW_AGENCY_INFO_IN_WORKER_INFORMATION")
+        information += [
+            { title: "Agency Information",            type: "sub-title" },
+            { title: "Agency Code",                   value: agency&.code },
+            { title: "Agency Name",                   value: agency&.name },
+            { title: "Agency Email",                  value: agency&.email },
+            { title: "Agency Telephone",              value: agency&.phone },
+            { title: "Agency Address",                value: agency&.displayed_address }
+        ]
+    end
+
+    @col_counting = 0
+%>
+
+<div>
+    <% information.each.with_index(0) do |hash, index| %>
+        <% if hash[:type] == "sub-title" %>
+            <% @current_title_tab = hash[:title] %>
+
+            <% if index > 0 # Close row if it is a title. %>
+                <% @col_counting = 0 %>
+                </div></div>
+            <% end %>
+
+            <div class="dropdown-toggle-bar d-flex align-items-center clickable border mt-4 px-2 bg-light" data-target="<%= @current_title_tab %>">
+                <h5 class="text-primary pt-2"><%= @current_title_tab %></h5>
+                <span class="flex-grow-1"></span>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        <% else %>
+            <% if @col_counting == 0 %>
+                <div class="dropdown-toggle-display border px-2 pt-3 <%= "hidden" unless ["Worker Information"].include?(@current_title_tab) %>" data-target="<%= @current_title_tab %>">
+            <% elsif @col_counting % 2 == 0 %>
+                </div>
+            <% end %>
+
+            <% if @col_counting % 2 == 0 %>
+                <div class="row">
+                <% @col_counting += 1 %>
+            <% end %>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><b><%= hash[:title] %></b></p>
+                        </div>
+                        <div class="col-md-8">
+                            <p><%= hash[:value] %></p>
+                        </div>
+                    </div>
+                </div>
+        <% end %>
+    <% end %>
+
+    </div></div>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col">
+        <label for="employer_uploads">Uploaded Documents</label>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Category</th>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+            </tr>
+
+            <% @transaction.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames"><%= upload.category %></td>
+                    <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, document_internal_document_path(upload, :document_id => document.id), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                    <td class="filenames"><%= upload.updated_at&.strftime("%d/%m/%Y %I:%M:%S %p") %></td>
+                </tr>
+            <% end %>
+
+            <% if @transaction.uploads.blank? %>
+                <tr><td colspan="3">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <label for="approval_history">Document Approval History</label>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Submitted Date</th>
+                <th>Approval Date</th>
+                <th>Approval By</th>
+                <th>Status</th>
+                <th>Comment</th>
+            </tr>
+            <% if @transaction.transaction_verify_docs.blank? %>
+                <tr>
+                    <td colspan="10" class="text-danger">No records found.</td>
+                </tr>
+            <% else %>
+                <% @transaction.transaction_verify_docs.order(id: :desc).each do |transaction| %>
+                    <tr>
+                        <td><%= transaction.submitted_at.strftime(get_standard_datetime_format) %></td>
+                        <td><%= transaction.approval_at&.strftime(get_standard_datetime_format) %></td>
+                        <td><%= transaction.approval_user.try(:name) %></td>
+                        <td><%= transaction.status %></td>
+                        <td><%= transaction.approval_comment %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,158 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - XQCC Pending Decision
+    </div>
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+        <%=render 'shared/all_validation_flash', { model_obj: @xray_pending_decision} %>
+
+        <% if @xray_pending_decision.transactionz.xray_pending_review_id? %>
+            <%=render 'internal/xray_pending_reviews/shared/xray_pending_review_type', { xray_pending_review: @xray_pending_decision.transactionz.xray_pending_review } %>
+        <% end %>
+
+        <% if @xray_pending_decision.transactionz.is_manual_audit? %>
+            <div class="alert alert-info">
+                <h6>PENDING REVIEW - MANUAL AUDIT</h6>
+            </div>
+        <% end %>
+
+        <%=render 'internal/xqccs/shared/transaction_worker_info', { transaction_model: @transaction } %>
+
+        <!-- tab menu -->
+        <ul class="nav nav-tabs" role="tablist">
+
+            <!--
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#doctor_examination-<%#= @xray_pending_decision.transactionz.doctor_examination&.id %>-content">Doctor Certification <%#= xqcc_result_badge(@xray_pending_decision.transactionz.doctor_examination.suitability) %></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#laboratory_examination-<%#= @xray_pending_decision.transactionz.laboratory_examination&.id %>-content">Laboratory Report <%#= xqcc_result_badge(@xray_pending_decision.transactionz.laboratory_examination.result) %></a>
+            </li>
+            -->
+
+            <% @xray_pending_decision.transactionz.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_examination.id %>-content">X-Ray Report <%= xqcc_result_badge(xray_examination.result) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_reviews.order(:created_at).each.with_index(1) do |xray_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= xray_review.id %>-content">XQCC Review <%= xqcc_result_badge(xray_review.result) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.pcr_reviews.order(:created_at).each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">PCR Review <%= xqcc_result_badge(pcr_review.result) %> <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button> <% end %></a>
+                </li>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_pending_reviews.order(:created_at).each.with_index(1) do |xray_pending_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_review-<%= xray_pending_review.id %>-content">XQCC Pending Review <%= xqcc_result_badge(xray_pending_review.decision) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_pending_decisions.order(:created_at).where.not(id: @xray_pending_decision.id).each.with_index(1) do |xray_pending_decision, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_decision-<%= xray_pending_decision.id %>-content">XQCC Pending Decision <%= xqcc_result_badge(xray_pending_decision.decision) %> <%= xqcc_result_badge(xray_pending_decision.approval_decision) %></a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#mle_comment-content">MLE Comments</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_pending_decision-<%= @xray_pending_decision.id %>-content">XQCC Pending Decision Request <%= xqcc_result_badge(@xray_pending_decision.decision) %></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#xray_pending_decision-<%= @xray_pending_decision.id %>-approval-content">XQCC Pending Decision Approval</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" id="unsuitable-reasons-tab" data-toggle="tab" href="#unsuitable-reasons" role="tab">Unsuitable Reasons</a>
+            </li>
+        </ul>
+        <!-- end of tab menu -->
+
+        <!-- tab content -->
+        <div class="tab-content">
+
+            <!--
+            <div class="tab-pane fade" role="tabpanel" id="doctor_examination-<%#= @xray_pending_decision.transactionz.doctor_examination&.id %>-content">
+                <%#=render 'internal/doctor_examinations/doctor_examination', { doctor_examination: @xray_pending_decision.transactionz.doctor_examination } %>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="laboratory_examination-<%#= @xray_pending_decision.transactionz.laboratory_examination&.id %>-content">
+                <%#=render 'internal/laboratory_examinations/laboratory_examination', { laboratory_examination: @xray_pending_decision.transactionz.laboratory_examination } %>
+            </div>
+            -->
+
+            <% @xray_pending_decision.transactionz.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination&.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_reviews.each.with_index(1) do |xray_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= xray_review&.id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: xray_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.pcr_reviews.each.with_index(1) do |pcr_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review&.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_pending_reviews.each.with_index(1) do |xray_pending_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_pending_review-<%= xray_pending_review&.id %>-content">
+                    <%=render 'internal/xray_pending_reviews/xray_pending_review', { xray_pending_review: xray_pending_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_pending_decision.transactionz.xray_pending_decisions.where.not(id: @xray_pending_decision.id).each.with_index(1) do |xray_pending_decision, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_pending_decision-<%= xray_pending_decision&.id %>-content">
+                    <%=render 'internal/xray_pending_decisions/xray_pending_decision', { xray_pending_decision: xray_pending_decision } %>
+                </div>
+            <% end %>
+
+            <div class="tab-pane fade" role="tabpanel" id="mle_comment-content">
+                <%=render 'internal/xqccs/shared/mle_comments' %>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="xray_pending_decision-<%= @xray_pending_decision&.id %>-content">
+                <%= render 'internal/xray_pending_decisions/xray_pending_decision', {xray_pending_decision: @xray_pending_decision} %>
+            </div>
+
+            <div class="tab-pane fade show active" role="tabpanel" id="xray_pending_decision-<%= @xray_pending_decision&.id %>-approval-content">
+                <%= form_for @xray_pending_decision, url: approval_internal_xray_pending_decision_path(@xray_pending_decision), method: "patch", html: {class: 'with-parsley'} do |form| %>
+                    <%=render 'internal/xray_pending_decisions/approval_form', {xray_pending_decision: @xray_pending_decision, form: form} %>
+                <% end %>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" id="unsuitable-reasons">
+                <%=render partial: "internal/transactions/shared/unsuitable_reasons_tab", locals: { readonly: true, hide_save_button: true } %>
+            </div>
+        </div>
+        <!-- end of tab content -->
+
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(internal_xray_pending_decisions_path) %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+var can_pcr = <%= @can_pcr %>;
+</script>
+<% end %>

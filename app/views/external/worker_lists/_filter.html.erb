@@ -1,0 +1,48 @@
+<div class="card ">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <strong></strong>
+    </div>
+    <form action="/worker_lists" method="get" id="worker-list-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Worker Name</label>
+                <div class="col-sm-4">
+                    <input type="text" name="name" id="filter_name" value="<%= params[:name] %>" class="form-control">
+                </div>
+                <label for="filter_code" class="col-sm-2 col-form-label">Worker Code</label>
+                <div class="col-sm-4">
+                    <input type="text" name="code" id="filter_code" value="<%= params[:code] %>" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="filter_passport" class="col-sm-2 col-form-label">Passport Number</label>
+                <div class="col-sm-4">
+                    <input type="text" name="passport" id="filter_passport" value="<%= params[:passport] %>" class="form-control">
+                </div>
+                <label for="approval_status" class="col-sm-2 col-form-label">Status</label>
+                <div class="col-sm-4">
+                    <%= select_tag :approval_status, options_for_select(ForeignWorker::PORTAL_STATUSES.invert, params[:approval_status]), include_blank: form_select_option_text, class: 'form-control' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">New Worker Without Worker Code</label>
+                <div class="col-sm-4" style="padding-top: 5px;">
+                    <%= check_box_tag :without_code, true, !!ActiveModel::Type::Boolean.new.cast(params[:without_code]) %>
+                </div>
+                <% if current_user.employer_supplement_id.present? %>
+                    <label class="col-sm-2 col-form-label">Worker Available in HQ</label>
+                    <div class="col-sm-4" style="padding-top: 5px;">
+                        <%= check_box_tag :worker_available_in_hq, true, !!ActiveModel::Type::Boolean.new.cast(params[:worker_available_in_hq]) %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+        <div class="card-footer text-right  border-0 bg-transparent text-dark">
+            <a href="<%= external_worker_lists_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+            <button type="submit" form="worker-list-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+        </div>
+    </form>
+</div>

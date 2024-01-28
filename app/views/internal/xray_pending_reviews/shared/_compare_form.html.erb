@@ -1,0 +1,20 @@
+<input type="hidden" id="xray_pending_review_compares_transaction_ids" value="<%= xray_pending_review.xray_pending_review_compares.pluck(:transaction_id).to_json if xray_pending_review.xray_pending_review_compares.count > 0 %>" <% if xray_pending_review.is_audit_comparison.eql?("YES") %> required <% end %> data-parsley-error-message="Comparison Transaction is required">
+<div class="card" id="compares-container" style="<%= " display: none; " unless xray_pending_review.is_audit_comparison == "YES" %>">
+    <div class="card-header">Audit & Comparison Transactions</div>
+    <table class="table table-bordered table-card" id="compares-table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>X-Ray Code</th>
+                <th>Worker Code</th>
+                <th>Worker Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% xray_pending_review.xray_pending_review_compares.each.with_index do |xray_pending_review_compare, index| %>
+                <%=render 'internal/xray_pending_reviews/shared/compare_row', {transaction: xray_pending_review_compare.transactionz, show_checkbox: false, show_remove: true} %>
+            <% end %>
+        </tbody>
+    </table>
+</div>

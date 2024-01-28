@@ -1,0 +1,141 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Plan - Clinic</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/internal/visit_plans/shared/filter", {
+            form_action: internal_visit_plans_clinics_path,
+            filter_type: false,
+            filter_status: VisitPlan::STATUSES
+        } %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_DOCTOR_VISIT_PLAN') %>
+                    <%= raw index_table_new_button(internal_visit_plans_clinics_new_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Plan ID</th>
+            <th>State</th>
+            <th>Visit Type</th>
+            <th>Inspect From</th>
+            <th>Inspect To</th>
+            <th>Status</th>
+            <th>Draft By</th>
+            <th>1st Approved By</th>
+            <th>2nd Approved By</th>
+            <th>Comment</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @visit_plans.blank? %>
+            <tr>
+                <td colspan="13" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @visit_plans.each.with_index((@visit_plans.current_page - 1) * get_per + 1) do
+                |visit_plan, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td>
+                        <%= visit_plan.code %>
+                    </td>
+                    <td>
+                        <%= visit_plan.visit_plan_states.map { |s| s.state.name }.join ', ' %>
+                    </td>
+                    <td>
+                        <%= visit_plan.visit_plan_categories.map { |c| c.category }.join ', ' %>
+                    </td>
+                    <td>
+                        <%= visit_plan.inspect_from.nil? ? "N/A" : visit_plan.inspect_from.strftime("%d/%m/%Y") %>
+                    </td>
+                    <td>
+                        <%= visit_plan.inspect_to.nil? ? "N/A" : visit_plan.inspect_to.strftime("%d/%m/%Y") %>
+                    </td>
+                    <td>
+                        <%= VisitPlan::STATUSES[visit_plan.status] %>
+                    </td>
+                    <td>
+                        <%= visit_plan.draft_by.username %>
+                    </td>
+                    <td>
+                        <%= visit_plan.level1_approval_user.nil? ? "N/A" : visit_plan.level1_approval_user.username %>
+                    </td>
+                    <td>
+                        <%= visit_plan.level2_approval_user.nil? ? "N/A" : visit_plan.level2_approval_user.username %>
+                    </td>
+                    <td>
+                        <%= visit_plan.comment %>
+                    </td>
+
+                    <td class="module-row-actions">
+
+                        <!-- edit -->
+                        <% if (has_permission?('VIEW_DOCTOR_VISIT_PLAN') and visit_plan.status != 'DRAFT' and visit_plan.status != 'REJECTED') %>
+                            <%= raw index_table_show_button internal_visit_plan_clinic_show_path(visit_plan) %>
+                        <% end %>
+
+                        <% if (has_permission?('EDIT_DOCTOR_VISIT_PLAN') and (visit_plan.status === 'DRAFT' or visit_plan.status === 'REJECTED')) %>
+                            <%= raw index_table_edit_button internal_visit_plan_clinic_edit_path(visit_plan) %>
+                        <% end %>
+
+                        <!-- delete -->
+                        <% if (has_permission?('DELETE_DOCTOR_VISIT_PLAN') and (visit_plan.status === 'DRAFT')) %>
+                            <%= raw index_table_delete_button(internal_visit_plan_clinic_delete_path(visit_plan)) %>
+                        <% end %>
+
+                        <!-- 1st approval -->
+                        <% if (has_permission?('APPROVAL_LEVEL_1_DOCTOR_VISIT_PLAN') and visit_plan.status === 'LEVEL_1_APPROVAL' and current_user[:id] != visit_plan.created_by) %>
+                            <%= raw index_table_approval_lvl1_button internal_visit_plan_clinic_approval_path(visit_plan) %>
+                        <% end %>
+
+                        <!-- 2nd approval -->
+                        <% if (has_permission?('APPROVAL_LEVEL_2_DOCTOR_VISIT_PLAN') and visit_plan.status === 'LEVEL_1_APPROVED' and current_user[:id] != visit_plan.level_1_approval_by) %>
+                            <%= raw index_table_approval_lvl2_button internal_visit_plan_clinic_approval_path(visit_plan) %>
+                        <% end %>
+
+                    </td>
+                </tr>
+
+            <% end %>
+
+        <% end %>
+    </tbody>
+
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_plans %>
+        </div>
+
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<% end %>

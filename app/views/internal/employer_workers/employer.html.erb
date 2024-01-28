@@ -1,0 +1,54 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Change Employer</div>
+        <%= form_for @foreign_worker, {url: employer_internal_employer_employer_worker_path(@employer, @foreign_worker), html: {multipart: true}} do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <div class="card">
+                    <div class="card-body">
+                        <%= render 'foreign_worker' %>
+                    </div>
+                </div>
+
+                <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :employer, class: 'required' %>
+                            <div class="input-group">
+                                <input style="display: none" name="foreign_worker[employer_id]" id="foreign_worker_employer_id" value="<%= @foreign_worker.employer_id %>" required></input>
+                                <div class="form-control" id="foreign_worker_employer_display">
+                                    <% if !@foreign_worker.employer_id.nil? %>
+                                        <%= "#{@foreign_worker.employer.name} - #{@foreign_worker.employer.code}" %>
+                                    <% end %>
+                                </div>
+                                <span class="input-group-append">
+                                    <button id="select-employer-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-employer-modal">Select employer</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- /card-body -->
+
+            <div class="card-footer">
+
+                <div class="text-right">
+                    <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                    <%=raw edit_save_button() %>
+                </div>
+            
+            </div>
+        <% end %>
+    </div>
+</div>
+<%=render 'search_employer' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

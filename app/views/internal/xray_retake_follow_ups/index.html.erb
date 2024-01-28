@@ -1,0 +1,77 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= @xray_retake.retake_review_type %> Retake Follow Up</strong>
+    </div>
+
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+        <%=render 'internal/xqccs/shared/transaction_worker_info', { transaction_model: @xray_retake.transactionz } %>
+
+        <ul class="nav nav-tabs" role="tablist">
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= @xray_retake.transactionz.xray_examination.id %>-content">X-Ray Report <%= xqcc_result_badge(@xray_retake.transactionz.xray_examination.result) %></a>
+            </li>
+
+            <% @xray_retake.transactionz.xray_reviews.each.with_index(1) do |xray_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= xray_review.id %>-content">XQCC Review <%= xqcc_result_badge(xray_review.result) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_retake.transactionz.pcr_reviews.each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">PCR Review <%= xqcc_result_badge(pcr_review.result) %></a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_retake-<%= @xray_retake.id %>-content">X-Ray Retake</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#xray_retake-<%= @xray_retake.id %>-followup-content">X-Ray Retake Follow Ups</a>
+            </li>
+
+        </ul>
+
+        <div class="tab-content">
+
+            <% @xray_retake.transactionz.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% @xray_retake.transactionz.xray_reviews.each do |xray_review| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= xray_review.id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: xray_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_retake.transactionz.pcr_reviews.each do |pcr_review| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <div class="tab-pane fade" role="tabpanel" id="xray_retake-<%= @xray_retake.id %>-content">
+                <%=render 'internal/xray_retakes/xray_retake', { xray_retake: @xray_retake } %>
+            </div>
+
+            <div class="tab-pane fade show active" role="tabpanel" id="xray_retake-<%= @xray_retake.id %>-followup-content">
+                <%= form_for @xqcc_comment, url: internal_xray_retake_xray_retake_follow_ups_path(@xray_retake), html: {class: "with-parsley"} do |form| %>
+                    <%=render 'internal/xray_retake_follow_ups/form', {
+                        xray_retake: @xray_retake,
+                        form: form
+                    } %>
+                <% end %>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(@xray_retake.index_path) %>
+    </div>
+</div>

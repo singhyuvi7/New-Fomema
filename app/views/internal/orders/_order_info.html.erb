@@ -1,0 +1,87 @@
+<div class="row">
+    <label class="col-md-3 col-form-label">Order Code</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @order.code %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Order Date</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @order.date&.strftime("%d/%m/%Y") %></div>
+    </div>
+</div>
+<% if !@order.organization_id.blank? %>
+    <div class="row">
+        <label class="col-md-3 col-form-label">Branch</label>
+        <div class="col-md-9">
+            <div class="form-control-plaintext"><%= "#{@order.organization&.name} - #{@order.creator.try(:username)}" %></div>
+        </div>
+    </div>
+<% end %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Customer</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= "#{@order.customerable&.name}#{" (#{@order.customerable&.code})" if !@order.customerable&.code.blank?}" %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Document Number</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @document_numbers.try(:join,', ') %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Payment No</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Order.get_payment_no(@order.id).try(:join,',') %></div>
+    </div>
+</div>
+<% if !['IPAY88','BANKDRAFT'].include?(@order.payment_method&.code) && !@order.payment_method.blank? %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Comment</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @order.latest_order_payment.try(:comment) %></div>
+    </div>
+</div>
+<% end %>
+<% if @order.payment_method&.code == 'BANKDRAFT' %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Bank</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Order.get_bank(@order.id).try(:join,',') %></div>
+    </div>
+</div>
+<% end %>
+<div class="row">
+    <label class="col-md-3 col-form-label">Amount</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext">
+            <input type="hidden" name="order_amount" id="order_amount" value="<%= @order.amount.to_f %>">
+            <%= number_to_currency(@order.amount, unit: "") %>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Category</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Order::CATEGORIES[@order.category] %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Payment Method</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @order.payment_method&.name || (raw '<i>N/A</i>') %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Status</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= Order::STATUSES[@order.status] %></div>
+    </div>
+</div>
+<div class="row">
+    <label class="col-md-3 col-form-label">Paid Date</label>
+    <div class="col-md-9">
+        <div class="form-control-plaintext"><%= @order.paid_at.try(:strftime,"%d/%m/%Y") %></div>
+    </div>
+</div>

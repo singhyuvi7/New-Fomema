@@ -1,0 +1,47 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  code: MyString
+  name: MyString
+  address1: MyString
+  address2: MyString
+  address3: MyString
+  address4: MyString
+  country: one
+  state: one
+  district: one
+  area: one
+  postcode: MyString
+  phone: MyString
+  fax: MyString
+  email: MyString
+  pic_name: MyString
+  pic_phone: MyString
+  organization_id: 
+  blacklisted: false
+  blacklisted_at: 2018-09-26 11:03:52
+  employer_type: MyString
+  business_registration_number: MyString
+
+two:
+  code: MyString
+  name: MyString
+  address1: MyString
+  address2: MyString
+  address3: MyString
+  address4: MyString
+  country: two
+  state: two
+  district: two
+  area: two
+  postcode: MyString
+  phone: MyString
+  fax: MyString
+  email: MyString
+  pic_name: MyString
+  pic_phone: MyString
+  organization_id: 
+  blacklisted: false
+  blacklisted_at: 2018-09-26 11:03:52
+  employer_type: MyString
+  business_registration_number: MyString

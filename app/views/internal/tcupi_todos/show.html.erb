@@ -1,0 +1,70 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>TCUPI Todos</strong> - TCUPI Todo Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="tcupi_todo_code">ID</label>
+                    <p class="form-control-plaintext">
+                        <%= @tcupi_todo.id %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="tcupi_todo_description">Description</label>
+                    <p class="form-control-plaintext">
+                        <%= @tcupi_todo.description %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="tcupi_todo_others">Is active</label>
+                    <p class="form-control-plaintext">
+                        <%= @tcupi_todo.is_active %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_tcupi_todos_path) %>
+            <% if has_permission?('EDIT_TCUPI_TODO') %>
+                <%=raw show_edit_button(edit_internal_tcupi_todo_path(@tcupi_todo)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_TCUPI_TODO") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_tcupi_todo_audits_path(@tcupi_todo) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

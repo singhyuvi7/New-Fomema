@@ -1,0 +1,50 @@
+<script>
+    function number_pages() {
+        var vars = {};
+        var x = document.location.search.substring(1).split('&');
+        for (var i in x) {
+            var z = x[i].split('=', 2);
+            vars[z[0]] = unescape(z[1]);
+        }
+        var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+        for (var i in x) {
+            var y = document.getElementsByClassName(x[i]);
+            for (var j = 0; j < y.length; ++j) y[j].textContent = vars[x[i]];
+        }
+    }
+</script>
+
+<body onload="number_pages()" class="header-body">
+    <div class="header-banner">
+        <span class="float-left bold"><%= @company_name.upcase %></span>
+        <span class="page-counter float-right bold">Page: <span class="page"></span>/<span class="topage"></span>
+    </div>
+</body>
+
+<style>
+    .header-banner {
+        border: 2px solid black;
+        padding: 5px;
+        margin-bottom: 1.5rem;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .header-line {
+        margin-bottom: 1rem;
+    }
+
+    .header {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .header-body {
+        padding-bottom: 1px;
+    }
+    .center-title {
+        padding-bottom: 1rem;
+    }
+</style>

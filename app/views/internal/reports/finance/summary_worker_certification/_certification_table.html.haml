@@ -1,0 +1,33 @@
+.w-100{:style => "margin-top: 2rem;"}
+  %h1= branch
+  %table.table.w-100.text-center.mb-0
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - total_female = 0
+      - total_male = 0
+      - certifications.each do |certification|
+        - certification_date, _, gender, count, gender_code, organization_id = certification
+        - if gender == 'Male'
+          - total_male += count
+        - if gender == 'Female'
+          - total_female += count
+        - unless count.zero?
+          %tr
+            %td{ width: '30%' }= certification_date
+            %td{ width: '30%' }= gender
+            %td{ width: '40%' }= link_to count, detail_worker_certification_internal_finance_reports_path(organization_id: organization_id, gender: gender_code, certification_date: certification_date.to_date.strftime('%Y-%m-%d'))
+      %tr.bold
+        %td Total
+        %td
+          - unless total_female.zero?
+            %div
+              Female : #{total_female}
+          - unless total_male.zero?
+            %div
+              Male : #{total_male}
+        %td
+          - unless total_male.zero? && total_female.zero?
+            Certification : #{total_female + total_male}

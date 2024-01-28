@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label"><%= @system_configurations["XQCC_PICKUPMETHOD"].name %></label>
+<div class="col-md-8">
+    <%= select_tag "XQCC_PICKUPMETHOD", options_for_select(SystemConfiguration::XQCC_PICKUP_METHODS.invert, @system_configurations["XQCC_PICKUPMETHOD"].new_value), {required: true, include_blank: form_select_option_text, class: "form-control", disabled: true} %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["XQCC_PICKUPMETHOD"].value %></p>
+</div>

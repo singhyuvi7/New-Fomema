@@ -1,0 +1,68 @@
+<div class="my-4">
+    <h5><%= params[:service_provider] %></h5>
+    <table id="service-provider-table" class="table-borders w-100 text-center">
+        <thead class="text-center">
+            <tr>
+                <th>Date</th>
+                <th>Success</th>
+                <th>%</th>
+                <th>Below Threshold</th>
+                <th>%</th>
+                <th>Not Matching</th>
+                <th>%</th>
+                <th>Others</th>
+                <th>%</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @response_by_dates.each do |row| %>
+            <tr>
+                <% row.each do |value| %>
+                <td><%= value %></td>
+                <% end %>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<div class="my-4">
+    <h5>Based on state</h5>
+    <table id="state-table" class="table-borders w-100 text-center">
+        <thead class="text-center">
+            <tr>
+                <th>State</th>
+                <th>Success</th>
+                <th>%</th>
+                <th>Below Threshold</th>
+                <th>%</th>
+                <th>Not Matching</th>
+                <th>%</th>
+                <th>Others</th>
+                <th>%</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @response_by_states.each do |row| %>
+            <tr>
+                <% row.each do |value| %>
+                <td><%= value %></td>
+                <% end %>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

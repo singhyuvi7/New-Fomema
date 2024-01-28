@@ -1,0 +1,83 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  ## visit plan request
+
+  visit_plan_header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  visit_plan_merge_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+
+  wb.add_worksheet(name: "Visit Plan Request") do |sheet|
+    sheet.add_row ["VISIT PLAN REQUEST - #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 10
+    sheet.add_row
+
+    sheet.add_row ['Date of Request',
+    'Urgent? Y/N',
+    'Date of Presentation to HOD',
+    'Date of Visit',
+    'Satisfacory(S)/NC',
+    'Report by',
+    'Type/Purpose of Visit',
+    '',
+    'Facility Code',
+    'Registered Person',
+    'Facility Name',
+    'Address',
+    'Area/State',
+    'Prepared by',
+    'Date presented in MSP MEETING'
+    ], style: visit_plan_header_style
+
+    sheet.add_row ['',
+    '',
+    '',
+    '',
+    '',
+    '',
+    'INSP (TARGET)',
+    'MSPD/MEDICAL/XQCC',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',''], style: visit_plan_merge_style
+
+    sheet.merge_cells "A3:A4"
+    sheet.merge_cells "B3:B4"
+    sheet.merge_cells "C3:C4"
+    sheet.merge_cells "D3:D4"
+    sheet.merge_cells "E3:E4"
+    sheet.merge_cells "F3:F4"
+    sheet.merge_cells "G3:H3"
+    sheet.merge_cells "I3:I4"
+    sheet.merge_cells "J3:J4"
+    sheet.merge_cells "K3:K4"
+    sheet.merge_cells "L3:L4"
+    sheet.merge_cells "M3:M4"
+    sheet.merge_cells "N3:N4"
+    sheet.merge_cells "O3:O4"
+
+    @visit_plan_requests.each do |visit_plan_request|
+      sheet.add_row [visit_plan_request.date_of_request.try(:strftime,'%d/%m/%Y'),
+      visit_plan_request.is_urgent,
+      visit_plan_request.date_of_presentation.try(:strftime,'%d/%m/%Y'),
+      visit_plan_request.date_of_visit.try(:strftime,'%d/%m/%Y'),
+      visit_plan_request.satisfactory,
+      visit_plan_request.report_by,
+      visit_plan_request.insp_type_of_visit,
+      visit_plan_request.mspd_type_of_visit,
+      visit_plan_request&.spable&.code,
+      visit_plan_request.registered_person,
+      visit_plan_request.facility_name,
+      [visit_plan_request.address1,visit_plan_request.address2,visit_plan_request.address3,visit_plan_request.address4, visit_plan_request.postcode, visit_plan_request&.town&.name, visit_plan_request&.state&.name].reject(&:blank?).join(', '),
+      visit_plan_request&.state&.name,
+      visit_plan_request.prepared_by, 
+      visit_plan_request.date_of_meeting.try(:strftime,'%d/%m/%Y')
+      ], style: data_style
+    end
+  end
+end

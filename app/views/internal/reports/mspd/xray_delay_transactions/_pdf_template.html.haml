@@ -1,0 +1,52 @@
+.table-responsive
+  %table.table.w-100.text-center
+    %thead
+      %tr
+        - headers.each do |header|
+          %th= header
+    %tbody
+      - if transactions.present?
+        - transactions.each.with_index(1) do |transaction|
+          %tr
+            %td= transaction.fw_name
+            %td= transaction.fw_code
+            %td= transaction.fw_passport_number
+            %td= transaction.medical_examination_date&.strftime('%d/%m/%Y')
+            %td= transaction.doctor_code
+            %td= transaction.xray_facility_code
+            %td= transaction.xray_facility_name
+            %td= transaction.xray_facility_town_name
+            %td= transaction.xray_facility_state_name
+            %td= transaction.xray_test_done_date&.strftime('%d/%m/%Y')
+            %td= transaction.xray_transmit_date&.strftime('%d/%m/%Y')
+            %td= transaction.certification_date&.strftime('%d/%m/%Y')
+            %td= transaction.xray_submit_day_taken
+
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

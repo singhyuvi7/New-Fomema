@@ -1,0 +1,57 @@
+<div class="card ">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <strong></strong>
+    </div>
+    <form action="/agency_workers " method="get" id="agency-worker-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <input type="hidden" name="employer_id" id="filter_employer_id" value="<%=@employer.id%>" class="form-control">
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="filter_passport" name="passport" class="filter_passport col-sm-2 col-form-label">Passport Number</label>
+                   <div class="col-sm-4">
+                      <input type="text" name="passport"  id="filter_passport" value="<%= params[:passport] %>" class="form-control">
+                   </div>
+                <label for="filter_code" class="filter_code col-sm-2 col-form-label">Worker Code</label>
+                <div class="col-sm-4">
+                    <input type="text" name="code" id="filter_code" value="<%= params[:code] %>" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                  <label for="filter_country" name="country" class="filter_country col-sm-2 col-form-label">Country</label>
+                     <div class="col-sm-4">
+                        <%= select_tag :country, options_from_collection_for_select(Country.order(:name).all, :id, :name, params[:country]), include_blank: form_select_option_text, class: 'filter_passport form-control'  do %>
+                             State
+                        <% end %>
+                   </div>
+            </div>
+            <div class="form-group row">
+                <label for="filter_passport" class="col-sm-2 col-form-label">New Worker Without Worker Code</label>
+                <div class="col-sm-4" style="padding-top: 5px;">
+                    <%= check_box_tag :without_code, true, !!ActiveModel::Type::Boolean.new.cast(params[:without_code]) %>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right  border-0 bg-transparent text-dark">
+            <a href="<%=external_agency_workers_path employer_id: @employer.id %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+            <button type="submit" form="agency-worker-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+        </div>
+    </form>
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+
+    $('select').on('change', function() {
+        search_type(this.value)
+    });
+    function search_type(country){
+        if (country) {
+            $('#filter_passport').attr('required',true);
+            $('.filter_passport').addClass("required");
+
+        } else {
+            $('#filter_passport').attr('data-parsley-required',false);
+            $('.filter_passport').removeClass("required");
+        }
+    }
+</script>
+<% end %>

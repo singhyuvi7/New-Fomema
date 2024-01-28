@@ -1,0 +1,155 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  table_name_style = style.add_style(b: true)
+  detail_header_style = style.add_style(b: true, border: { style: :thin, color: '00' }, :alignment=>{:horizontal => :center})
+  digital_header_style = style.add_style(bg_color: '63c530', border: { style: :thin, color: '00' })
+  analog_header_style = style.add_style(bg_color: '52c9ec', border: { style: :thin, color: '00' })
+  data_style = style.add_style(border: { style: :thin, color: '00' })
+
+  data_align_center = style.add_style(border: { style: :thin, color: '00' }, :alignment=>{:horizontal => :center})
+
+  # xray worksheet
+  wb.add_worksheet(name: 'Xray Facilities') do |sheet|
+    sheet.add_row ['XRAY DETAILS'], style: table_name_style
+    sheet.add_row ["XRAY CODE", "XRAY NAME","PRIMARY CONTACT PERSON", "ADDRESS1",	"ADDRESS2", "ADDRESS3",	"ADDRESS4", "POSTCODE","DISTRICT", "STATE NAME", "RADIOLOGIST OPERATED", "FP DEVICE",	"STATUS",	"PHONE", "LOWER(EMAIL ID)","TOTAL FW ALLOCATED #{@previous_year}/#{@year}", "ACTIVE CLINIC ASSOCIATES"], style: detail_header_style
+
+    @xray_facilities.each do |xray|
+      radiologist_operated = xray.radiologist_operated ? 'Y' : 'N'
+      fp_device = XrayFacility::FP_DEVICES[xray.fp_device.to_s]
+      status = XrayFacility::STATUSES[xray.status]
+
+      sheet.add_row [xray.code, xray.name, xray.license_holder_name, xray.address1, xray.address2, xray.address3, xray.address4, xray.postcode, xray&.alt_town_name, xray&.alt_state_name, radiologist_operated, fp_device,
+      status, xray.phone, xray.email, "#{xray&.total_fw_previous_year}/#{xray&.total_fw_selected_year}", xray&.active_clinic_count
+      ], style: [data_align_center, data_style, data_style, data_style, data_style, data_style, data_style, data_align_center, data_style, data_style, data_align_center, data_style, data_style, data_align_center, data_style, data_align_center, data_align_center]
+    end
+  end
+
+  # doctor worksheet
+  wb.add_worksheet(name: 'Doctors') do |sheet|
+    sheet.add_row ['Doctor DETAILS'], style: table_name_style
+    sheet.add_row ["DOCTOR_CODE", "DOCTOR_NAME", "CLINIC_NAME", "ADDRESS1",	"ADDRESS2",	"ADDRESS3", "ADDRESS4", "POSTCODE", "DISTRICT", 	"STATE_NAME", "GP_EMAIL", "FP DEVICE", "STATUS", "PHONE","TOTAL FW ALLOCATED #{@previous_year}/#{@year}"], style: detail_header_style
+
+    @doctors.each do |doc|
+      fp_device = Doctor::FP_DEVICES[doc.fp_device.to_s]
+      status = Doctor::STATUSES[doc.status]
+
+      sheet.add_row [doc.code, doc.name, doc.clinic_name, doc.address1, doc.address2, doc.address3, doc.address4, doc.postcode, doc&.alt_town_name, doc&.alt_state_name, doc.email, fp_device, status, doc.phone, "#{doc&.total_fw_previous_year}/#{doc&.total_fw_selected_year}"], style: [data_align_center, data_style, data_style, data_style, data_style, data_style, data_style, data_align_center, data_style, data_style, data_style, data_align_center, data_align_center, data_align_center, data_align_center]
+    end
+  end
+
+  # digital worksheet
+  wb.add_worksheet(name: 'Digital') do |sheet|
+    # total non comply detail
+    sheet.add_row ['NON COMPLY DETAILS (DIGITAL)'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[REVIEW_DATE XRAY_CODE XRAY_NAME PARAMETER_CODE TOTAL_NC], style: detail_header_style
+    sheet.column_widths 10
+
+    @digital_non_comply_details.each do |row|
+      sheet.add_row [row.alt_review_date.try(:strftime,'%d/%m/%Y'), row.code, row.name, row.parameter_code, row.count], style: [data_align_center, data_align_center, data_style, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL SUBMISSION DIGITAL FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE SUBMIT_DIGI], style: detail_header_style
+
+    @digital_total_submissions.each do |row|
+      sheet.add_row [row.code, row.count], style: [data_align_center, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW DIGITAL FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE DIGI_VIEW], style: detail_header_style
+
+    @digital_total_views.each do |row|
+      sheet.add_row [row.code, row.count], style: [data_align_center, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW DIGITAL FILM BY GP'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE DIGI_GP], style: detail_header_style
+
+    @digital_total_view_by_gps.each do |row|
+      sheet.add_row [row.code, row.count], style: [data_align_center, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW DIGITAL FILM BY CONSULTANT RADIOLOGIST'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE DIGI_CR], style: detail_header_style
+
+    @digital_total_view_by_cr.each do |row|
+      sheet.add_row [row.code, row.count], style: [data_align_center, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL NON COMPLY DIGITAL FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE FILM_NC_DIGI], style: detail_header_style
+
+    @digital_non_complies.each do |row|
+      sheet.add_row [row.code, row.count], style: [data_align_center, data_align_center]
+    end
+
+  end
+
+  # analog worksheet
+  wb.add_worksheet(name: 'Analog') do |sheet|
+    # total non comply detail
+    sheet.add_row ['NON COMPLY DETAILS (ANALOG)'], style: table_name_style
+    sheet.add_row %w[REVIEW_DATE XRAY_CODE XRAY_NAME PARAMETER_CODE TOTAL_NC], style: detail_header_style
+
+    @analog_non_comply_details.each do |row|
+      sheet.add_row [row.alt_review_date.try(:strftime,'%d/%m/%Y'), row.code, row.name, row.parameter_code, row.count], style: [data_align_center, data_align_center, data_style, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL SUBMISSION ANALOG FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE XRAY_NAME SUBMIT_ANA], style: detail_header_style
+
+    @analog_total_submissions.each do |row|
+      sheet.add_row [row.code,row.name, row.count], style: [data_align_center, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW ANALOG FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE XRAY_NAME VIEW_ANA], style: detail_header_style
+
+    @analog_total_views.each do |row|
+      sheet.add_row [row.code, row.name, row.count], style: [data_align_center, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW ANALOG FILM BY GP'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE XRAY_NAME ANA_GP], style: detail_header_style
+
+    @analog_total_view_by_gps.each do |row|
+      sheet.add_row [row.code, row.name, row.count], style: [data_align_center, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL VIEW ANALOG FILM BY CONSULTANT RADIOLOGIST'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE XRAY_NAME ANA_CR], style: detail_header_style
+
+    @analog_total_view_by_cr.each do |row|
+      sheet.add_row [row.code, row.name, row.count], style: [data_align_center, data_style, data_align_center]
+    end
+
+    sheet.add_row
+    sheet.add_row ['TOTAL NON COMPLY ANALOG FILM'], style: table_name_style
+    sheet.column_widths 10
+    sheet.add_row %w[XRAY_CODE XRAY_NAME FILM_NC_ANA], style: detail_header_style
+
+    @analog_non_complies.each do |row|
+      sheet.add_row [row.code, row.name, row.count], style: [data_align_center, data_style, data_align_center]
+    end
+  end
+end

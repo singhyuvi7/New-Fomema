@@ -1,0 +1,30 @@
+.w-100{:style => "margin-top: 2rem;"}
+  %h1= branch
+  %table.table.w-100.text-center.mb-0
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - total_net_amount = 0
+      - total_gst_amount = 0
+      - total_processing_fee = 0
+      - total_draft_amount = 0
+      - drafts.each do |bank_draft|
+        - created_at, _, net_amount, gst_amount, processing_fee, draft_amount = bank_draft
+        - total_net_amount += net_amount
+        - total_gst_amount += gst_amount
+        - total_processing_fee += processing_fee
+        - total_draft_amount += draft_amount
+        %tr
+          %td{width: '20%'}= created_at
+          %td{width: '20%'}= number_to_currency(net_amount, unit: '')
+          %td{width: '20%'}= number_to_currency(gst_amount, unit: '')
+          %td{width: '20%'}= number_to_currency(processing_fee, unit: '')
+          %td{width: '20%'}= number_to_currency(draft_amount, unit: '')
+      %tr.bold
+        %td Total
+        %td= number_to_currency(total_net_amount, unit: '')
+        %td= number_to_currency(total_gst_amount, unit: '')
+        %td= number_to_currency(total_processing_fee, unit: '')
+        %td= number_to_currency(total_draft_amount, unit: '')

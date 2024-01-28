@@ -1,0 +1,18 @@
+<div class="card">
+	<div class="card-header">
+		<strong>Branch Jumlah Pati</strong>
+	</div>
+
+	<div class="card-body">
+		<%= render '/shared/all_flash' %>
+		<%= render partial: "shared/reports/report_cronjob_settings" %>
+
+		<%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+			<% if @filter_options.present? %>
+	            <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+	            <%= render partial: "shared/reports/report_filter_options" %>
+	        <% end %>
+        <% end %>
+
+	</div>
+</div>

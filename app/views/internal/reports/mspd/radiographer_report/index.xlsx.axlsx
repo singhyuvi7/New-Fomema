@@ -1,0 +1,7 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Radiographer') do |sheet|
+  sheet.add_row ['DATE', 'RECEIVE', 'REVIEW', 'AUTO RELEASE']
+  @dates.each do |date|
+    sheet.add_row([date.strftime('%d-%^b-%Y'), @data.dig(:receive, date) || 0, @data.dig(:review, date) || 0, @data.dig(:auto_release, date) || 0])
+  end
+end

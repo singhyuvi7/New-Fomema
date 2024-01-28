@@ -1,0 +1,43 @@
+.w-100.pb-3{:style => "margin-top: 2rem;"}
+  %table.table.w-100.text-center
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - if @activities.present?
+        - @activities.each_with_index do |activity, index|
+          %tr
+            %td= index + 1
+            %td= activity[0]
+            %td= activity[1]
+            %td= activity[2]
+
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

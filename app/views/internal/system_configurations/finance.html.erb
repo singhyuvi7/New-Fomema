@@ -1,0 +1,49 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        System Configurations - Finance
+        <div class="card-header-actions">
+
+            <% if has_permission?('EDIT_FINANCE_SYSTEM_CONFIGURATION') and @pending_approvals.blank? %>
+
+                <%=raw index_table_edit_button finance_edit_internal_system_configurations_path %>
+
+            <% end %>
+
+        </div>
+        <!-- /.card-header-actions -->
+
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+
+        <% SystemConfiguration::FINANCES.each do |code| %>
+            <div class="form-group row">
+                <% if lookup_context.find_all("internal/system_configurations/show/_#{code}").any? %>
+                    <%= render "internal/system_configurations/show/#{code}" %>
+                <% else %>
+                    <label class="col-md-4 col-form-label">
+                        <% if has_permission?("VIEW_AUDIT_SYSTEM_CONFIGURATION") %>
+                            <a href="<%= internal_system_configuration_audits_path(@system_configurations[code]) %>"><i class="fa fa-history"></i></a>
+                        <% end %>
+                        <%= @system_configurations[code].name %>
+                    </label>
+                    <% if ['INSURANCE_RECOGNIZED_COLLECTION'].include?(code) %>
+                        <%= render "internal/system_configurations/show/boolean_field", :code => code %>
+                    <% else %>
+                        <div class="col-md-8">
+                            <p class="form-control-plaintext"><%= @system_configurations[code].value %></p>
+                            <% if @system_configurations[code].comment.present? %>
+                                <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+                            <% end %>
+                        </div>
+                    <% end %>
+                <% end %>
+            </div>
+        <% end %>
+
+    </div>
+    <!-- /.card-body -->
+</div>

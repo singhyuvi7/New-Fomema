@@ -1,0 +1,60 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_bulletins_path, method: 'get' do |form| %>
+        <div class="card-body">
+
+            <div class="form-group row">
+                <label for="title" class="col-sm-2 col-form-label">Title</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="title" id="title" value="<%= params[:title] %>">
+                </div>
+                <label for="modification_date" class="col-sm-2 col-form-label">Modification Date</label>
+                <div class="col-sm-4">
+                    <input type="date" name="modification_date" id="modification_date" value="<%= params[:modification_date] %>" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="publish_from_start_date" class="col-sm-2 col-form-label">Publish Date (From) Start</label>
+                <div class="col-sm-4">
+                    <input type="date" name="publish_from_start_date" id="publish_from_start_date" value="<%= params[:publish_from_start_date] %>" class="form-control">
+                </div>
+                <label for="publish_from_end_date" class="col-sm-2 col-form-label">Publish Date (From) End</label>
+                <div class="col-sm-4">
+                    <input type="date" name="publish_from_end_date" id="publish_from_end_date" value="<%= params[:publish_from_end_date] %>" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="publish_to_start_date" class="col-sm-2 col-form-label">Publish Date (To) Start</label>
+                <div class="col-sm-4">
+                    <input type="date" name="publish_to_start_date" id="publish_to_start_date" value="<%= params[:publish_to_start_date] %>" class="form-control">
+                </div>
+                <label for="publish_to_end_date" class="col-sm-2 col-form-label">Publish Date (To) End</label>
+                <div class="col-sm-4">
+                    <input type="date" name="publish_to_end_date" id="publish_to_end_date" value="<%= params[:publish_to_end_date] %>" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="require_acknowledge" class="col-sm-2 col-form-label">Require Acknowledge</label>
+                <div class="col-sm-4">
+                    <%= select_tag :require_acknowledge, options_for_select({'Yes' => true,'No' => false}, params[:require_acknowledge]), include_blank: form_select_option_text, class: 'form-control' %>
+                </div>
+                <label for="is_pop_up" class="col-sm-2 col-form-label">Pop-Up</label>
+                <div class="col-sm-4">
+                    <%= select_tag :is_pop_up, options_for_select({'Yes' => true,'No' => false}, params[:is_pop_up]), include_blank: form_select_option_text, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_bulletins_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

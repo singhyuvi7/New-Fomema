@@ -1,0 +1,53 @@
+<script type="text/javascript">
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawStacked);
+
+    function drawStacked() {
+        var chartData = <%= @fw_Reg_by_countries.nil? ? [] : @fw_Reg_by_countries.to_json.html_safe %>;
+        console.log("Chart Data:", chartData);
+        if (!chartData.length) {
+            var placeholderDiv = document.getElementById('columnchart_values1');
+            placeholderDiv.innerHTML = '<div class="center-message">No Data to Display</div>';
+        } else {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Country Code');
+            data.addColumn('number', 'Total');
+            data.addColumn({type: 'string', role: 'tooltip'});
+
+            chartData.forEach(function (entry) {
+                var countryName = entry[0];
+                var countryCode = entry[1];
+                var total = entry[2];
+                var tooltip = countryName + ' (' + countryCode + ') \nTotal: ' + total;
+
+                data.addRow([countryCode, total, tooltip]);
+            });
+
+            var options = {
+                hAxis: {
+                    title: 'Country Codes',
+                    titleTextStyle: {
+                        color: '#000000',
+                    },
+                    slantedText: true,
+                    slantedTextAngle: 45,
+                    textStyle: {
+                        fontSize: 7,
+                    },
+                },
+                vAxis: {
+                    scaleType: 'log',
+                    minValue: 1,
+                },
+                'chartArea': {'width': '90%'},
+                'bar': {'groupWidth': '70%'},
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('columnchart_values1'));
+            chart.draw(data, options);
+        }
+    }
+</script>
+<% if has_permission?('DASHBOARD_FW_REGISTRATION_COUNTRY') %>
+<div id="columnchart_values1" class="animated-div" style="width: 100%; height:100%;"></div>
+<%end%>

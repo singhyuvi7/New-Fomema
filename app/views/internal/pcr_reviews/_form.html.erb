@@ -1,0 +1,105 @@
+<style>
+.condition-code {
+    display: none;
+}
+.condition-code::after {
+    content: " - ";
+}
+</style>
+<div class="pcr_review_form">
+    <%=render 'internal/xqccs/shared/perform_by_info', {
+        name: pcr_review.pcr_user&.name,
+        code: pcr_review.pcr_user&.code,
+        label: 'PCR'
+    } %>
+
+    <!-- pcr quality -->
+    <div class="pcr_quality_checklist_form">
+        <%=render 'internal/pcr_reviews/shared/pcr_checklist_quality', { pcr_review: pcr_review } %>
+    </div>
+
+    <!-- pcr reporting -->
+    <div class="pcr_reporting_checklist_form">
+        <%=render 'internal/pcr_reviews/shared/pcr_checklist_reporting', { pcr_review: pcr_review } %>
+    </div>
+
+    <!-- pcr conclusion -->
+    <div class="pcr_conclusion_form">
+        <%=render 'internal/pcr_reviews/shared/pcr_conclusion', { pcr_review: pcr_review, appeal: @pcr_review.medical_appeal } %>
+    </div>
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_pcr_reviews_path) %>
+        <%=raw edit_submit_button %>
+    </div>
+</div>
+
+<% content_for :page_head_styles do %>
+<style>
+.invalid-feedback {
+    display: block;
+}
+</style>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('form.pcr-review-form .pcr_quality_checklist_form input[type="radio"]').change(function () {
+    $(this).parents("tr").find('textarea').prop("required", this.value == "Y");
+    decide_decision_availability();
+});
+
+$('form.pcr-review-form .pcr_reporting_checklist_form input[type="radio"]').change(function () {
+    $(this).parents("tr").find('textarea').prop("required", this.value == "Y");
+    decide_decision_availability();
+});
+
+$('form.pcr-review-form input[type="radio"][name="pcr_review[belong]"]').change(function () {
+    decide_decision_availability();
+});
+
+$('input[name="pcr_review[result]"]').change(function () {
+    $('#pcr_review_comment').prop("required", this.value != "NORMAL");
+    if ($('#pcr_review_comment').prop("required")) {
+        $('#label_for_pcr_review_comment').addClass('required');
+    } else {
+        $('#label_for_pcr_review_comment').removeClass('required');
+    }
+});
+
+function decide_decision_availability()
+{
+    if (must_retake && can_retake) {
+        $('#pcr_review_result_normal').prop('disabled', true);
+        $('#pcr_review_result_abnormal').prop('disabled', true);
+        $('#pcr_review_result_retake').prop('disabled', false);
+        $('#pcr_review_result_retake').prop('checked', true);
+        $('input[name="pcr_review[result]"]:checked').trigger('change');
+        return;
+    }
+
+    if (can_retake && $('form.pcr-review-form .pcr_quality_checklist_form input[type="radio"][value="Y"]:checked').length > 0) {
+        $('#pcr_review_result_retake').prop('disabled', false);
+    }
+
+    if ($('form.pcr-review-form .pcr_reporting_checklist_form input[type="radio"][value="Y"]:checked').length > 0 || $('form.pcr-review-form input[type="radio"][name="pcr_review[belong]"]:checked').val() == "NO") {
+        $('#pcr_review_result_normal').prop('disabled', true);
+        $('#pcr_review_result_abnormal').prop('disabled', false);
+        $('#pcr_review_result_abnormal').prop('checked', true);
+    } else {
+        $('#pcr_review_result_normal').prop('disabled', false);
+        $('#pcr_review_result_abnormal').prop('disabled', true);
+        $('#pcr_review_result_normal').prop('checked', true);
+    }
+    $('input[name="pcr_review[result]"]:checked').trigger('change');
+}
+
+function remove_belong()
+{
+    $('input[name="pcr_review[belong]"]').prop('checked', false);
+    decide_decision_availability();
+}
+
+decide_decision_availability();
+</script>
+<% end %>

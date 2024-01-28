@@ -1,0 +1,251 @@
+<% last_year = Date.current.years_ago(1).strftime('%Y') %>
+<% current_year = Date.current.year %>
+
+<%= wicked_pdf_stylesheet_link_tag "inspectorate/visit_plan_listing" %>
+
+<div class="page-container">
+
+    <table class="table-bordered table-sm">
+        <% if @visit_plan.visitable_type == Doctor.to_s %>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Doc. Code</th>
+                <th style="width: 10%">Doc. Name</th>
+                <th style="width: 10%">Clinic Name</th>
+                <th style="width: 10%">Address</th>
+                <th>Town</th>
+                <th>Own X-ray</th>
+                <th>Phone</th>
+                <th>SOP Compliance</th>
+                <th>Last Visit Date</th>
+                <th style="width: 5%"><%= "Allocation (#{last_year}/#{current_year})" %></th>
+                <th style="width: 5%"><%= "Examined (#{last_year}/#{current_year})" %></th>
+                <th style="width: 5%"><%= "Certified (#{last_year}/#{current_year})" %></th>
+                <th>Status</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if @visit_plan_items.count == 0 %>
+            <tr>
+                <td colspan="14" class="text-danger">No records found.</td>
+            </tr>
+            <% else %>
+            <% @visit_plan_items.each.with_index(1) do |item, index| %>
+            <tr>
+                <% 
+                    provider = item.visitable
+                    latest_visit_report = provider.visit_report_doctors.order(:created_at).last
+                    last_visit_date = latest_visit_report.try(:created_at)
+                    allocations_last_year = Transaction.have_assigned_doctor(provider.id).by_year('transaction_date',last_year).count
+                    allocations_current_year = Transaction.have_assigned_doctor(provider.id).by_year('transaction_date',current_year).count
+                    examined_last_year = Transaction.have_assigned_doctor(provider.id).by_year('medical_examination_date',last_year).count
+                    examined_current_year = Transaction.have_assigned_doctor(provider.id).by_year('medical_examination_date',current_year).count
+                    certification_last_year = Transaction.have_assigned_doctor(provider.id).by_year('certification_date',last_year).count
+                    certification_current_year = Transaction.have_assigned_doctor(provider.id).by_year('certification_date',current_year).count
+                %>
+                <td class="text-center"><%= index %></td>
+                <td><%= provider.code %></td>
+                <td><%= provider.name %></td>
+                <td><%= provider.clinic_name %></td>
+                <td>
+                    <%= provider.address1 %>
+                    <% if provider.address2.present? %>
+                    <br><%= provider.address2 %>
+                    <% end %>
+                    <% if provider.address3.present? %>
+                    <br><%= provider.address3 %>
+                    <% end %>
+                    <% if provider.address4.present? %>
+                    <br><%= provider.address4 %>
+                    <% end %>
+                    <br><%= provider.town.name %>
+                    <br><%= provider.postcode %>
+                    <br><%= provider.state.name %>
+                </td>
+                <td><%= provider.town.name %></td>
+                <td class="text-center"><%= provider.xray_facility_id ? 'Yes' : 'No' %></td>
+                <td><%= provider.phone %></td>
+                <td><%= latest_visit_report ? latest_visit_report.sop_compliance : '-' %></td>
+                <td class="text-center"><%= last_visit_date ? last_visit_date.strftime("%d/%m/%Y") : '-' %></td>
+                <td class="text-center"><%= allocations_last_year %>/<%= allocations_current_year %></td>
+                <td class="text-center"><%= examined_last_year %>/<%= examined_current_year %></td>
+                <td class="text-center"><%= certification_last_year %>/<%= certification_current_year %></td>
+                <td class="text-center"><%= Doctor::STATUSES[provider.status] %></td>
+                <% if last_visit_date && (last_visit_date.strftime("%Y").to_s === last_year.to_s) %>
+                <td class="yellow-category">Yellow</td>
+                <% elsif last_visit_date && (last_visit_date.strftime("%Y").to_s === current_year.to_s) %>
+                <td class="green-category">Green</td>
+                <% else %>
+                <td class="red-category">Red</td>
+                <% end %>
+            </tr>
+            <% end %>
+            <% end %>
+        </tbody>
+        <% elsif @visit_plan.visitable_type == Laboratory.to_s %>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Laboratory Code</th>
+                <th>Laboratory Name</th>
+                <th>Address</th>
+                <th>Town</th>
+                <th>Total Associated Clinic</th>
+                <th>Phone</th>
+                <th>Last Visit Date</th>
+                <th>Status</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if @visit_plan_items.count == 0 %>
+            <tr>
+                <td colspan="9" class="text-danger">No records found.</td>
+            </tr>
+            <% else %>
+            <% @visit_plan_items.each.with_index(1) do |item, index| %>
+            <tr>
+                <% 
+                    provider = item.visitable
+                    last_visit_date = provider.visit_report_laboratories.order(:created_at).pluck(:created_at).last
+                %>
+                <td class="text-center"><%= index %></td>
+                <td><%= provider.code %></td>
+                <td><%= provider.name %></td>
+                <td>
+                    <%= provider.address1 %>
+                    <% if provider.address2.present? %>
+                    <br><%= provider.address2 %>
+                    <% end %>
+                    <% if provider.address3.present? %>
+                    <br><%= provider.address3 %>
+                    <% end %>
+                    <% if provider.address4.present? %>
+                    <br><%= provider.address4 %>
+                    <% end %>
+                    <br><%= provider.town.name %>
+                    <br><%= provider.postcode %>
+                    <br><%= provider.state.name %>
+                </td>
+                <td><%= provider.town.name %></td>
+                <td class="text-center"><%= provider.doctors.count %></td>
+                <td><%= provider.phone %></td>
+                <td class="text-center"><%= last_visit_date ? last_visit_date.strftime("%d/%m/%Y") : '-' %></td>
+                <td class="text-center"><%= Laboratory::STATUSES[provider.status] %></td>
+                <% if last_visit_date && (last_visit_date.strftime("%Y").to_s === last_year.to_s) %>
+                <td class="yellow-category">Yellow</td>
+                <% elsif last_visit_date && (last_visit_date.strftime("%Y").to_s === current_year.to_s) %>
+                <td class="green-category">Green</td>
+                <% else %>
+                <td class="red-category">Red</td>
+                <% end %>
+            </tr>
+            <% end %>
+            <% end %>
+        </tbody>
+        <% elsif @visit_plan.visitable_type == XrayFacility.to_s %>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>X-Ray Code</th>
+                <th>X-Ray Name</th>
+                <th>License Holder Name</th>
+                <th>Address</th>
+                <th>Town</th>
+                <th>Total Associated Clinic</th>
+                <th>Phone</th>
+                <th>SOP Compliance</th>
+                <th>Last Visit Date</th>
+                <th>Allocation (<%= last_year %> / <%= current_year %>)</th>
+                <th>Examined (<%= last_year %> / <%= current_year %>)</th>
+                <th>Status</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if @visit_plan_items.count == 0 %>
+            <tr>
+                <td colspan="13" class="text-danger">No records found.</td>
+            </tr>
+            <% else %>
+            <% @visit_plan_items.each.with_index(1) do |item, index| %>
+            <tr>
+                <% 
+                    provider = item.visitable
+                    latest_visit_report = provider.visit_report_xray_facilities.order(:created_at).last
+                    last_visit_date = latest_visit_report.try(:created_at)
+                    allocations_last_year = Transaction.have_assigned_xray(provider.id).by_year('transaction_date',last_year).count
+                    allocations_current_year = Transaction.have_assigned_xray(provider.id).by_year('transaction_date',current_year).count
+                    examined_last_year = Transaction.have_assigned_xray(provider.id).by_year('xray_transmit_date',last_year).count
+                    examined_current_year = Transaction.have_assigned_xray(provider.id).by_year('xray_transmit_date',current_year).count
+                %>
+                <td class="text-center"><%= index %></td>
+                <td><%= provider.code %></td>
+                <td><%=provider.name %></td>
+                <td><%= provider.license_holder_name %></td>
+                <td>
+                    <%= provider.address1 %>
+                    <% if provider.address2.present? %>
+                    <br><%= provider.address2 %>
+                    <% end %>
+                    <% if provider.address3.present? %>
+                    <br><%= provider.address3 %>
+                    <% end %>
+                    <% if provider.address4.present? %>
+                    <br><%= provider.address4 %>
+                    <% end %>
+                    <br><%= provider.town.name %>
+                    <br><%= provider.postcode %>
+                    <br><%= provider.state.name %>
+                </td>
+                <td><%= provider.town.name %></td>
+                <td class="text-center"><%= provider.doctors.count %></td>
+                <td><%= provider.phone %></td>
+                <td><%= latest_visit_report ? latest_visit_report.sop_compliance : '-' %></td>
+                <td class="text-center"><%= last_visit_date ? last_visit_date.strftime("%d/%m/%Y") : '-' %></td>
+                <td class="text-center"><%= allocations_last_year %>/<%= allocations_current_year %></td>
+                <td class="text-center"><%= examined_last_year %>/<%= examined_current_year %></td>
+                <td class="text-center"><%= XrayFacility::STATUSES[provider.status] %></td>
+                <% if last_visit_date && (last_visit_date.strftime("%Y").to_s === last_year.to_s) %>
+                <td class="yellow-category">Yellow</td>
+                <% elsif last_visit_date && (last_visit_date.strftime("%Y").to_s === current_year.to_s) %>
+                <td class="green-category">Green</td>
+                <% else %>
+                <td class="red-category">Red</td>
+                <% end %>
+            </tr>
+
+            <% end %>
+            <% end%>
+            <% end %>
+    </table>
+
+    <!-- signature -->
+    <div class="signature">
+        <div class="d-flex">
+            <div class="signature-box">
+                <p>Drafted By :</p>
+                <hr class="signature-line">
+                <p>(<%= @visit_plan.draft_by.username %>)</p>
+                <p>Date : <%= @visit_plan.created_at.strftime("%d/%m/%Y") %></p>
+            </div>
+
+            <div class="signature-box">
+                <p>1st Approval By :</p>
+                <hr class="signature-line">
+                <p>(<%= @visit_plan.level1_approval_user.username %>)</p>
+                <p>Date : <%= @visit_plan.level_1_approval_at.strftime("%d/%m/%Y") %></p>
+            </div>
+
+            <div class="signature-box">
+                <p>2nd Approval By :</p>
+                <hr class="signature-line">
+                <p>(<%= @visit_plan.level2_approval_user.username %>)</p>
+                <p>Date : <%= @visit_plan.level_2_approval_at.strftime("%d/%m/%Y") %></p>
+            </div>
+        </div>
+    </div>
+    <!-- end signature -->
+</div>

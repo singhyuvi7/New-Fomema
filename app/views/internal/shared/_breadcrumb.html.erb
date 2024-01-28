@@ -1,0 +1,21 @@
+<% load_internal_breadcrumb_items %>
+
+<ol class="breadcrumb">
+    <% @breadcrumb_items.each do |hash| %>
+        <%= link_to hash[:title], hash[:path], class: "breadcrumb-item #{ "active" if hash[:active] }" %>
+    <% end %>
+
+    <li class="breadcrumb-menu d-md-down-none">
+        <div class="btn-group" role="group" aria-label="Button group">
+            <!-- <a class="btn" href="#">
+                <i class="icon-speech"></i>
+            </a>
+            <a class="btn" href="<%= internal_root_path %>">
+                <i class="icon-graph"></i>  Dashboard
+            </a>
+            <a class="btn" href="#">
+                <i class="icon-settings"></i>  Settings
+            </a> -->
+        </div>
+    </li>
+</ol>

@@ -1,0 +1,1 @@
+json.extract! monitor_reason, :id, :code, :description, :short_description

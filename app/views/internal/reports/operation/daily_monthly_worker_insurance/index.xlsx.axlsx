@@ -1,0 +1,36 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+  # worksheet styles
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'c8ced3', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style border: Axlsx::STYLE_THIN_BORDER
+
+  # worksheet data
+  wb.add_worksheet(name: 'Detailed Report') do |sheet|
+    # sector statistics data
+    sheet.add_row ["#{@company_name.to_s.upcase}"], style: title_style
+    sheet.add_row ["DAILY & MONTHLY WORKER INSURANCE REPORT"], style: title_style
+
+    sheet.add_row
+    sheet.add_row ['Month/Year', 'Total Registration', 'Insurance (Howden)', 'Insurance (ProtectMigrant)', 'Total Insurance Purchased'], style: header_style
+
+    if @monthly_data.present?
+      @monthly_data.each do |monthly|
+        sheet.add_row ["#{Date::ABBR_MONTHNAMES[monthly.month]}-#{monthly.year.to_s[2,2]}", monthly.registration, monthly.insurance_howden, monthly.insurance_protectmigrant, monthly.insurance], style: data_style
+      end
+    end
+
+    sheet.add_row
+    sheet.add_row
+
+    sheet.add_row ['Registration & Insurance Purchased Date', 'Week day', 'Total Registration', 'Insurance (Howden)', 'Insurance (ProtectMigrant)', 'Total Insurance'], style: header_style
+    sheet.column_widths *[35,20,23,23]
+
+    if @daily_data.present?
+      @daily_data.each do |daily|
+        sheet.add_row [daily.paid_date.strftime('%d-%b-%y'), daily.paid_date.strftime('%A'), daily.registration, daily.insurance_howden, daily.insurance_protectmigrant, daily.insurance], style: data_style
+      end
+    end
+  end
+end

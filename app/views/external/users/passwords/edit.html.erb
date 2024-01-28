@@ -1,0 +1,108 @@
+<div class="container text-center" style="padding-top:50px">
+    <img src="<%= image_path('external_bg_logo.png')%>" class="img-responsive" style="max-height: 180px">
+</div>
+
+<div class="container">
+    <div class="container margin-top-30">
+        <h2 class="text-center text-white">
+            Welcome to Foreign Workers’ Medical Examination Online Registration Portal (FOMEMA)
+        </h2>
+    </div>
+
+    <div class="row justify-content-center ">
+        <hr class="navbar-sep-1">
+        <hr class="navbar-sep-2">
+    </div>
+
+    <div class="card container-blue-portal">
+        <h2 class="text-center">Update password</h2>
+
+        <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+            <%= render "devise/shared/error_messages", resource: resource %>
+            <%= f.hidden_field :reset_password_token %>
+
+            <div class="margin-bg">
+                <div class="alert alert-info blue-portal color-blue text-white" role="alert">
+                    <p>Password Policy</p>
+
+                    <ul class="">
+                        <% @password_requirements.each do |requirement| %>
+                            <li><%= requirement %></li>
+                        <% end %>
+                    </ul>
+                </div>
+
+                <% if flash[:errors].present? %>
+                    <div class="alert alert-danger" role="alert">
+                        <p>Errors</p>
+
+                        <ul class="">
+                            <% flash[:errors].each do |error| %>
+                                <li><%= error %></li>
+                            <% end %>
+                        </ul>
+                    </div>
+                <% end %>
+
+                <div class="field">
+                    <%= f.label :password, "New password" %>
+                    <div class="form-check form-check-inline">
+                        <button type="button"
+                            data-toggle="popover"
+                            data-placement="top"
+                            data-html="true"
+                            data-content="
+                            <ul class='emp_type_desc'>
+                                <li>e.g fomema1234, online1234</li>
+                            </ul>"
+                            title="Sample password"
+                            class="btn btn-primary btn-sm"><i class="fa fa-info-circle"></i></button>
+                    </div>
+                    <br/>
+                    <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "form-control col-md-12" %>
+                </div>
+
+                <div class="field">
+                    <%= f.label :password_confirmation, "Confirm new password" %><br />
+                    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control col-md-12" %>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <%= f.submit "Reset my password", class: 'btn btn-blue color-blue text-white col-md-12' %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<style>
+    .submit-request-btn {
+        margin-top: 25px;
+    }
+
+    .card {
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    #error_explanation {
+        color: #813838;
+        background-color: #fee2e1;
+        border-color: #fdd6d6;
+        position: relative;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .btn-fomema {
+        width: auto !important;
+    }
+
+    label {
+        margin-top: 30px;
+    }
+</style>

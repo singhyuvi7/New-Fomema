@@ -1,0 +1,43 @@
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const canvas_1 = $('#fomemaOfficerModal #JohnHancock-canvas')[0]
+  const hidden_field_1 = $('#fomemaOfficerModal #JohnHancock-hidden')[0]
+
+  const canvas_2 = $('#labPersonnelModal #JohnHancock-canvas')[0]
+  const hidden_field_2 = $('#labPersonnelModal #JohnHancock-hidden')[0]
+
+  if ((canvas_1 && hidden_field_1) || (canvas_2 && hidden_field_2)) {
+
+    const parent_form = canvas_1.closest("form");
+    const signaturePad = new SignaturePad(canvas_1);
+    const signaturePad2 = new SignaturePad(canvas_2);
+
+    parent_form.onsubmit = function() {
+      hidden_field_1.value = signaturePad.toDataURL()
+      hidden_field_2.value = signaturePad2.toDataURL()
+    }
+
+    function resizeCanvas1() {
+      var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+      canvas_1.width = canvas_1.offsetWidth * ratio;
+      canvas_1.height = canvas_1.offsetHeight * ratio;
+      canvas_1.getContext("2d").scale(ratio, ratio);
+      signaturePad.clear();
+    }
+  
+    function resizeCanvas2() {
+      var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+      canvas_2.width = canvas_2.offsetWidth * ratio;
+      canvas_2.height = canvas_2.offsetHeight * ratio;
+      canvas_2.getContext("2d").scale(ratio, ratio);
+      signaturePad2.clear();
+    }
+
+    window.addEventListener("resize", resizeCanvas1, true);
+    window.addEventListener("resize", resizeCanvas2, true);
+    resizeCanvas1();
+    resizeCanvas2();
+  }
+
+}, false)
+</script>

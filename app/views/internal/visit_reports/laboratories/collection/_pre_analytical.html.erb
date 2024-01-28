@@ -1,0 +1,232 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-index"></th>
+                <th class="table-items"></th>
+                <th colspan="3" class="text-center table-acceptable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2">1.</td>
+                <td>
+                    <div class="font-weight-bold">Appropriate Specimen Transportation</div>
+                    <div class="pl-1 font-weight-bold">
+                        1.1 Despatch Transportation 
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :despatch_transportation, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :despatch_transportation, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :despatch_transportation, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :transport_to_test_lab_comment, '1.2 Transportation to Testing Laboratory' %>
+                        <%= visit_report_laboratory.text_area :transport_to_test_lab_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :transport_to_test_lab, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :transport_to_test_lab, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :transport_to_test_lab, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">2.</td>
+                <td>
+                    <div class="font-weight-bold"> Appropriate Specimen Packaging</div>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :despatch_bag_comment, '2.1 Despatch Bag' %>
+                        <%= visit_report_laboratory.text_area :despatch_bag_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :despatch_bag, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :despatch_bag, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :despatch_bag, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :packaging_to_test_lab_comment, '2.2 Packaging to Testing Laboratory' %>
+                        <%= visit_report_laboratory.text_area :packaging_to_test_lab_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :packaging_to_test_lab, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :packaging_to_test_lab, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :packaging_to_test_lab, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="3">3.</td>
+                <td>
+                    <div class="font-weight-bold">Record of Specimen Traceability</div>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :clinic_to_despatch_comment, '3.1 Clinic to Despatch' %>
+                        <%= visit_report_laboratory.text_area :clinic_to_despatch_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :clinic_to_despatch, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :clinic_to_despatch, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :clinic_to_despatch, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :despatch_to_comment, '3.2 Despatch to Collection Centre' %>
+                        <%= visit_report_laboratory.text_area :despatch_to_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :despatch_to, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :despatch_to, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :despatch_to, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :collection_centre_to_test_lab_comment, '3.3 Collection Centre to Testing Laboratory' %>
+                        <%= visit_report_laboratory.text_field :collection_centre_to_test_lab_name, class: 'form-control mb-2', placeholder: 'Testing Laboratory Name' %>
+                        <%= visit_report_laboratory.text_area :collection_centre_to_test_lab_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :collection_centre_to_test_lab, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :collection_centre_to_test_lab, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :collection_centre_to_test_lab, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="3">4.</td>
+                <td>
+                    <div class="font-weight-bold">Pre-Analytical Procedure</div>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :registration_record_comment, '4.1 Specimen Registration Record' %>
+                        <%= visit_report_laboratory.text_area :registration_record_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :registration_record, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :registration_record, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :registration_record, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :rejection_register_comment, '4.2 Specimen Rejection Register' %>
+                        <%= visit_report_laboratory.text_area :rejection_register_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :rejection_register, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :rejection_register, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :rejection_register, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :rejection_criteria_comment, '4.3 Specimen Rejection Criteria' %>
+                        <%= visit_report_laboratory.text_area :rejection_criteria_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="pre_analytical">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :rejection_criteria, 'YES', class: 'pre_analytical' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :rejection_criteria, 'NO', class: 'pre_analytical' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :rejection_criteria, 'NA', class: 'pre_analytical' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

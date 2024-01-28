@@ -1,0 +1,5 @@
+<% if PaymentMethod.find_by(id: @order.payment_method_id)&.code&.include? "SWIPE" %>
+    <p class="swipe-reminder-message">
+        If you select Swipe as your payment method, please download "The Swipe App" before make payment. Click <a href="<%= swipe_user_guide_external_order_path %>" target="_blank">here</a> to view the download steps.
+    </p>
+<% end %>

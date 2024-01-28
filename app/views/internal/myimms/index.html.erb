@@ -1,0 +1,57 @@
+<div class="card">
+    <div class="card-header">
+        <strong>TRANSACTIONS - MyIMMs</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row-fluid">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active nav-item"> <a class="nav-link active show" href="#transactions" data-target="#transactions" data-toggle="tab">Transactions</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#log" data-target="#log" data-toggle="tab">Log</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active fade in active show" id="transactions">
+                    <%=render "transactions" %>
+                </div>
+                <div class="tab-pane" id="log">
+                    <%=render "log" %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#submit_to_jim').click(function() {
+        var selected_transactions = getSelectedTransactions();
+
+        if(selected_transactions.length == 0)
+        {
+            alert('Please make sure you have selected transactions')
+        }else{
+            selected_transaction_ids = selected_transactions.join(",");
+            var url = '<%= internal_myimms_submit_path %>' + '?ids=' + selected_transaction_ids;
+            window.location.href = url
+        }
+
+    });
+
+    function getSelectedTransactions() {
+        var transactions = $('.child-checkbox:checkbox:checked').map(function() {
+            return this.value;
+        }).get();
+
+        return transactions;
+    }
+</script>
+<% end %>

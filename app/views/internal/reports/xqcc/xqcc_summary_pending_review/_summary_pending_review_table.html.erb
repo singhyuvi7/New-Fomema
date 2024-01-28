@@ -1,0 +1,67 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+		<p><b>DAILY</b></p>
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<tbody>
+				<% if @daily_data.present? %>
+					<% query_date = params[:date].to_time.strftime("%d-%m-%Y") %>
+
+					<tr>
+						<td rowspan="2"><%= query_date %></td>
+						<td>Monitoring</td>
+						<td>MERTS</td>
+						<td><%= @daily_data.monitoring_total_amended %></td>
+						<td><%= @daily_data.monitoring_total_amended %></td>
+						<td><%= @daily_data.monitoring_total_concurred %></td>
+					</tr>
+
+					<tr>
+						<td>Quarantine</td>
+						<td>MERTS</td>
+						<td><%= @daily_data.quarantine_total_amended %></td>
+						<td><%= @daily_data.quarantine_total_amended %></td>
+						<td><%= @daily_data.quarantine_total_concurred %></td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+
+		<p class="mt-5"><b>MONTHLY</b></p>
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<tbody>
+				<% if @monthly_data.present? %>
+					<% query_date = params[:date].to_time.strftime("%B %Y")%>
+					<tr>
+						<td rowspan="2"><%= query_date %></td>
+						<td>Monitoring</td>
+						<td>MERTS</td>
+						<td><%= @monthly_data.monitoring_total_amended %></td>
+						<td><%= @monthly_data.monitoring_total_amended %></td>
+						<td><%= @monthly_data.monitoring_total_concurred %></td>
+					</tr>
+
+					<tr>
+						<td>Quarantine</td>
+						<td>MERTS</td>
+						<td><%= @monthly_data.quarantine_total_amended %></td>
+						<td><%= @monthly_data.quarantine_total_amended %></td>
+						<td><%= @monthly_data.quarantine_total_concurred %></td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+
+	</div>
+</div>

@@ -1,0 +1,178 @@
+<div class="card xray_report_form">
+<div class="card-header">
+    <div class="row">
+        <div class="col">
+            PART V. FOLLOW UP BY THE DOCTOR
+        </div>
+    </div>
+</div>
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Report</th>
+                <th colspan="2" class="text-center">Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of Health Office has been notified -->
+            <tr>
+                <td width="100">1</td>
+                <td>Health Office has been notified</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="notified_health_office_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][notified_health_office]" id="<%= input_key %>_notified_health_office_yes" value="YES"
+                            <% if doctor_examination_model.notified_health_office %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_notified_health_office_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="notified_health_office_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][notified_health_office]" id="<%= input_key %>_notified_health_office_no" value="NO"
+                            <% if !doctor_examination_model.notified_health_office %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_notified_health_office_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea disabled type="date" class="form-control" name="<%= input_key %>[doctor_examination][notified_health_office_date]"
+                        id="<%= input_key %>_doctor_examination_notified_health_office_date" rows="2"><%= doctor_examination_model.notified_health_office_date %></textarea>
+                </td>
+            </tr>
+            <!--End of Health Office has been notified -->
+
+            <!-- Start of referred to government hospital -->
+            <tr>
+                <td width="100">2</td>
+                <td>Case referred to Government hospital</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="referred_to_government_hospital_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][referred_to_government_hospital]" id="<%= input_key %>_referred_to_government_hospital_yes" value="YES"
+                            <% if doctor_examination_model.referred_to_government_hospital %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_referred_to_government_hospital_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="referred_to_government_hospital_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][referred_to_government_hospital]" id="<%= input_key %>_referred_to_government_hospital_no" value="NO"
+                            <% if !doctor_examination_model.referred_to_government_hospital %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_referred_to_government_hospital_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea disabled type="date" class="form-control" name="<%= input_key %>[doctor_examination][referred_to_government_hospital_date]"
+                        id="<%= input_key %>_doctor_examination_referred_to_government_hospital_date" rows="2"><%= doctor_examination_model.referred_to_government_hospital_date %></textarea>
+                </td>
+            </tr>
+            <!-- End of referred to government hospital -->
+
+            <!-- Start of reffered to private hospital -->
+            <tr>
+                <td width="100">3</td>
+                <td>Case referred to a Private hospital</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="referred_to_private_hospital_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][referred_to_private_hospital]" id="<%= input_key %>_referred_to_private_hospital_yes" value="YES"
+                            <% if doctor_examination_model.referred_to_private_hospital %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_referred_to_private_hospital_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="referred_to_private_hospital_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][referred_to_private_hospital]" id="<%= input_key %>_referred_to_private_hospital_no" value="NO"
+                            <% if !doctor_examination_model.referred_to_private_hospital %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_referred_to_private_hospital_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea disabled type="date" class="form-control" name="<%= input_key %>[doctor_examination][referred_to_private_hospital_date]"
+                        id="<%= input_key %>_doctor_examination_referred_to_private_hospital_date" rows="2"><%= doctor_examination_model.referred_to_private_hospital_date %></textarea>
+                </td>
+            </tr>
+            <!--End of reffered to private hospital -->
+
+            <!-- Start of treating the patient -->
+            <tr>
+                <td width="100">4</td>
+                <td>I am treatimng the patient</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="treating_patient_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][treating_patient]" id="<%= input_key %>_treating_patient_yes" value="YES"
+                            <% if doctor_examination_model.treating_patient %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_treating_patient_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="treating_patient_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][treating_patient]" id="<%= input_key %>_treating_patient_no" value="NO"
+                            <% if !doctor_examination_model.treating_patient %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_treating_patient_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea disabled type="date" class="form-control" name="<%= input_key %>[doctor_examination][treating_patient_date]"
+                        id="<%= input_key %>_doctor_examination_treating_patient_date" rows="2"><%= doctor_examination_model.treating_patient_date %></textarea>
+                </td>
+            </tr>
+
+            <!-- End of treating the patient -->
+
+            <!-- Start of treating the patient -->
+            <tr>
+                <td width="100">5</td>
+                <td>The patient is undergoing treatment in another clinic / hospital</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="undergoing_treatment_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][undergoing_treatment]" id="<%= input_key %>_undergoing_treatment_yes" value="YES"
+                            <% if doctor_examination_model.undergoing_treatment %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_undergoing_treatment_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="undergoing_treatment_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][undergoing_treatment]" id="<%= input_key %>_undergoing_treatment_no" value="NO"
+                            <% if !doctor_examination_model.undergoing_treatment %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_undergoing_treatment_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <textarea disabled type="date" class="form-control" name="<%= input_key %>[doctor_examination][undergoing_treatment_date]"
+                        id="<%= input_key %>_doctor_examination_undergoing_treatment_date" rows="2"><%= doctor_examination_model.undergoing_treatment_date %></textarea>
+                </td>
+            </tr>
+
+            <!-- End of treating the patient -->
+
+        </tbody>
+    </table>
+</div>

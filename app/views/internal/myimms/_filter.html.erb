@@ -1,0 +1,57 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_myimms_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Transaction Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Status</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status, options_for_select(MyimmsTransaction::RESPONSE_STATUS.invert, params[:status]), include_blank: "Select Option", class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="passport_number" class="col-sm-3 col-form-label">Passport Number</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="passport_number" id="passport_number" value="<%= params[:passport_number] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="date_send" class="col-sm-3 col-form-label">Date Send</label>
+                        <div class="col-sm-9">
+                            <div class="d-flex align-items-center">
+                                <%= text_field_tag "date_send_start", params["date_send_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'date_send' }, max: Date.today.strftime("%F") %>
+                                <span class="mx-3">to</span>
+                                <%= text_field_tag "date_send_end", params["date_send_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'date_send' }, max: Date.today.strftime("%F") %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_myimms_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

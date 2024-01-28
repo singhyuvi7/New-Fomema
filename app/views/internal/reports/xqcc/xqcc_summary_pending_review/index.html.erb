@@ -1,0 +1,37 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Summary Pending Review Report</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+            <%= hidden_field_tag "type", params[:type] %>
+            <% if @excel.present? %>
+                <%= link_to "Download as excel", "#{ request.path }.xlsx#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% end %>
+
+            <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+
+            <div class="d-flex align-items-center mb-2">
+            	<label class="mb-0 mr-3 w-em-10">Date</label>
+            	<%= text_field_tag "date", params[:date].present? ? params[:date] : '', placeholder: "Select Date", class: "w-em-34 form-control datepicker" %>
+            </div>
+            
+        <% end %>
+    </div>
+
+    <%= render '/internal/reports/xqcc/xqcc_summary_pending_review/summary_pending_review_table' %>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style> 

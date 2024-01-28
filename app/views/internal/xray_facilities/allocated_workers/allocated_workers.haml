@@ -1,0 +1,6 @@
+.card
+  .card-header
+    %strong Allocated Workers
+  .card-body
+    = render 'internal/xray_facilities/allocated_workers/transaction_filter', url: allocated_workers_internal_xray_facility_path(@xray_facility, format: :xlsx)
+    = render '/shared/all_flash'

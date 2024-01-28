@@ -1,0 +1,14 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns:getAccessTokenResponse xmlns:ns="http://dbixelabs.com/xsd">
+      <ns:return xsi:type="ax21:AccessTokenOutput" xmlns:ax21="http://pojo.service.xqcc.dbixelabs.com/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <ax21:status><%= @response[:status] %></ax21:status>
+        <% if @response[:status] > 0 %>
+          <ax21:token><%= @response[:token] %></ax21:token>
+        <% else %>
+          <ax21:token xsi:nil="true"/>
+        <% end %>
+      </ns:return>
+    </ns:getAccessTokenResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

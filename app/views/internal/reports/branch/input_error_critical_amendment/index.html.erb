@@ -1,0 +1,72 @@
+<div class="card">
+    <div class="card-header">
+        Amendment of Critical Information Due to Input Error Report
+    </div>
+
+    <div class="card-body">
+        <%=render 'internal/reports/branch/input_error_critical_amendment/filter' %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers" rowspan="2">#</th>
+                        <th rowspan="2">Created By</th>
+                        <th rowspan="2">Creation Date</th>
+                        <th rowspan="2">Modify By</th>
+                        <th rowspan="2">Amendment Date</th>
+                        <th rowspan="2">Worker Code</th>
+                        <th colspan="2">Name</th>
+                        <th colspan="2">Gender</th>
+                        <th colspan="2">Passport Number</th>
+                        <th colspan="2">Country of Origin</th>
+                        <th colspan="2">Date of Birth</th>
+                    </tr>
+                    <tr>
+                        <% (1..5).each do |n| %>
+                            <th>Old</th>
+                            <th>New</th>
+                        <% end %>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @fw_amendments.blank? %>
+                        <tr>
+                            <td colspan="16" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+                        <% @fw_amendments.each.with_index((@fw_amendments.current_page - 1) * get_per + 1) do |fw_amendment, index| %>
+                            <tr>
+                                <td class="module-row-numbers"><%= index %></td>
+                                <td><%= fw_amendment.fw_created_by_name %></td>
+                                <td><%= fw_amendment.fw_created_at.try(:strftime, get_standard_date_format) %></td>
+                                <td><%= fw_amendment.amendment_by_name %></td>
+                                <td><%= fw_amendment.amendment_at.try(:strftime, get_standard_date_format) %></td>
+                                <td><%= fw_amendment.fw_code %></td>
+                                <td><%= fw_amendment.name_old_value %></td>
+                                <td><%= fw_amendment.name_new_value %></td>
+                                <td><%= fw_amendment.gender_old_value %></td>
+                                <td><%= fw_amendment.gender_new_value %></td>
+                                <td><%= fw_amendment.passport_number_old_value %></td>
+                                <td><%= fw_amendment.passport_number_new_value %></td>
+                                <td><%= Country.find(fw_amendment.country_id_old_value).try(:name) if !fw_amendment.country_id_old_value.blank? %></td>
+                                <td><%= Country.find(fw_amendment.country_id_new_value).try(:name) if !fw_amendment.country_id_new_value.blank? %></td>
+                                <td><%= fw_amendment.date_of_birth_old_value.try(:to_date).try(:strftime, get_standard_date_format) %></td>
+                                <td><%= fw_amendment.date_of_birth_new_value.try(:to_date).try(:strftime, get_standard_date_format) %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <%= paginate @fw_amendments if @fw_amendments %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

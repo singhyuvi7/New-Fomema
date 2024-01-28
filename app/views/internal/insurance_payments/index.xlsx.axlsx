@@ -1,0 +1,59 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+  # worksheet styles
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, alignment: {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style border: Axlsx::STYLE_THIN_BORDER
+  total_style = s.add_style(b: true, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  col_widths = [10,23,23,23,23,23]
+  title = "Insurance Payment Batch Code : #{@batch&.code} (#{@batch.start_date.strftime("%d/%m/%Y")} - #{@batch.end_date.strftime("%d/%m/%Y")})"
+  grand_total = 0
+
+  # worksheet data
+  wb.add_worksheet(name: 'Invoices') do |sheet|
+    sheet.add_row [title], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+    sheet.add_row ['Date','To','Order Code','Status','Total (RM)'], style: header_style
+    if !@batch&.ip_invoices.blank?
+      @batch.ip_invoices.order('payment_to ,payment_date ASC').each do |ip_invoice|
+        sheet.add_row [ip_invoice.payment_date.try(:strftime, "%d/%m/%Y").to_s, InsurancePayment::PAYMENTS[ip_invoice.payment_to], "#{ip_invoice.document_number[1..].to_s} ", IpInvoice::STATUSES[ip_invoice&.status] ? IpInvoice::STATUSES[ip_invoice&.status] : insurance_payment&.status, ip_invoice.total_amount], style: data_style, :types => [:string]
+      end
+
+      @payment_to.each do |to|
+        grand_total += @batch.ip_invoices.where(:payment_to => to).sum(:total_amount)
+        sheet.add_row ['','','',"Total (#{InsurancePayment::PAYMENTS[to]})", @batch.ip_invoices.where(:payment_to => to).sum(:total_amount)], style: total_style
+      end
+
+      sheet.add_row ['','','',"Grand Total", grand_total], style: total_style
+    end
+  end
+
+  wb.add_worksheet(name: 'Calculations') do |sheet|
+    sheet.add_row [title], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+    sheet.add_row ['Order Code',
+    "Total Premium Paid (RM)\r(Gross Premium + SST\r+ Stamp Duty +\rAdmin Fees +\rAdmin Fees SST)",
+    "Total Gross Premium (RM)",
+    "Commission (RM)\r(10% x Gross Premium)",
+    "Payment Charges (RM)\r(Percentage Charged\rBy Payment Method x\rTotal Premium)",
+    "Total Payment Amount(RM)\r(Total Premium Paid -\rComission -\rPayment Charges)"], style: header_style
+    sheet.column_widths *col_widths
+
+    if !@batch&.insurance_payments.blank?
+      @batch.insurance_payments.each do |insurance_payment|
+        sheet.add_row [insurance_payment&.order&.code, insurance_payment.total_premium, insurance_payment.total_gross_premium, insurance_payment.commission, insurance_payment.ipay_charges, insurance_payment.total_payment_amount], style: data_style, :types => [:string]
+      end
+
+      sheet.add_row ['Total (RM)', @batch.insurance_payments.sum(:total_premium),
+      @batch.insurance_payments.sum(:total_gross_premium),
+      @batch.insurance_payments.sum(:commission),
+      @batch.insurance_payments.sum(:ipay_charges),
+      @batch.insurance_payments.sum(:total_payment_amount)], style: total_style
+    end
+  end
+end

@@ -1,0 +1,86 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Orders</strong> - Payment
+    </div>
+    <%= form_for @order, url: payment_internal_order_path(@order), html: {class: "edit_order order-payment-form"} do |form| %>
+        <div class="card-body">
+
+            <%=render "/shared/all_flash" %>
+
+            <%= render "order_info" %>
+
+            <!-- bank draft's card -->
+            <div class="card">
+                <div class="card-header">
+                    Bank Drafts
+                    <div class="card-header-actions">
+                        <!--<button class="btn btn-primary" data-toggle="modal" data-target="#bank-draft-modal" type="button">+</button>-->
+                        <a class="btn btn-primary" href="<%= payment_bankdraft_internal_order_path @order %>">Add Bankdraft</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table bankdraft-table">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Bank</th>
+                                <th>Issue Date</th>
+                                <th>Issue Place (Zone)</th>
+                                <th>Bank Draft Amount</th>
+                                <th>Allocated Amount</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5">&nbsp;</td>
+                                <td>
+                                    <input type="hidden" name="bank_draft_total_amount" id="bank_draft_total_amount" value="<%= @order.bank_draft_allocations.sum(:amount).to_f %>">
+                                    <%= number_to_currency(@order.bank_draft_allocations.sum(:amount), unit: "") %>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </tfoot>
+                        <tbody class="bank-draft-container">
+                            <% @order.bank_draft_allocations.each do |bank_draft_allocation| %>
+                                <tr>
+                                    <td><%= bank_draft_allocation.bank_draft.number %></td>
+                                    <td><%= bank_draft_allocation.bank_draft.bank.name %></td>
+                                    <td><%= bank_draft_allocation.bank_draft.issue_date.strftime("%d/%m/%Y") %></td>
+                                    <td><%= bank_draft_allocation.bank_draft.issue_place %> (<%= bank_draft_allocation.bank_draft&.zone&.name %>)</td>
+                                    <td><%= number_to_currency(bank_draft_allocation.bank_draft.amount, unit: "") %></td>
+                                    <td><%= number_to_currency(bank_draft_allocation.amount, unit: "") %></td>
+                                    <td>
+                                        <%=raw index_table_edit_button(payment_bankdraft_edit_internal_order_path(@order, bank_draft_allocation.bank_draft))  %>
+                                        <%=raw index_table_delete_button(payment_bankdraft_destroy_internal_order_path(@order, bank_draft_allocation.bank_draft)) %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /bank draft's card -->
+        </div>
+
+        <div class="card-footer text-right">
+            <%#=raw edit_save_button(label: '<i class="fa fa-credit-card"></i> Complete Payment', title: 'Payment') %>
+            <button class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Complete Payment" data-original-title="Complete Payment" type="submit" name="submit" value="Save" data-disable-with="Save" <%= onclick="return false" %> ><i class="fa fa-credit-card"></i> Complete Payment</button>
+        </div>
+    <% end %>
+</div>
+
+<%= render "bankdraft_form" %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.order-payment-form').submit(function (e) {
+    // e.preventDefault();
+    if ($('#order_amount').val() != $('#bank_draft_total_amount').val()) {
+        alert("Bank draft allocated amount is different from order amount!");
+        return false;
+    }
+    return true;
+});
+</script>
+<% end %>

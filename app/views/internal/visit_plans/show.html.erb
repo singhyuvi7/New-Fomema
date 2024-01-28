@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Visitable category:</strong>
+  <%= @visit_plan.visitable_category %>
+</p>
+
+<p>
+  <strong>Inspect from:</strong>
+  <%= @visit_plan.inspect_from %>
+</p>
+
+<p>
+  <strong>Inspect to:</strong>
+  <%= @visit_plan.inspect_to %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @visit_plan.status %>
+</p>
+
+<p>
+  <strong>Comment:</strong>
+  <%= @visit_plan.comment %>
+</p>
+
+<%= link_to 'Edit', edit_visit_plan_path(@visit_plan) %> |
+<%= link_to 'Back', visit_plans_path %>

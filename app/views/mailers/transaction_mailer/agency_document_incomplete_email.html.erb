@@ -1,0 +1,45 @@
+<p>
+    <b>Dear <%= @agency.name %> </b>,<br>
+    <b><i>Tuan / Puan <%= @agency.name %> </i></b>,  
+</p>  
+
+<p>
+    Please be informed that your document(s) is incomplete due <%= @reason %>. The details are as follows:<br>
+    <i>Dokumen Pekerja asing anda tidak lengkap atas sebab <%= @reason %>.</i>
+</p>
+
+<p>
+    Foreign Worker Information:<br>
+    <i>Maklumat Pekerja Asing</i><br>
+
+    Code: <%= @fw.code %><br>
+    <i>Kod</i><br>
+
+    Name: <%= @fw.name %><br>
+    <i>Nama</i><br>
+
+    Passport Number:  <%= @fw.passport_number %><br>
+    <i>Nombor Passport</i><br>
+
+    Employer Name: <%= "#{@employer.name} (#{@employer.code})" %><br>
+    <i>Nama Majikan </i>
+</p>
+
+<p>
+    To re-submit your document(s), please click on the link below or copy and paste the link into your browser.<br>
+    <i>Untuk  menghantar semula dokumen, slik klik pautan dibawah atau salin dan tampal semula paparan ke dalam pelayar web anda:</i>
+</p>
+
+<p>
+    <%= @url %><br>
+</p>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih.</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

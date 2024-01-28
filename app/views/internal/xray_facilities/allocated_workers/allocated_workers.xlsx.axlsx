@@ -1,0 +1,16 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Transactions') do |sheet|
+  sheet.add_row %w[WORKER_CODE WORKER_NAME EMPLOYER_NAME PRIMARY_CONTACT_PERSON
+                   PHONE TRANSDATE EXAM_DATE LAB_SUBMIT_DATE XRAY_SUBMIT_DATE
+                   CERTIFY_DATE JOB_TYPE COUNTRY_NAME RENEWAL STATE_NAME
+                   XRAY_CODE FACILITY_NAME LICENSE_HOLDER_NAME COMPANY_NAME STATUS DOCTOR_CODE DOCTOR_NAME]
+  @transactions.find_each do |transaction|
+    %i[fw_code fw_name emp_name emp_pic_name emp_pic_phone
+       transaction_date medical_examination_date laboratory_transmit_date
+       xray_transmit_date certification_date fw_jt_name fw_cty_name
+       renewal emp_state_name xray_facility_code xray_facility_name xray_facility_license_holder_name xray_facility_company_name
+       final_result doc_code doc_name].then do |attributes|
+      sheet.add_row(attributes.map { |attribute| transaction.try(attribute) })
+    end
+  end
+end

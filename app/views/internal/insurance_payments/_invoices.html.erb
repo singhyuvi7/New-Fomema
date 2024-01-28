@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+
+            <table class="table table-responsive-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>To</th>
+                        <th>Order Code</th>
+                        <th>Status</th>
+                        <th>Total (RM)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        statuses = IpInvoice::STATUSES
+                        grand_total = 0
+                    %>
+
+                    <% if @batch.ip_invoices.empty? %>
+                        <tr>
+                            <td colspan="5">No Records Found</td>
+                        </tr>
+                    <% end %>
+                    <% @batch.ip_invoices.order('payment_to ,payment_date ASC').each do |ip_invoice| %>
+                        <tr>
+                            <td><%= ip_invoice.payment_date.try(:strftime, "%d/%m/%Y") %></td>
+                            <td><%= InsurancePayment::PAYMENTS[ip_invoice.payment_to] %></td>
+                            <td><%= ip_invoice.document_number[1..] %></td>
+                            <td>
+                                <div><%= statuses[ip_invoice&.status] ? statuses[ip_invoice&.status] : insurance_payment&.status %></div>
+                                <div><small><%= "(#{ip_invoice.fail_reason})" if (ip_invoice.status == 'FAILED' && !ip_invoice.fail_reason.blank?) %></small></div>
+                            </td>
+                            <td><%= ip_invoice.total_amount %></td>
+                        </tr>
+                    <% end %>
+
+                    <% @payment_to.each do |to| %>
+                        <% grand_total += @batch.ip_invoices.where(:payment_to => to).sum(:total_amount) %>
+                        <tr>
+                            <td colspan="4"><div class="float-right font-weight-bold">Total (<%= InsurancePayment::PAYMENTS[to] %>)</div></td>
+                            <td><%= @batch.ip_invoices.where(:payment_to => to).sum(:total_amount) %></td>
+                        </tr>
+                    <% end %>
+
+                    <tr>
+                        <td colspan="4"><div class="float-right font-weight-bold">Grand Total</div></td>
+                        <td><%= grand_total %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

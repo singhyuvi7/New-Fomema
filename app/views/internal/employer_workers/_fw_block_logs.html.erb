@@ -1,0 +1,67 @@
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Action</th>
+        <th>Reason</th>
+        <th>Block Purchase Medical Form Comment</th>
+        <th>Block SP Result Transmit Comment</th>
+        <th>Block Send to JIM Comment</th>
+        <th>Request By</th>
+        <th>Request At</th>
+        <th>Approval By</th>
+        <th>Approval At</th>
+        <th>Approval Decision</th>
+        <th>Foreign Worker Verification</th>
+    </tr>
+    <% if @block_logs.blank? %>
+        <tr>
+            <td colspan="10" class="text-danger">No records found.</td>
+        </tr>
+    <% else %>
+        <% @block_logs.each do |block_log| %>
+            <tr>
+                <td><%= block_log.action %></td>
+                <td><%= block_log.block_reason.try(:description) %></td>
+                <td>
+                    <%= block_log.is_reg_medical_blocked ? 'Yes' : 'No' %>
+                    <% if !block_log.is_reg_medical_blocked_comment.blank? %>
+                        <p class="font-italic"><%= "#{block_log.is_reg_medical_blocked_comment}" %></p>
+                    <% end %>
+                </td>
+                <td>
+                    <%= block_log.is_sp_transmit_blocked ? 'Yes' : 'No' %>
+                    <% if !block_log.is_sp_transmit_blocked_comment.blank? %>
+                        <p class="font-italic"><%= "#{block_log.is_sp_transmit_blocked_comment}" %></p>
+                    <% end %>
+                </td>
+                <td>
+                    <%= block_log.is_imm_blocked ? 'Yes' : 'No' %>
+                    <% if !block_log.is_imm_blocked_comment.blank? %>
+                        <p class="font-italic"><%= "#{block_log.is_imm_blocked_comment}" %></p>
+                    <% end %>
+                </td>
+                <td><%= block_log.requester.try(:name) %></td>
+                <td><%= block_log.requested_at.try(:strftime, get_standard_datetime_format) %></td>
+                <td><%= block_log.approver.try(:name) %></td>
+                <td><%= block_log.approval_at.try(:strftime, get_standard_datetime_format) %></td>
+                <td>
+                    <%= block_log.approval_decision || "Pending Approval" %>
+                    <% if !block_log.approval_comment.blank? %>
+                        <p class="font-italic"><%= "#{block_log.approval_comment}" %></p>
+                    <% end %>
+                </td>
+                <td>
+                    <% if !block_log.fw_verification_par_id.blank? %>
+                        <% block_log.fw_verification_par_id.each.with_index do |ar_id, index| %>
+                            <% if !ar_id.blank? %>
+                                <% ar = FwVerificationPar.find_by_code(ar_id)&.name %>
+                                <div><%= index + 1 %>. <%= ar %></div>
+                            <% end %>
+                        <% end %>
+                    <% else %>
+                        <div>N/A</div>
+                    <% end %>
+                </td>
+            </tr>
+        <% end %>
+    <% end %>
+</table>

@@ -1,0 +1,25 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        System Configurations
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_SYSTEM_CONFIGURATION") %>
+                <li class="list-group-item">
+                    <%= link_to "System", system_internal_system_configurations_path %>
+                </li>
+            <% end %>
+            <% if has_permission?("VIEW_XQCC_SYSTEM_CONFIGURATION") %>
+                <li class="list-group-item">
+                    <%= link_to "XQCC", xqcc_internal_system_configurations_path %>
+                </li>
+            <% end %>
+            <% if has_permission?("VIEW_FINANCE_SYSTEM_CONFIGURATION") %>
+                <li class="list-group-item">
+                    <%= link_to "Finance", finance_internal_system_configurations_path %>
+                </li>
+            <% end %>
+    </div>
+</div>

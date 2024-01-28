@@ -1,0 +1,28 @@
+<p>
+    <b>Dear <%= @customer&.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @customer&.name %></i></b>,
+</p>
+
+<p>
+    Please be informed, we already made payment for your refund request but unsuccessful due to your Account Number Wrongly Key In/Invalid ID/Account Frozen. <br>
+    <i>Dimaklumkan bahawa kami telah membuat bayaran Balik ke akaun anda tetapi tidak berjaya kerana kesalahan dalam meletakkan nombor akaun/ID tidak sah/Akaun dibekukan.</i>
+</p>
+
+<p>
+    Kindly update your account information to reprocess the refund. Please click on the link below or copy and paste the link into your browser. <br>
+    <i>Sila kemaskini akaun anda untuk  proses semula Bayaran Balik. Sila klik paparan dibawah atau salin dan tampal semula paparan</i>
+</p>
+
+<p>
+    <%= "#{@refund&.customerable_type == 'Employer' ? ENV["APP_URL_PORTAL"] : ENV["APP_URL_MERTS"]}profile" %>
+</p>
+
+<p>
+    Thank You. <br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

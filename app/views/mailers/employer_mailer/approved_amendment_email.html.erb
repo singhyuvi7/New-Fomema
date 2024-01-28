@@ -1,0 +1,37 @@
+<p>
+    <b>Dear <%= @name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @name %></i></b>,
+</p>
+
+<p>
+    Please be informed that your request to update <Company Registration Number/ NRIC Number>
+    was approved. The details are as follows:<br>
+    <i>Dimaklumkan permohonan mengemaskini <Nombor Pendaftaran Syarikat/ Nombor Kad Pengenalan> anda telah berjaya.
+    Maklumat adalah seperti berikut:</i><br>
+</p>
+
+<p>
+Employer Information: <br>
+<i>Maklumat Majikan </i><br>
+Code: <%= @employer.code %><br>
+<i>Kod</i><br>
+Name: <%= @employer.name %><br>
+<i>Nama </i><br>
+Company Registration Number / NRIC NUMBER:
+    <% if @employer.employer_type_id == 1 %>
+        <%= @employer.ic_passport_number %>
+    <% elsif @employer.employer_type_id == 2 %>
+        <%= @employer.business_registration_number %>
+    <% end %><br>
+<i>Nombor Pendaftaran Syarikat/ Nombor Kad Pengenalan</i>
+</p>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

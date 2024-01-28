@@ -1,0 +1,23 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <tbody>
+            <tr>
+                <td class="table-items">
+                    <%= visit_report_laboratory.label :satisfactory_comment, 'Satisfactory' %>
+                    <%= visit_report_laboratory.text_area :satisfactory_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right table-acceptable" colspan="3">
+                    <div class="btn-group btn-group-toggle w-75 non-summary" data-toggle="buttons" data-group-name="conclusion">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :satisfactory, 'YES', class: 'conclusion' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :satisfactory, 'NO', class: 'conclusion' %> No
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

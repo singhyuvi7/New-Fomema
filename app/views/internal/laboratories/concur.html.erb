@@ -1,0 +1,38 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Laboratories</strong> - Concur
+    </div>
+    <%= form_for @laboratory, url: concur_update_internal_laboratories_path(@laboratory), html: {class: "#{params[:action]}_laboratory laboratory-form"} do |form| %>
+
+        <div class="card-body">
+
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <%=render "shared/approval_comments", { comments: @laboratory.approval_request.comments } if @laboratory.approval_request %>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <%= form.label :comment, "Concur Comment", for: 'concur_comment' %>
+                                <textarea class="form-control" name="concur[comment]" id="concur_comment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_laboratories_path) %>
+                <%=raw approval_submit_concur_button %>
+            </div>
+        
+        </div>
+    <% end %>
+</div>

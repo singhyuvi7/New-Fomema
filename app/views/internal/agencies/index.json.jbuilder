@@ -1,0 +1,1 @@
+json.array! @agencies, partial: '/internal/agencies/agency', as: :agency

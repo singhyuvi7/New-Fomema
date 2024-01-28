@@ -1,0 +1,185 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Master List</strong> - Edit
+    </div>
+    <%= form_for @item, url: edit_master_list_internal_inspectorate_reports_path(id: @batch.id, item_id: @item.id), html: {multipart: true, class: "with-parsley"} do |form| %>
+        <div class="card-body">
+            <%= render 'shared/all_validation_flash', { model_obj: @item } %>
+            <%= render "/shared/all_flash" %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :visit_date %>
+                        <%= form.text_field :visit_date, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :name_of_clinic %>
+                        <%= form.text_field :name_of_clinic, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :doctor_code, 'Code' %>
+                        <%= form.text_field :sp_code, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :name_of_doctor, 'Name Of Reg. Doctor' %>
+                        <%= form.text_field :name_of_doctor, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :location, 'Location' %>
+                        <%= form.text_field :location, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :state, 'State' %>
+                        <%= form.text_field :state, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :inspected_by, 'Inspected By' %>
+                        <%= form.text_field :inspected_by, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :visit_report_id, 'Visit Report ID' %>
+                        <%= form.text_field :visit_report_id, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :nc, 'NC' %>
+                        <%= form.text_field :nc, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :letter_ref, 'Letter ref. #' %>
+                        <%= form.text_field :letter_ref, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :letter_date, 'Letter date' %>
+                        <%= form.text_field :letter_date, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :report_date, 'Report Date' %>
+                        <%= form.text_field :report_date, class: "form-control disable-field" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :report_by, 'Report By' %>
+                        <%= form.text_field :report_by, class: "form-control disable-field" %>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :serial_no, 'Serial No.' %>
+                        <%= form.text_field :serial_no, class: "form-control" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :repeated_offence, 'Repeated offence (NC/Year)' %>
+                        <%= form.text_field :repeated_offence, class: "form-control" %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :date_of_faxed, 'Date of Faxed' %>
+                        <%= form.date_field :date_of_faxed, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :follow_up_date, 'Follow-up Date' %>
+                        <%= form.date_field :follow_up_date, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :reminder_letter, 'Reminder letter' %>
+                        <%= form.text_field :reminder_letter, class: "form-control" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :reply_date, 'Reply date' %>
+                        <%= form.date_field :reply_date, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :present_in_meeting, 'Present in Meeting' %>
+                        <%= form.text_field :present_in_meeting, class: "form-control" %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :remarks, 'Remarks' %>
+                        <%= form.text_area :remarks, class: 'form-control' %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(view_master_list_internal_inspectorate_reports_path(@batch)) %>
+                <%=raw edit_save_button() %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.disable-field').prop('disabled', true);
+</script>
+<% end %>

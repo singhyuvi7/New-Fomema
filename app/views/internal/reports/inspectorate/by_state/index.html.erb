@@ -1,0 +1,94 @@
+<!-- new template for index -->
+<div class="card">
+    <div class="card-header">
+        <strong>By State</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <div class="card">
+            <div class="card-header">
+                <strong>Search</strong>
+            </div>
+
+            <%= form_tag by_state_internal_inspectorate_reports_path, method: 'get' do |form| %>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="state_id" class="col-sm-3 col-form-label">State</label>
+                            <div class="col-sm-9">
+                                <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: 'All', class: 'form-control' do %>
+                                    State
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="activated" class="col-sm-3 col-form-label">Town</label>
+                            <div class="col-sm-9">
+                                <%= select_tag :town_id, options_from_collection_for_select(Town.where(state_id: params[:state_id]).order(:name).all, 'id', 'name',  params[:town_id]), include_blank: 'All', class: 'form-control' %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="start_date" class="col-sm-3 col-form-label">Visit Date From</label>
+                            <div class="col-sm-9">
+                                 <%= text_field_tag "start_date", params[:start_date], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'start_date' }, max: Date.today.strftime("%F"), :required => true %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="end_date" class="col-sm-3 col-form-label">Visit Date To</label>
+                            <div class="col-sm-9">
+                                <%= text_field_tag "end_date", params["end_date"], class: "form-control datepicker custom-date-range-picker flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'start_date' }, max: Date.today.strftime("%F"), :required => true %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, by_state_internal_inspectorate_reports_path(format: :xlsx, params: params.permit!), class: "btn btn-sm btn-warning with-excel-format" %>
+                </div>
+            </div>
+            <% end %>
+        </div>
+
+        <%= render "/shared/all_flash" %>
+
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function (e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+
+    // when change state, ajax fetch towns
+    $('#state_id').change(function () {
+        // empty town and postcode
+        $('#town_id').html('<option value>All</option>');
+
+        if (this.value) {
+            $.ajax({
+                url: '/states/' + this.value + '/towns.json',
+                method: "GET",
+            }).done(function (data) {
+                $.each(data, function (idx, town) {
+                    $('#town_id').append('<option value="'+town.id+'" data-postcode_id="'+town.postcode_id+'" data-postcode_code="'+town.postcode_code+'">'+town.name+'</option>');
+                });
+            });
+        }
+    });
+
+</script>
+<% end %>

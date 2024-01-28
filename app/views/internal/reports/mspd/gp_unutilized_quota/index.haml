@@ -1,0 +1,41 @@
+.card
+  .card-header
+    %strong MSPD - GP Unutilized Quota
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: gp_unutilized_quota_internal_mspd_reports_path(format: :xlsx), method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :laboratory_codes, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.collection_select :laboratory_codes, Laboratory.allocated.order(:code), :code, :code, { include_blank: false }, { class: 'form-control select2', multiple: true }
+              .col-md-6
+                .row.form-group
+                  = form.label :xray_codes, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.collection_select :xray_codes, XrayFacility.allocated.order(:code), :code, :code, { include_blank: false }, { class: 'form-control select2', multiple: true }
+              .col-md-6
+                .row.form-group
+                  = form.label :doctor_codes, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.collection_select :doctor_codes, Doctor.order(:code), :code, :code, { include_blank: false }, { class: 'form-control select2', multiple: true }
+              .col-md-6
+                .row.form-group
+                  = form.label :year, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.select :year, options_for_select((5.years.ago.year..DateTime.now.year).step(1).to_a.reverse, DateTime.current.year), {}, class: 'form-control'
+          .card-footer
+            - if has_permission?("MSPD_REPORTS")
+              .text-right
+                = link_to gp_unutilized_quota_internal_mspd_reports_path, class: 'btn btn-sm btn-danger mx-1' do
+                  %i.icon-trash
+                  Clear
+                = form.button :export, class: 'btn btn-primary btn-sm' do
+                  %i.fa.fa-download
+                  Download

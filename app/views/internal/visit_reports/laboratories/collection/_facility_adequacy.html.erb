@@ -1,0 +1,82 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-index"></th>
+                <th class="table-items"></th>
+                <th colspan="3" class="text-center table-acceptable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1.</td>
+                <td>
+                    <%= visit_report_laboratory.label :adequate_facility_comment, 'Adequate Facility' %>
+                    <%= visit_report_laboratory.text_area :adequate_facility_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="facility_adequacy">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :adequate_facility, 'YES', class: 'facility_adequacy' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :adequate_facility, 'NO', class: 'facility_adequacy' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :adequate_facility, 'NA', class: 'facility_adequacy' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>
+                    <%= visit_report_laboratory.label :adequate_staff_comment, 'Adequate Staff' %>
+                    <%= visit_report_laboratory.text_area :adequate_staff_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="facility_adequacy">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :adequate_staff, 'YES', class: 'facility_adequacy' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :adequate_staff, 'NO', class: 'facility_adequacy' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :adequate_staff, 'NA', class: 'facility_adequacy' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>3.</td>
+                <td>
+                    <%= visit_report_laboratory.label :adequate_instrument_comment, 'Adequate instrument/material/consumables' %>
+                    <div class="py-2 pl-1">
+                        <%= visit_report_laboratory.collection_check_boxes(:adequate_instrument_items,  VisitReportLabOption.get_data('', 'instrument'), :code, :name) do |b| %>
+                            <div class="form-check form-check-inline">
+                                <%= b.check_box class: 'form-check-input' %>
+                                <%= b.label class: 'form-check-label' %>
+                            </div>
+                        <% end %>
+                    </div>
+                    <%= visit_report_laboratory.text_area :adequate_instrument_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="facility_adequacy">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :adequate_instrument, 'YES', class: 'facility_adequacy' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :adequate_instrument, 'NO', class: 'facility_adequacy' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :adequate_instrument, 'NA', class: 'facility_adequacy' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

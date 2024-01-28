@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Register Worker</strong> - Amendment
+    </div>
+    <%= form_for @foreign_worker, url: external_agency_worker_path(@foreign_worker, employer_id: @employer.id), html: { multipart: true, class: "with-parsley" } do |form| %>
+        <%= render 'form', { form: form, is_change_employer: false } %>
+    <% end %>
+</div>

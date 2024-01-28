@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Countries</strong> - New Country
+    </div>
+    <%= form_for @country, url: internal_countries_path, html: {class: "#{params[:action]}_country country-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

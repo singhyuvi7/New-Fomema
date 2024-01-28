@@ -1,0 +1,42 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag daily_monthly_worker_insurance_internal_operation_reports_path, method: 'get' do |form| %>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="register_date" class="col-sm-3 col-form-label">Date</label>
+                    <div class="col-sm-9">
+                        <div class="d-flex align-items-center">
+                            <%= text_field_tag "month", params["month"], class: "form-control datepicker-month flex-grow-1", placeholder: "Select Month", required: true %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <!-- <%=raw filter_clear_button daily_monthly_worker_insurance_internal_operation_reports_path %> -->
+            <% if has_permission?("OPERATION_REPORTS") %>
+                <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, daily_monthly_worker_insurance_internal_operation_reports_path(format: :xlsx, params: params.permit!), class: "btn btn-sm btn-warning with-excel-format" %>
+            <% end %>
+            <!-- <%=raw filter_button %> -->
+        </div>
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-pdf-format').click(function(e) {
+        $(this).attr("href", this.href + ".pdf?" + $(this).closest('form').serialize());
+    });
+    $('.with-excel-format').click(function(e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

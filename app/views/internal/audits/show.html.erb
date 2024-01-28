@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= @module_title || @auditable.class.name.titleize %> Audits</strong>
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+        <table class="table">
+            <tr>
+                <% if @revision_previous %>
+                    <th colspan="2" style="width: 50%">
+                        Version <%= @audit_previous.version %> As of <%= @audit_previous.created_at.strftime(get_standard_datetime_format) %>
+                    </th>
+                <% end %>
+                <th colspan="2">
+                    Version <%= @audit.version %> As of <%= @audit.created_at.strftime(get_standard_datetime_format) %>
+                </th>
+            </tr>
+            <%
+            @revision.attributes.each_pair do |name, value|
+                partial = lookup_context.find_all("internal/audits/fields/_#{name}").any? ? "internal/audits/fields/#{name}" : "internal/audits/fields/_standard"
+            %>
+                <tr class="<%= " audit-changed " if @revision_previous && @revision_previous.try(name.to_sym) != value %>">
+                    <% if @revision_previous %>
+                        <%= render partial: partial, locals: {revision: @revision_previous, name: name, value: @revision_previous.try(name.to_sym)} %>
+                    <% end %>
+                    <%= render partial: partial, locals: {revision: @revision, name: name, value: value} %>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <a href="../audits" class="btn btn-sm btn-secondary"><i class="fa fa-history"></i> Back</a>
+            <% if @audit_previous %>
+                <a href="../audits/<%= @audit_previous.id %>" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-left"></i> Previous</a>
+            <% end %>
+            <% if @audit && @audit.next_audit %>
+                <a href="../audits/<%= @audit.next_audit.id %>" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-right"></i> Next</a>
+            <% end %>
+        </div>
+    </div>
+</div>
+<!-- /.card -->
+<style>
+tr.audit-changed {
+    color: red;
+}
+</style>

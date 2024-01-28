@@ -1,0 +1,8 @@
+<a href="<%= internal_user_setup_path(activity.owner_id) %>"><%= activity.owner.name %></a>  perform PCR Audit on
+
+<% if activity.trackable and !activity.trackable.transactionz.blank? %>
+    <!-- Original action deleted. If want to update, should be PcrReview#Edit -->
+    <a href="<%= internal_pcr_review_path(activity.trackable.id) %>"><%= activity.trackable.transactionz&.code %></a>
+<% else %>
+    which has since been removed
+<% end %>

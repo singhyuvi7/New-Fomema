@@ -1,0 +1,25 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: 'misc') do |sheet|
+    if @data.present?
+      @data.each.with_index do |(branch, collection), index|
+        sheet.add_row [branch]
+        sheet.add_row @headers, style: header_style
+        collection&.sort_by { |p| [p[0], p[1], p[2], p[3], p[4], p[5]] }&.each do |income|
+          income.delete_at(3)
+          income.delete_at(1)
+          sheet.add_row income, style: data_style
+        end
+        sheet.add_row ['Total', nil, collection.pluck(2).sum, collection.pluck(3).sum]
+        2.times { sheet.add_row } if index != (@data.size - 1)
+      end
+    end
+
+    if @stats.present?
+      sheet.add_row ['Grand Total', nil, @stats.dig(:grand_total, :total_amount), @stats.dig(:grand_total, :total_count)]
+    end
+  end
+end

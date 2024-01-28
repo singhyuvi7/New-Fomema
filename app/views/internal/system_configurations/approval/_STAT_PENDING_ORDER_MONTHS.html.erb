@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "STAT_PENDING_ORDER_MONTHS" %>"><%= @system_configurations["STAT_PENDING_ORDER_MONTHS"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "PENDING_PAYMENT_STATISTIC_MONTH", @system_configurations["STAT_PENDING_ORDER_MONTHS"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["STAT_PENDING_ORDER_MONTHS"].value %></p>
+</div>

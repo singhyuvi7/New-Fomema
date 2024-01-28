@@ -1,0 +1,74 @@
+<div class="card">
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render partial: '/internal/service_provider_groups/shared/service_provider_group' %>
+        <%=render partial: '/internal/service_provider_groups/shared/tabs', locals: {active_tab: "service_provider_groups"} %>
+
+        <div class="tab-content">
+            <div class="tab-pane active">
+
+                <%=render "/shared/all_flash" %>
+
+                <div class="row">
+                    <div class="col module-actions text-right">
+                        <!-- <% if has_permission?("CREATE_MEMBER_SERVICE_PROVIDER_GROUP") %>
+                            <%=raw index_table_new_button(members_new_internal_service_provider_group_path) %>
+                        <% end %> -->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="<%= index_table_class %>">
+                                <thead>
+                                    <tr>
+                                        <th class="module-row-numbers">#</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Scheduled Date</th>
+                                        <th class="module-row-actions">Action(s)</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <% if @memberables.blank? %>
+                                        <tr>
+                                            <td colspan="5" class="text-danger">No records found.</td>
+                                        </tr>
+                                    <% else %>
+
+                                        <% @memberables.each.with_index((@memberables.current_page - 1) * get_per + 1) do |member, index| %>
+                                            <tr>
+                                                <td class="module-row-numbers"><%= index %></td>
+                                                <td><%= member.code%></td>
+                                                <td><%= member.name %></td>
+                                                <td><%= member.sp_group_schedules.where(service_provider_group_id: @service_provider_group.id).last&.scheduled_date&.strftime("%d-%m-%Y") %></td>
+                                                <td class="module-row-actions">
+                                                    <% if @service_provider_group.category == 'Doctor' && has_permission?('VIEW_DOCTOR') %>
+                                                        <%= raw index_table_show_button(internal_doctor_path(member.id)) %>
+                                                    <% end %>
+                                                    <% if @service_provider_group.category == 'Laboratory' && has_permission?('VIEW_LABORATORY') %>
+                                                        <%= raw index_table_show_button(internal_laboratory_path(member.id)) %>
+                                                    <% end %>
+                                                    <% if @service_provider_group.category == 'XrayFacility' && has_permission?('VIEW_XRAY_FACILITY') %>
+                                                        <%= raw index_table_show_button(internal_xray_facility_path(member.id)) %>
+                                                    <% end %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
+
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <%= paginate @memberables %>
+                </div>
+            </div>
+            <!-- /tab-pane -->
+        </div>
+    </div>
+</div>

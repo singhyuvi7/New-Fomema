@@ -1,0 +1,12 @@
+<label class="col-md-4 col-form-label"><%= @system_configurations["EMPLOYER_APPROVAL"].name %></label>
+<div class="col-md-8">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="EMPLOYER_APPROVAL_1" type="radio" value="1" name="EMPLOYER_APPROVAL" required<%= " checked" if @system_configurations["EMPLOYER_APPROVAL"].new_value == '1' %><%= " disabled" if @system_configurations["EMPLOYER_APPROVAL"].new_value != '1' %>>
+        <label class="form-check-label" for="EMPLOYER_APPROVAL_1">Yes</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="EMPLOYER_APPROVAL_0" type="radio" value="0" name="EMPLOYER_APPROVAL" required<%= " checked" if @system_configurations["EMPLOYER_APPROVAL"].new_value == '0' %><%= " disabled" if @system_configurations["EMPLOYER_APPROVAL"].new_value != '0' %>>
+        <label class="form-check-label" for="EMPLOYER_APPROVAL_0">No</label>
+    </div>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["EMPLOYER_APPROVAL"].value == '1' ? 'Yes' : 'No' %></p>
+</div>

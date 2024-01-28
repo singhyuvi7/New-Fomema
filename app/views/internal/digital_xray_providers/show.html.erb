@@ -1,0 +1,70 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Digital X-Ray Providers</strong> - Digital X-Ray Provider Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="digital_xray_provider_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @digital_xray_provider.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="digital_xray_provider_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @digital_xray_provider.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="digital_xray_provider_provider_url">Provider URL</label>
+                    <p class="form-control-plaintext">
+                        <%= @digital_xray_provider.provider_url %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_digital_xray_providers_path) %>
+            <% if has_permission?('EDIT_DIGITAL_XRAY_PROVIDER') %>
+                <%=raw show_edit_button(edit_internal_digital_xray_provider_path(@digital_xray_provider)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_DIGITAL_XRAY_PROVIDER") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_digital_xray_provider_audits_path(@digital_xray_provider) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

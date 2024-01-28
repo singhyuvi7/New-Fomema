@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :telephone_number, class: 'required' %>
+            <%= form.text_field :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :fax_number %>
+            <%= form.text_field :fax, class: 'form-control' %>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <%= form.label :email, class: 'required' %>
+            <%= form.email_field :email, class: 'form-control', required: true %>
+        </div>
+    </div>
+</div>

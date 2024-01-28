@@ -1,0 +1,96 @@
+<div class="card">
+
+    <div class="card-body">
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :sp_schedulable_type, "Type" %>
+                <p class="form-control-plaintext">
+                    <%= @group_schedule.sp_schedulable_type %>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :sp_schedulable_id, "Service Provider" %>
+                <p class="form-control-plaintext">
+                    <%= "#{ @group_schedule.sp_schedulable&.name} (#{@group_schedule.sp_schedulable&.code})" %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <% if @group_schedule.sp_schedulable_type.eql? 'Doctor' %>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :sp_schedulable_id, "Clinic Name" %>
+                <p class="form-control-plaintext">
+                    <%= @group_schedule.sp_schedulable.clinic_name %>
+                </p>
+            </div>
+        </div>
+    </div>
+    <% end %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :service_provider_group_id, "Service Provider Group" %>
+                <p class="form-control-plaintext">
+                    <%= @group_schedule.service_provider_group_id ? @group_schedule.service_provider_group.name : 'No Group' %>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :scheduled_date, "Scheduled Date" %>
+                <p class="form-control-plaintext">
+                    <%= @group_schedule.scheduled_date.strftime("%d/%m/%Y") %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :created_by, "Created By" %>
+                <p class="form-control-plaintext">
+                    <%= User.find_by(id: @group_schedule.created_by).username %>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= label_tag :created_at, "Created At" %>
+                <p class="form-control-plaintext">
+                    <%= @group_schedule.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_group_schedules_path(
+            {}.merge(
+                params.key?("sp_schedulable_code") ? {sp_scheduleable_code: params[:sp_schedulable_code]} : {}
+            ).merge(
+                params.key?("sp_schedulable_type") ? {sp_scheduleable_type: params[:sp_schedulable_type]} : {}
+            )
+        )) %>
+    </div>
+
+    </div>
+
+
+    <% content_for :page_end_scripts do %>
+    <script>
+    </script>
+    <% end %>
+</div>

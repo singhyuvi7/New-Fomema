@@ -1,0 +1,291 @@
+<div class="card">
+    <div class="card-header">
+        <%= @employer.name %>
+    </div>
+    <div class="card-body">
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Employer Type</label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @employer.employer_type&.name %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Code</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.code %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Name</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.name %></div>
+            </div>
+        </div>
+        <% if @employer.is_individual? %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">ICNO / Passport Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.ic_passport_number %></div>
+                </div>
+            </div>
+        <% else %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Business Registration Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.business_registration_number %></div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Name (Person In Charge)</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.pic_name %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Contact Details (Person In Charge)</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.pic_phone %></div>
+                </div>
+            </div>
+        <% end %>
+
+        <!-- address -->
+        <div class="row">
+            <label class="col-md-2 col-form-label">Address</label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext">
+                    <%= @employer.address1 %>
+                    <%=raw "<br>#{@employer.address2}" if @employer.address2 %>
+                    <%=raw "<br>#{@employer.address3}" if @employer.address3 %>
+                    <%=raw "<br>#{@employer.address4}" if @employer.address4 %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">State</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.state&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Town</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.town&.name %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Postcode</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.postcode %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Email Address</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @employer&.email %> <strong><i><%= "(Unconfirmed, #{@employer.user&.confirmation_sent_at&.strftime(get_standard_datetime_format)})" if !@employer.user&.unconfirmed_email.blank? %></i></strong>
+                    <% if has_permission?("RESEND_CONFIRMATION_INSTRUCTION_USER") && @employer.user&.pending_reconfirmation? %>
+                        <%=raw index_table_primary_button resend_confirmation_internal_employer_path, label: 'Resend Confirmation Instruction' %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Telephone Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.phone %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Fax Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.fax %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Status</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= Employer::STATUSES[@employer.status] %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Remarks</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><pre><%= @employer&.registration_comment %></pre></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Problematic</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.problematic ? 'Yes' : 'No' %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Document Verified</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.document_verified ? 'Yes' : 'No' %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Corporate</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.is_corporate ? 'Yes' : 'No' %></div>
+            </div>
+        </div>
+        <!-- /address -->
+
+        <% if has_permission?("VIEW_FINANCE_INFO_EMPLOYER") %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Bank Payment ID</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.bank_payment_id || raw("<i>N/A</i>") %></div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Bank</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.bank&.name || raw("<i>N/A</i>") %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Bank Account Number</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.bank_account_number || raw("<i>N/A</i>") %></div>
+                </div>
+            </div>
+        <% end %>
+
+        <% if has_permission?("VIEW_NON_FINANCE_INFO_EMPLOYER") %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="employer_uploads">Uploaded Documents</label>
+                    <%= hidden_field_tag :remove_uploaded_file, "" %>
+                    <table class="table">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                            <th>Date Uploaded</th>
+                            <th></th>
+                        </tr>
+
+                        <% @employer.uploads.each do |upload| %>
+                            <tr>
+                                <td class="filenames"><%= upload.category %></td>
+
+                                <td class="filenames">
+                                    <% upload.documents.each do |document| %>
+                                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                    <% end %>
+                                </td>
+
+                                <td>
+                                    <%= upload.created_at&.strftime(get_standard_date_format) %>
+                                </td>
+
+                                <td style="width: 150px;">
+                                </td>
+                            </tr>
+                        <% end %>
+
+                        <% if @employer.uploads.blank? %>
+                            <tr><td colspan="4">There are no uploaded documents</td></tr>
+                        <% end %>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="employer_comment_logs">Comment Logs</label>
+
+                        <table class="table">
+                            <tr>
+                                <th>Date</th>
+                                <th>Created By</th>
+                                <th>Comment</th>
+                            </tr>
+
+                            <% @employer.comment_logs.each do |log| %>
+                                <tr>
+                                    <td><%= log.created_at&.strftime(get_standard_date_format) %></td>
+
+                                    <td><%= log.creator.name %></td>
+
+                                    <td><%= log.comment %></td>
+                                </tr>
+                            <% end %>
+
+                            <% if @employer.comment_logs.blank? %>
+                                <tr><td colspan="3">There are no comment log.</td></tr>
+                            <% end %>
+                        </table>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="employer_comment_logs">Amendment</label>
+
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>Requested Date</th>
+                            <th>Status</th>
+                            <th>Comment</th>
+                            <th>Requested By</th>
+                            <th>Assigned To</th>
+                            <th>Approval By</th>
+                            <th>Approval Date</th>
+                        </tr>
+
+                        <tr>
+                            <%
+                                approval_request = Employer.approval_requests.where('employers.id = ?', @employer.id)
+                                .select('approval_requests.created_at, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id, approval_requests.respond_user_id, approval_requests.approval_at')
+                                .order('approval_requests.created_at asc').last
+                            %>
+                            <% if !approval_request.blank?%>
+                                <% requester = User.find(approval_request&.request_user_id) %>
+                                <td><%= "#{approval_request&.created_at.try(:strftime, get_standard_datetime_format)}" %></td>
+                                <td><%= approval_request&.approval_decision if !approval_request&.approval_at.nil? %></td>
+                                <td><%= @employer.approval_remark if !approval_request&.approval_at.nil? %></td>
+                                <td><%= requester.name %> (<%= requester.code %>)</td>
+                                <td><%= User.find(approval_request&.assigned_to_user_id).name if !approval_request&.assigned_to_user_id.nil? %></td>
+                                <td><%= User.find(approval_request&.respond_user_id).name if !approval_request&.respond_user_id.nil? %></td>
+                                <td><%= approval_request&.approval_at.try(:strftime, get_standard_datetime_format) if !approval_request&.approval_at.nil? %></td>
+                            <% else %>
+                                <td colspan="7">There are no ammendment.</td>
+                            <% end %>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        <% end %>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_employers_path) %>
+            <% if has_any_permission?('EDIT_NON_FINANCE_INFO_EMPLOYER', 'EDIT_FINANCE_INFO_EMPLOYER') and (['INACTIVE', 'ACTIVE'].include?(@employer.status)) %>
+                <%=raw show_edit_button(edit_internal_employer_path(@employer)) %>
+            <% end %>
+        </div>
+
+    </div>
+    <!-- /.card-footer -->
+</div>
+
+<% if has_permission?("VIEW_NON_FINANCE_INFO_EMPLOYER") %>
+    <div class="card">
+        <div class="card-body">
+            <ul class="list-group">
+                <% if has_permission?("VIEW_AUDIT_EMPLOYER") %>
+                    <li class="list-group-item">
+                        <%= link_to "Audits", internal_employer_audits_path(@employer) %>
+                    </li>
+                <% end %>
+                <% if has_permission?("EDIT_EMPLOYER_FOREIGN_WORKER") %>
+                    <li class="list-group-item">
+                        <%= link_to "Move Foreign Workers", move_fw_internal_employer_path(@employer) %>
+                    </li>
+                <% end %>
+            </ul>
+        </div>
+    </div>
+<% end %>

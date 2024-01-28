@@ -1,0 +1,35 @@
+<div id="json-response">
+<data id="last-refresh-timestamp" class="d-none">Last refreshed at <%= @last_refresh.strftime("%-l:%M:%S%p") %></data>
+    <div class="row">
+   </div>
+    <div class="row">
+        <% @payment_stats.each do |hash| %>
+            <div class="col-md-4">
+                <div class="border border-<%= hash[:color] %> rounded p-3" style="border-width: 0.2em !important;">
+                    <div class="section-headers">
+                        <p class="font-size-8"><%= hash[:title] %> :</p>
+                    </div>
+
+                    <p class="font-size-13 mt-2 mb-0 text-<%= hash[:color] %>">
+                        <i class="<%= hash[:icon] %> mr-3"></i>
+                        <b><%= number_with_delimiter(hash[:data], :delimiter => ',') %></b>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+        <% @clinic_stats.each do |hash| %>
+            <div class="col-md-4">
+                <div class="border border-<%= hash[:color] %> rounded p-3" style="border-width: 0.2em !important;">
+                    <div class="section-headers">
+                        <p class="font-size-8"><%= hash[:title] %> :</p>
+                    </div>
+
+                    <p class="font-size-13 mt-2 mb-0 text-<%= hash[:color] %>">
+                        <i class="<%= hash[:icon] %> mr-3"></i>
+                        <b><%= number_with_delimiter(hash[:data], :delimiter => ',') %></b>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>

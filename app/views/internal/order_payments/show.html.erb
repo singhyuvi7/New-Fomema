@@ -1,0 +1,186 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Other Payment</strong> - Details
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="order_code">Order Code</label>
+                    <p class="form-control-plaintext">
+                        <%= link_to @order_payment.order.code, internal_order_path(@order_payment.order) %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <p class="form-control-plaintext">
+                        <%= number_to_currency(@order_payment.amount, unit: "") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="reference">Payment Method</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.order.payment_method.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="reference">Reference</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.reference %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="comment">Comment</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.comment %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Creation Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.created_at&.strftime(get_standard_date_format) %>
+                    </p>
+                </div>
+            </div>
+            <% if @order_payment.order&.payment_method&.code == 'CIMB_CLICKS' %>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Issue Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.issue_date&.strftime(get_standard_date_format) %>
+                    </p>
+                </div>
+            </div>
+            <% end %>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Branch</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.order&.organization&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="holded">Holded</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.holded ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="bank_draft_code">Bad</label>
+                    <p class="form-control-plaintext">
+                        <%= @order_payment.bad ? 'Yes' : 'No' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%  if !@order_payment.replacement_id.blank? %>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Replaced By :</label>
+                    <p class="form-control-plaintext">
+                        <%= link_to @order_payment.replacement&.reference, internal_order_payment_path(@order_payment.replacement_id) %>
+                    </p>
+                </div>
+            </div>
+            <% end %>
+            <%
+            replaced_order_payment = OrderPayment.find_by(replacement_id: @order_payment.id)
+            if !replaced_order_payment.blank?
+            %>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="issue_date">Replaced :</label>
+                    <p class="form-control-plaintext">
+                        <%= link_to replaced_order_payment.reference, internal_order_payment_path(replaced_order_payment.id) %>
+                    </p>
+                </div>
+            </div>
+            <% end %>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Hold Logs</div>
+            <div class="card-body">
+                <table class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Hold By</th>
+                            <th>Hold At</th>
+                            <th>Hold Reason</th>
+                            <th>Unhold By</th>
+                            <th>Unhold At</th>
+                            <th>Unhold Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if @order_payment.order_payment_hold_logs.blank? %>
+                            <tr>
+                                <td colspan="6" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+                            <% @order_payment.order_payment_hold_logs.each do |order_payment_hold_log| %>
+                                <tr>
+                                    <td><%= "#{order_payment_hold_log.holder&.name} (#{order_payment_hold_log.holder&.userable&.name})" if !order_payment_hold_log.holded_by.nil? %></td>
+                                    <td><%= order_payment_hold_log.holded_at&.strftime(get_standard_date_format) %></td>
+                                    <td><pre><%= order_payment_hold_log.hold_comment %></pre></td>
+                                    <td><%= "#{order_payment_hold_log.unholder&.name} (#{order_payment_hold_log.unholder&.userable&.name})" if !order_payment_hold_log.unholded_by.nil? %></td>
+                                    <td><%= order_payment_hold_log.unholded_at&.strftime(get_standard_date_format) %></td>
+                                    <td><pre><%= order_payment_hold_log.unhold_comment %></pre></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_order_payments_path) %>
+            <% if has_permission?('EDIT_OTHER_PAYMENT') && !@order_payment.bad %>
+                <%=raw show_edit_button(edit_internal_order_payment_path(@order_payment)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

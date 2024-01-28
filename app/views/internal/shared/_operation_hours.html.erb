@@ -1,0 +1,334 @@
+    
+        Operation Hour In FOMEMA System:
+        <div class="form-group form-row">
+            <div class="col-1 text-center">Weekday</div>
+            <div class="col-1 text-center">Closed</div>
+            <div class="col-1 text-center">Open 24Hrs</div>
+            <div class="col-2 text-center">Start Hours </div>
+            <div class="col-2 text-center">End Hours </div>
+            <div class="col-2 text-center">Start Break Hours </div>
+            <div class="col-2 text-center">End Break Hours </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- monday -->
+            <div class="col-1 text-center">Mon</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[monday_is_close]"
+                disabled="true" class="form-check-input" id="mon_closed" <%= @operating_hour.monday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[monday_is_24_hour]"
+                    disabled="true" data-vv-as="Mon" class="form-check-input" id="mon_24hours" <%= @operating_hour.monday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.monday_start) %>"
+                            name="'operating_hour[monday_start]'" readonly="true" id="monday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.monday_end) %>" name="'operating_hour[monday_end]'"
+                            readonly="true" id="monday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.monday_break_start) %>"
+                            name="'operating_hour[monday_break_start]'" readonly="true" id="monday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.monday_break_end) %>" name="'operating_hour[monday_break_end]'"
+                            readonly="true" id="monday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end mon -->
+        <div class="form-row pb-2">
+            <!-- tues -->
+            <div class="col-1 text-center">Tues</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[tuesday_is_close]"
+                disabled="true" data-vv-as="tues"
+                    class="form-check-input" id="tues_closed" <%= @operating_hour.tuesday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[tuesday_is_24_hour]" 
+                disabled="true" data-vv-as="tues" class="form-check-input" id="tues_24hours" <%= @operating_hour.tuesday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.tuesday_start) %>"
+                            name="'operating_hour[tuesday_start]'" readonly="true" id="tuesday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.tuesday_end) %>"
+                            name="'operating_hour[tuesday_end]'" readonly="true" id="tuesday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.tuesday_break_start) %>"
+                            name="'operating_hour[tuesday_break_start]'" readonly="true" id="tuesday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.tuesday_break_end) %>" name="'operating_hour[tuesday_break_end]'"
+                            readonly="true" id="tuesday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- wed -->
+            <div class="col-1 text-center">Wed</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[wednesday_is_close]"
+                disabled="true" data-vv-as="wed"
+                    class="form-check-input" id="wed_closed" <%= @operating_hour.wednesday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[wednesday_is_24_hour]"
+                disabled="true" data-vv-as="wed"
+                    class="form-check-input" id="wed_24hours" <%= @operating_hour.wednesday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.wednesday_start) %>"
+                            name="'operating_hour[wednesday_start]'" readonly="true" id="wednesday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.wednesday_end) %>"
+                            name="'operating_hour[wednesday_end]'" readonly="true" id="wednesday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.wednesday_break_start) %>"
+                            name="'operating_hour[wednesday_break_start]'" readonly="true" id="wednesday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.wednesday_break_end) %>" name="'operating_hour[wednesday_break_end]'"
+                            readonly="true" id="wednesday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- thurs -->
+            <div class="col-1 text-center">Thurs</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[thursday_is_close]"
+                disabled="true" data-vv-as="thurs"
+                    class="form-check-input" id="thurs_closed" <%= @operating_hour.thursday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[thursday_is_24_hour]"
+                disabled="true" data-vv-as="thurs"
+                    class="form-check-input" id="thurs_24hours" <%= @operating_hour.thursday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.thursday_start) %>"
+                            name="'operating_hour[thursday_start]'" readonly="true" id="thursday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.thursday_end) %>"
+                            name="'operating_hour[thursday_end]'" readonly="true" id="thursday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.thursday_break_start) %>"
+                            name="'operating_hour[thursday_break_start]'" readonly="true" id="thursday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.thursday_break_end) %>" name="'operating_hour[thursday_break_end]'"
+                            readonly="true" id="thursday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- fri -->
+            <div class="col-1 text-center">Fri</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[friday_is_close]"
+                disabled="true" data-vv-as="fri"
+                    class="form-check-input" id="fri_closed" <%= @operating_hour.friday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[friday_is_24_hour]"
+                disabled="true" data-vv-as="fri"
+                    class="form-check-input" id="fri_24hours" <%= @operating_hour.friday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.friday_start) %>"
+                            name="'operating_hour[friday_start]'" readonly="true" id="friday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.friday_end) %>" name="'operating_hour[friday_end]'"
+                            readonly="true" id="friday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.friday_break_start) %>"
+                            name="'operating_hour[friday_break_start]'" readonly="true" id="friday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.friday_break_end) %>" name="'operating_hour[friday_break_end]'"
+                            readonly="true" id="friday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- sat -->
+            <div class="col-1 text-center">Sat</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[saturday_is_close]"
+                disabled="true" data-vv-as="sat"
+                    class="form-check-input" id="sat_closed" <%= @operating_hour.saturday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[saturday_is_24_hour]"
+                disabled="true" data-vv-as="sat"
+                    class="form-check-input" id="sat_24hours" <%= @operating_hour.saturday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.saturday_start) %>"
+                            name="'operating_hour[saturday_start]'" readonly="true" id="saturday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.saturday_end) %>"
+                            name="'operating_hour[saturday_end]'" readonly="true" id="saturday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.saturday_break_start) %>"
+                            name="'operating_hour[saturday_break_start]'" readonly="true" id="saturday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.saturday_break_end) %>" name="'operating_hour[saturday_break_end]'"
+                            readonly="true" id="saturday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- sun -->
+            <div class="col-1 text-center">Sun</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[sunday_is_close]"
+                disabled="true" data-vv-as="sun"
+                    class="form-check-input" id="sun_closed" <%= @operating_hour.sunday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[sunday_is_24_hour]"
+                disabled="true" data-vv-as="sun"
+                    class="form-check-input" id="sun_24hours" <%= @operating_hour.sunday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.sunday_start) %>"
+                            name="'operating_hour[sunday_start]'" readonly="true" id="sunday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.sunday_end) %>" name="'operating_hour[sunday_end]'"
+                            readonly="true" id="sunday_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.sunday_break_start) %>"
+                            name="'operating_hour[sunday_break_start]'" readonly="true" id="sunday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.sunday_break_end) %>" name="'operating_hour[sunday_break_end]'"
+                            readonly="true" id="sunday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row pb-2">
+            <!-- public_holiday -->
+            <div class="col-1 text-center">Public Holidays</div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[public_holiday_is_close]"
+                disabled="true" data-vv-as="public_holiday"
+                    class="form-check-input" id="public_holiday_closed" <%= @operating_hour.public_holiday_is_close ? 'checked' : '' %>>
+            </div>
+            <div class="col-1 text-center form-check">
+                <input class="form-control" type="checkbox" name="operating_hour[public_holiday_is_24_hour]"
+                disabled="true"
+                    data-vv-as="public_holiday" class="form-check-input" id="public_holiday_24hours" <%= @operating_hour.public_holiday_is_24_hour ? 'checked' : '' %>>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.public_holiday_start) %>"
+                            name="'operating_hour[public_holiday_start]'" readonly="true"
+                            id="public_holiday_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.public_holiday_end) %>"
+                            name="'operating_hour[public_holiday_end]'" readonly="true" id="public_holiday_end"></input>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.public_holiday_break_start) %>"
+                            name="'operating_hour[public_holiday_break_start]'" readonly="true" id="public_holiday_break_start"></input>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control" type="text" value="<%= format_date(@operating_hour.public_holiday_break_end) %>" name="'operating_hour[public_holiday_break_end]'"
+                            readonly="true" id="public_holiday_break_end">
+                        </input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        Remarks:
+        <div class="col-12 text-center">
+            <textarea class="form-control" name="'operating_hour[sunday_break]'"
+                readonly="true"><%= @operating_hour.close_remark %></textarea>
+        </div>

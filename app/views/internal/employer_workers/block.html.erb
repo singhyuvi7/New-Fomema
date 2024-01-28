@@ -1,0 +1,373 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Block Foreign Worker</div>
+        <%= form_for @foreign_worker, {
+            url: block_internal_employer_employer_worker_path(@employer, @foreign_worker),
+            html: {
+                multipart: true,
+                class: "with-parsley"
+            }
+        } do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <div class="card">
+                    <div class="card-body">
+                        <%= render 'foreign_worker' %>
+                    </div>
+                </div>
+
+                <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_reg_medical_blocked, "Block Purchase Medical Form", class: "required" %><br />
+                        <label><%= form.radio_button :is_reg_medical_blocked, true, checked: form.object.is_reg_medical_blocked, class: "mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_reg_medical_blocked_was ? 'true': 'false' %> Yes</label>
+                        <label><%= form.radio_button :is_reg_medical_blocked, false, checked: !form.object.is_reg_medical_blocked, class: "ml-4 mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_reg_medical_blocked_was ? 'true': 'false' %> No</label>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_reg_medical_blocked_comment, "Block Purchase Medical Form Comment", id: "is_reg_medical_blocked_label", class: "#{" required " if form.object.is_reg_medical_blocked_changed?}" %><br />
+                        <%= form.text_area :is_reg_medical_blocked_comment, class: "form-control", required: form.object.is_reg_medical_blocked_changed? %>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_sp_transmit_blocked, "Block SP Result Transmit", class: "required" %><br />
+                        <label><%= form.radio_button :is_sp_transmit_blocked, true, checked: form.object.is_sp_transmit_blocked, class: "mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_sp_transmit_blocked_was ? 'true': 'false' %> Yes</label>
+                        <label><%= form.radio_button :is_sp_transmit_blocked, false, checked: !form.object.is_sp_transmit_blocked, class: "ml-4 mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_sp_transmit_blocked_was ? 'true': 'false' %> No</label>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_sp_transmit_blocked_comment, "Block SP Result Transmit Comment", id: "is_sp_transmit_blocked_label", class: "#{" required " if form.object.is_sp_transmit_blocked_changed?}" %><br />
+                        <%= form.text_area :is_sp_transmit_blocked_comment, class: "form-control", required: form.object.is_sp_transmit_blocked_changed? %>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_imm_blocked, "Block Send to JIM", class: "required" %><br />
+                        <label><%= form.radio_button :is_imm_blocked, true, checked: form.object.is_imm_blocked_was, class: "mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_imm_blocked ? 'true': 'false' %> Yes</label>
+                        <label><%= form.radio_button :is_imm_blocked, false, checked: !form.object.is_imm_blocked_was, class: "ml-4 mr-2", onchange: "block_changed(this)", "data-was" => form.object.is_imm_blocked ? 'true': 'false' %> No</label>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <%= form.label :is_imm_blocked_comment, "Block Send to JIM Comment", id: "is_imm_blocked_label", class: "#{" required " if form.object.is_imm_blocked_changed?}" %><br />
+                        <%= form.text_area :is_imm_blocked_comment, class: "form-control", required: form.object.is_imm_blocked_changed? %>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <%= form.label :blocked, "Blocked", class: "required" %><br />
+                        <label><%= form.radio_button :blocked, true, checked: form.object.blocked, class: "mr-2", onclick: "return false" %> Yes</label>
+                        <label><%= form.radio_button :blocked, false, checked: !form.object.blocked, class: "ml-4 mr-2", onclick: "return false" %> No</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <%= form.label :block_reason_id, "Block Reason", class: 'required' %>
+                            <select name="foreign_worker[block_reason_id]" id="foreign_worker_block_reason_id" class="form-control select2" data-parsley-errors-container="#select2_parsley_error_block_reason_id" required <%= " disabled " if !form.object.blocked? %>>
+                                <option value=""><%= form_select_option_text %></option>
+                                <% BlockReason.where(category: "BLOCK").each do |block_reason| %>
+                                    <option value="<%= block_reason.id %>" data-code="<%= block_reason.code %>"<%= " selected" if block_reason.id == form.object.block_reason_id %>><%= block_reason.description %></option>
+                                <% end %>
+                            </select>
+                            <div id="select2_parsley_error_block_reason_id"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <%= form.label :unblock_reason_id, "Unblock Reason", class: 'required' %>
+                            <select name="foreign_worker[unblock_reason_id]" id="foreign_worker_unblock_reason_id" class="form-control select2" data-parsley-errors-container="#select2_parsley_error_unblock_reason_id" required <%= " disabled " if form.object.blocked? %>>
+                                <option value=""><%= form_select_option_text %></option>
+                                <% BlockReason.where(category: "UNBLOCK").each do |unblock_reason| %>
+                                    <option value="<%= unblock_reason.id %>" data-code="<%= unblock_reason.code %>"<%= " selected" if unblock_reason.id == form.object.unblock_reason_id %>><%= unblock_reason.description %></option>
+                                <% end %>
+                            </select>
+                            <div id="select2_parsley_error_unblock_reason_id"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- upload function -->
+                    <div class="col-md-12 form-group">
+                        <div id="document-input-group" class="form-group">
+                            <label for="foreign_worker_uploads">Upload Foreign Worker Image</label>
+                            <div class="input-group custom-input-group" style="margin: 5px;">
+                                <div class="document-type col-md-4">
+                                    <select class="form-control document-type-selector" name="foreign_worker[uploads][][category]">
+                                        <option value="">Select option</option>
+                                        <% ForeignWorker::REREG_DOCUMENT_TYPES.each do |index, document_type| %>
+                                            <option value="<%= index %>"><%= document_type %></option>
+                                        <% end %>
+                                    </select>
+                                </div>
+                                <div class="custom-file col-md-6">
+                                    <input type="file" name="foreign_worker[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled required>
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                                <div style="width: 140px;" class="">
+                                    <input type="text" style="border-radius: 0; border: 0;" readonly="readonly" class="form-control inline-file-size" placeholder="0 MB" value="">
+                                </div>
+                                <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        <div class="col-md-6">
+                            <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        <div class="col-md-12">
+                            <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                        </div>
+                    </div>
+                    <!-- suspicious fw image -->
+                    <div class="col-md-12 form-group">
+                        <label>Suspicious Uploaded Document(s)</label>
+                        <%= hidden_field_tag :remove_uploaded_file, "" %>
+                        <table class="table table-bordered table-striped ">
+                            <tr>
+                                <th width="20%">Category</th>
+                                <th>Documents</th>
+                                <th width="15%">Date Uploaded</th>
+                                <th width="25%">Uploaded By</th>
+                                <th width="150px">Action(s)</th>
+                            </tr>
+
+                            <% @foreign_worker.uploads.where(deleted_at: nil, category: ["SUSPICIOUS_IMAGE"]).order(created_at: :desc).each do |upload| %>
+                                <tr>
+                                    <td class="filenames" name="uploadedfilecategory">
+                                        <%= upload.category %>
+                                    </td>
+                                    <td class="filenames" name="uploadedfilename">
+                                        <% upload.documents.each do |document| %>
+                                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                        <% end %>
+                                    </td>
+                                    <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                    <td class="filenames"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                    <td>
+                                        <% if has_permission?('DELETE_UPLOAD_DOCUMENT_FOREIGN_WORKER') %>
+                                            <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @foreign_worker.uploads.where(deleted_at: nil, category: ["SUSPICIOUS_IMAGE"]).blank? %>
+                                <tr><td colspan="5">There are no uploaded documents</td></tr>
+                            <% end %>
+                        </table>
+                    </div>
+
+                    <!-- verified fw image -->
+                    <div class="col-md-12 form-group">
+                        <label>Verified Uploaded Document(s)</label>
+                        <table class="table table-bordered table-striped ">
+                            <tr>
+                                <th width="20%">Category</th>
+                                <th>Documents</th>
+                                <th width="15%">Date Uploaded</th>
+                                <th width="25%">Uploaded By</th>
+                                <th width="150px">Action(s)</th>
+                            </tr>
+
+                            <% @foreign_worker.uploads.where(deleted_at: nil, category: ["FOREIGN_WORKER_IMAGE"]).order(created_at: :desc).each do |upload| %>
+                                <tr>
+                                    <td class="filenames" name="uploadedfilecategory">
+                                        <%= upload.category%>
+                                    </td>
+                                    <td class="filenames" name="uploadedfilename">
+                                        <% upload.documents.each do |document| %>
+                                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                        <% end %>
+                                    </td>
+                                    <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                    <td class="filenames"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                    <td>
+                                        <% if has_permission?('DELETE_UPLOAD_DOCUMENT_FOREIGN_WORKER') %>
+                                            <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                            <% if @foreign_worker.uploads.where(deleted_at: nil, category: ["FOREIGN_WORKER_IMAGE"]).blank? %>
+                                <tr><td colspan="5">There are no uploaded documents</td></tr>
+                            <% end %>
+                        </table>
+                    </div>
+                </div>
+
+                <% if !@foreign_worker.block_reason.nil? && @foreign_worker.block_reason.code == 'SUSPECTFRAUD' && @foreign_worker.blocked? %>
+                   <p id="checkbox-warning"></p>
+                    <div class="col-md-6 form-group fw_verification" id="fw_verification">
+                        <%= form.label :fw_verification_par_id, "Foreign Worker Verification" %>
+                        <br>
+                        <label>Note:</label>
+                        <br>
+                        1. CRITERIA - Must meet at least 6 criteria including the mandatory criteria (*).<br>
+                        2. If any of the mandatory criteria is not met, the application will be rejected.<br><br>
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>Description</th>
+                                <th>Similar</th>
+                            </tr>
+                                <%= form.collection_check_boxes :fw_verification_pars, FwVerificationPar.where(status: "ACTIVE"), :code, :name,  include_hidden: false do |b| %>
+                                    <tr>
+                                        <td><%= b.label class: 'form-check-label' %></td>
+                                        <% if b.value=="SHAPE_NOSE" || b.value=="DISTANCE_TWO_EYES" %>
+                                            <td style="text-align:center;"><%= b.check_box(checked: true, readonly: true, disabled: true) %></td>
+                                            <input type="hidden" value="<%=b.value %>" name="foreign_worker[fw_verification_pars][]">
+                                        <% else %>
+                                            <td style="text-align:center;"><%= b.check_box(required: true) %></td>
+                                        <% end %>
+                                    <tr>
+                                <% end %>
+                        </table>
+                    </div>
+                <% end %>
+            </div>
+            <!-- /card-body -->
+            <div class="card-footer text-right">
+                <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                <%=raw edit_submit_for_approval_button() %>
+            </div>
+        <% end %>
+    </div>
+</div>
+<% content_for :page_end_scripts do %>
+    <%
+        transaction_verify_doc = TransactionVerifyDoc.where(transaction_id: @foreign_worker&.latest_transaction_id, category: "AGENCY_TRANSACTION_REGISTRATION").order(id: :desc).first
+        if !transaction_verify_doc.nil? && ['APPROVAL','INCOMPLETE'].include?(transaction_verify_doc.status)
+    %>
+            <script>
+                $('#foreign_worker_is_imm_blocked_true').prop('disabled', true)
+                $('#foreign_worker_is_imm_blocked_false').prop('disabled', true)
+                $('#foreign_worker_is_imm_blocked_comment').prop('disabled', true)
+            </script>
+    <%
+        end
+    %>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#fw_verification').hide();
+
+    function block_changed(ele)
+    {
+        let col = ele.name.match(/\[(.+)\]/)[1];
+        if (ele.value != ele.getAttribute("data-was")) {
+            $(`#${col}_label`).addClass('required');
+            $(`#foreign_worker_${col}_comment`).attr('required', true);
+        } else {
+            $(`#${col}_label`).removeClass('required');
+            $(`#foreign_worker_${col}_comment`).attr('required', false);
+        }
+
+        if ($(`#foreign_worker_is_reg_medical_blocked_true`).prop('checked') || $(`#foreign_worker_is_sp_transmit_blocked_true`).prop('checked') || $(`#foreign_worker_is_imm_blocked_true`).prop('checked')) {
+            $('#foreign_worker_blocked_true').prop('checked', true);
+            $('#foreign_worker_block_reason_id').attr('disabled', false);
+            $('#foreign_worker_unblock_reason_id').attr('disabled', true);
+        } else {
+            $('#foreign_worker_blocked_false').prop('checked', true)
+            $('#foreign_worker_block_reason_id').attr('disabled', true);
+            $('#foreign_worker_unblock_reason_id').attr('disabled', false);
+        }
+
+        if($(`#foreign_worker_is_reg_medical_blocked_false`).prop('checked')){
+            $('#fw_verification').show();
+        }else{
+            $('#fw_verification').hide();
+        }
+
+        // $('#foreign_worker_blocked_true').prop('checked', true)
+        // $('#foreign_worker_block_reason_id').attr('disabled', true)
+    }
+
+    /**
+    * file upload
+    **/
+    <%= render 'shared/fileupload_script' %>
+    /**
+    * Function to duplicate document fields
+    **/
+    $('#add_more_documents').click(() => {
+        $('.custom-input-group:first')
+            .clone(true, true)
+            .appendTo("#document-input-group")
+            .find(".custom-file-input")
+            .val("")
+            .attr("disabled", "disabled")
+        $('.custom-input-group:last')
+            .find(".custom-file-label").html("Choose file")
+    });
+
+
+    /**
+    * Function to set file name
+    **/
+    $('.custom-file-input').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    /**
+    * Function to re-enable form input after selecting dom type
+    **/
+    $(".document-type-selector").change(function() {
+        let selectedValue = $("option:selected", this).val()
+
+        if (selectedValue.length > 0)
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+        else
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+    });
+
+    /**
+    * Function to remove document fields
+    **/
+    $('.removal-button').click(function(){
+        if ($('.custom-input-group').length > 1){
+            $(this).closest('.custom-input-group').remove()
+        }
+    });
+
+    $('.set-deletion').click(function() {
+        filenames = $(this).closest('tr').find('.filenames');
+        filenames.toggleClass('text-decoration-line-through');
+        text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+        $(this).text(text).toggleClass('btn-danger btn-primary');
+
+        ids = $('.set-deletion.btn-primary').map(function() {
+            return $(this).attr('data-id');
+        }).get().join(',');
+
+        $('#remove_uploaded_file').val(ids);
+    });
+
+    $('#approval_submit').click(function (e) {
+        numberOfChecked = $('input:checkbox:checked').length;
+        fw_reason = '<%= @foreign_worker.block_reason ?  @foreign_worker.block_reason.code : '' %>'
+        fw_blocked = '<%= @foreign_worker.blocked? %>'
+        fw_sp_blocked = '<%= @foreign_worker.is_reg_medical_blocked? %>'
+
+        if(fw_blocked == 'true' && fw_reason == 'SUSPECTFRAUD' && fw_sp_blocked == 'true' && $(`#foreign_worker_is_reg_medical_blocked_false`).prop('checked')){
+            if(numberOfChecked < 6){
+                $('#checkbox-warning').html("<li class='text-danger'>At least 4 checkbox must be selected</li>");
+                event.preventDefault();
+            }
+        }
+    });
+
+</script>
+<% end %>

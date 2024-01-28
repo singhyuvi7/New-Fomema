@@ -1,0 +1,123 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.employer_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Sir/Madam,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        With regards to the above matter, the foreign worker listed below had been certified as SUITABLE for employment
+        in Malaysia based on the NORMAL chest X-ray findings transmitted online by the X-ray facility.
+        However, after the subsequent auditing of the worker&apos; chest X-ray, it was found to be similar to the image of another worker. The details are as follows:
+    </p>
+
+    <table class="w-100 no-spacing" style="font-size: 0.9em;">
+        <tr>
+            <% ["No.", "WORKER CODE", "NAME", "PASSPORT NUMBER", "DATE OF XRAY", "AUDITED DATE", "EMPLOYER"].each do |header| %>
+                <th class="table-border header-background text-center"><%= header %></th>
+            <% end %>
+        </tr>
+
+        <% @foreign_workers.each.with_index(1) do |worker, index| %>
+            <tr>
+                <td class="table-border"><%= index %></td>
+                <td class="table-border text-center"><%= worker.worker_code %></td>
+                <td class="table-border text-center"><%= worker.worker_name %></td>
+                <td class="table-border text-center"><%= worker.worker_passport %></td>
+                <td class="table-border text-center"><%= worker.xray_date&.strftime("%d/%m/%Y") %></td>
+                <td class="table-border text-center"><%= worker.audit_date&.strftime("%d/%m/%Y") %></td>
+                <td class="table-border text-center"><%= worker.employer_name %></td>
+            </tr>
+        <% end %>
+    </table><br>
+
+    <p class="text-justify">
+        Therefore, the worker listed above medical examination has been pending further investigation,
+         until a repeat chest X-ray is done as suggested by the consultant radiologist.
+    </p>
+    <p class="text-justify">
+        The repeat chest X-ray must be done within <b><%= @letter.retake_period %> from the date of letter received</b>, whereby failing to do so will remain the foreign worker&apos;s medical status as <b>UNSUITABLE</b> for employment in Malaysia.
+    </p>
+    <p class="text-justify">
+        Kindly proceed to the address below to carry out the repeat chest X-ray.
+    </p>
+
+    <table>
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p class="text-justify">
+        Thank you.<br>
+    </p>
+
+    <!-- This is the only way to keep this entire block together. For some reason, page-break-inside: avoid; does not work -->
+    <table style="margin-left: -2px;">
+        <tr>
+            <td style="padding: 0;">
+                <p style="margin: 0;">
+                    Yours sincerely,<br><br><br><br><br>
+                    <b><%= @letter.issuer_name %></b><br>
+                    <%= @letter.issuer_title %>
+                </p>
+            </td>
+        </tr>
+    </table><br>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .table-border {
+        border: 1px solid black;
+        padding: 5px;
+        padding: 0.5em;
+    }
+
+    .no-spacing {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .header-background {
+        background-color: #d3d3d3;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

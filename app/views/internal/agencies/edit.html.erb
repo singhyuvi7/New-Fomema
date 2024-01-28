@@ -1,0 +1,15 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Agencies</strong> - Editing Agency
+    </div>
+    <%= form_for @agency, {
+        url: internal_agency_path(@agency), 
+        html: {
+            multipart: true, 
+            class: "#{@agency.status == 'INACTIVE' ? '' : 'with-parsley'} agency-form",
+            novalidate: @agency.status.eql?("INACTIVE")
+        }
+    } do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

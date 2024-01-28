@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Facilities</strong> - New X-Ray Facility
+    </div>
+    <%= form_for @xray_facility, url: internal_xray_facilities_path, html: {class: "#{params[:action]}_xray_facility xray_facility-form with-parsley disable-enter-keypress"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

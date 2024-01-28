@@ -1,0 +1,142 @@
+<pdfbody>
+    <div>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_logo.png", style: "float:left; height: 110px; padding-bottom: 20px;"%>
+        <%= wicked_pdf_image_tag "letters/fomema_letterhead_add.png", style: "float:right; height: 110px; padding-bottom: 20px;"%>
+        <%#= wicked_pdf_image_tag "letters/fomema_letterhead_25.png", style: "float:right; height: 110px; max-width:100%; padding-bottom: 20px;"%>
+    </div>
+
+    <div style="height: 2.2cm;">
+        &nbsp;
+    </div>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Our Ref</td>
+            <td>: <%= @data[:letter_ref_no] %></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:letter_date] %></td>
+            <td style="text-align: right;"><b>CONFIDENTIAL</b></td>
+        </tr>
+    </table><br>
+
+    <table class="w-100">
+        <tr>
+            <td rowspan="2"><%= raw @data[:employer_address].join("<br>") %></td>
+
+            <td valign="top" style="width: 2.5em;">
+                Tel:
+            </td>
+
+            <td valign="top" style="width: 9em;">
+                <%= @data[:phone] %>
+            </td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 2.5em;">
+                Fax:
+            </td>
+
+            <td valign="top" style="width: 9em;">
+                <%= @data[:fax] %>
+            </td>
+        </tr>
+    </table>
+
+    <p class="paragraph-spacing">Dear Sir,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+        PENDING REVIEW CASE<br>
+        &ndash; FURTHER INVESTIGATIONS
+    </b></p>
+
+    <p>This is with reference to the foreign worker who has been certified by the doctor as <b>"SUITABLE"</b>. The foreign worker's details are as follows:</p>
+
+    <table class="w-100 paragraph-double-spacing">
+        <tr>
+            <td valign="top" style="width: 9em;">Worker Name &nbsp;:</td>
+            <td><%= @data[:worker_name] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 9em;">Worker Code &nbsp;:</td>
+            <td><%= @data[:worker_code] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 9em;">Passport No. &nbsp;:</td>
+            <td><%= @data[:worker_passport] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 9em;">Doctor Name &nbsp;:</td>
+            <td><%= @data[:doctor_name] %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 9em;">Clinic Name &nbsp;:</td>
+            <td><%= @data[:clinic_name] %></td>
+        </tr>
+    </table>
+
+    <p class="paragraph-double-spacing">
+        The foreign worker's result has been marked as pending review due to:
+    </p>
+
+    <ol class="paragraph-double-spacing">
+        <% @data[:reasons].each do |reason| %>
+            <li><%= reason %></li>
+        <% end %>
+    </ol>
+
+    <p class="paragraph-double-spacing">
+        In view of the above findings, your worker has been certified as <b>"TEMPORARILY CERTIFIED AS UNSUITABLE PENDING INVESTIGATIONS (TCUPI)"</b> for employment until further examination/investigations have been done.<br>
+        If you intend to continue the employment of this foreign worker, the foreign worker needs to be presented at the above clinic for further examination/investigations.<br><br>
+        The examining doctor is required to verify the identity of the foreign worker with his/her original passport before carrying out the following examination/investigations:
+    </p>
+
+    <ol class="paragraph-double-spacing">
+        <% @data[:todo_list].each do |todo_item| %>
+            <li><%= todo_item %></li>
+        <% end %>
+    </ol>
+
+    <p class="paragraph-double-spacing">
+        The cost of the above further examination/investigations is to be borne by you as the employer.<br><br>
+        Examining doctor/employer is required to email the report of the further examination /investigation findings together with the filled-up declaration form within two weeks to FOMEMA at <span style="text-decoration: underline; color: blue;">pendingreview@fomema.com.my</span> (Attn: Pending Review Section)<br><br>
+        If there is no response within two weeks from the date of this letter, the medical status of the foreign worker will automatically be amended to <b>"UNSUITABLE"</b> for employment in Malaysia.
+    </p>
+
+    <p class="paragraph-double-spacing">
+        Yours sincerely,<br>
+        <b>FOMEMA SDN BHD</b>
+    </p>
+
+    <p class="paragraph-double-spacing" style="font-size: 0.85em;">This letter is computer generated and no signature is required.</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+</style>

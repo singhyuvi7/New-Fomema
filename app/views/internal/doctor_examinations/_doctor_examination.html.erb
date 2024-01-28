@@ -1,0 +1,9 @@
+<% if doctor_examination.present? %>
+    <form>
+      <%=render "internal/doctor_examinations/shared/certification_condition", {doctor_examination: doctor_examination} %>
+      <%=render "internal/doctor_examinations/shared/certification_certification", {doctor_examination: doctor_examination} %>
+      <%=render "internal/doctor_examinations/shared/certification_follow_up", {doctor_examination: doctor_examination} %>
+    <form>
+<% else %>
+    <h4>There is no Doctor Certification</h4>
+<% end %>

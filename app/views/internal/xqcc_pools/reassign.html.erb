@@ -1,0 +1,106 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>XQCC Pool</strong> - Reassign
+    </div>
+
+    <%= form_for @transaction, url: reassign_internal_xqcc_pools_path(transaction_id: @transaction.id), html: {class: "with-parsley"} do |form| %>
+    
+        <div class="card-body">
+
+            <%#= render 'shared/all_validation_flash', { model_obj: @xqcc_pool } %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :code, "Transaction ID" %>
+                        <%= text_field_tag :code, @transaction.code, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :fw_code, "Worker Code" %>
+                        <%= text_field_tag :fw_code, @transaction.fw_code, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :fw_name, "Worker Name" %>
+                        <%= text_field_tag :fw_name, @transaction.fw_name, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :fw_gender, "Gender" %>
+                        <%= text_field_tag "transaction[fw_gender]", ForeignWorker::GENDERS[@transaction.fw_gender], class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :fw_passport_number, "Passport No" %>
+                        <%= text_field_tag :fw_passport_number, @transaction.fw_passport_number, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :fw_country_id, "Country" %>
+                        <%= text_field_tag "transaction[fw_country_id]", @transaction.fw_country&.name, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :process_status, "Process Status" %>
+                        <p class="form-control-plaintext">
+                            <%= @transaction.xray_status %>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :assigned_to, "Assigned To" %>
+                        <p class="form-control-plaintext">
+                            <% if @picked_up_by %>
+                                <%= User.find(@picked_up_by).name %>
+                            <% else %>
+                                <i>N/A</i>
+                            <% end %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <% field_id = generate_field_id(form, :picked_up_by) %>
+                        <%= label_tag :reassign_to, "Reassign To", class: "required" %>
+                        <%= select_tag :reassign_to, options_from_collection_for_select(User.active.where(role_id: Role.where(code: ["XQCC_RADIOGRAPHER", "XQCC_ASSISTANT_MANAGER", "XQCC_MO"]).pluck(:id)).where.not(id: @picked_up_by).order(:name).order(name: :asc).all, "id", "name", @picked_up_by), include_blank: form_select_option_text, required: true, class: "form-control select2", data: { 
+                            parsley_errors_container: "#select2_parsley_error__#{ field_id }", 
+                            parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", 
+                            parsley_group: field_id
+                        } %>
+                        <div id="select2_parsley_error__<%= field_id %>"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(internal_transaction_path(@transaction)) %>
+            <%=raw edit_save_button() %>
+        </div>
+
+    <% end %>
+    <!-- /form -->
+</div>

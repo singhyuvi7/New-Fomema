@@ -1,0 +1,14 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">
+        <div class="d-inline">Level of drug detection (Cannabinoids) :</div>
+        <div class="d-inline">
+            <% if finding.drug_level_cannabinoids.blank? %>
+                -
+            <% else %>
+            <%= finding.drug_level_cannabinoids %> ng/ml
+            <% end %>
+        </div>
+    </td>
+    <td colspan="3"></td>
+</tr>

@@ -1,0 +1,549 @@
+<div class="card">
+<div class="card-header">
+    <div class="row">
+        <div class="col">
+            PART IV. CERTIFICATION BY DOCTOR
+        </div>
+    </div>
+</div>
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of HIV -->
+            <tr>
+                <td width="100">1</td>
+                <td>HIV</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hiv_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hiv]" id="<%= input_key %>_condition_hiv_yes" value="YES"
+                            <% if doctor_examination_model.condition_hiv %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hiv_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hiv_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hiv]" id="<%= input_key %>_condition_hiv_no" value="NO"
+                            <% if !doctor_examination_model.condition_hiv %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hiv_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of HIV -->
+
+            <!-- Start of Tuberculosis -->
+            <tr>
+                <td width="100">2</td>
+                <td>Tuberculosis</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_tuberculosis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_tuberculosis]" id="<%= input_key %>_condition_tuberculosis_yes" value="YES"
+                            <% if doctor_examination_model.condition_tuberculosis %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_tuberculosis_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_tuberculosis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_tuberculosis]" id="<%= input_key %>_condition_tuberculosis_no" value="NO"
+                            <% if !doctor_examination_model.condition_tuberculosis %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_tuberculosis_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Tuberculosis -->
+
+            <!-- Start of Malaria -->
+            <tr>
+                <td width="100">3</td>
+                <td>Malaria</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_malaria_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_malaria]" id="<%= input_key %>_condition_malaria_yes" value="YES"
+                            <% if doctor_examination_model.condition_malaria %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_malaria_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_malaria_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_malaria]" id="<%= input_key %>_condition_malaria_no" value="NO"
+                            <% if !doctor_examination_model.condition_malaria %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_malaria_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Malaria -->
+
+            <!-- Start of Leprosy -->
+            <tr>
+                <td width="100">4</td>
+                <td>Leprosy</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_leprosy_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_leprosy]" id="<%= input_key %>_condition_leprosy_yes" value="YES"
+                            <% if doctor_examination_model.condition_leprosy %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_leprosy_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_leprosy_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_leprosy]" id="<%= input_key %>_condition_leprosy_no" value="NO"
+                            <% if !doctor_examination_model.condition_leprosy %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_leprosy_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Leprosy -->
+
+            <!-- Start of Sexually Transmitted Diseases -->
+            <tr>
+                <td width="100">5</td>
+                <td>Sexually Transmitted Diseases</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_std_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_std]" id="<%= input_key %>_condition_std_yes" value="YES"
+                            <% if doctor_examination_model.condition_std %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_std_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_std_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_std]" id="<%= input_key %>_condition_std_no" value="NO"
+                            <% if !doctor_examination_model.condition_std %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_std_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Sexually Transmitted Diseases -->
+
+            <!-- Start of Hepatitis B -->
+            <tr>
+                <td width="100">6</td>
+                <td>Hepatitis B</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hepatitis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hepatitis]" id="<%= input_key %>_condition_hepatitis_yes" value="YES"
+                            <% if doctor_examination_model.condition_hepatitis %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hepatitis_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hepatitis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hepatitis]" id="<%= input_key %>_condition_hepatitis_no" value="NO"
+                            <% if !doctor_examination_model.condition_hepatitis %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hepatitis_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Hepatitis B -->
+
+            <!-- Start of Cancer -->
+            <tr>
+                <td width="100">7</td>
+                <td>Cancer</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_cancer_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_cancer]" id="<%= input_key %>_condition_cancer_yes" value="YES"
+                            <% if doctor_examination_model.condition_cancer %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_cancer_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_cancer_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_cancer]" id="<%= input_key %>_condition_cancer_no" value="NO"
+                            <% if !doctor_examination_model.condition_cancer %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_cancer_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Cancer -->
+
+            <!-- Start of Epilepsy -->
+            <tr>
+                <td width="100">8</td>
+                <td>Epilepsy</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_epilepsy_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_epilepsy]" id="<%= input_key %>_condition_epilepsy_yes" value="YES"
+                            <% if doctor_examination_model.condition_epilepsy %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_epilepsy_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_epilepsy_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_epilepsy]" id="<%= input_key %>_condition_epilepsy_no" value="NO"
+                            <% if !doctor_examination_model.condition_epilepsy %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_epilepsy_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Epilepsy -->
+
+            <!-- Start of Psychiatric Disorder -->
+            <tr>
+                <td width="100">9</td>
+                <td>Psychiatric Disorder</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_psychiatric_disorder_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_psychiatric_disorder]" id="<%= input_key %>_condition_psychiatric_disorder_yes" value="YES"
+                            <% if doctor_examination_model.condition_psychiatric_disorder %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_psychiatric_disorder_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_psychiatric_disorder_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_psychiatric_disorder]" id="<%= input_key %>_condition_psychiatric_disorder_no" value="NO"
+                            <% if !doctor_examination_model.condition_psychiatric_disorder %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_psychiatric_disorder_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Psychiatric disorder -->
+
+            <!-- Start of Hypertension -->
+            <tr>
+                <td width="100">10</td>
+                <td>Hypertension</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hypertension_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hypertension]" id="<%= input_key %>_condition_hypertension_yes" value="YES"
+                            <% if doctor_examination_model.condition_hypertension %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hypertension_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_hypertension_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_hypertension]" id="<%= input_key %>_condition_hypertension_no" value="NO"
+                            <% if !doctor_examination_model.condition_hypertension %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_hypertension_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Hypertension -->
+
+            <!-- Start of Heart Diseases -->
+            <tr>
+                <td width="100">11</td>
+                <td>Heart Diseases</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_heart_diseases_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_heart_diseases]" id="<%= input_key %>_condition_heart_diseases_yes" value="YES"
+                            <% if doctor_examination_model.condition_heart_diseases %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_heart_diseases_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_heart_diseases_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_heart_diseases]" id="<%= input_key %>_condition_heart_diseases_no" value="NO"
+                            <% if !doctor_examination_model.condition_heart_diseases %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_heart_diseases_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Heart Diseases -->
+
+            <!-- Start of Bronchial Asthma -->
+            <tr>
+                <td width="100">12</td>
+                <td>Bronchial Asthma</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_bronchial_asthma_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_bronchial_asthma]" id="<%= input_key %>_condition_bronchial_asthma_yes" value="YES"
+                            <% if doctor_examination_model.condition_bronchial_asthma %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_bronchial_asthma_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_bronchial_asthma_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_bronchial_asthma]" id="<%= input_key %>_condition_bronchial_asthma_no" value="NO"
+                            <% if !doctor_examination_model.condition_bronchial_asthma %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_bronchial_asthma_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+
+            <!-- End of Bronchial Asthma -->
+
+            <!-- Start of Diabetes Mellitus -->
+            <tr>
+                <td width="100">13</td>
+                <td>Diabetes Mellitus</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_diabetes_mellitus_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_diabetes_mellitus]" id="<%= input_key %>_condition_diabetes_mellitus_yes" value="YES"
+                            <% if doctor_examination_model.condition_diabetes_mellitus %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_diabetes_mellitus_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_diabetes_mellitus_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_diabetes_mellitus]" id="<%= input_key %>_condition_diabetes_mellitus_no" value="NO"
+                            <% if !doctor_examination_model.condition_diabetes_mellitus %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_diabetes_mellitus_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Diabetes Mellitus -->
+
+            <!-- Start of Peptic Ulcer -->
+            <tr>
+                <td width="100">14</td>
+                <td>Peptic Ulcer</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_peptic_ulcer_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_peptic_ulcer]" id="<%= input_key %>_condition_peptic_ulcer_yes" value="YES"
+                            <% if doctor_examination_model.condition_peptic_ulcer %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_peptic_ulcer_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_peptic_ulcer_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_peptic_ulcer]" id="<%= input_key %>_condition_peptic_ulcer_no" value="NO"
+                            <% if !doctor_examination_model.condition_peptic_ulcer %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_peptic_ulcer_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- End of Peptic Ulcer -->
+
+            <!-- Start of Kidney Disease -->
+            <tr>
+                <td width="100">15</td>
+                <td>Kidney Disease</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_kidney_diseases_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_kidney_diseases]" id="<%= input_key %>_condition_kidney_diseases_yes" value="YES"
+                            <% if doctor_examination_model.condition_kidney_diseases %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_kidney_diseases_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_kidney_diseases_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_kidney_diseases]" id="<%= input_key %>_condition_kidney_diseases_no" value="NO"
+                            <% if !doctor_examination_model.condition_kidney_diseases %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_kidney_diseases_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Kidney Disease -->
+
+            <!-- Start of Other -->
+            <tr>
+                <td width="100">16</td>
+                <td>Other</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_other_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_other]" id="<%= input_key %>_condition_other_yes" value="YES"
+                            <% if doctor_examination_model.condition_other %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_other_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_other_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_other]" id="<%= input_key %>_condition_other_no" value="NO"
+                            <% if !doctor_examination_model.condition_other %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_other_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- End of Other -->
+
+            <!-- Start of Urine for pregnant -->
+            <tr>
+                <td width="100">17</td>
+                <td>Her urine for pregnancy</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_pregnant_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_pregnant]" id="<%= input_key %>_condition_urine_for_pregnant_yes" value="YES"
+                            <% if doctor_examination_model.condition_urine_for_pregnant %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_pregnant_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_pregnant_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_pregnant]" id="<%= input_key %>_condition_urine_for_pregnant_no" value="NO"
+                            <% if !doctor_examination_model.condition_urine_for_pregnant %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_pregnant_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- End of Urine for pregnant -->
+
+            <!-- Start of Kidney Disease -->
+            <tr>
+                <td width="100">18</td>
+                <td>His/her urine for opiates (screening test)</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_opiates_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_opiates]" id="<%= input_key %>_condition_urine_for_opiates_yes" value="YES"
+                            <% if doctor_examination_model.condition_urine_for_opiates %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_opiates_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_opiates_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_opiates]" id="<%= input_key %>_condition_urine_for_opiates_no" value="NO"
+                            <% if !doctor_examination_model.condition_urine_for_opiates %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_opiates_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Kidney Disease -->
+
+            <!-- Start of Urine for cannabis -->
+            <tr>
+                <td width="100">19</td>
+                <td>His/her urine for cannabis (screening test)</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_cannabis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_cannabis]" id="<%= input_key %>_condition_urine_for_cannabis_yes" value="YES"
+                            <% if doctor_examination_model.condition_urine_for_cannabis %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_cannabis_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="condition_urine_for_cannabis_status form-check-input" type="radio"
+                            name="<%= input_key %>[doctor_examination][condition_urine_for_cannabis]" id="<%= input_key %>_condition_urine_for_cannabis_no" value="NO"
+                            <% if !doctor_examination_model.condition_urine_for_cannabis %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_condition_urine_for_cannabis_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- End of Urine for cannabis -->
+
+        </tbody>
+    </table>
+</div>

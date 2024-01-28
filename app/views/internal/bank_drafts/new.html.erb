@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bank Drafts</strong> - New Bank Draft
+    </div>
+    <%= form_for @bank_draft, url: internal_bank_drafts_path, html: {class: "with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,68 @@
+<div class="invoice page-container">
+    <div class="text-center invoice-title"><b><%= @title %></b></div>
+
+    <%= render "/pdf_templates/orders/invoice_main_details" %>
+
+    <!-- note*** if its purchase insurance only and no convenient fee, invoice unit table will be empty. need to confirm with pic what to do if theres cases like this happen. hidden currently. -->
+    <% if !['INSURANCE_PURCHASE'].include?(@order.category) || !@order.order_items.get_convenient_fee.blank? %>
+        <table class="invoice-table table-sm">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Description</th>
+                    <th>Unit</th>
+                    <th>Unit Price (RM)</th>
+                    <th>Amount (RM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% _index = 0 %>
+                <% if ['TRANSACTION_REGISTRATION','SPECIAL_RENEWAL_TRANSACTION_REGISTRATION'].include? @order.category %>
+                    <% @order.order_items.joins(:fee).select('gender, sum(order_items.amount), count(*) filter (where order_items.amount > 0) as non_foc_unit, count(*) as actual_unit, fee_id, fees.code').group('gender, fee_id, fees.code').exclude_insurance_fee.exclude_convenient_fee.each.with_index(1) do |order_item, index| %>
+                        <% _index = index %>
+                        <tr>
+                            <td class="text-center"><%= index %></td>
+                            <td><%= order_item.fee.is_registration_fee? ? "#{Order::CATEGORIES[@order.category]} - #{order_item.gender == 'M' ? 'MALE' : 'FEMALE'}" : order_item.fee.name %></td>
+                            <td class="text-center"><%= order_item.actual_unit %></td>
+                            <td class="text-center"><%= number_with_precision((order_item.non_foc_unit == 0 ? 0 : order_item.sum/order_item.non_foc_unit), precision: 2) %></td>
+                            <td class="text-center"><%= number_with_precision(order_item.sum, precision: 2) %></td>
+                        </tr>
+                    <% end %>
+                <% else %>
+                    <% @order.order_items.exclude_insurance_fee.exclude_convenient_fee.select('sum(order_items.amount) as amount, count(*) as cnt, fee_id').group(:fee_id).each.with_index(1) do |order_item, index| %>
+                        <% _index = index %>
+                        <tr>
+                            <td class="text-center"><%= index %></td>
+                            <td><%= Order::CATEGORIES[@order.category] %></td>
+                            <td class="text-center"><%= order_item.cnt %></td>
+                            <td class="text-center"><%= number_with_precision(order_item.amount/order_item.cnt, precision: 2) %></td>
+                            <td class="text-center"><%= number_with_precision(order_item.amount, precision: 2) %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                <% if !@order.order_items.get_convenient_fee.blank? %>
+                    <% _index = _index+1 %>
+                    <% @order.order_items.get_convenient_fee.select('sum(order_items.amount), count(*) filter (where order_items.amount > 0) as non_foc_unit, count(*) as actual_unit, fee_id, fees.code').group('fee_id, fees.code').each.with_index(_index) do |order_item, index| %>
+                        <tr>
+                            <td class="text-center"><%= index %></td>
+                            <td><%= order_item.fee.name %></td>
+                            <td class="text-center"><%= order_item.actual_unit %></td>
+                            <td class="text-center"><%= number_with_precision((order_item.non_foc_unit == 0 ? 0 : order_item.sum/order_item.non_foc_unit), precision: 2) %></td>
+                            <td class="text-center"><%= number_with_precision(order_item.sum, precision: 2) %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                <tr>
+                    <td class="text-right" colspan="4"><b>Total Payable Amount</b></td>
+                    <td class="text-center"><b><%= number_with_precision(@order.order_items.exclude_insurance_fee.sum(&:amount), precision: 2) %></b></td>
+                </tr>
+            </tbody>
+        </table>
+    <% end %>
+
+    <%=render '/pdf_templates/orders/payment_details' %>
+
+    <div class="doc-footer">
+        <%=render '/pdf_templates/orders/special_notes' %>
+    </div>
+</div>

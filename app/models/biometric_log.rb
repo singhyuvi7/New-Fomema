@@ -1,0 +1,2 @@
+class BiometricLog < ApplicationRecord
+end

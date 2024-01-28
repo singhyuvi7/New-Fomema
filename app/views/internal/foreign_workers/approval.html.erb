@@ -1,0 +1,118 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+            <strong>Employers</strong> - Employer Detail
+    </div>
+    <!-- /card-header -->
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render 'shared/all_validation_flash', { model_obj: @employer } %>
+        
+        <% if @employer.approval_status.eql?('newly_created_record') %>
+            <%= form_for @employer, url: send("internal_#{controller_name}_url", @employer),authenticity_token: false, method: :put, html: {id: 'form'} do |form| %>
+                <%= hidden_field_tag 'authenticity_token', session[:_csrf_token] %>
+                <%= label_tag :comment %>
+                <%= text_field_tag :comment %>
+            <% end %>
+
+            <div class="text-right">
+                <%= button_tag 'Approve', class: 'btn btn-sm btn-primary', id: 'approve' %>
+                <%= button_tag 'Reject', class: 'btn btn-sm btn-primary', id: 'reject' %>
+                <%= button_tag 'Cancel', class: 'btn btn-sm btn-primary', id: 'cancel' %>
+                <%= link_to 'Back', send("internal_#{controller_name}_path"), class: 'btn btn-sm btn-secondary' %>
+            </div>
+
+        <% elsif @employer.approval_status.eql?('pending')  %>
+
+            <% @request = Approval::Request.joins(:items).find_by(state: 'pending', approval_items: { resource_type: controller_name.classify}) %>
+            <% item = @request.try(:items).try(:first) %>
+            <% unless item.nil? %>
+                <div class="card">
+                    <div class="card-body">
+                        <%= "#{item.event} request by #{@request.request_user.name}" %>
+                        <div class="row margin-top-10">
+                            <% item.params.each do |key, value| %>
+                            <div class="col-3">
+                                <strong><%= key %></strong>
+                            </div>
+                            <div class="col-9"><%= value %></div>
+                            <% end %>
+                            <div class="col-3">
+                                <strong>Documents:</strong>
+                            </div>
+                            <% item.documents.each do |document| %>
+                            <%= link_to document.url, target: "_blank" do %>
+                            <%= document.file.filename %>
+                            <% end %>
+                            <% end %>
+                        </div>
+                        <%= form_for @request, url: send("internal_#{controller_name}_url", @request),authenticity_token: false, method: :put, html: {id: 'form'} do |form| %>
+                        <%= hidden_field_tag 'authenticity_token', session[:_csrf_token] %>
+                        <%= label_tag :comment %>
+                        <%= text_field_tag :comment %>
+                        <% end %>
+                    </div>
+
+                    <div class="card-footer">
+
+                        <div class="text-right">
+                            <%= button_tag 'Approve', class: 'btn btn-sm btn-primary', id: 'approve' %>
+                            <%= button_tag 'Reject', class: 'btn btn-sm btn-primary', id: 'reject' %>
+                            <%= button_tag 'Cancel', class: 'btn btn-sm btn-primary', id: 'cancel' %>
+                            <%= link_to 'Back', send("internal_#{controller_name}_path"), class: 'btn btn-sm btn-secondary' %>
+                        </div>
+
+                    </div>
+
+                </div>
+            <% end %>
+
+        <% end %>
+        
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+
+    <% if @employer.approval_status.eql?('newly_created_record') %>
+        <script>
+            $('#approve').click(function () {
+                $('#form').attr('action', "<%= send("approve_new_record_internal_#{ controller_name }_path", request: @employer.id) %>");
+                $("#form").submit();
+            });
+
+            $('#reject').click(function () {
+                $('#form').attr('action', "<%= send("reject_new_record_internal_#{ controller_name }_path", request: @employer.id) %>");
+                $("#form").submit();
+            });
+
+            $('#cancel').click(function () {
+                $('#form').attr('action', "<%= send("cancel_internal_#{ controller_name }_path", request: @employer.id) %>");
+                $("#form").submit();
+            });
+        </script>
+
+    <% elsif @employer.approval_status.eql?('pending')  %>
+
+        <script>
+            $('#approve').click(function () {
+                $('#form').attr('action', "<%= send("approve_internal_#{ controller_name }_path", request: @request.id) %>");
+                $("#form").submit();
+            });
+
+            $('#reject').click(function () {
+                $('#form').attr('action', "<%= send("reject_internal_#{ controller_name }_path", request: @request.id) %>");
+                $("#form").submit();
+            });
+
+            $('#cancel').click(function () {
+                $('#form').attr('action', "<%= send("cancel_internal_#{ controller_name }_path", request: @request.id) %>");
+                $("#form").submit();
+            });
+        </script>
+    <% end %>
+<% end %>

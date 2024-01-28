@@ -1,0 +1,46 @@
+/*
+ *= require_self
+ *= require_tree .
+ *= stub ./pdf/medical-form.scss
+ *= stub ./pdf/medical-form-v2.scss
+ *= stub ./pdf/medical-form-v3.scss
+*= stub ./pdf/medical-form-v4.scss
+ */
+
+// @import "custom-variables";
+// @import "coreui-free";
+@import "fomema";
+
+.orgchart {
+  display: inline;
+  background-image: none;
+}
+
+.orgchart .node .title {
+  width: 200px;
+}
+
+.orgchart .node .content {
+  height: 40px;
+}
+
+.multiselect.is-invalid .multiselect__tags {
+  border: 1px solid red !important;
+}
+
+.multiselect.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.table-card {
+  margin-bottom: 0;
+  border-style: hidden;
+}
+
+.min-width-120{
+  min-width: 120px;
+}
+
+[v-cloak] {
+  display: none;
+}

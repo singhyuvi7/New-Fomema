@@ -1,0 +1,65 @@
+<div class="card xray_report_form">
+<div class="card-header">
+    <div class="row">
+        <div class="col">
+            PART IV. CERTIFICATION BY DOCTOR (cont'd)
+        </div>
+    </div>
+</div>
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of Comments -->
+            <tr>
+                <td>19</td>
+                <td>Comments (for any abnormalities detected in PART IV)</td>
+                <td colspan="3">
+                    <pre class="form-control text-break"><%= doctor_examination.certification_comment %></pre>
+                </td>
+            </tr>
+            <!--End of Comments -->
+
+            <!-- Start of Suitability -->
+            <tr>
+                <td width="100">20</td>
+                <td>I therefore ceritfy that this foreign worker is found to be suitable / unsuitable medically for employment in Malaysia</td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="SUITABLE"
+                            <% if doctor_examination.suitability == 'SUITABLE' %> checked <% else %> disabled <% end %>>
+                            SUITABLE
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" value="UNSUITABLE"
+                            <% if doctor_examination.suitability == 'UNSUITABLE' %> checked <% else %> disabled <% end %>>
+                            UNSUITABLE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!-- End of Suitability -->
+
+            <!-- Start of unsuitable comment -->
+            <tr>
+                <td>21</td>
+                <td>If considered not suitable for employment, please state the reason</td>
+                <td colspan="3">
+                    <pre class="form-control text-break"><%= doctor_examination.unsuitable_comment %></pre>
+                </td>
+            </tr>
+            <!--End of unsuitable comment -->
+    
+        </tbody>
+</table>
+</div>

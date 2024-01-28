@@ -1,0 +1,5 @@
+<%= form_for @order, url: payment_internal_order_path(@order) do |form| %>
+    <div>Code: <%= @order.code %></div>
+    <div>Amount: <%= number_to_currency(@order.amount, unit: "") %></div>
+    <div><a href="<%= internal_orders_path %>">Back</a> <button type="submit">Paid</button></div>
+<% end %>

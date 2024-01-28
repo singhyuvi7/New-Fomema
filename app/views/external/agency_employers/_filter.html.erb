@@ -1,0 +1,32 @@
+<div class="card">
+    <div class="card-header  border-0 bg-transparent text-dark">
+            <strong>Search</strong>
+        </div>    
+        <%= form_tag external_agency_employers_path, method: 'get' do |form| %>
+            <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="code" class="col-sm-3 col-form-label">Employer Code</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="code" class="col-sm-3 col-form-label">ROC No. / NRIC</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="icno" id="icno" value="<%= params[:icno] %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>               
+            <div class="card-footer text-right  border-0 bg-transparent text-dark">
+                <a href="<%= external_agency_employers_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+                <button type="submit" name="submit" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+            </div
+        <% end %>
+    </div>

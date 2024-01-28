@@ -1,0 +1,76 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent">
+        <!-- Filter -->
+    </div>
+    <form action="/foreign_workers" method="get" id="foreign-workers-filter-form">
+        <div class="card-body">
+            <div class="form-group row">
+    
+                <label for="search_type" class="col-sm-2 col-form-label">Search Type</label>
+                 <div class="col-sm-4"> 
+                    <select name="search_type" id="search_type" class="form-control" Required>
+                        <option value='3'>Select Option</option>  
+                        <option value='1'>Worker Code</option>  
+                        <option value='2'>Passport Number</option>  
+                    </select>
+                    
+                </div>        
+            </div>
+            <div class="form-group row" id="filter_code">
+                <% (1..10).each do |x| %>
+                    <label for="filter_code" class="col-sm-2 col-form-label">Worker Code</label>
+                        <div class="col-sm-4"> 
+                           <input type="text" name="code[]" id="filter_code_<%= x %>" value="<%= params[:code].present? ? params[:code][x-1] : '' %>" class="form-control" style="margin-bottom:20px;">
+                        </div>
+                 <% end %>
+             </div>
+            <div class="form-group row"id="passportnumber">
+                 <% (1..10).each do |x| %>
+                    <label for="passport_number" class="col-sm-2 col-form-label">Passport Number</label>
+                       <div class="col-sm-4">  
+                          <input type="text" name="passport_number[]" id="passport_number_<%= x %>" value="<%= params[:passport_number].present? ? params[:passport_number][x-1] : '' %>" class="form-control">
+                        <br>
+                      </div>
+                  <% end %>
+            </div>
+                      
+            </div> 
+        </div>
+        <div class="card-footer text-right border-0 bg-transparent">
+            <a href="<%= external_foreign_workers_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i>Clear</a>
+            <button type="submit" form="foreign-workers-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i>Search</button>
+        </div>
+    </form>
+</div>
+
+
+ <% content_for :page_end_scripts do %>
+<script>
+
+$(document).ready(function() {
+  search_type(this.value)
+});
+
+
+$('select').on('change', function() {
+  search_type(this.value)
+});
+
+function search_type(select){
+    if (select == '1'){
+        $('#filter_code').show();
+        $('#passportnumber').hide();
+        
+    }else if (select=='2') {
+         $('#passportnumber').show();
+         $('#filter_code').hide();
+      
+    }else{
+         $('#passportnumber').hide();
+         $('#filter_code').hide();
+      
+    }
+}
+
+</script>
+<% end %>

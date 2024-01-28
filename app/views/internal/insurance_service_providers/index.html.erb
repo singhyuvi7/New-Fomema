@@ -1,0 +1,72 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Insurance Service Providers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_INSURANCE_SERVICE_PROVIDER') %>
+                    <%=raw index_table_new_button(new_internal_insurance_service_provider_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers">#</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Display Name</th>
+                        <th>Payment To Code</th>
+                        <th>Active</th>
+                        <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @insurance_service_providers.blank? %>
+                        <tr>
+                            <td colspan="7" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+
+                        <% @insurance_service_providers.each.with_index((@insurance_service_providers.current_page - 1) * get_per + 1) do |insurance_service_provider, index| %>
+                        <tr>
+                            <td class="module-row-numbers"><%= index %></td>
+                            <td><%= insurance_service_provider.code %></td>
+                            <td><%= insurance_service_provider.name %></td>
+                            <td><%= insurance_service_provider.display_name %></td>
+                            <td><%= insurance_service_provider.payment_to_code %></td>
+                            <td><%= insurance_service_provider.active ? "Yes" : "No" %></td>
+
+
+                            <td class="module-row-actions">
+                            <%=raw index_table_show_button(internal_insurance_service_provider_path(insurance_service_provider)) %>
+                            <% if has_permission?('edit_insurance_service_provider') %>
+                                <%=raw index_table_edit_button edit_internal_insurance_service_provider_path(insurance_service_provider) %>
+                            <% end %>
+                            <% if has_permission?('delete_insurance_service_provider') %>
+                                <%=raw index_table_delete_button(internal_insurance_service_provider_path(insurance_service_provider)) %>
+                            <% end %>
+                            </td>
+                        </tr>
+                        <% end %>
+
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <%= paginate @insurance_service_providers %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

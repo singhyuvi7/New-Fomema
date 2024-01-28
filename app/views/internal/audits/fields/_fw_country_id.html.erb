@@ -1,0 +1,5 @@
+<%
+c = Country.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{c.name} (#{c.code})" if !value.blank? && c %></td>

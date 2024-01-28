@@ -1,0 +1,85 @@
+<table class="workers-table w-100" style="margin-top: 2rem;">
+    <thead>
+        <tr>
+            <th class="module-row-numbers" rowspan="2">No</th>
+            <th rowspan="2">Created By</th>
+            <th rowspan="2">Creation Date</th>
+            <th rowspan="2">Modify By</th>
+            <th rowspan="2">Amendment Date</th>
+            <th rowspan="2">Worker Code</th>
+            <th colspan="2">Name</th>
+            <th colspan="2">Gender</th>
+            <th colspan="2">Passport Number</th>
+            <th colspan="2">Country of Origin</th>
+            <th colspan="2">Date of Birth</th>
+        </tr>
+        <tr>
+            <% (1..5).each do |n| %>
+                <th>Old</th>
+                <th>New</th>
+            <% end %>
+        </tr>
+    </thead>
+    <tbody>
+        <% if @fw_amendments.blank? %>
+            <tr>
+                <td colspan="5" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+            <% @fw_amendments.find_each.with_index(1) do |fw_amendment, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= fw_amendment.fw_created_by_name %></td>
+                    <td><%= fw_amendment.fw_created_at.try(:strftime, get_standard_date_format) %></td>
+                    <td><%= fw_amendment.amendment_by_name %></td>
+                    <td><%= fw_amendment.amendment_at.try(:strftime, get_standard_date_format) %></td>
+                    <td><%= fw_amendment.fw_code %></td>
+                    <td><%= fw_amendment.name_old_value %></td>
+                    <td><%= fw_amendment.name_new_value %></td>
+                    <td><%= fw_amendment.gender_old_value %></td>
+                    <td><%= fw_amendment.gender_new_value %></td>
+                    <td><%= fw_amendment.passport_number_old_value %></td>
+                    <td><%= fw_amendment.passport_number_new_value %></td>
+                    <td><%= Country.find(fw_amendment.country_id_old_value).try(:name) if !fw_amendment.country_id_old_value.blank? %></td>
+                    <td><%= Country.find(fw_amendment.country_id_new_value).try(:name) if !fw_amendment.country_id_new_value.blank? %></td>
+                    <td><%= fw_amendment.date_of_birth_old_value.try(:to_date).try(:strftime, get_standard_date_format) %></td>
+                    <td><%= fw_amendment.date_of_birth_new_value.try(:to_date).try(:strftime, get_standard_date_format) %></td>
+                </tr>
+            <% end %>
+        <% end %>
+    </tbody>
+</table>
+
+<style>
+.w-100 {
+    width: 100%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+.workers-table {
+    padding: 1rem 0px;
+}
+
+thead {
+    background-color: #c8ced3;
+}
+
+thead th {
+    padding: 3px;
+}
+
+tbody td {
+    padding: 1px 2px;
+    vertical-align: center;
+    height: 18px;
+}
+</style>

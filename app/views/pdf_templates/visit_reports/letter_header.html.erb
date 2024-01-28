@@ -1,0 +1,77 @@
+<body class="header-body">
+    <div class="header-banner">
+        <div class="float-left bold banner-logo">
+            <%= wicked_pdf_image_tag "logo/fomema-logo.png", class: 'banner-image' %>
+            <div class="banner-text">
+                <div><i><small>Foreign Workers' Medical</small></i></div>
+                <div class="banner-text-line-2"><i><small>Examination Surveillance System</small></i></div>
+            </div>
+        </div>
+        <div>
+            <div>
+                <span class="bold"><%= SystemConfiguration.find_by_code('COMPANY_NAME').value.upcase %></span>
+                <small class="reg-info"><%= SystemConfiguration.find_by_code('COMPANY_REGNO').value %></small>
+            </div>
+            <p class="company-address"><%= SystemConfiguration.find_by_code('COMPANY_ADDR').value %></p>
+            <div class="tel-info">Tel: <%= SystemConfiguration.find_by_code('COMPANY_PHONE').value %> | Fax: <%= SystemConfiguration.find_by_code('COMPANY_FAX').value %></div>
+            <div class="site-info">Website: <i>www.fomema.com.my</i> | Online Portal: <i>https://portal.fomema.com.my</i></div>
+
+        </div>
+    </div>
+    <hr>
+</body>
+
+<style>
+    .header-banner {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .banner-image{
+        width: 300px;
+        margin-left: -2rem;
+    }
+    .banner-text{
+        margin-top: -0.5rem;
+        /* padding-left: 2rem; */
+        letter-spacing: -0.3px;
+    }
+    .banner-text-line-2{
+        margin-top: -0.3rem;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .header-line {
+        margin-bottom: 1rem;
+    }
+
+    .header {
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .header-body {
+        padding-bottom: 0.5rem;
+    }
+    .center-title {
+        padding-bottom: 1rem;
+    }
+    .banner-logo{
+        padding-right: 4rem;
+    }
+    .tel-info, .site-info, .reg-info{
+        font-size: 10px;
+        /* color: gray; */
+    }
+    .company-address{
+        width: 250px;
+        font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    }
+</style>

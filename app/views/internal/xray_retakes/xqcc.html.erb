@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Retake (XQCC)</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "internal/xray_retakes/filter", requestable_type: "XrayReview" %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Transaction ID</th>
+            <th>X-Ray Code</th>
+            <th>Worker Code</th>
+            <th>Worker Name</th>
+            <th>X-Ray Taken Date</th>
+            <th>Retake Request</th>
+            <th>Retake Reason</th>
+            <th>Retake X-Ray Facility</th>
+            <th>Radiographer Name</th>
+            <th>Retake Request Date</th>
+            <th>Retake Approval Date</th>
+            <th>Retake Approval Status</th>
+            <th>Duration</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @xray_retakes.each.with_index((@xray_retakes.current_page - 1) * get_per + 1) do |xray_retake, index| %>
+            <tr>
+                <td class="module-row-numbers"><label><%= index %></label></td>
+                <td><%= xray_retake.transactionz.code %></td>
+                <td><%= xray_retake.transactionz.xray_facility&.code %></td>
+                <td><%= xray_retake.transactionz&.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{xray_retake.transactionz&.foreign_worker&.code}"  %>
+                </td>
+                <td><%= xray_retake.transactionz&.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{xray_retake.transactionz&.foreign_worker&.name}"  %>
+                </td>
+                <td><%= xray_retake.transactionz&.xray_examination&.xray_taken_date.nil? ? "N/A" : xray_retake.transactionz&.xray_examination.xray_taken_date.strftime(get_standard_date_format) %></td>
+                <td><%= xray_retake.retake_review_type %></td>
+                <td><%= xray_retake.retake_reason&.name %></td>
+                <td><%= xray_retake.xray_facility&.name %> (<%= xray_retake.xray_facility&.code %>)</td>
+                <td><%= xray_retake.creator.name %></td>
+                <td><%= xray_retake.created_at.nil? ? "N/A" : xray_retake.created_at.strftime(get_standard_date_format) %></td>
+                <td><%= xray_retake.approved_at.nil? ? "N/A" : xray_retake.approved_at.strftime(get_standard_date_format) %></td>
+                <td><%= xray_retake.approval_status %></td>
+                <td><%= xray_retake.retake_duration %></td>
+                <td>
+                    <% if xray_retake.status == 'DRAFT' %>
+                        <%=raw index_table_edit_button(draft_internal_xray_retake_path(xray_retake.id), title: 'Edit') %>
+                    <% elsif xray_retake.status == 'APPROVAL' %>
+                        <%=raw index_table_approval_button(approval_internal_xray_retake_path(xray_retake.id)) %>
+                    <% end %>
+                    <% if !["REJECTED"].include?(xray_retake.status) %>
+                        <%=raw index_table_edit_button(internal_xray_retake_xray_retake_follow_ups_path(xray_retake.id), label: '<i class="fa fa-clock"></i>', title: 'Follow Up') %>
+                    <% end %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% if @xray_retakes.blank? %>
+            <tr>
+                <td colspan="21" class="text-danger">No records found.</td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @xray_retakes %>
+        </div>
+    </div>
+</div>

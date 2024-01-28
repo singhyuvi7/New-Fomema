@@ -1,0 +1,103 @@
+<div class="card">
+    <div class="card-header"><strong>Agencies</strong> - Agency Registration Detail</div>
+    <div class="card-body">
+        <%=render '/internal/agencies/shared/agency_detail' %> 
+    </div>
+</div>
+
+<div class="card bg-light">
+    <div class="card-header"><strong>Agency</strong> - Agency Registration Approval</div>
+    <div class="card-body">
+
+        <%= render 'shared/all_validation_flash', { model_obj: @agency } %> 
+        <%=render "/shared/all_flash" %> 
+
+        <%= form_tag registration_approval_internal_agency_path(@agency), method: 'patch', id: 'registrationApprovalForm' do |form| %>
+            <div class="form-group">
+                <label class="required" for="">Decision</label>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input approval-decision" id="approval_decision_APPROVE" type="radio" value="APPROVE"
+                            name="approve_action" required>
+                        <label class="form-check-label" for="approval_decision_APPROVE">APPROVE</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input approval-decision" id="approval_decision_REJECT" type="radio" value="REJECT"
+                            name="approve_action" required>
+                        <label class="form-check-label" for="approval_decision_REJECT">REJECT</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input approval-decision" id="approval_decision_INCOMPLETE" type="radio" value="INCOMPLETE"
+                            name="approve_action" required>
+                        <label class="form-check-label" for="approval_decision_INCOMPLETE">INCOMPLETE</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="required" for="">Comment</label>
+                <textarea class="form-control" name="registration_comment" id="registration_comment" rows="3" ></textarea>
+                <small id="" class="form-text text-muted">Comment is required when you Reject or select Incomplete Agency Registration</small>
+            </div>
+
+            <% if has_permission?("APPROVAL_AGENCY") %>
+
+                <div class="text-right">
+                    <%=raw edit_back_button(internal_agencies_path) %>
+                    <button class="btn btn-sm btn-primary submit-decision" type="submit"><i class="icon-pencil"></i> Submit decision</button>
+                </div>
+
+            <% end %>
+
+        <% end %>
+
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // when decision changed, we conditionally required comment
+    $('input[type=radio][name=approve_action]').change(function() {
+
+        if (this.value === 'REJECT' || this.value === 'INCOMPLETE') {
+            $('#registration_comment').prop('required', true);
+        }
+        else {
+            $('#registration_comment').prop('required', false);
+        }
+
+    });
+
+    // check viewed attached documents
+    $('.submit-decision').on('click',function (e){
+        e.preventDefault();
+        form = $('#registrationApprovalForm')
+        submit_btn = $(this)
+        submit_btn.prop('disabled', true);
+
+        $.ajax({
+            url: `<%= check_internal_documents_path %>`,
+            method: 'GET',
+            data: {
+                type: 'Agency',
+                id: `<%= @agency.id %>`
+            },
+            success: function (response) {
+                if (response.has_viewed){
+                    validity = form[0].checkValidity();
+                    form[0].reportValidity();
+                    if(validity){
+                        form.submit();
+                    }
+                }else{
+                    alert('Please review all the uploaded document(s) before approval.')
+                }
+            }
+        }).done(function () {
+            submit_btn.prop('disabled', false);
+        })
+    });
+
+</script>
+<% end %>

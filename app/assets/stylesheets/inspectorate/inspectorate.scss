@@ -1,0 +1,173 @@
+// select2 style to fix select2 field height wont expand
+$signature-height: 200px;
+$signature-width: 400px;
+
+.wrapper{
+    position: relative;
+    width: 100%;
+    height: $signature-height;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    #JohnHancock-canvas, .signature-img{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: $signature-width;
+        height: $signature-height;
+        background-color: white;
+        margin: 0 auto;
+        right: 0;
+    }
+    #JohnHancock-canvas{
+        border: 1px solid gray;
+    }
+}
+.personnel-acknowledge-details{
+    .personnel-detail-input{
+        text-align: center; 
+        width: $signature-width;
+        margin: 3px 0;
+    }
+    .personnel-detail-input::placeholder{
+        text-align: center;
+    }
+}
+.visit-report-download{
+    .visit-details-field{
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .visit-details-list{
+        margin: 5px;
+    }
+    .row{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+    .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto {
+        position: relative;
+        width: 100%;
+        min-height: 1px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+    .col-6{
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .d-inline{
+        display: inline-block;
+    }
+    .field-name{
+        font-weight: bold;
+        width: 170px;
+        vertical-align: top;
+    }
+    .colon{
+        font-weight: bold;
+        vertical-align: top;
+    }
+
+    //newly added
+    table {
+        border-collapse: collapse;
+    }
+
+    // table,
+    // th,
+    // td {
+    //     border: 1px solid black;
+    // }
+
+    thead th {
+        padding: 3px;
+    }
+
+    tbody td {
+        padding: 1px 2px;
+        vertical-align: center;
+        height: 20px;
+    }
+    .width-100, .w-100{
+        width: 100% !important;
+    }
+    .acceptable-col{
+        text-align: center;
+    }
+    .bold{
+        font-weight: bold;
+    }
+    .unbold{
+        font-weight: normal;
+    }
+    .row-name{
+        // width: 76%;
+        font-weight: bold;
+    }
+    .table-index{
+        width: 4%;
+        font-weight: bold;
+    }
+    .unacceptable-field{
+        padding-left: 15px;
+        .finding-comment{
+            padding-left: 1.3rem;
+        }
+    }
+    .non-compliance-field{
+        width: 48%;
+        display: inline-block;
+    }
+    .recommendation-field{
+        width: 48%;
+        display: inline-block; 
+    }
+    .closings{
+        margin-top: 5rem;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    .signature-img{
+        width: 200px;
+    }
+    .text-left{
+        text-align: left;
+    }
+    .text-right{
+        text-align: right;
+    }
+    .xray-centre-license-field{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    .w-50{
+        width: 50%
+    }
+
+    .finding-row{
+        &.method-field{
+            border-top: 0.7rem solid transparent;
+        }
+    }
+    
+}
+.outline-active-checkbox{
+    box-shadow: 0 0 3px #FF0000;
+    background-color: red;
+}

@@ -1,0 +1,198 @@
+<%
+    namespacing ||= "de_attributes_#{ rand(1000) }"
+    readonly    ||= false
+%>
+
+<div class="category-switchable hidden" data-type="physical">
+    <div class="p-4 border-bottom">
+        <h3><u>PART III. PHYSICAL EXAMINATION Section A: General Examination</u></h3>
+        <p class="font-size-8 mb-0">This part is to be completed by the examining doctor.</p>
+    </div>
+
+    <h5 class="px-4 py-3 border-bottom mb-0">Section A - General Examination</h5>
+
+    <% DoctorExamination.physical_exam_measurements.each_with_index do |array, index| %>
+        <%
+            field_name, label, unit = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 d-flex flex-wrap boolean-field-parent justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "#{ index + 1 }" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0  align-items-center">
+                <%= number_field_tag "#{ namespacing }[#{ field_name }]", value, class: "form-control rounded-0 w-em-12 must-fill measurement-range-check", data: { type: field_name }, step: 0.01, readonly: readonly %>
+                <div class="w-em-6 ml-4"><%= unit %></div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">4</label>
+        <label class="flex-grow-1 mb-0">Blood pressure</label>
+    </div>
+
+    <% DoctorExamination.blood_pressure.each_with_index do |array, index| %>
+        <%
+            field_name, label, unit = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 d-flex flex-wrap boolean-field-parent justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0"><%= ["a", "b"][index] %>) <%= label %></label>
+
+            <div class="d-flex flex-shrink-0 align-items-center">
+                <%= number_field_tag "#{ namespacing }[#{ field_name }]", value, class: "form-control rounded-0 w-em-12 must-fill measurement-range-check", data: { type: field_name }, step: 1, readonly: readonly %>
+                <div class="w-em-6 ml-4"><%= unit %></div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">5</label>
+        <label class="flex-grow-1 mb-0">Last menstrual period date (only for females)</label>
+
+        <div class="d-flex flex-shrink-0">
+            <%
+                date_value  = doctor_examination.try(:physical_last_menstrual_period_date)
+                formatted   = date_value.present? ? readonly ? date_value.strftime("%d/%m/%Y") : date_value.strftime("%F") : nil
+                is_male     = @transaction.fw_gender == "M"
+            %>
+
+            <%= text_field_tag "#{ namespacing }[physical_last_menstrual_period_date]", formatted, placeholder: "Select date", class: "w-em-12 px-2 form-control rounded-0 datepicker", max: Date.today.strftime("%F"), autocomplete: "off", disabled: is_male, readonly: readonly %>
+            <div class="w-em-6 ml-4"></div>
+        </div>
+    </div>
+
+    <% DoctorExamination.physical_exam_visible_problems.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "#{ index + 6 }" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Present") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Absent") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">12</label>
+        <label class="flex-grow-1 mb-0">Vision test (if defective, please fill in visual acuity in # 15 comments below)</label>
+    </div>
+
+    <% DoctorExamination.vision_test.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="vision_parent">
+            <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+                <label class="row-index"></label>
+                <label class="flex-grow-1 mb-0"><%= ["a", "b", "c", "d"][index] %>) <%= label %></label>
+
+                <div class="d-flex flex-shrink-0">
+                    <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field number-input-bool-field doc-exam-vision-aided-wipe" %>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Defective", classes: "additional-value-input") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal", classes: "additional-value-input") %>
+                </div>
+            </div>
+
+            <% if ['Unaided Left', 'Unaided Right'].include?(label) %>
+                <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+                    <label class="flex-shrink-0 mb-0 mr-4 w-em-4"></label>
+                    <label class="flex-grow-1 mb-0"><%= label %> Acuity</label>
+
+                    <div class="d-flex flex-shrink-0 align-items-center">
+                        <p class="mb-0 mr-2"></p>
+                        <%= number_field_tag "#{ namespacing }[#{ field_name }_a_value]", doctor_examination.try("#{ field_name }_a_value"), placeholder: "", class: "w-em-7 form-control rounded-0 px-2 number-input-field", data: {type: "#{field_name}_a_value"}, disabled: !value, step: 1, min: 0, readonly: readonly %>
+                        <label class="w-em-2 px-2 mb-0">/</label>
+                        <%= number_field_tag "#{ namespacing }[#{ field_name }_b_value]", doctor_examination.try("#{ field_name }_b_value"), placeholder: "", class: "w-em-7 form-control rounded-0 px-2 number-input-field", data: {type: "#{field_name}_b_value"}, disabled: !value, step: 1, min: 1, readonly: readonly %>
+                    </div>
+                </div>
+            <% end %>
+
+            <% if ['Aided Left', 'Aided Right'].include?(label) %>
+                <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+                    <label class="flex-shrink-0 mb-0 mr-4 w-em-4"></label>
+                    <label class="flex-grow-1 mb-0"><%= label %> Acuity</label>
+
+                    <div class="d-flex flex-shrink-0 align-items-center">
+                        <p class="mb-0 mr-2"></p>
+                        <%= number_field_tag "#{ namespacing }[#{ field_name }_a_value]", doctor_examination.try("#{ field_name }_a_value"), placeholder: "", class: "w-em-7 form-control rounded-0 px-2 number-input-field", data: {type: "#{field_name}_a_value"},  step: 1, min: 0, readonly: readonly %>
+                        <label class="w-em-2 px-2 mb-0">/</label>
+                        <%= number_field_tag "#{ namespacing }[#{ field_name }_b_value]", doctor_examination.try("#{ field_name }_b_value"), placeholder: "", class: "w-em-7 form-control rounded-0 px-2 number-input-field", data: {type: "#{field_name}_b_value"},  step: 1, min: 1, readonly: readonly %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">13</label>
+        <label class="flex-grow-1 mb-0">Hearing ability</label>
+    </div>
+
+    <% DoctorExamination.hearing_ability.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0"><%= ["a", "b"][index] %>) <%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Defective") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">14</label>
+        <label class="flex-grow-1 mb-0">Others (if abnormal, describe under comments below)</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% value = doctor_examination.try(:physical_other) %>
+            <%= hidden_field_tag "#{ namespacing }[physical_other]", value, class: "boolean-field" %>
+            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Abnormal") %>
+            <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal") %>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 border-bottom">
+        <div class="d-flex">
+            <label class="row-index">15</label>
+            <label class="mb-0">Comments (refer to Part III, Section A: 1-14)</label>
+        </div>
+
+        <%= text_area_tag "#{ namespacing }[physical_comment]", doctor_examination.try(:physical_comment), rows: 5, class: "mt-2", style: "margin-left: 4.5em; width: calc(100% - 4.5em);", readonly: readonly %>
+    </div>
+
+    <% unless readonly %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Yes, I have visited physical exam for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:visited_physical) %>
+                <%= hidden_field_tag "#{ namespacing }[visited_physical]", value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+                <div class="w-em-6"></div>
+            </div>
+        </div>
+    <% end %>
+</div>

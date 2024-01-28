@@ -1,0 +1,76 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Decision Approvals</strong>
+    </div>
+
+    <div class="card-body">
+        <%=render "internal/xray_pending_decisions/filter_approval" %>
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Transaction ID</th>
+            <th>Worker Code</th>
+            <th>Doctor Code</th>
+            <th>Certify Date</th>
+            <th>X-Ray Code</th>
+            <th>X-Ray Date</th>
+            <th>X-Ray Result</th>
+            <th>PCR Result</th>
+            <th>Pending Decision Result</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @xray_pending_decisions.each.with_index((@xray_pending_decisions.current_page - 1) * get_per + 1) do |xray_pending_decision, index| %>
+        <tr>
+            <td class="module-row-numbers"><label><%= index %></label></td>
+            <td>
+                <% if xray_pending_decision.status == "XQCC_PENDING_DECISION_APPROVAL" && has_permission?("EDIT_APPROVAL_XQCC_PENDING_DECISION") && xray_pending_decision.reviewed_by != current_user.id %>
+                    <a href="<%= approval_internal_xray_pending_decision_path(xray_pending_decision.id) %>"><%= xray_pending_decision.transactionz.code %></a>
+                <% else %>
+                    <%= xray_pending_decision.transactionz.code %>
+                <% end %>
+
+            </td>
+            <td><%= xray_pending_decision.transactionz.fw_code %></td>
+            <td><%= xray_pending_decision.transactionz.doctor&.code %></td>
+            <td><%= xray_pending_decision.transactionz.doctor_transmit_date&.strftime(get_standard_date_format) %></td>
+            <td><%= xray_pending_decision.transactionz.xray_facility&.code %></td>
+            <td><%= xray_pending_decision.transactionz.xray_examination&.xray_taken_date&.strftime(get_standard_date_format) %></td>
+            <td><%= xray_pending_decision.transactionz.xray_examination&.result %></td>
+            <td><%= xray_pending_decision.transactionz.pcr_review&.result %></td>
+            <td><%= XrayPendingDecision::DECISIONS[xray_pending_decision.transactionz.xray_pending_decision&.decision] %></td>
+            <td>PENDING APPROVAL</td>
+
+            <td>
+                <% if xray_pending_decision.status == "XQCC_PENDING_DECISION_APPROVAL" && has_permission?("EDIT_APPROVAL_XQCC_PENDING_DECISION") && xray_pending_decision.reviewed_by != current_user.id %>
+                    <%=raw index_table_edit_button approval_internal_xray_pending_decision_path(xray_pending_decision.id) %>
+                <% end %>
+            </td>
+        </tr>
+        <% end %>
+
+        <% if @xray_pending_decisions.blank? %>
+            <tr>
+                <td colspan="12" class="text-danger">No records found.<!--No active XQCC Pending Decision Approval cases.--></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @xray_pending_decisions %>
+        </div>
+    </div>
+</div>

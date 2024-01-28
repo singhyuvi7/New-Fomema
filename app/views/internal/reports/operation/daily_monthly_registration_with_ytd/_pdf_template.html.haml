@@ -1,0 +1,42 @@
+- date = @for_mail ? DateTime.current : @date.to_date
+- common_path = 'internal/reports/operation/daily_monthly_registration_with_ytd'
+= render "#{common_path}/yearly_registrations_table", data: @past_year, year: (date - 1.year).year, cert_data: @cert_past_year, date: date
+= render "#{common_path}/monthly_registrations_table", data: @current_year_monthly, total_data: @current_year, year: date.year, cert_data: @cert_current_year_monthly, cert_total_data: @cert_current_year
+-# = render "#{common_path}/yearly_registrations_table", data: @current_year, year: date.year
+= render "#{common_path}/current_month_daily_registrations_table", data: @current_month_daily, cert_data: @cert_current_month_daily
+= render "#{common_path}/branch_registrations_table", data: @branches_data, branches: @branches
+
+%i.text-danger
+  **Note: All the figures in this report are accurate as of the report date and time. It may change from time to time due to cancellation of registration.
+
+:css
+  .w-600 {
+    width: 600px;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 10px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 5px;
+    vertical-align: center;
+    border: 1px solid #aaa;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .bgcolor {
+    background-color: #d0d0d0;
+  }

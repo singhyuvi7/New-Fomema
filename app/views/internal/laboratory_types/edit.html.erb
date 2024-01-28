@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>LaboratoryTypes</strong> - Edit LaboratoryType
+    </div>
+    <%= form_for @laboratory_type, url: internal_laboratory_type_path(@laboratory_type), html: {class: "#{params[:action]}_laboratory_type laboratory_type-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,44 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  grand_total = Array.new(8) { 0 }
+
+  # worksheet data
+  wb.add_worksheet(name: 'dx_pending_audit_pcr') do |sheet|
+    sheet.merge_cells "A1:C1"
+    sheet.add_row ["Digital X-Ray Pending Audit by PCR"]
+
+    sheet.add_row
+    sheet.add_row
+    pickup_row = sheet.add_row ["Pending PCR to Pickup"]
+    pickup_header = pickup_row.row_index+1
+    sheet.merge_cells "A#{pickup_header}:B#{pickup_header}"
+    sheet.add_row
+    sheet.add_row @to_pickup_headers
+    if @pending_pickup_data.present?
+      @pending_pickup_data.each do |key, value|
+        sheet.add_row [key.strftime("%d-%^b-%y"), value]
+      end
+    end
+
+    sheet.add_row
+    sheet.add_row
+    review_row = sheet.add_row ["Pending PCR to Review"]
+    review_header = review_row.row_index+1
+    sheet.merge_cells "A#{review_header}:B#{review_header}"
+    sheet.add_row
+    sheet.add_row @to_review_headers
+    if @pending_review_data.present?
+      @pending_review_data.each do |key, value|
+        sheet.add_row [key.strftime("%d-%^b-%y"), value]
+      end
+    end
+
+
+    sheet.column_widths 10, 15, 15, 15, *Array.new(9) { 10 }
+  end
+end

@@ -1,0 +1,189 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Documents Foreign Worker </div>
+    <%= form_for @foreign_worker, {url: upload_internal_employer_employer_worker_path(@employer, @foreign_worker), html: {multipart: true, class: "with-parsley"}} do |form| %>
+    <div class="card-body">
+        <div class="col-md-12">
+            <label>Uploaded Document(s)</label>
+                <%= hidden_field_tag :remove_uploaded_file, "" %>
+                <table class="table table-bordered table-striped ">
+                    <tr>
+                        <th>Category</th>
+                        <th>Documents</th>
+                        <th>Date Uploaded</th>
+                        <th>Uploaded By</th>
+                        <th>Action(s)</th>
+                    </tr>
+
+                    <% @foreign_worker.uploads.order(created_at: :desc).each do |upload| %>
+                        <% if upload.category == "FOREIGN_WORKER_IMAGE" %>
+                            <tr>
+                                <td class="filenames" width="30%" name="uploadedfilecategory">
+                                    <%= upload.category%>
+                                </td>
+                                <td class="filenames" width="30%" name="uploadedfilename">
+                                    <% upload.documents.each do |document| %>
+                                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                    <% end %>
+                                </td>
+                                <td class="filenames" width="15%"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                                <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" %></td>
+                                <td style="width: 150px;">
+                                <% if has_permission?('DELETE_UPLOAD_DOCUMENT_FOREIGN_WORKER') %>
+                                    <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                                <% end %>
+                                </td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+
+                    <% if @foreign_worker.uploads.blank? %>
+                        <tr><td colspan="5">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+        </div>
+        <div class="col-md-12">
+            <div id="document-input-group" class="form-group">
+                <label for="foreign_worker_uploads">Upload Foreign Worker Image</label>
+                <div class="input-group custom-input-group">
+                    <div class="document-type col-md-4">
+                        <select class="form-control document-type-selector" name="foreign_worker[uploads][][category]">
+                            <option value="">Select option</option>
+                            <% ForeignWorker::REREG_DOCUMENT_TYPES.each do |index, document_type| %>
+                                <option value="<%= index %>"><%= document_type %></option>
+                            <% end %>
+                        </select>
+                    </div>
+                    <div class="custom-file col-md-6">
+                        <input type="file" name="foreign_worker[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled required>
+                        <label class="custom-file-label">Choose file</label>
+                    </div>
+                    <div style="width: 140px;" class="">
+                        <input type="text" style="border-radius: 0; border: 0;" readonly="readonly" class="form-control inline-file-size" placeholder="0 MB" value="">
+                    </div>
+                    <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+            <%=raw edit_save_button() %>
+        </div>
+    </div>
+</div>
+<% end %>
+
+<style>
+    .custom-input-group {
+        border: 1px solid #e4e7ea;
+        border-radius: 5px;
+        padding: 0;
+    }
+    .document-type {
+        padding: 0;
+    }
+    .document-type > select {
+        border: 0px;
+    }
+    .buttons-wrapper {
+        padding: 0;
+    }
+    .top-margin {
+        margin-top: 10px;
+    }
+    #add_more_documents {
+        margin-bottom: 10px;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // file upload
+
+    <%= render 'shared/fileupload_script' %>
+
+    /**
+    * Function to duplicate document fields
+    **/
+    $('#add_more_documents').click(() => {
+        $('.custom-input-group:first')
+            .clone(true, true)
+            .appendTo("#document-input-group")
+            .addClass('top-margin col-md-12')
+            .find(".custom-file-input")
+            .val("")
+            .attr("disabled", "disabled")
+        $('.custom-input-group:last')
+            .find(".custom-file-label").html("Choose file")
+    });
+
+
+    /**
+    * Function to set file name
+    **/
+    $('.custom-file-input').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    /**
+    * Function to re-enable form input after selecting dom type
+    **/
+    $(".document-type-selector").change(function() {
+        let selectedValue = $("option:selected", this).val()
+
+        if (selectedValue.length > 0)
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+        else
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+    });
+
+    /**
+    * Function to remove document fields
+    **/
+    $('.removal-button').click(function(){
+        if ($('.custom-input-group').length > 1){
+            $(this).closest('.custom-input-group').remove()
+        }
+    });
+
+    $('.set-deletion').click(function() {
+        filenames = $(this).closest('tr').find('.filenames');
+        filenames.toggleClass('text-decoration-line-through');
+        text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+        $(this).text(text).toggleClass('btn-danger btn-primary');
+
+        ids = $('.set-deletion.btn-primary').map(function() {
+            return $(this).attr('data-id');
+        }).get().join(',');
+
+        var i = $('#remove_uploaded_file').val(ids);
+
+        if (i != null){
+            $('#foreign_worker_amendment_reasons').prop('required',false);
+            $('#fee_id').prop('required',false);
+        }else{
+            $('#foreign_worker_amendment_reasons').prop('required',true);
+            $('#fee_id').prop('required',true);
+        }
+
+    });
+
+</script>
+<% end %>

@@ -1,0 +1,90 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Master List (<%= @batch.start_date.strftime('%d/%m/%Y') %> to <%= @batch.end_date.strftime('%d/%m/%Y') %>)</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+
+        <%= render 'internal/reports/inspectorate/master_list/items/filter', { filter_link: view_master_list_internal_inspectorate_reports_path(@batch)} %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>" style="table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers" style="width: 30px;">#</th>
+                                <th style="width: 100px;">Visit Date</th>
+                                <th style="width: 120px;">Name Of Clinic</th>
+                                <th style="width: 100px;">Code</th>
+                                <th style="width: 150px;">Name Of Reg. Doctor</th>
+                                <th style="width: 100px;">Location</th>
+                                <th style="width: 100px;">State</th>
+                                <th style="width: 120px;">Inspected By</th>
+                                <th style="width: 100px;">Serial No.</th>
+                                <th style="width: 100px;">Visit Report ID</th>
+                                <th style="width: 100px;">NC</th>
+                                <th style="width: 200px;">Repeated offence (NC/Year)</th>
+                                <th style="width: 100px;">Letter ref. #</th>
+                                <th style="width: 100px;">Letter date</th>
+                                <th style="width: 100px;">Date of Faxed</th>
+                                <th style="width: 120px;">Follow-up Date</th>
+                                <th style="width: 120px;">Reminder letter</th>
+                                <th style="width: 100px;">Reply date</th>
+                                <th style="width: 130px;">Present in Meeting</th>
+                                <th style="width: 100px;">Report Date</th>
+                                <th style="width: 100px;">Report By</th>
+                                <th style="width: 100px;">Remarks</th>		
+                                <th class="module-row-actions" style="width: 100px;">Action(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @insp_master_lists.blank? %>
+                                <tr>
+                                <td colspan="26" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @insp_master_lists.each.with_index(1) do |item, index| %>
+                                    <tr>
+                                        <td><%= index %></td>
+                                        <td><%= item.visit_date %></td>
+                                        <td><%= item.name_of_clinic %></td>
+                                        <td><%= item.sp_code %></td>
+                                        <td><%= item.name_of_doctor %></td>
+                                        <td><%= item.location %></td>
+                                        <td><%= item.state %></td>
+                                        <td><%= item.inspected_by %></td>
+                                        <td><%= item.serial_no %></td>
+                                        <td><%= item.visit_report_id %></td>
+                                        <td><%= item.nc %></td>
+                                        <td><%= item.repeated_offence %></td>
+                                        <td><%= item.letter_ref %></td>
+                                        <td><%= item.letter_date %></td>
+                                        <td><%= item.date_of_faxed %></td>
+                                        <td><%= item.follow_up_date %></td>
+                                        <td><%= item.reminder_letter %></td>
+                                        <td><%= item.reply_date %></td>
+                                        <td><%= item.present_in_meeting %></td>
+                                        <td><%= item.report_date %></td>
+                                        <td><%= item.report_by %></td>
+                                        <td><%= item.remarks %></td>
+                                        <td>
+                                            <%= raw(index_table_edit_button(edit_master_list_internal_inspectorate_reports_path(id: @batch.id, item_id: item.id))) %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /card-body -->
+</div>

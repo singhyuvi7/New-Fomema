@@ -1,0 +1,14 @@
+<div id="notice"><%= alert %></div>
+<div class="container">
+    <div class="employer-registration-title-container">
+        <h1>Employer Registration</h1>
+        <div class="employer-registration-title-left-bar">&nbsp;</div>
+        <div class="employer-registration-title-right-bar">&nbsp;</div><br>
+    </div>
+
+    <%= render 'shared/all_validation_flash', { model_obj: @employer } %>
+    
+    <%= form_for @employer, url: external_employers_path, html: { multipart: true, id: 'employer-registration-form' } do |f| %>
+        <%= render 'form', f: f %>
+    <% end %>
+</div>

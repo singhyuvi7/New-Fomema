@@ -1,0 +1,55 @@
+<div class="card-scroll">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <div class="list-group-icon circle1"></div>
+      <div class="list-body"><h6>FW Registration</h6></div>
+      <div class="list-visit"><%= @transactions_count %></div>
+      <div class="list-rate tx-success"></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle2"></div>
+      <div class="list-body"><h6>FW Went to Medical Examination</h6></div>
+      <div class="list-visit"><%= @fw_medicalexamiation %></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle3"></div>
+      <div class="list-body"><h6>Certification</h6></div>
+      <div class="list-visit"><%= @fw_certification %> </div>
+    </li>
+    <li class="list-group-item">
+      <div id="fw_pending_view">
+        <%= render 'side_bar_value' %>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle5"></div>
+      <div class="list-body"><h6>Final Result Released</h6></div>
+      <div class="list-visit"><%= @fw_finalresult %></div>
+      <div class="list-rate tx-danger"></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle6"></div>
+      <div class="list-body"><h6>Result Transmitted to Immigration</h6></div>
+      <div class="list-visit"><%= @fw_resulttransmitted %></div>
+      <div class="list-rate tx-success"></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle7"></div>
+      <div class="list-body"><h6>Blocked FW</h6></div>
+      <div class="list-visit"><%= @fw_blocked %></div>
+      <div class="list-rate tx-success"></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle8"></div>
+      <div class="list-body"><h6>Appeal</h6></div>
+      <div class="list-visit"><%= @fw_appeal %></div>
+      <div class="list-rate tx-success"></div>
+    </li>
+    <li class="list-group-item">
+      <div class="list-group-icon circle9"></div>
+      <div class="list-body"><h6>FW Insured</h6></div>
+      <div class="list-visit"><%= @fw_insured %></div>
+      <div class="list-rate tx-success"></div>
+    </li>
+  </ul>
+</div>

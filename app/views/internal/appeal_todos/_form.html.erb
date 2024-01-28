@@ -1,0 +1,40 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @appeal_todo } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :description, class: 'required' %>
+                <%= form.text_field :description, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :is_active, class: 'required' %>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_active, true, class: "form-check-input" %>
+                        <label class="form-check-label" for="tcupi_todo_others_true">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :is_active, false, class: "form-check-input" %>
+                        <label class="form-check-label" for="tcupi_todo_others_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_appeal_todos_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

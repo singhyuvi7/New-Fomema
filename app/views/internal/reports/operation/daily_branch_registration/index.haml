@@ -1,0 +1,26 @@
+.card
+  .card-header
+    %strong Daily Branch Registration Report
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: daily_branch_registration_internal_operation_reports_path, method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .col-md-6
+                .row.form-group
+                  = form.label :date, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :date, value: params[:date], class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "date_from"}, max: DateTime.current, required: true
+          .card-footer
+            - if has_permission?("OPERATION_REPORTS")
+              .text-right
+                = form.button :export, class: 'btn btn-primary btn-sm' do
+                  %i.icon-magnifier
+                  Filter
+    - if @data.present?
+      = render 'internal/reports/operation/daily_branch_registration/pdf_template', headers: @headers, data: @data

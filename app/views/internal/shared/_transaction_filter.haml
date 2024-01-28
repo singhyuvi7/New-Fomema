@@ -1,0 +1,22 @@
+.card
+  .card-header
+    %strong Filter
+  = form_with(url: url, method: :get, local: true) do |form|
+    .card-body
+      .row
+        .col-md-6
+          .row.form-group
+            = form.label :medical_examination_date_from, 'Examination Date From', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = form.text_field :medical_examination_date_from, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"}, required: true
+        .col-md-6
+          .row.form-group
+            = form.label :medical_examination_date_to, 'Examination Date To', class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = form.text_field :medical_examination_date_to, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"}, required: true
+    .card-footer
+      - if has_permission?("MSPD_REPORTS")
+        .text-right
+          = form.button :export, class: 'btn btn-primary btn-sm' do
+            %i.fa.fa-download
+            Download

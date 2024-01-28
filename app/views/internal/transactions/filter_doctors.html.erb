@@ -1,0 +1,53 @@
+<% @doctors.each do |doctor| %>
+    <%
+        has_quota   = doctor.available_quota > 0
+        xray        = doctor.xray_facility
+    %>
+
+	<tr class="filter-table-search-results" data-type="doctor" data-id="<%= doctor.id %>" data-name="<%= doctor.name %>">
+        <td><%= doctor.code %></td>
+        <td><%= doctor.name %></td>
+
+        <td>
+            <%= doctor.clinic_name %><br>
+
+            <div class="collapse multi-collapse-<%= doctor.id %>" id="">
+                <%= raw [doctor.address1, doctor.address2, doctor.address3, doctor.address4, doctor&.town&.name, doctor&.state&.name, "<i class='fas fa-phone mr-1'></i>#{ doctor.phone }"].select(&:present?).join("<br>") %>
+            </div>
+        </td>
+
+        <td>
+            <%= xray&.name %><br>
+            <%= "(#{xray&.code})" %><br>
+
+            <div class="collapse multi-collapse-<%= doctor.id %>" id="">
+                <%= raw [xray&.address1, xray&.address2, xray&.address3, xray&.address4, xray&.town&.name, xray&.state&.name, "<i class='fas fa-phone mr-1'></i>#{ xray&.phone }"].select(&:present?).join("<br>") %>
+            </div>
+        </td>
+
+        <% if on_nios? %>
+            <td><%= xray&.film_type == "DIGITAL" ? "YES" : "NO" %></td>
+        <% end %>
+
+        <td class="text-<%= has_quota ? "success" : "danger" %>"><%= doctor.available_quota %></td>
+
+        <td>
+            <button type="button" class="btn btn-<%= has_quota ? "success" : "secondary" %> doctor-workers-pairing-trigger m-1" data-id="<%= doctor.id %>" data-name="<%= doctor.name %>">Select doctor</button>
+        <% if current_user.userable_type == "Employer" %>
+            <button type="button" data-toggle="collapse" data-target=".multi-collapse-<%= doctor.id %>" aria-expanded="false" class="btn btn-blue-portal m-1">Show / Hide</button>
+        <% else %>
+            <button type="button" data-toggle="collapse" data-target=".multi-collapse-<%= doctor.id %>" aria-expanded="false" class="btn btn-primary m-1">Show / Hide</button>
+        <% end %>
+        </td>
+    </tr>
+<% end %>
+
+<% if @doctors.blank? %>
+    <tr>
+        <td colspan="7"><font color='red'><b>The doctor you search for is temporary not available OR has exceeded its allocated quota for this quarter of the year. Search other clinic to continue.</b></font></td>
+    </tr>
+<% end %>
+
+<div id="pagination-response" class="row">
+    <%= paginate @doctors %>
+</div>

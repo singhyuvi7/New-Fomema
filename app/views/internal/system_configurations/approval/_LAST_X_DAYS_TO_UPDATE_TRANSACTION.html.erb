@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "LAST_X_DAYS_TO_UPDATE_TRANSACTION" %>"><%= @system_configurations["LAST_X_DAYS_TO_UPDATE_TRANSACTION"].name %></label>
+<div class="col-md-8">
+    <%= text_field_tag "LAST_X_DAYS_TO_UPDATE_TRANSACTION", @system_configurations["LAST_X_DAYS_TO_UPDATE_TRANSACTION"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["LAST_X_DAYS_TO_UPDATE_TRANSACTION"].value %></p>
+</div>

@@ -1,0 +1,37 @@
+.xqcc-report
+  - if @non_comply_data.present?
+    - if @film_type == 'analog'
+      = render 'internal/reports/xqcc/xqcc_quality_summary/analog_report', year: @year, xray_facility: @xray_facility, non_comply_data: @non_comply_data[:analog], xqcc_data: @xqcc_data[:analog], stats: @stats[:analog]
+    - else
+      = render 'internal/reports/xqcc/xqcc_quality_summary/digital_report', year: @year, xray_facility: @xray_facility, non_comply_data: @non_comply_data[:digital], xqcc_data: @xqcc_data[:digital], stats: @stats[:digital]
+
+:css
+  .page-break { display:block; clear:both; page-break-after:always; }
+
+  .w-100 {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    border: 1px solid #aaa;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 2px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 2px 5px;
+    vertical-align: center;
+    border: 1px solid #aaa;
+  }
+
+  .bold {
+    font-weight: bold;
+  }

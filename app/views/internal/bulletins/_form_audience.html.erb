@@ -1,0 +1,21 @@
+<div class="row mt-1 form-audience-row">
+    <div class="col-sm-5">
+        <select name="bulletin_audiences[][bulletin_audienceable_type]" class="form-control input-bulletin_audienceable_type">
+            <% BulletinAudience::TYPES.each do |type, label| %>
+                <option value="<%= type %>"<%= " selected" if bulletin_audience.bulletin_audienceable_type == type %>><%= label %></option>
+            <% end %>
+        </select>
+    </div>
+    <div class="col-sm-5">
+        <div class="input-group">
+            <input class="input-bulletin_audienceable_id" type="hidden" name="bulletin_audiences[][bulletin_audienceable_id]" value="<%= bulletin_audience.bulletin_audienceable_id %>">
+            <input class="form-control placeholder-bulletin_audienceable_id" type="text" value="<%= bulletin_audience.bulletin_audienceable_id.blank? ? 'All' : "#{bulletin_audience.bulletin_audienceable.name} - #{bulletin_audience.bulletin_audienceable.code}" %>" readonly>
+            <span class="input-group-append">
+                <button class="btn btn-primary" type="button" onclick="select_audience(this)">Change</button>
+            </span>
+        </div>
+    </div>
+    <div class="col-sm-2 text-right">
+        <button type="button" class="btn btn-danger" onclick="remove_audience(this)" data-toggle="tooltip" title="Remove audience"><i class="icon-minus"></i></button>
+    </div>
+</div>

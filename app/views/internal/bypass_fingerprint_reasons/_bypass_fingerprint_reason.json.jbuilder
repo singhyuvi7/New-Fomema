@@ -1,0 +1,1 @@
+json.extract! bypass_fingerprint_reason, :id, :code, :description

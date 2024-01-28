@@ -1,0 +1,187 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if @laboratory.errors.any? %>
+    <p class="alert alert-danger">error : <%= @laboratory.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if flash[:error] %>
+    <p class="alert alert-danger"><%= flash[:error] %></p>
+<% end %>
+
+<%= form_for @user, url: external_profile_update_path, method: :PUT ,html: {id: "profile_form", class: "with-parsley"}  do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    <strong>Profile - <%= form.label :laboratory, @laboratory.code %></strong>
+                </div>
+                <div class="col-md-2">
+                    <strong>Registration Date: <%= form.label :activated_at, @laboratory&.activated_at&.strftime(get_standard_date_format) %></strong>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row" style="display:none">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title" %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :name, 'Laboratory Name', class: 'col-form-label required' %>
+                        <%= text_field :laboratory, :name, { class: 'form-control', required: true, disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :icno, 'Business Registration No.', class: 'col-form-label required' %>
+                        <%= text_field :laboratory, :business_registration_number, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :samm_number, "SAMM Number", class: 'required' %>
+                        <%= text_field :laboratory, :samm_number, class: 'form-control', required: true, maxlength: '4', data: { parsley_maxlength: "4", parsley_maxlength_message: "Maximum length of 4 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :samm_accredited_since, "SAMM Accredited Since", class: 'required'  %>
+                        <%= date_field :laboratory, :samm_accredited_since, class: 'form-control', required: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :samm_expiry_date, "SAMM Expiry Date", class: 'required' %>
+                        <%= date_field :laboratory, :samm_expiry_date, class: 'form-control', required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :address1, 'Address', class: 'col-form-label required' %>
+                        <%= text_field :laboratory, :address1, { class: 'form-control', required: true, disabled: true } %>
+                        <%= text_field :laboratory, :address2, { class: 'form-control', disabled: true } %>
+                        <%= text_field :laboratory, :address3, { class: 'form-control', disabled: true } %>
+                        <%= text_field :laboratory, :address4, { class: 'form-control', disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'external/shared/profile_form_state_postcode_town', {form: form} %>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :phone, 'Phone', class: 'col-form-label required' %>
+                        <%= telephone_field :laboratory, :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :fax, 'Fax', class: 'col-form-label' %>
+                        <%= telephone_field :laboratory, :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }  %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email, 'Email', class: 'col-form-label required' %>
+                        <%= email_field :laboratory, :email, class: 'form-control', required: true, data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email_payment, 'Email (Payment)', class: 'col-form-label' %>
+                        <%= text_field :laboratory, :email_payment, { class: 'form-control' } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :pic_name, 'Person In Charge Name', class: 'col-form-label required' %>
+                        <%= text_field :laboratory, :pic_name, { class: 'form-control', required: true, disabled: true} %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :pic_phone, 'Person In Charge Phone', class: 'col-form-label required' %>
+                        <%= text_field :laboratory, :pic_phone, { class: 'form-control', required: true , disabled: true} %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :district_health_office_id, 'Nearest District Health Office', class: 'col-form-label' %>
+                        <%= collection_select(:laboratory, :district_health_office_id, DistrictHealthOffice.all, :id, :name,
+                        {include_blank: 'Select option'}, class: 'form-control select2', required: false, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'operating_hour' %>
+
+            <% if @laboratory.web_service %>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="web_service_passphrase_clear_text">Web Service Passphrase</label>
+                                    <input type="text" name="web_service_passphrase_clear_text" id="web_service_passphrase_clear_text" class="form-control no-uppercase">
+                                    <%#= form.label :web_service_passphrase, 'Web Service Passphrase', class: 'col-form-label required' %>
+                                    <%#= text_field :laboratory, :web_service_passphrase, { class: 'form-control', required: true } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+
+        </div>
+
+        <div class="card-footer text-right">
+            <a class="btn btn-primary" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit" name="save" id="save" value="Save">Save</button>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <%= render 'external/shared/profiles_script' %>
+<% end %>

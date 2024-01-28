@@ -1,0 +1,176 @@
+// select2 style to fix select2 field height wont expand
+$signature-height: 200px;
+$signature-width: 400px;
+
+.lqcc-form {
+    .select2-container .select2-selection--multiple {
+        height: auto!important;
+        margin: 0;
+        padding: 0;
+        line-height:inherit;
+        border-radius:0;
+    }
+    .select2-container .select2-search--inline .select2-search__field {
+        margin:0;
+        padding:0;
+        min-height:0;
+    }
+    .select2-container .select2-search--inline {
+        line-height:inherit;
+    }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link{
+        background-color: #c8ced3;
+    }
+    .nav-link {
+        font-weight: bold;
+        color: black;
+        border-radius: 0 !important;
+    }
+    .nav-link.disabled{
+        background: #dddddd;
+        color: rgb(170, 170, 170);
+        .dot{
+            background-color: #0000ff0d !important;
+        }
+    }
+    .table {
+        .table-index{
+            width: 2%;
+        }
+        .table-items{
+            width: 58%;
+        }
+        .table-acceptable{
+            width: 40%;
+        }
+        th{
+            border: none;
+        }
+        td{
+           // border-top: 1px solid #c8ced3;
+           border: none;
+        }
+    }
+
+    .dot {
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .header-collapse-btn{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        outline: 0;
+        box-shadow: none;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .test-compliance-footer{
+        margin: 0 -1rem -1rem -1rem;
+        border-bottom: 1px solid #c8ced3;
+
+        td{
+            border: none;
+        }
+    }
+
+    .last-part{
+        margin-top: 2rem;
+    }
+    .disabled{
+        pointer-events: none;
+    }
+    .drug-level::placeholder {
+        text-align: right;
+    }
+    .drug-level
+    {
+        position: relative;
+    }
+    .drug-level::after
+    {
+        position: absolute;
+        right: 10px;
+        top: 6px;
+        content: attr(data-placeholder);
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .drug-level.urine-col::after{
+        right: 20px;
+    }
+    .wrapper{
+        position: relative;
+        width: 100%;
+        height: $signature-height;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        #JohnHancock-canvas, .signature-img{
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: $signature-width;
+            height: $signature-height;
+            background-color: white;
+            margin: 0 auto;
+            right: 0;
+        }
+        #JohnHancock-canvas{
+            border: 1px solid gray;
+        }
+    }
+    .personnel-acknowledge-details{
+        .personnel-detail-input{
+            text-align: center; 
+            width: $signature-width;
+            margin: 3px 0;
+        }
+        .personnel-detail-input::placeholder{
+            text-align: center;
+        }
+    }
+
+    .note-editor.disabled {
+        pointer-events: none;
+        background-color:#e4e7ea;
+        opacity: 1;
+    }  
+    .note-editor.disabled.note-frame .note-editing-area .note-editable{
+        background-color:#e4e7ea;
+        opacity: 1;
+    }
+}
+
+.email-wrapper{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    .email-field{
+        margin: 5px 0;
+        width: $signature-width;
+    }
+    .invalid-feedback{
+        width: $signature-width;
+    }
+}
+
+@media (max-width: 768px) {
+    .text-right.table-acceptable{
+        text-align: center !important;
+    }
+}
+@media (min-width: 769px) {
+    .text-right.table-acceptable{
+        text-align: right !important;
+    }
+}

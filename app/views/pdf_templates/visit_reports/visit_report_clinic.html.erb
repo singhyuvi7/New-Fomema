@@ -1,0 +1,453 @@
+<!-- for debug -->
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css' %>
+<!-- end debug -->
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "inspectorate/inspectorate" %>
+
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+
+    visit_report_details = @visit_report.visit_report_doctor
+    service_provider = @visit_report&.visitable
+    officers = @visit_report&.visit_report_visitors
+    unacceptable_fields = JSON.parse(visit_report_details&.unacceptable_fields || {})
+    @unacceptable_fields_with_comments = JSON.parse(visit_report_details&.unacceptable_fields || {})
+    finding_number = 1
+
+    non_compliances = [
+        [:non_verify_original_passport_fw_present, "Non Verification Of Original Passport - FW Present (Y)"],
+        [:inappropriate_vacutainer, "Inappropriate Vacutainer/Specimen Container (V)"],
+        [:non_verify_original_passport_fw_not_present, "Non Verification Of Original Passport - FW Not Present (N)"],
+        [:no_produce_dispatch_record, "Unable To Produce Laboratory Dispatch Book/Record (L)"],
+        [:unable_to_produce_apc, "Unable To Produce APC (A)"],
+        [:no_produce_written_consent, "Unable To Produce Written Consent (C)"],
+        [:non_notify_communicable_disease, "Non Notification Of Communicable Disease (G)"],
+        [:no_produce_medical_record, "Unable To Produce Medical Records (R)"],
+        [:inadequate_equipment, "Inadequate Facility (I)"],
+        [:closed, "Clinic Closed (P)"],
+        [:insufficient_operation_hour, "Insufficient Operation Hours (Less Than 8 Hours) (H)"],
+        [:no_produce_borang_b, "Unable To Produce Borang B(B)"],
+        [:other, "Others (K)"]
+
+    ].map do |key, value|
+        {
+            name: value,
+            is_ticked: visit_report_details.try(key)
+        }
+    end
+%>
+
+<div class="visit-report-download page-container">
+
+    <div class="visit-details">
+        <h3>Part 1: Visit Details</h3>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Visit Date</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= @visit_report.visit_date.try(:strftime,'%d/%m/%Y') %></div>
+            </div>
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Type Of Visit</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= visit_report_details.type_of_visit %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Visit Time From</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= @visit_report.visit_time_from.try(:strftime,"%I:%M%p") %></div>
+            </div>
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Visit Time To</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= @visit_report.visit_time_to.try(:strftime,"%I:%M%p") %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Clinic Name</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= "#{service_provider.clinic_name}" %></div>
+            </div>
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Clinic Address</div><span class="colon"> :</span>
+                <div class="field-value d-inline">
+                    <% if !service_provider.address1.blank? %><%= service_provider.address1 %><br><% end %>
+                    <% if !service_provider.address2.blank? %><%= service_provider.address2 %><br><% end %>
+                    <% if !service_provider.address3.blank? %><%= service_provider.address3 %><br><% end %>
+                    <% if !service_provider.address4.blank? %><%= service_provider.address4 %><br><% end %>
+                    <%= service_provider.town.name %><br>
+                    <%= "#{service_provider.postcode} #{service_provider.state.name}," %><br>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Doctor Name</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= visit_report_details.doctor_name %></div>
+            </div>
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Doctor Code</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= service_provider.code %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Type of Visit</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= visit_report_details.type_of_visit %></div>
+            </div>
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">Number of visit checklist</div><span class="colon"> :</span>
+                <div class="field-value d-inline"><%= visit_report_details.number_of_visit_checklist %></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-6 visit-details-field">
+                <div class="field-name d-inline">FOMEMA's Officers</div><span class="colon"> :-</span>
+                <ul class="visit-details-list">
+                    <% officers.each do |officer| %>
+                    <li><%= officer.name %></li>
+                    <% end %>
+                </ul>
+            </div>
+            <div class="col col-6 inline-field visit-details-field">
+                <div class="field-name d-inline">Interacted With</div><span class="colon"> :-</span>
+                <ul class="visit-details-list">
+                    <li><%= visit_report_details.interacted_with %></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+        
+    <div class="content">
+        <h3>Part 1: Findings</h3>
+        <div class="finding-section">
+            <table class="w-100">
+                <tbody>
+                    <tr>
+                        <td class="table-name" colspan="2"></td>
+                        <td class="text-center bold">YES</td>
+                        <td class="text-center bold">NO</td>
+                        <td class="text-center bold">N/A</td>
+                    </tr>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">1.</td>
+                        <td class="row-name">Verification Of Identity Of Foreign Worker</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.foreign_worker_present_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.foreign_worker_present_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.foreign_worker_present_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <div class="finding-comment">
+                                <span class="bold">No Of Foreign Workers Present :</span>
+                                <span class="unbold"><%= visit_report_details.foreign_worker_present %></span>
+                            </div>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'foreign_worker', field_list: VisitReportDoctor::FIELD_FOREIGN_WORKER, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">2.</td>
+                        <td class="row-name">Valid Annual Practicing Certificate(APC)</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.apc_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.apc_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.apc_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <div class="finding-comment">
+                                <span class="bold">APC No. :</span>
+                                <span class="unbold"><%= visit_report_details.apc_number %></span>
+                            </div>
+                            <div class="finding-comment">
+                                <span class="bold">Year :</span>
+                                <span class="unbold"><%= visit_report_details.apc_year %></span>
+                            </div>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'apc', field_list: VisitReportDoctor::FIELD_APC, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index"></td>
+                        <td class="row-name">Registration Under Private Healthcare Facilities And Service Act 1998</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.private_healthcare_registration_number_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.private_healthcare_registration_number_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.private_healthcare_registration_number_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <div class="finding-comment">
+                                <span class="bold">Registration No :</span>
+                                <span class="unbold"><%= visit_report_details.private_healthcare_registration_number %></span>
+                            </div>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'registration_number', field_list: VisitReportDoctor::FIELD_REGISTRATION_NUMBER, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">3.</td>
+                        <td class="row-name">Written Consent From Foreign Workers</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.written_consent_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.written_consent_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.written_consent_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'foreign_workers_consent', field_list: VisitReportDoctor::FIELD_FOREIGN_WORKER_CONSENT, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">4.</td>
+                        <td class="row-name">Maintenance Of Medical Records Of Examined Foreign Workers.</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.medical_record_maintenance_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.medical_record_maintenance_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.medical_record_maintenance_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'medical_records', field_list: VisitReportDoctor::FIELD_MEDICAL_RECORDS, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">5.</td>
+                        <td class="row-name">Notification Of Communicable Diseases (FOMEMA Cases)</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.communicable_disease_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.communicable_disease_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.communicable_disease_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <%= visit_report_details.notification_via_e_notifikasi == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> Notification of communicable diseases via online 'e-notifikasi'</span>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <%= visit_report_details.notification_via_notification_form == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> Notification of communicable diseases via notification form</span>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <%= visit_report_details.no_communicable_disease == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> No Cases Of Communicable Disease For This Year</span>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'notification', field_list: VisitReportDoctor::FIELD_NOTIFICATION, is_others: false } %>
+
+                 <tr class="finding-row method-field">
+                        <td class="table-index">6.</td>
+                        <td class="row-name">Validity Of Vacutainer.</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.vacutainer_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.vacutainer_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.vacutainer_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td>
+                            <div class="finding-comment">
+                                <span class="bold">Expiry Date :</span>
+                                <span class="unbold"><%= visit_report_details.vacutainer_expiry_date.try(:strftime,'%d/%m/%Y') %></span>
+                            </div>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'vacutainer', field_list: VisitReportDoctor::FIELD_VACUTAINER, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">7.</td>
+                        <td class="row-name">Adequate Facilities.</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.adequate_facility_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.adequate_facility_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.adequate_facility_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'adequate_facilities', field_list: VisitReportDoctor::FIELD_ADEQUATE_FACILITIES, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">8.</td>
+                        <td class="row-name">Laboratory Specimens Dispatch Book/Record</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.dispatch_record_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.dispatch_record_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.dispatch_record_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'dispatch', field_list: VisitReportDoctor::FIELD_DISPATCH, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">9.</td>
+                        <td class="row-name" colspan="4">Operation Hour In FOMEMA System:</td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td class="row-name" colspan="4">
+                            <%= render 'pdf_templates/visit_reports/operating_hour', { operating_hour: @visit_report.operating_hour } %>
+                        </td>
+                    </tr>
+                    <tr class="finding-row method-field">
+                        <td class="table-index"></td>
+                        <td class="row-name">Does The Facility's Operation Hours Fulfil 8 Hours A Day, 5 Days A Week ?</td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.operating_hour_acceptable == 'Y' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.operating_hour_acceptable == 'N' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                        <td class="acceptable-col">
+                            <%= visit_report_details.operating_hour_acceptable == 'NA' ? @checkbox_checked : @checkbox_unchecked %>
+                        </td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'operation_hours', field_list: VisitReportDoctor::FIELD_OPERATION_HOURS, is_others: false } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">10.</td>
+                        <td class="row-name" colspan="4">Others, Please Specify :</td>
+                    </tr>
+                    <%= render 'pdf_templates/visit_reports/visit_report_clinic_unacceptable_field', { unacceptable_fields: unacceptable_fields, field_name: 'others', field_list: VisitReportDoctor::FIELD_OTHERS, is_others: true } %>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">11.</td>
+                        <td class="row-name" colspan="4">
+                            <div>
+                                <span class="bold">Remarks/Follow Up :</span>
+                                <span class="unbold"><%= @visit_report.follow_up %></span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="finding-row method-field">
+                        <td class="table-index">12.</td>
+                        <td colspan="4">
+                            <%= visit_report_details.satisfactory == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> Satisfactory</span>
+                        </td>
+                    </tr>
+                    <tr class="finding-row method-field">
+                        <td class="table-index"></td>
+                        <td colspan="4">SOP Non-Compliance</td>
+                    </tr>
+                    <tr class="finding-row method-field">
+                        <td class="table-index"></td>
+                        <td colspan="4">
+                            <% non_compliances.each do |non_compliance| %>
+                                <div class="non-compliance-field">
+                                    <%= non_compliance[:is_ticked] == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> <%= non_compliance[:name] %></span>
+                                </div>
+                            <% end %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-index"></td>
+                        <td colspan="4">
+                            <div class="bold">Others, Please Specify :</div>
+                            <div class="unbold">
+                                <%= raw visit_report_details&.other_comment.gsub(/\n/, '<br>').html_safe %>
+                            </div>
+                        </td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr class="finding-row method-field">
+                        <td class="table-index">13.</td>
+                        <td class="row-name recommendation-row" colspan="4">
+                            <div class="recommendation-field">
+                                <span class="bold">Recommendations :</span>
+                                <span class="unbold"><%= VisitReportDoctor::RECOMMENDATIONS[visit_report_details.recommendation] %></span>
+                            </div>
+                            <div class="recommendation-field">
+                                <span class="bold">Date :</span>
+                                <span class="unbold"><%= visit_report_details.recommendation_date.try(:strftime,'%d/%m/%Y') %></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="finding-row method-field">
+                        <td class="table-index">14.</td>
+                        <td class="row-name" colspan="4">
+                            <div class="recommendation-field">
+                                <span class="bold">Prepared By :</span>
+                                <span class="unbold"><%= @visit_report&.prepare_user&.username %></span>
+                            </div>
+                            <div class="recommendation-field">
+                                <span class="bold">Prepared Date :</span>
+                                <span class="unbold"><%= @visit_report.prepare_at.try(:strftime,'%d/%m/%Y') %></span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- closings -->
+    <div class="closings">
+
+        <div class="signature">
+            <p class="bold">Clinic's Person In Charge,</p>
+            <%= image_tag visit_report_details.personnel_signature, class: "signature-img" if !visit_report_details.personnel_signature.blank? %>
+            <div class="bold"><%= visit_report_details.personnel_name %></div>
+            <div class="bold"><%= visit_report_details.personnel_designation %></div>
+        </div>
+
+        <div class="signature">
+            <p class="bold">FOMEMA's Officer,</p>
+            <%= image_tag visit_report_details.fomema_officer_signature, class: "signature-img" if !visit_report_details.fomema_officer_signature.blank? %>
+            <div class="bold"><%= visit_report_details.fomema_officer_name %></div>
+        </div>
+    </div>
+
+</div>

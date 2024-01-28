@@ -1,0 +1,485 @@
+<%
+    laboratory_index            = 1
+    xray_index                  = 1
+    laboratory_test_not_done    = @lab_exam.try(:laboratory_test_not_done) == "YES"
+    xray_examination_not_done   = @xray_exam.try(:xray_examination_not_done) == "YES"
+
+    unless laboratory_test_not_done
+        specimen_taken_date     = @lab_exam.try(:specimen_taken_date).present? ? @lab_exam.try(:specimen_taken_date).strftime("%d/%m/%Y %H:%M") : "-"
+        blood_specimen_barcode  = @lab_exam.try(:blood_specimen_barcode)
+        urine_specimen_barcode  = @lab_exam.try(:urine_specimen_barcode)
+        specimen_received_date  = @lab_exam.try(:specimen_received_date).present? ? @lab_exam.try(:specimen_received_date).strftime("%d/%m/%Y %H:%M") : "-"
+        laboratory_report_date  = @lab_exam.try(:transmitted_at).present? ? @lab_exam.try(:transmitted_at).strftime("%d/%m/%Y %H:%M") : "-"
+        blood_group_value       = @lab_exam.try(:blood_group) == "OTHER" ? @lab_exam.try(:blood_group_other) : @lab_exam.try(:blood_group)
+        blood_rhesus_value      = @lab_exam.try(:blood_group_rhesus) == "OTHER" ? @lab_exam.try(:blood_group_rhesus_other) : @lab_exam.try(:blood_group_rhesus)
+    end
+
+    unless xray_examination_not_done
+        xray_taken_date = @xray_exam.try(:xray_taken_date).present? ? @xray_exam.try(:xray_taken_date).strftime("%d/%m/%Y") : "-"
+        xray_ref_number = @xray_exam.try(:xray_ref_number).present? ? @xray_exam.try(:xray_ref_number) : "-"
+    end
+
+    laboratory_blood_test = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'REACTIVE',
+            no: 'NEGATIVE'
+        },{
+            number: '',
+            name: 'HIV',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:elisa),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:elisa)
+        },{
+            number: '',
+            name: 'HBsAg',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:hbsag),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:hbsag)
+        },{
+            number: '',
+            name: 'Syphilis(VDRL / RPR)',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:vdrl),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:vdrl)
+        }
+    ]
+
+    if !laboratory_test_not_done && @lab_exam.try(:vdrl)
+        laboratory_blood_test += [
+            {
+                number: '',
+                name: 'TPHA/TPPA',
+                yes: laboratory_test_not_done ? nil : @lab_exam.try(:tpha),
+                no: laboratory_test_not_done ? nil : !@lab_exam.try(:tpha),
+                skip_numbering: true
+            }
+        ]
+    end
+
+    laboratory_blood_test += [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'POSITIVE',
+            no: 'NEGATIVE'
+        },
+        {
+            number: '',
+            name: 'Malaria(Screening)',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:malaria),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:malaria)
+        }
+    ]
+
+    if !laboratory_test_not_done && @lab_exam.try(:malaria)
+        laboratory_blood_test += [
+            {
+                number: '',
+                name: 'BFMP',
+                yes: laboratory_test_not_done ? nil : @lab_exam.try(:bfmp),
+                no: laboratory_test_not_done ? nil : !@lab_exam.try(:bfmp),
+                skip_numbering: true
+            }
+        ]
+    end
+
+    laboratory_urine_test = [
+        {
+            number: '',
+            name: 'Opiates',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:opiates),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:opiates)
+        },{
+            number: '',
+            name: 'Cannabis',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:cannabis),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:cannabis)
+        }
+    ]
+
+    if @transaction.fw_gender == "F"
+        laboratory_urine_test += [
+            {
+                number: '',
+                name: 'Urine Pregnancy Test',
+                yes: laboratory_test_not_done ? nil : @lab_exam.try(:pregnancy),
+                no: laboratory_test_not_done ? nil : !@lab_exam.try(:pregnancy)
+            }
+        ]
+    end
+
+    if !laboratory_test_not_done && @lab_exam.try(:pregnancy)
+        laboratory_urine_test += [
+            {
+                number: '',
+                name: 'Serum Beta-HCG',
+                yes: laboratory_test_not_done ? nil : @lab_exam.try(:pregnancy_serum_beta_hcg),
+                no: laboratory_test_not_done ? nil : !@lab_exam.try(:pregnancy_serum_beta_hcg),
+                skip_numbering: true
+            }
+        ]
+    end
+
+    laboratory_urine_test += [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'PRESENT',
+            no: 'ABSENT'
+        },{
+            number: '',
+            name: 'Sugar',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:sugar),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:sugar)
+        }
+    ]
+
+    if !laboratory_test_not_done && @lab_exam.try(:sugar)
+        laboratory_urine_test += [
+            {
+                number: '',
+                type: 'values',
+                name: 'Sugar Value',
+                value: laboratory_test_not_done ? nil : @lab_exam.try(:sugar_value),
+                prepend_text: "millimoles per litre",
+                skip_numbering: true
+            }
+        ]
+    end
+
+    laboratory_urine_test += [
+        {
+            number: '',
+            name: 'Albumin',
+            yes: laboratory_test_not_done ? nil : @lab_exam.try(:albumin),
+            no: laboratory_test_not_done ? nil : !@lab_exam.try(:albumin)
+        }
+    ]
+
+    if !laboratory_test_not_done && @lab_exam.try(:albumin)
+        laboratory_urine_test += [
+            {
+                number: '',
+                type: 'values',
+                name: 'Albumin Value',
+                value: laboratory_test_not_done ? nil : @lab_exam.try(:albumin_value),
+                prepend_text: "grams per litre",
+                skip_numbering: true
+            }
+        ]
+    end
+
+    laboratory_urine_test += [
+        {
+            type: 'text',
+            number: '',
+            name: 'Please specify if Reactive/Positive/Present',
+            value: laboratory_test_not_done ? nil : @lab_exam.try(:abnormal_reason)
+        }
+    ]
+
+    xray_reports = [
+        {
+            type: 'label',
+            number: '',
+            name: '',
+            yes: 'ABNORMAL',
+            no: 'NORMAL',
+            details: 'DETAILS OF ABNORMALITY'
+        },{
+            number: '',
+            name: 'Thoracic Cage',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:thoracic_cage),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:thoracic_cage),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:thoracic_cage_comment)
+        },{
+            number: '',
+            name: 'Heart Shape and Size<br>(CTR)',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:heart_shape_and_size),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:heart_shape_and_size),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:heart_shape_and_size_comment)
+        },{
+            number: '',
+            name: 'Lung Fields',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:lung_fields),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:lung_fields),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:lung_fields_comment)
+        },{
+            number: '',
+            name: 'Mediastinum and Hila',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:mediastinum_and_hila),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:mediastinum_and_hila),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:mediastinum_and_hila_comment)
+        },{
+            number: '',
+            name: 'Pleura /Hemidiaphragms<br>/Costopherenic Angles',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:pleura_hemidiaphragms_costopherenic_angles),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:pleura_hemidiaphragms_costopherenic_angles),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:pleura_hemidiaphragms_costopherenic_angles_comment)
+        },{
+            number: '',
+            name: 'Focal Lesion (E.g. Old /<br>New PTB, Cancer)',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:focal_lesion),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:focal_lesion),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:focal_lesion_comment)
+        },{
+            number: '',
+            name: 'Any Other Abnormalities',
+            yes: xray_examination_not_done ? nil : @xray_exam.try(:other_findings),
+            no: xray_examination_not_done ? nil : !@xray_exam.try(:other_findings),
+            details: xray_examination_not_done ? nil : @xray_exam.try(:other_findings_comment)
+        },{
+            type: 'text',
+            number: '',
+            name: 'Impression',
+            value: @xray_exam.try(:impression)
+        }
+    ]
+%>
+
+<div class="medical-results-content lab-xray-content">
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART IV. INVESTIGATION</b>
+    </div>
+
+    <div class="section-title">SECTION A: LABORATORY RESULTS</div>
+
+    <div class="laboratory-result-details">
+        <div class="column">
+            <div class="row">
+                <div class="label">DATE & TIME OF SPECIMEN TAKEN</div>: <span class="value bold"><%= specimen_taken_date %></span>
+            </div>
+
+            <div class="row">
+                <div class="label">BARCODE NO. (BLOOD SPECIMEN)</div>: <span class="value bold"><%= blood_specimen_barcode %></span>
+            </div>
+
+            <div class="row">
+                <div class="label">BARCODE NO. (URINE SPECIMEN)</div>: <span class="value bold"><%= urine_specimen_barcode %></span>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="row">
+                <div class="label">DATE & TIME OF SPECIMEN RECEIVED</div>: <span class="value bold"><%= specimen_received_date %></span>
+            </div>
+
+            <div class="row">
+                <div class="label">DATE & TIME OF LABORATORY REPORT</div>: <span class="value bold"><%= laboratory_report_date %></span>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <tbody class="lab-xray-done-tbl">
+            <tr>
+                <td class="head-title"></td>
+                <td class="head-checkbox text-center bold">YES</td>
+            </tr>
+
+            <tr>
+                <td class="head-index">LABORATORY TESTS NOT DONE</td>
+                <td class="text-center"><%= laboratory_test_not_done ? @checkbox_checked : @checkbox_unchecked  %></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left underline" colspan="4">BLOOD TESTS</th>
+            </tr>
+        </thead>
+
+        <tbody class="without-date">
+            <tr>
+                <td class="head-index"><%= "#{laboratory_index.to_s}." %></td>
+                <td class="head-title blood-details">
+                    <div class="label">Blood Group</div> : <span class="value bold"><%= blood_group_value %></span>
+                </td>
+                <td class="head-checkbox blood-details" colspan="2">
+                    <div class="label">Rh</div> : <span class="value bold"><%= blood_rhesus_value %></span>
+                </td>
+            </tr>
+
+            <% laboratory_blood_test.each do |disease| %>
+                <%
+                    if disease[:number].blank? && disease[:type].blank? && !disease[:skip_numbering]
+                        laboratory_index += 1
+                    end
+                %>
+
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td>
+                            <% unless disease[:skip_numbering] %>
+                                <%= disease[:number].present? ? disease[:number] : "#{laboratory_index.to_s}." %>
+                            <% end %>
+                        </td>
+
+                        <td><%= disease[:name] if !disease[:hide_name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left underline" colspan="4">URINE TESTS</th>
+            </tr>
+        </thead>
+        <tbody class="without-date">
+            <% laboratory_urine_test.each do |disease| %>
+                <%
+                    if !disease[:skip_numbering] && ((disease[:number].blank? && disease[:type].blank?) || (disease[:type].present? && disease[:type] == 'text'))
+                        laboratory_index += 1
+                    end
+                %>
+
+
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                    </tr>
+                <% elsif disease[:type].present? && disease[:type] == 'values' %>
+                    <tr>
+                        <td valign="top" style="padding-bottom: 12px;">
+                            <% unless disease[:skip_numbering] %>
+                                <%= disease[:number].present? ? disease[:number] : "#{laboratory_index.to_s}." %>
+                            <% end %>
+                        </td>
+
+                        <td valign="top" style="padding-bottom: 12px;"><%= disease[:name] if !disease[:hide_name] %></td>
+
+                        <td colspan="2" valign="top" style="padding-bottom: 12px;"><%= disease[:prepend_text] %>: <%= disease[:value] %></td>
+                    </tr>
+                <% elsif disease[:type].present? && disease[:type] == 'text' %>
+                    <tr>
+                        <td valign="top">
+                            <% unless disease[:skip_numbering] %>
+                                <%= disease[:number].present? ? disease[:number] : "#{laboratory_index.to_s}." %>
+                            <% end %>
+                        </td>
+
+                        <td colspan="3">
+                            <div class="label"><%= disease[:name] %><div>
+                            <div class="value"><%= disease[:value].present? ? simple_format(disease[:value]) : "-" %></>
+                        </td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td>
+                            <% unless disease[:skip_numbering] %>
+                                <%= disease[:number].present? ? disease[:number] : "#{laboratory_index.to_s}." %>
+                            <% end %>
+                        </td>
+
+                        <td><%= disease[:name] if !disease[:hide_name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+        </tbody>
+    </table>
+
+    <!-- xray findings -->
+
+    <div class="sub-title text-center subtitle-top-margin"></div>
+
+    <div class="section-title">SECTION B: X-RAY FINDINGS</div>
+
+    <div class="xray-result-details">
+        <div class="column">
+            <div class="row">
+                <div class="label">DATE OF X-RAY TAKEN </div>: <span class="bold"><%= xray_taken_date %></span>
+            </div>
+
+            <div class="row">
+                <div class="label">X-RAY REF. NO.</div>: <span class="bold"><%= xray_ref_number %></span>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="row">
+                <div class="label">DATE OF X-RAY REPORT</div>: <span class="bold"><%= @xray_exam&.transmitted_at&.strftime("%d/%m/%Y") %></span>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <tbody class="lab-xray-done-tbl">
+            <tr>
+                <td class="head-title"></td>
+                <td class="head-checkbox text-center bold">YES</td>
+            </tr>
+
+            <tr>
+                <td>X-RAY EXAMINATION NOT DONE</td>
+                <td class="text-center"><%= xray_examination_not_done ? @checkbox_checked : @checkbox_unchecked  %></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left underline" colspan="5">REPORT</th>
+            </tr>
+        </thead>
+        <tbody class="xray-finding-report">
+            <% xray_reports.each do |disease| %>
+                <% if disease[:type].present? && disease[:type] == 'label' %>
+                    <tr>
+                        <td class="head-index"></td>
+                        <td class="head-title"></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:yes] %></td>
+                        <td class="head-checkbox text-center bold"><%= disease[:no] %></td>
+                        <td class="head-details bold"><%= disease[:details] %></td>
+                    </tr>
+                <% elsif disease[:type].present? && disease[:type] == 'text' %>
+                    <tr>
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{xray_index.to_s}." %></td>
+
+                        <td colspan="4">
+                            <div class="label"><%= disease[:name] %><div>
+                            <div class="value"><%= disease[:value].present? ? simple_format(disease[:value]) : "-" %></>
+                        </td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{xray_index.to_s}." %></td>
+                        <td valign="top" style="height: 35px;"><%= raw(disease[:name]) if !disease[:hide_name] %></td>
+                        <td valign="top" class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td valign="top" class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td valign="top" class="white-space-normal" style="padding-bottom: 15px;"><%= disease[:details].present? ? simple_format(disease[:details], style: "margin: 0;") : "-" %></td>
+                    </tr>
+                <% end %>
+
+                <%
+                    if (disease[:number].blank? && disease[:type].blank?) || (disease[:type].present? && disease[:type] == 'text')
+                        xray_index += 1
+                    end
+                %>
+            <% end %>
+        </tbody>
+    </table>
+</div>

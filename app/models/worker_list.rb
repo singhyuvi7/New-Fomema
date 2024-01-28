@@ -1,0 +1,2 @@
+class WorkerList < ForeignWorker
+end

@@ -1,0 +1,160 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Transfer Worker(s)</strong>
+    </div>
+
+    <form action="<%= bulk_transfer_worker_internal_employer_employer_workers_path(@employer) %>" id="transfer_worker_form" method="post">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+        <div class="card-body">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <label class="col-md-9 col-sm-6">Transfer to Account</label>
+                        <input type="text" class="form-control col-md-3 col-sm-6" placeholder="Filter name" id="supplement-transfer-worker-filter">
+                    </div>
+                </div>
+
+                <!--<div class="card-body">
+                    <div class="form-group row">
+                        <label for="transfer_to" class="col-sm-2 col-form-label">Transfer Following Worker(s) to</label>
+                        <div class="col-md-4">
+                            <%= select_tag :employer_supplement_id, options_from_collection_for_select(EmployerSupplement.where(employer_id: @employer.id).order(:name).all, 'id', 'name'), include_blank: @employer.try(:name)+" (Main Account)", class: "form-control ajax-input select2" %>
+                        </div>
+                    </div>
+                </div>-->
+
+                <!--<input type="hidden" id="selected_employer_supplement_id">-->
+                <%= hidden_field_tag :selected_employer_supplement_id %>
+
+                <div class="card-body">
+                    <table class="table table-responsive-sm table-striped supplement-transfer-worker-filterable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>No.</th>
+                                <th>Name </th>
+                                <th>Address 1</th>
+                                <th>Address 2</th>
+                                <th>Address 3</th>
+                                <th>Address 4</th>
+                                <th>Postcode</th>
+                                <th>Town</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @employer_supplements.order([@employer_supplements.try(:state_name), @employer_supplements.try(:town_name), :name]).each.with_index(1) do |es, index| %>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="ids[]" id="ids_<%= es.id %>" value="<%= es.id %>" class="child-checkbox">
+                                    </td>
+                                    <td>
+                                        <%= index %>
+                                        <input type="hidden" class="supplement_cb" name="ids[]" id="ids_<%= es.id %>" value="<%= es.id %>">
+                                    </td>
+                                    <td><%= es.name %></td>
+                                    <td><%= es.address1 %></td>
+                                    <td><%= es.address2 %></td>
+                                    <td><%= es.address3 %></td>
+                                    <td><%= es.address4 %></td>
+                                    <td><%= es.postcode %></td>
+                                    <td><%= es.try(:town_name) %></td>
+                                    <td><%= es.try(:state_name) %></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer text-right border-0 bg-transparent">
+                    <a href="<%= internal_employer_employer_workers_path %>" class="btn btn-danger">Cancel</a>
+                    <button type="submit" id="transfer" form="transfer_worker_form" class="btn btn-primary">Transfer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-responsive-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Country</th>
+                        <th>Passport Number</th>
+                        <th>Gender</th>
+                        <th>Account Name</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% @foreign_workers.each.with_index do |fw, index| %>
+                        <tr>
+                            <td>
+                                <%= index + 1 %>
+                                <input type="hidden" name="foreign_worker_ids[]" id="foreign_worker_ids_<%= fw.id %>" value="<%= fw.id %>">
+                            </td>
+                            <td><%= fw.code %></td>
+                            <td><%= fw.name %></td>
+                            <td><%= fw.country&.name %></td>
+                            <td><%= fw.passport_number %></td>
+                            <td><%= ForeignWorker::GENDERS[fw.gender] %></td>
+                            <td>
+                                <% if fw.employer_supplement_id.present? %>
+                                    <%= EmployerSupplement.find_by(id: fw.employer_supplement_id).name %>
+                                <% else %>
+                                    <%= fw.try(:employer_name) %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#supplement-transfer-worker-filter').keyup(function () {
+        var keywords = this.value.toUpperCase();
+        var table = $('.supplement-transfer-worker-filterable');
+
+        table.find('tbody > tr').each(function () {
+            var nameCellText = $(this).find('td:eq(2)').text().toUpperCase();
+            var row = $(this);
+            if (nameCellText.includes(keywords)) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
+    });
+
+    $('input[name*="ids["]').change(function() {
+        supplement_id = ($(this).attr('id').replace('ids_',''));
+
+        if($(this).is(':checked')) {
+            $('input[id*="ids_"]').prop("checked", false);
+            $('input[id="ids_'+supplement_id+'"]').prop("checked", true);
+            $("#selected_employer_supplement_id").val(supplement_id);
+        }
+    });
+
+    $('#transfer').click(function() {
+        var selected_supplement = getSelectedSupplement();
+        // $('select[name="employer_supplement_id"]').find('option[value="'+ selected_supplement +'"]').attr("selected", true);
+        $("#selected_employer_supplement_id").val(selected_supplement);
+    });
+
+    // methods
+    function getSelectedSupplement() {
+        var supplement = $('.child-checkbox:checkbox:checked').map(function() {
+            return this.value;
+        }).get();
+
+        return supplement;
+    }
+</script>
+<% end %>

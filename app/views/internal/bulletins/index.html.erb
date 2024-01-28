@@ -1,0 +1,72 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bulletins</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_BULLETIN') %>
+                    <%=raw index_table_new_button(new_internal_bulletin_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="table-responsive">
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Title</th>
+            <th>Publish Period</th>
+            <th>Modification Date</th>
+            <th>Require Acknowledge</th>
+            <th>Pop-Up</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @bulletins.blank? %>
+            <tr>
+                <td colspan="7" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @bulletins.order('bulletins.updated_at DESC').each.with_index((@bulletins.current_page - 1) * get_per + 1) do |bulletin, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%== bulletin.title %></td>
+                    <td><%= bulletin.publish_from.try(:strftime,'%d/%m/%Y') %> <%= "- #{bulletin.publish_to.try(:strftime,'%d/%m/%Y')}" if !bulletin.publish_to.blank? %></td>
+                    <td><%= bulletin.updated_at.strftime("%d/%m/%Y") %></td>
+                    <td><%= bulletin.require_acknowledge ? 'Yes' : 'No' %></td>
+                    <td><%= bulletin.is_pop_up ? 'Yes' : 'No' %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_bulletin_path(bulletin)) %>
+                        <% if has_permission?('EDIT_BULLETIN') %>
+                            <%=raw index_table_edit_button edit_internal_bulletin_path(bulletin) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_BULLETIN') %>
+                            <%=raw index_table_delete_button(internal_bulletin_path(bulletin)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+        </div>
+        <!-- /.table-responsive -->
+
+        <div class="row">
+            <%= paginate @bulletins %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

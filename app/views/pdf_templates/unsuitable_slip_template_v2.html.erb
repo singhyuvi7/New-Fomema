@@ -1,0 +1,96 @@
+<pdfbody>
+    <table class="w-100">
+        <tr>
+            <td style="text-align: right;">Ruj kami: <%= @data[:result_date] %> / <%= @data[:worker_code] %></td>
+        </tr>
+
+        <tr>
+            <td style="text-align: right;">Tarikh: <%= @data[:slip_date] %></td>
+        </tr>
+
+        <% @data[:employer_address].each do |address| %>
+            <tr>
+                <td><%= address %></td>
+            </tr>
+        <% end %>
+    </table>
+    <p class="paragraph-spacing">Dear Sir/Madam,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+    NOTICE OF REPATRIATION OF "UNSUITABLE" FOREIGN WORKERS AFTER FOMEMA MEDICAL EXAMINATION<br>
+    </b></p>
+        NAME: <%= @data[:worker_name] %> / <%= @data[:worker_gender_bi] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">In reference to the matter above, please be informed that the result of FOMEMA medical
+        examination for the abovementioned foreign worker is <b>"NOT SUITABLE"</b> to work in Malaysia due to the following reason:</p>
+
+    <ul class="paragraph-spacing text-justify">
+        <% @data[:failed_reasons_bi].each do |reason| %>
+            <li><b><%= reason %></b></li>
+        <% end %>
+    </ul>
+    <p class="paragraph-spacing text-justify">You are advised immediately to arrange all necessary preparation for repatriation and submit
+        the flight/ferry ticket for the issuance of the Check-Out Memo (COM) online via the
+        https://imigresen-online.imi.gov.my/ OR at any nearest Immigration Office for a proper
+        repatriation of the said foreign worker.</p>
+    <p class="paragraph-spacing text-justify">Your cooperation in this matter is greatly appreciated.</p>
+     <p class="paragraph-spacing">Thank you.</p>
+
+    <hr>
+
+
+    <p class="paragraph-spacing">Tuan / Puan,</p>
+
+    <p class="paragraph-spacing letter-header-underline"><b>
+    NOTIS PENGHANTARAN PULANG KE NEGARA ASAL UNTUK PEKERJA ASING DIDAPATI TIDAK SESUAI SELEPAS PEMERIKSAAN KESIHATAN FOMEMA<br>
+    </b></p>
+        NAMA: <%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">Merujuk kepada perkara di atas, dengan dukacitanya dimaklumkan bahawa keputusan
+        pemeriksaan kesihatan (FOMEMA) bagi pekerja asing tersebut adalah <b>"TIDAK SESUAI"</b>
+        untuk bekerja di Malaysia kerana sebab yang berikut:</p>
+
+    <ul class="paragraph-spacing text-justify">
+        <% @data[:failed_reasons_bm].each do |reason| %>
+            <li><b><%= reason %></b></li>
+        <% end %>
+    </ul>
+
+    <p class="paragraph-spacing text-justify">Pihak tuan/puan dinasihatkan untuk melakukan segala persiapan penghantaran pulang
+        pekerja asing tersebut dengan kadar segera serta mengemukakan tiket penerbangan/feri
+        secara dalam talian melalui https://imigresen-online.imi.gov.my/ ATAU di mana-mana Pejabat
+        Imigresen terdekat bagi mendapatkan Memo Periksa Keluar (COM) bagi tujuan penghantaran
+        pulang secara teratur</p>
+
+    <p class="paragraph-spacing">Sekian, terima kasih.</p>
+
+    <%= image_tag wicked_pdf_asset_base64("logo/fomema-logo.png"), style: "height: 30px;" %>
+
+    <p class="paragraph-double-spacing" style="font-size: 0.85em; text-align: center;">***This letter is computer generated and no signature is required.***</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 14px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

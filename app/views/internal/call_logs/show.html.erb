@@ -1,0 +1,25 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Call Logs</strong> - Call Log Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <%=render "call_log" %>
+
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_call_logs_path, ignore_referer: true) %>
+            <%=raw show_edit_button(edit_internal_call_log_path(@call_log)) if has_permission?('EDIT_CALL_LOG') and !@call_log.status.eql?("CLOSE") %>
+        </div>
+    </div>
+
+</div>
+<!-- /.card -->
+
+<%=render "follow_ups" %>

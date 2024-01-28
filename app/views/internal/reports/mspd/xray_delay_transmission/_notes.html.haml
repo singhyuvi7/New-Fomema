@@ -1,0 +1,10 @@
+%ol
+  %li
+    The data has been retrieved on #{DateTime.current.strftime('%-d %B %Y')}.
+  %li
+    - if @start_date.present?
+      The data has been retrieved from #{@start_date.to_date.strftime('%d %B %Y')} until #{@end_date.to_date.strftime('%d %B %Y')}.
+    - else
+      The data for year #{DateTime.current.year} has been retrieved from #{DateTime.current.beginning_of_year.strftime('%d %B %Y')} until YTD.
+  %li
+    The data may be differ from time to time due to operational processes.

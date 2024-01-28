@@ -1,0 +1,68 @@
+<div class="card">
+    <div class="card-header  border-0 bg-transparent text-dark">
+        <strong>Employers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% #if has_permission?('CREATE_EMPLOYER') %>
+                   <!-- <a class="btn btn-blue-portal" href="<%=new_external_agency_employer_path%>"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Employer</a> -->
+                <% #end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+ <table class="table table-responsive-sm table_circle">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Employer Code</th>
+            <th>Employer Name</th>
+            <th>ROC No. / NRIC</th>
+            <th>Address</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @employers.blank? %>
+            <tr>
+                <td colspan="10" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% #@employers.each.with_index((@employers.current_page - 1) * get_per + 1) do |employer, index| %>
+                <% employer = @employers.first%>
+                <tr>
+                    <td class="module-row-numbers">1<%#= index %></td>
+                    <td><%= employer.code %></td>
+                    <td><%= employer.name %></td>
+                    <td>
+                        <%= employer.is_individual? ? "#{employer.ic_passport_number}" : "#{employer.business_registration_number}" %>
+                    </td>
+                    <td><%=employer.address1 %>,<%= employer.address2%>,<%= employer.address3 %>,<%= employer.address4 %>,<%= employer.postcode %> <%= employer&.town&.name %>,<%= employer&.state&.name %> </td>
+                    <td class="module-row-actions">
+                        <a href="<%=external_agency_employer_path(employer) %>" class="btn btn-blue-portal">Show</a>
+                    </td>
+                </tr>
+            <%# end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%#= paginate @employers %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

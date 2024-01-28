@@ -1,0 +1,105 @@
+<table class="workers-table w-100" style="margin-top: 2rem;">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">No</th>
+            <th>Paid Date</th>
+            <th>Branch</th>
+            <th>Created By</th>
+            <th>Order Code</th>
+            <th>Worker Code</th>
+            <th>Worker Name</th>
+            <th>Gender</th>
+            <th>Country</th>
+            <th>Insurance Provider</th>
+            <th>Insurer</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if @data.blank? %>
+            <tr>
+                <td colspan="11" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+            <% @data.find_each.with_index(1) do |order, index| %>
+                <% order.order_items.get_insurance_gross_premium.each do |order_item| %>
+                    <%
+                        insurance_purchase = order_item.insurance_purchase
+                    %>
+                    <tr>
+                        <td class="module-row-numbers"><%= index %></td>
+                        <td><%= order.paid_at.try(:strftime, get_standard_date_format) %></td>
+                        <td><%= order.organization.name %></td>
+                        <td><%= User.find(order.created_by).code %></td>
+                        <td><%= order.code %></td>
+                        <td><%= insurance_purchase&.fw_code %></td>
+                        <td><%= insurance_purchase&.fw_name %></td>
+                        <td><%= insurance_purchase&.fw_gender %></td>
+                        <td><%= insurance_purchase&.fw_country&.name %></td>
+                        <td><%= InsuranceServiceProvider.find_by(id: insurance_purchase&.insurance_service_provider_id)&.name %></td>
+                        <td><%= insurance_purchase&.insurance_provider %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+        <% end %>
+    </tbody>
+</table>
+
+<p></p>
+<div>
+    <table class="workers-table w-100" style="margin-top: 2rem; border: none">
+        <tr>
+            <td class="no-border">Authorised By:</td>
+            <td class="no-border">Approved By:</td>
+        </tr>
+        <tr rowspan="4">
+            <td class="no-border"><br><br><br><br><hr></td>
+            <td class="no-border"><br><br><br><br><hr></td>
+        </tr>
+        <tr>
+            <td class="no-border">Name:</td>
+            <td class="no-border">Name:</td>
+        </tr>
+        <tr>
+            <td class="no-border">Date:</td>
+            <td class="no-border">Date:</td>
+        </tr>
+    </table>
+</div>
+
+<style>
+.w-100 {
+    width: 100%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+.workers-table {
+    padding: 1rem 0px;
+}
+
+thead {
+    background-color: #c8ced3;
+}
+
+thead th {
+    padding: 3px;
+}
+
+tbody td {
+    padding: 1px 2px;
+    vertical-align: center;
+    height: 18px;
+}
+
+.no-border {
+    border: none;
+}
+</style>

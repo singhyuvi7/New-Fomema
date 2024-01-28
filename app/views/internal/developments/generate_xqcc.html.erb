@@ -1,0 +1,56 @@
+<div class="card">
+
+    <form method="POST" action="<%= generate_xqcc_internal_developments_path %>">
+
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="hidden" name="_method" value="PATCH">
+
+        <div class="card-header">
+            <strong>Generate XQCC Case</strong>
+        </div>
+
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render "/shared/all_flash" %>
+
+            <div class="form-group">
+                <label for="xqcc_case_number">XQCC Case Number</label>
+                <input type="number" value="1" required name="xqcc_case_number" class="form-control" id="xqcc_case_number" placeholder="Enter XQCC Case number">
+            </div>
+
+            <div class="form-group">
+                <label for="pcr_case_number">PCR Case Number</label>
+                <input type="number" value="1" required name="pcr_case_number" class="form-control" id="pcr_case_number" placeholder="Enter PCR Case number">
+            </div>
+
+            <div class="form-group">
+                <label for="xqcc_pending_review_xqcc_unsuitable_case_number">XQCC Pending Review Case Number (XQCC Unsuitable)</label>
+                <input type="number" value="1" required name="xqcc_pending_review_xqcc_unsuitable_case_number" class="form-control" id="xqcc_pending_review_xqcc_unsuitable_case_number" placeholder="Enter Pending Review XQCC Unsuitable Case number">
+            </div>
+
+            <div class="form-group">
+                <label for="xqcc_pending_review_medical_unsuitable_case_number">XQCC Pending Review Case Number (Medical Unsuitable)</label>
+                <input type="number" value="1" required name="xqcc_pending_review_medical_unsuitable_case_number" class="form-control" id="xqcc_pending_review_medical_unsuitable_case_number" placeholder="Enter Pending Review Medical Unsuitable Case number">
+            </div>
+
+            <div class="form-group">
+                <label for="xqcc_pending_review_xray_finding_case_number">XQCC Pending Review Case Number (Unsuitable with X-Ray findings)</label>
+                <input type="number" value="1" required name="xqcc_pending_review_xray_finding_case_number" class="form-control" id="xqcc_pending_review_xray_finding_case_number" placeholder="Enter Pending Review Medical Unsuitable Case number">
+            </div>
+
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+
+            <div class="text-right">
+
+                <button type="submit" class="btn btn-primary" data-toggle="tooltip" title="Pickup">Generate</button>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,106 @@
+<%= render "/shared/all_flash" %>
+
+<h1>Reports for Demo</h1>
+
+<div class='m-2'>
+    <%= link_to 'Finance Reports Demo', finance_demo_internal_reports_path %> |
+    <%= link_to 'MSPD Reports Demo', mspd_demo_internal_reports_path %>
+</div>
+
+<table id="list-of-reports" class="table-borders w-100">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Title</th>
+            <th>Download</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @index = 0 %>
+        <% @sample_list.each do |hash| %>
+            <tr>
+                <td><%= @index += 1 %></td>
+                <td><%= hash[:title] %></td>
+
+                <td>
+                    <%= link_to "Preview (dev only)", hash[:path], class: "btn btn-small btn-info" %>
+                    <%= link_to "Download", hash[:download], class: "btn btn-small btn-primary" %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% @list.each do |hash| %>
+            <tr>
+                <td><%= @index += 1 %></td>
+                <td><%= hash[:title] %></td>
+
+                <td>
+                    <% if on_development? %>
+                        <%= link_to "Preview (dev only)", hash[:path], class: "btn btn-small btn-info" %>
+                    <% end %>
+
+                    <%= link_to "Download", hash[:path], class: "btn btn-small btn-primary with-csv-format" %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% @excelList.each do |hash| %>
+            <tr>
+                <td><%= @index += 1 %></td>
+                <td><%= hash[:title] %></td>
+
+                <td>
+                    <%= link_to "Download", hash[:path], class: "btn btn-small btn-primary with-xlsx-format" %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% @pdfList.each do |hash| %>
+            <tr>
+                <td><%= @index += 1 %></td>
+                <td><%= hash[:title] %></td>
+
+                <td>
+                    <%= link_to "Download", hash[:path], class: "btn btn-small btn-primary with-pdf-format" %>
+                </td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+
+<style>
+    #list-of-reports th,
+    #list-of-reports td {
+        padding: 0.5em;
+    }
+
+    #list-of-reports th {
+        background-color: #f3f3f3 !important;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.with-csv-format').each(function() {
+            link        = $(this).attr('href');
+            linkParts   = link.split('?');
+            linkParts.splice(1, 0, '.csv?');
+            $(this).attr('href', linkParts.join(''));
+        });
+
+        $('.with-xlsx-format').each(function() {
+            link        = $(this).attr('href');
+            linkParts   = link.split('?');
+            linkParts.splice(1, 0, '.xlsx?');
+            $(this).attr('href', linkParts.join(''));
+        });
+
+        $('.with-pdf-format').each(function() {
+            link        = $(this).attr('href');
+            linkParts   = link.split('?');
+            linkParts.splice(1, 0, '.pdf');
+            $(this).attr('href', linkParts.join(''));
+        });
+    </script>
+<% end %>

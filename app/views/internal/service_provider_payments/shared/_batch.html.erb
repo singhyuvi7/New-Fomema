@@ -1,0 +1,105 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Payment Batch</strong> - Batch Details
+    </div>
+
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="batch_code">Batch Code :  <span id="batch_code_string"></span></label>
+                    <p class="text-danger"><small><i><%= @error&.remark %></i></small></p>
+
+                    <table class="table table-responsive-sm table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th colspan="5" scope='colgroup'><center>Service Provider Group</center></th>
+                            </tr>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Service Provider Type</th>
+                                <th>Status</th>
+                                <th>Total (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                statuses = SpFinBatch::STATUSES
+                            %>
+
+                            <% if @group_batches.empty? %>
+                                <tr>
+                                    <td colspan="5">No Records Found</td>
+                                </tr>
+                            <% end %>
+                            <% @group_batches.each do |batch, index| %>
+                                <tr>
+                                    <td>
+                                        <%= !batch.batchable&.blank? ? batch.batchable&.code : '-' %>
+                                    </td>
+                                    <td>
+                                        <%= batch.batchable&.name %>
+                                    </td>
+                                    <td><%= batch.batchable&.category %></td>
+                                    <td>
+                                        <div><%= statuses[batch.status] ? statuses[batch.status] : batch.status %></div>
+                                        <div><small><%= "(#{batch.fail_reason})" if (batch.status == 'FAILED' && !batch.fail_reason.blank?) %></small></div>
+                                    </td>
+                                    <td><%= batch.total_amount %></td>
+                                </tr>
+                            <% end %>
+                            <tr>
+                                <td colspan="5"><center><b>Individual</b></center></td>
+                            </tr>
+                            <% if @individual_batches.empty? %>
+                                <tr>
+                                    <td colspan="5">No Records Found</td>
+                                </tr>
+                            <% end %>
+                            <% @individual_batches.each do |batch, index| %>
+                                <tr>
+                                    <td>
+                                        <%= batch.batchable&.code %>
+                                    </td>
+                                    <td>
+                                        <%= batch.company_name.present? ? batch.company_name : batch.batchable.name %>
+                                    </td>
+                                    <td><%= batch.batchable_type %></td>
+                                    <td>
+                                        <div><%= statuses[batch.status] ? statuses[batch.status] : batch.status %></div>
+                                        <div><small><%= "(#{batch.fail_reason})" if (batch.status == 'FAILED' && !batch.fail_reason.blank?) %></small></div>
+                                    </td>
+                                    <td><%= batch.total_amount %></td>
+                                </tr>
+                            <% end %>
+                            <tr>
+                                <tr>
+                                    <td colspan="4"><div class="float-right font-weight-bold">Grand Total (RM)</div></td>
+                                    <td><%= @total_amount %></td>
+                                </tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_payments_path) %>
+            <% if has_permission?('REPROCESS_SERVICE_PROVIDER_PAYMENT') && !(['FAILED'] & @batch.sp_fin_batches.search_service_provider(params[:service_provider]).pluck('DISTINCT status')).empty?  %>
+                <a href="<%= internal_payments_reprocess_path(@batch, service_provider: params[:service_provider]) %>" class="btn btn-sm btn-warning process-payment-btn"><i class="fas fa-arrow-right"></i> Re-process Failed Payment</a>
+            <% end %>
+            <% if has_permission?('PROCESS_SERVICE_PROVIDER_PAYMENT') && !(['NOT_PROCESS','PROCESS_FAILED'] & @batch.sp_fin_batches.search_service_provider(params[:service_provider]).pluck('DISTINCT status')).empty? %>
+                <a href="<%= internal_payments_process_path(@batch, service_provider: params[:service_provider]) %>" class="btn btn-sm btn-warning process-payment-btn"><i class="fas fa-arrow-right"></i> Process Payment</a>
+            <% end %>
+            <a href="<%= internal_payments_export_path + '.csv?service_provider='+(params[:service_provider].present? ? params[:service_provider] : '') %>" class="btn btn-sm btn-primary" id="download_payment_csv"><i class="fas fa-download"></i> Download</a>
+        </div>
+    </div>
+
+</div>

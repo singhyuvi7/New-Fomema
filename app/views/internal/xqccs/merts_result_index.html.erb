@@ -1,0 +1,86 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Medical History Result</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="alert alert-info mb-2">
+                  <h5>Foreign Worker: <%= @foreign_worker.name %></h5>
+                  <h5>Passport: <%= @foreign_worker.passport_number %></h5>
+                  <h5>Worker Code: <%= @foreign_worker.code %></h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label>#</label></th>
+                                <th>Transaction ID</th>
+                                <th>X-Ray Type</th>
+                                <th>Employer Code</th>
+                                <th>Doctor Code</th>
+                                <th>Lab Code</th>
+                                <th>X-Ray Code</th>
+                                <th>X-Ray Date</th>
+                                <th>Exam Date</th>
+                                <th>Certify Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><label><%= index %></label></td>
+                                    <td>
+                                        <a href="<%= merts_results_internal_transaction_path(transaction, except_transaction_id: params[:except_transaction_id], pending_review: params[:pending_review]) %>"><%= transaction.code %></a>
+                                    </td>
+                                    <td><%= transaction.xray_film_type %></td>
+                                    <td><%= transaction.employer&.code %></td>
+                                    <td><%= transaction.doctor&.code %></td>
+
+
+                                    <td><%= transaction.laboratory&.code %></td>
+
+                                    <td><%= transaction.xray_facility&.code %></td>
+                                    <td><%= transaction.xray_examination&.xray_taken_date&.strftime(get_standard_date_format) %></td>
+                                    <td><%= transaction.medical_examination_date.nil? ? "N/A" : transaction.medical_examination_date.strftime(get_standard_date_format) %></td>
+                                    <td><%= transaction.doctor_transmit_date.strftime(get_standard_date_format) if transaction.doctor_transmit_date? %></td>
+                                    <td><%= transaction.final_result %>
+                                    <td>
+                                        <%=raw index_table_show_button merts_results_internal_transaction_path(transaction) %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @transactions.blank? %>
+                                <tr>
+                                    <td colspan="12" class="text-danger">No Medical History Result</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @transactions %>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <% if params[:except_transaction_id] && params[:pending_review] %>
+                <%= raw edit_back_button(edit_internal_xray_pending_review_path(params[:pending_review])) %>
+            <% end %>
+        </div>
+    </div>
+</div>

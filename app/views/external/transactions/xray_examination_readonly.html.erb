@@ -1,0 +1,84 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong> - X-Ray Facility Medical Examination</div>
+
+    <%= nested_form_for @transaction, url: "" do |form| %>
+        <div class="p-4 border-bottom">
+            <h3><u>SECTION D. X-RAY FINDINGS - SUBMITTED</u></h3>
+        </div>
+
+        <div class="border-bottom d-flex">
+            <div class="category-tab btn btn-primary" data-type="worker_info">Worker Information</div>
+            <% if @notifiable_cases.present? %>
+                <div class="category-tab btn btn-default" data-type="employer_info">Employer Information</div>
+            <% end %>
+            <div class="category-tab btn btn-default" data-type="xray">X-ray Results</div>
+            <% if @xray_pending_decisions.present? && @notifiable_cases.present? %>
+                <div class="category-tab btn btn-default" data-type="xray_pr">Fomema Result Review</div>
+            <% end %>
+            <% if @result_updates.present? && @notifiable_cases.present? %>
+                <div class="category-tab btn btn-default" data-type="update_result_details">Update Result</div>
+            <% end %>
+            <% if @amendments.present? && @notifiable_cases.present? %>
+                <div class="category-tab btn btn-default" data-type="final_result_details">Amendment Final Result</div>
+            <% end %>
+        </div>
+
+        <div class="category-switchable" data-type="worker_info">
+            <%= render partial: "external/transactions/xray_examinations/xray_worker_information_page", locals: { form: form, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @xray_examination, readonly: true, hide_not_done: true } %>
+        </div>
+
+        <% if @notifiable_cases.present?%>
+            <div class="category-switchable hidden" data-type="employer_info">
+                <%= render partial: "external/transactions/xray_examinations/xray_employer_information_page" %>
+            </div>
+        <% end %>
+
+        <% if @result_updates.present?  && @notifiable_cases.present?%>
+            <div class="category-switchable hidden" data-type="update_result_details">
+                <%= render partial: "internal/transactions/nios_update_results_details" %>
+            </div>
+        <% end %>
+
+        <% if @amendments.present? && @notifiable_cases.present? %>
+            <div class="category-switchable hidden" data-type="final_result_details">
+                <%= render partial: "internal/transactions/nios_final_results_update_details" %>
+            </div>
+        <% end %>
+
+        <% if @xray_pending_decisions.present? && @notifiable_cases.present? %>
+            <div class="category-switchable hidden" data-type="xray_pr">
+                <%= render partial: "internal/transactions/pending_decision", locals: { merts: true } %>
+            </div>
+        <% end %>
+
+        <div class="card-footer text-right">
+            <%= link_to "Back", @index_url, class: "btn btn-secondary" %>
+        </div>
+    <% end %>
+</div>
+
+<% if flash[:sp_completed].present? %>
+    <div id="dialog-sp-success" class="hidden" title="Report submitted" data-path="<%= @index_url %>">
+        <p>Chest X-ray report for <b><%= flash[:sp_completed_worker] %></b> has been successfully transmitted.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-sp-success', type: 'success'});
+
+            $('#dialog-sp-success').on('dialogbeforeclose', function(event, ui) {
+                window.location = $('#dialog-sp-success').attr('data-path');
+            });
+        </script>
+    <% end %>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        loadCategoryTabSelection();
+    </script>
+<% end %>

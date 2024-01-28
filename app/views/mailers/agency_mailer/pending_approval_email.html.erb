@@ -1,0 +1,24 @@
+<p>
+    <b>Dear <%= @agency.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @agency.name %></i></b>,
+</p>
+
+<p>
+    Thank you for registering with FOMEMA. We are currently processing your application. An email notification will be sent to you within <b><%= @agency_register_approval_reply_days %></b> working days.<br>
+    <i>Terima kasih kerana mendaftar dengan FOMEMA. Kami sedang memproses permohonan anda. Emel pemberitahuan akan dihantar dalam tempoh <b><%= @agency_register_approval_reply_days %></b> hari waktu bekerja.</i>
+</p>
+
+<p>
+    For further enquiries, please use your registration ID which is <b><%= @agency.id %></b><br>
+    <i>Untuk pertanyaaan lanjut, sila gunakan ID pendaftaran ini <b><%= @agency.id %></b></i>
+</p>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***Email dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

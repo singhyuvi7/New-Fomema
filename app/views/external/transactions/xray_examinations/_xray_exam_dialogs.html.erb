@@ -1,0 +1,128 @@
+<!-- Consolidated -->
+<div id="dialog-identity-required" class="hidden" title="Foreign Worker Identity Confirmation">
+    <p>You have not confirmed the identity for this worker. The transaction cannot be saved.</p>
+</div>
+
+<div id="dialog-radiologist-required" class="hidden" title="Radiologist Required">
+    <p>You have chosen the option "Radiologist" for this examination, please select a Radiologist.</p>
+</div>
+
+<div id="dialog-radiologist-choose" class="hidden" title="">
+    <p>You have selected “assign to a radiologist” for this examination. Click “Save” to continue</p>
+</div>
+
+<div id="dialog-comment-fill" class="hidden" title="Please include details of abnormality">
+    <p>You must include the details of abnormality for the categories marked as <b>ABNORMAL</b> before you can save.</p>
+</div>
+
+<div id="dialog-impression-fill" class="hidden font-size-8" title="Please fill in the impression field">
+    <p>Please fill in the <b>Impression</b> field if there are any abnormalities.</p>
+</div>
+
+<div id="dialog-date-fill" class="hidden" title="X-ray date taken">
+    <% if @is_digital %>
+        <p><b>Date of x-ray taken</b> is required before transmitting. View the Digital X-ray and refresh this page to retrieve the date. (If you have any changes made, please save before doing this)</p>
+    <% else %>
+        <p>Please include <b>date of x-ray taken</b> before transmitting.</p>
+    <% end %>
+</div>
+
+<!-- Dialog for visited for both Radiologist and Xray Facility -->
+<div id="dialog-visited-fill" class="hidden font-size-8" title="Please mark as viewed">
+    <p>Please ensure that you have marked <b>YES</b> for the section <b><%= @sourceable.xray_reporter_type == "RADIOLOGIST" && current_user.userable_type == "XrayFacility" ? "Acknowledge the x-ray findings reported by the radiologist" : "Viewed digital x-ray and confirmed the x-ray findings" %></b> before transmitting.</p>
+</div>
+
+<div id="dialog-impression-fill-not-done" class="hidden font-size-8" title="Please fill in the impression field">
+    <p>Please fill in the <b>Impression</b> field due to marking exam as <b>Not Done</b>.</p>
+</div>
+
+<!-- After Radiologist has submitted, will popup and redirect to index page. -->
+<% if flash[:sp_completed].present? %>
+    <div id="dialog-sp-success" class="hidden" title="Report submitted" data-path="<%= @index_url %>">
+        <% if current_user.userable_type == "Radiologist" %>
+            <p>The X-ray result for <b><%= flash[:sp_completed_worker] %></b> has been successfully transmitted and awaiting for acknowledgement by X-ray Facility.</p>
+        <% else %>
+            <p>Chest X-ray report for <b><%= flash[:sp_completed_worker] %></b> has been successfully transmitted.</p>
+        <% end %>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-sp-success', type: 'success'});
+
+            $('#dialog-sp-success').on('dialogbeforeclose', function(event, ui) {
+                window.location = $('#dialog-sp-success').attr('data-path');
+            });
+        </script>
+    <% end %>
+<% end %>
+
+<div id="dialog-xray-date-invalid" class="hidden" title="Invalid date received">
+    <p></p>
+</div>
+
+<!-- If Radiologist has aborted, but the aborted params is nil, allow Radiologist a dialog to cancel abortion. -->
+<% if current_user.userable_type == "Radiologist" && params[:aborted].blank? && @xray_examination.radiologist_aborted_at? %>
+    <div id="dialog-radiologist-abort-msg" class="hidden" title="Examination was aborted" data-path="<%= @index_url %>" data-revert="<%= @revert_url %>">
+        <p>The X-ray examination has been aborted. You may revert this status and continue working on the examination.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            $('#dialog-radiologist-abort-msg').dialog({
+                modal: true,
+                minWidth: 600,
+                dialogClass: `dialog__title-danger shadow`,
+                buttons: {
+                    'Revert status and continue examination': function() {
+                        window.location = $('#dialog-radiologist-abort-msg').attr('data-revert');
+                    },
+                    'Return to listing': function() {
+                       $(this).dialog('close');
+                    }
+                }
+            });
+
+            $('#dialog-radiologist-abort-msg').on('dialogbeforeclose', function(event, ui) {
+                window.location = $('#dialog-radiologist-abort-msg').attr('data-path');
+            });
+        </script>
+    <% end %>
+<% end %>
+
+<!-- After Radiologist has aborted, will popup and redirect to home page. -->
+<% if flash[:sp_aborted].present? %>
+    <div id="dialog-radiologist-abort" class="hidden" title="Examination aborted" data-path="<%= @index_url %>">
+        <p>The X-ray examination for <b><%= flash[:sp_aborted_worker] %></b> has been successfully aborted.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-radiologist-abort', type: 'danger'});
+
+            $('#dialog-radiologist-abort').on('dialogbeforeclose', function(event, ui) {
+                window.location = $('#dialog-radiologist-abort').attr('data-path');
+            });
+        </script>
+    <% end %>
+<% end %>
+
+<div id="dialog-xray-not-done-fill" class="hidden font-size-8" title="Please fill in reason">
+    <p>
+        You are about to transmit this X-ray examination to <b>X-ray Not Done</b>.<br>
+        Please include a reason to continue.
+
+        <%= form_for @transaction, url: @form_url, html: { class: "#{ params[:action] }_transaction transaction-form disable-enter-keypress" } do |form| %>
+            <%= hidden_field_tag "xe_attributes[xray_examination_not_done]", "YES" %>
+            <%= text_area_tag "xe_attributes[impression]", "", placeholder: "Reason", rows: 5, class: "w-100 p-2", required: true %>
+
+            <div class="text-right">
+                <%= form.submit "Save and Transmit", class: "btn btn-primary", value: "Save and Transmit" %>
+            </div>
+        <% end %>
+    </p>
+</div>
+
+<div id="dialog-radiologist-date-check" class="hidden" title="Cannot select radiologist">
+    <p>The digital xray must be available for viewing before you can assign this case to a radiologist.</p>
+</div>

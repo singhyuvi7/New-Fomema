@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <table class="table table-responsive-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Order Code</th>
+                        <th>
+                            <div>Total Premium Paid (RM)</div>
+                            <div><small>(Gross Premium + SST + Stamp Duty +
+                            <br>Admin Fees + Admin Fees SST)</small></div>
+                        </th>
+                        <th>Total Gross Premium (RM)</th>
+                        <th>
+                            <div>Commission (RM)</div>
+                            <div><small>(10% x Gross Premium)</small></div>
+                        </th>
+                        <th>
+                            <div>Payment Charges (RM)</div>
+                            <div><small>(Percentage Charged By<br>Payment Method x Total Premium)</small></div>
+                        </th>
+                        <th>
+                            Total Payment Amount(RM)
+                            <div>
+                                <small>(Total Premium Paid - Comission - Payment Charges)</small>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if @batch.insurance_payments.empty? %>
+                        <tr>
+                            <td colspan="7">No Records Found</td>
+                        </tr>
+                    <% end %>
+                    <% @batch.insurance_payments.each do |insurance_payment| %>
+                        <tr>
+                            <td>
+                                <%= insurance_payment.order.code %>
+                            </td>
+                            <td><%= insurance_payment.total_premium %></td>
+                            <td><%= insurance_payment.total_gross_premium %></td>
+                            <td><%= insurance_payment.commission %></td>
+                            <td><%= insurance_payment.ipay_charges %></td>
+                            <td><%= insurance_payment.total_payment_amount %></td>
+  
+                        </tr>
+                    <% end %>
+                    <tr>
+                        <td><div class="float-right font-weight-bold">Total (RM)</div></td>
+                        <td><%= @batch.insurance_payments.sum(:total_premium) %></td>
+                        <td><%= @batch.insurance_payments.sum(:total_gross_premium) %></td>
+                        <td><%= @batch.insurance_payments.sum(:commission) %></td>
+                        <td><%= @batch.insurance_payments.sum(:ipay_charges) %></td>
+                        <td><%= @batch.insurance_payments.sum(:total_payment_amount) %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

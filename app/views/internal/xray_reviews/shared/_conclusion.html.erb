@@ -1,0 +1,71 @@
+<div class="card border-primary">
+
+    <div class="card-header">
+        XQCC Review Conclusion
+    </div>
+
+    <table class="table table-table table-card">
+        <tbody>
+            <tr>
+                <td width="120">
+                    Decision
+                </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="NORMAL" <% if xray_review.result === 'NORMAL' || xray_review.result.nil? %> checked <% else %> disabled <% end %>>
+                            Normal
+                        </label>
+                    </div>
+                </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="SUSPICIOUS" <% if xray_review.result === 'SUSPICIOUS' %> checked <% else %> disabled <% end %>>
+                            Suspicious
+                        </label>
+                    </div>
+                </td>
+                
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="IDENTICAL" <% if xray_review.result === 'IDENTICAL' %> checked <% else %> disabled <% end %> >
+                            Identical
+                        </label>
+                        <button disabled type="button" class="btn btn-primary btn-sm py-0 ml-1"><i class="fa fa-search"></i></button>
+                    </div>
+                </td>
+                
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="WRONGLY_TRANSMITTED" <% if xray_review.result === 'WRONGLY_TRANSMITTED' %> checked <% else %> disabled <% end %> >
+                            Wrongly Transmitted
+                        </label>
+                    </div>
+                </td>
+                 
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="ABORT" <% if xray_review.result === 'ABORT' %> checked <% else %> disabled <% end %> >
+                                 Abort
+                        </label>
+                    </div>
+                 </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="RETAKE" <% if xray_review.result === 'RETAKE' %> checked <% else %> disabled <% end %>>
+                            Retake
+                        </label>
+                    </div>
+                </td>   
+            </tr>
+        </tbody>
+    </table>
+</div>

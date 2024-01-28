@@ -1,0 +1,8 @@
+<%= wicked_pdf_stylesheet_link_tag "internal/pdf/registration_invoice" %>
+
+<%= render "/pdf_templates/orders/invoice" %>
+
+<% if !['INSURANCE_PURCHASE'].include?(@order.category) %>
+    <div style="page-break-after: always;"></div>  
+    <%= render "/pdf_templates/orders/invoice_details" %>
+<% end %>

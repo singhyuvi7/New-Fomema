@@ -1,0 +1,41 @@
+<%
+    if @visit_report.laboratory_type&.name == 'COLLECTION'
+        render_path = 'internal/visit_reports/laboratories/collection_form'
+        title = 'Collection Centre'
+    else
+        render_path = 'internal/visit_reports/laboratories/full_partial_form'
+        title = 'Full/Partial'
+    end
+
+    form_path = ['approval'].include?(params[:action]) ? internal_visit_report_laboratory_approve_report_path(@visit_report) : internal_visit_report_laboratory_update_path(@visit_report)
+%>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Report</strong> - LQCC Visit <%= title %> Checklist
+    </div>
+
+    <%= form_for @visit_report, url: form_path, html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+        <input type="hidden" id="currentSubmitBtn" value="">
+        <div class="card-body">
+            <% if !@visit_report.status.blank? %>
+                <div class="alert alert-info" role="alert">
+                    LATEST STATUS: <b><%= VisitReport::STATUSES[@visit_report.status] %></b>
+                </div>
+            <% end %>
+
+            <% if @visit_report.status == 'REJECTED' %>
+            <div class="alert alert-danger" role="alert">
+                <% rejection_comment = @visit_report.level_1_approval_decision == 'REJECT' ? @visit_report.level_1_approval_comment : @visit_report.level_2_approval_comment  %>
+                COMMENT ON REJECTION: <b><%= rejection_comment %></b>
+            </div>
+            <% end %>
+
+            <%=render render_path, { form: form } %>
+
+            <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false  if params[:action] == 'approval' %>
+        </div>
+        <%=render 'internal/visit_reports/laboratories/card_footer' %>
+
+    <% end %>
+</div>

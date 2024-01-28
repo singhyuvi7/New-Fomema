@@ -1,0 +1,7 @@
+<a href="<%= internal_user_setup_path(activity.owner_id) %>"><%= activity.owner.name %></a>  perform Pending Decision Approval on
+
+<% if activity.trackable %>
+    <a href="<%= approval_internal_xray_pending_decision_path(activity.trackable.id) %>"><%= activity.trackable.transactionz&.code %></a>
+<% else %>
+    which has since been removed
+<% end %>

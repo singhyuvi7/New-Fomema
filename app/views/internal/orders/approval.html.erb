@@ -1,0 +1,52 @@
+<div class="card">
+    <div class="card-header">
+        Order - Approval
+    </div>
+    <%= form_for @order, url: approval_internal_order_path(@order), method: 'patch' do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%= render 'shared/all_validation_flash', { model_obj: @order } %>
+
+            <%=render partial: '/internal/orders/shared/order_detail_readonly' %>
+
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th>Items</th>
+                        <th>Fee</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.each do |order_item| %>
+                        <tr>
+                            <td><%= order_item.order_itemable.class.name %></td>
+                            <td><%= order_item.fee.name %></td>
+                            <td><%= number_to_currency(order_item.amount, unit: "") %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+        </div>
+        <!-- /card-body -->
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_orders_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

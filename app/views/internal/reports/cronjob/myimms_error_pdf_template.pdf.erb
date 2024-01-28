@@ -1,0 +1,70 @@
+<table class="errors-table w-100" style="margin-top: 2rem;">
+    <thead>
+        <tr>
+            <% @headers.each do |header| %>
+            <th><%= header %></th>
+            <% end %>
+        </tr>
+    </thead>
+    <tbody>
+        <% @myimms_errors.each do |myimms_error| %>
+        <% 
+            transaction = myimms_error.myimms_transaction.transactionz
+            myimms_response = MyimmsResponse.where(:myimms_request_id => myimms_error.id).first
+            if myimms_response.present?
+                myimms_status = MyimmsTransaction::RESPONSE_STATUS[myimms_response.status]
+                myimms_status = myimms_status.present? ? myimms_status : 'FAILED'
+                response =  myimms_response.response
+            else
+                myimms_status = MyimmsTransaction::RESPONSE_STATUS['0']
+                response = "Failed to submit to JIM"
+            end
+        %>
+
+        <tr>
+            <td><%= myimms_error.txn_id %></td>
+            <td><%= myimms_error.doc_no %></td>
+            <td><%= Country.where(:code => myimms_error.nat).pluck(:name).first %></td>
+            <td><%= myimms_error.med_sts %></td>
+            <td><%= myimms_error.created_at.strftime("%d-%m-%Y %l:%M:%S") %></td>
+            <td><%= myimms_error.sts_ind %></td>
+            <td><%= myimms_status %></td>
+            <td><%= response %></td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+
+<div class="footer">
+    <div>Thanks.</div>
+    <div class="auto-msg">***This is an auto generated email. Do not reply to this email.***</div>
+    <div class="ref">[Ref:ijm/myimms_error]</div>
+</div>
+
+<style>
+    .w-100 {
+        width: 100%;
+    }
+
+    table,
+    th,
+    td {
+        border-collapse: collapse;
+        border: 1px solid #aaa;
+        padding: 3px 2px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .errors-table {
+        color: #808080;
+    }
+
+    .footer {
+        color: #808080;
+        margin-top: 1rem;
+    }
+
+    .footer div {
+        padding: 0.5rem 0px;
+    }
+</style>

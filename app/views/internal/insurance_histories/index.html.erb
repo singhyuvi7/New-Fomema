@@ -1,0 +1,78 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Insurances</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers">#</th>
+                        <th>Worker Name</th>
+                        <th>Gender</th>
+                        <th>Date Of Birth</th>
+                        <th>Passport No.</th>
+                        <th>Country</th>
+                        <th>Worker Code</th>
+                        <th>Employer</th>
+                        <th>Insurer</th>
+                        <th>Product</th>
+                        <th>Branch</th>
+                        <th>Paid Date</th>
+                        <th>Order Status</th>
+                        <th class="module-row-actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @insurance_purchases.blank? %>
+                        <tr>
+                            <td colspan="14" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+
+                        <% @insurance_purchases.each.with_index((@insurance_purchases.current_page - 1) * get_per + 1) do |insurance_purchase, index| %>
+                            <tr>
+                                <td class="module-row-numbers"><%= index %></td>
+                                <td><%= insurance_purchase.fw_name %></td>
+                                <td><%= ForeignWorker::GENDERS[insurance_purchase.fw_gender] %></td>
+                                <td><%= insurance_purchase.fw_date_of_birth&.strftime("%d/%m/%Y") %></td>
+                                <td><%= insurance_purchase.fw_passport_number %></td>
+                                <td><%= insurance_purchase.fw_country&.name %></td>
+                                <td><%= insurance_purchase.fw_code %></td>
+                                <td><%= "#{insurance_purchase.employer&.name} (#{insurance_purchase.employer&.code})" %></td>
+                                <td><%= insurance_purchase.insurance_provider %> <%= "(#{insurance_purchase.insurance_service_provider.display_name})" if !insurance_purchase.insurance_service_provider.blank? %></td>
+                                <td><%= insurance_purchase.product_purchased %></td>
+                                <td><%= insurance_purchase.order&.organization&.name %></td>
+                                <td><%= insurance_purchase.order&.paid_at.try(:strftime,"%d/%m/%Y") %></td>
+                                <td><span data-toggle="tooltip" data-html="true" title="<%= insurance_purchase.order&.code %>"><%= insurance_purchase.order&.status %></span></td>
+                                <td class="module-row-actions">
+                                    <%=raw index_table_show_button(internal_insurance_history_path(insurance_purchase)) %>
+                                    <% if insurance_purchase.order&.status == "PAID" && has_permission?("RESUBMIT_PAID_INSURANCE_PURCHASE") %>
+                                        <%=raw index_table_warning_button(resubmit_paid_internal_insurance_history_path(insurance_purchase), label: '<i class="fa fa-upload"></i>', title: 'Resubmit Paid Insurance')%>
+                                    <% end %>
+                                </td>
+                            </tr>
+                        <% end %>
+
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <%= paginate @insurance_purchases %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

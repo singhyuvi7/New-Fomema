@@ -1,0 +1,45 @@
+<%
+can_revert = local_assigns[:can_revert]
+%>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :decision, class: 'required' %>
+            <div class="col-form-label">
+                <div class="form-check form-check-inline">
+                    <%= radio_button_tag "approval[decision]", "APPROVE", false, class: "form-check-input approval-decision", required: true %>
+                    <%= label_tag "approval[decision_APPROVE]", "APPROVE", class: "form-check-label" %>
+                    &emsp;
+                    <% if can_revert %>
+                        <%= radio_button_tag "approval[decision]", "REVERT", false, class: "form-check-input approval-decision ml-5" %>
+                        <%= label_tag "approval[decision_REVERT]", "REVERT", class: "form-check-label" %>
+                        &emsp;
+                    <% end %>
+                    <%= radio_button_tag "approval[decision]", "REJECT", false, class: "form-check-input approval-decision ml-5" %>
+                    <%= label_tag "approval[decision_REJECT]", "REJECT", class: "form-check-label" %>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment, for: 'approval_comment' %>
+            <%= text_area_tag "approval[comment]", nil, class: "form-control" %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('input.approval-decision').click(function () {
+        if (this.value == 'REVERT' || this.value == 'REJECT') {
+            $('#approval_comment').attr('required', 'required');
+        } else {
+            $('#approval_comment').attr('required', false);
+        }
+    });
+</script>
+<% end %>

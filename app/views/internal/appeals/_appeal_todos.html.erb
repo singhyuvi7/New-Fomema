@@ -1,0 +1,683 @@
+<div class="p-4 border-bottom">
+    <h3><u>Appeal To Do List</u></h3>
+</div>
+
+<%
+    doctor_todos        = @appeal_todos.to_a.select {|todo| !todo.secondary_type?}
+    laboratory_todos    = @appeal_todos.to_a.select {|todo| todo.secondary_type == "Laboratory"}
+    xray_todos          = @appeal_todos.to_a.select {|todo| todo.secondary_type == "Xray"}
+    appeal_retakes      = @appeal.xray_retakes.order(:id).includes(:pcr_reviews)
+    appeal_retakes      = [XrayRetake.new] if appeal_retakes.blank?
+%>
+
+<div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if doctor_todos.blank? %>" data-type="doctor">
+    <label>Doctor To Do List</label>
+
+    <% doctor_todos.each do |todo| %>
+        <div class="selected-todo-container my-3 d-flex" data-id="<%= todo.appeal_todo_id %>">
+            <div class="flex-grow-1">
+                <p class="mb-1"><%= todo.appeal_todo.description %></p>
+                <p class="mb-1"><b>Status: </b><%= todo.completed_at? ? "Done (#{ todo.completed_at.strftime("%d/%m/%Y") })" : "Not Done" %></p>
+
+                <% if todo.comment? %>
+                    <b>Remarks: </b>
+
+                    <div class="border-left pt-2">
+                        <%= simple_format "#{ todo.comment }", class: "pl-3" %>
+                    </div>
+                <% else %>
+                    <b>Remarks: </b><i>N/A</i>
+                <% end %>
+            </div>
+
+            <% unless readonly || moh_readonly %>
+                <div class="flex-shrink-0 ml-2">
+                    <div class="btn btn-danger toggle-todo-buttons" data-action="remove" data-id="<%= todo.appeal_todo_id %>">Remove</div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if laboratory_todos.blank? %>" data-type="laboratory">
+    <label>Laboratory To Do List</label>
+
+    <% laboratory_todos.each do |todo| %>
+        <div class="selected-todo-container my-3 d-flex" data-id="<%= todo.appeal_todo_id %>">
+            <div class="flex-grow-1">
+                <p class="mb-1"><%= todo.appeal_todo.description %></p>
+                <p class="mb-1"><b>Status: </b><%= todo.completed_at? ? "Done (#{ todo.completed_at.strftime("%d/%m/%Y") })" : "Not Done" %></p>
+
+                <% if todo.comment? %>
+                    <b>Remarks: </b>
+
+                    <div class="border-left pt-2">
+                        <%= simple_format "#{ todo.comment }", class: "pl-3" %>
+                    </div>
+                <% else %>
+                    <b>Remarks: </b><i>N/A</i>
+                <% end %>
+            </div>
+
+            <% unless readonly || moh_readonly %>
+                <div class="flex-shrink-0 ml-2">
+                    <div class="btn btn-danger toggle-todo-buttons" data-action="remove" data-id="<%= todo.appeal_todo_id %>">Remove</div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<div class="px-4 pt-4 border-bottom parent-todos <%= "hidden" if xray_todos.blank? %>" data-type="xray">
+    <label>X-ray To Do List</label>
+
+    <div class="pb-4">
+        <% appeal_retakes.each.with_index(1) do |xray_retake, index| %>
+            <div class="border p-4 mb-4 bg-light">
+                <%= render partial: "internal/appeals/appeal_pcr_retake_information", locals: { numbering: index, xray_retake: xray_retake } %>
+            </div>
+        <% end %>
+
+        <div class="py-2 d-flex flex-wrap justify-content-end align-items-center">
+            <label class="text-primary flex-grow-1 mb-0">Select X-Ray Facility</label>
+
+            <div class="d-flex flex-shrink-0 align-items-center">
+                <% lab = @appeal.xray_facility %>
+                <%= hidden_field_tag :selected_xray_facility_id, lab.try(:id) %>
+
+                <p id="selected-xray-name-code" class="mb-0 mr-3 clickable text-primary"><%= lab.try(:name) %> (<b><%= lab.present? ? lab.try(:code) : "No X-Ray Facility Selected" %></b>)</p>
+
+                <% if !readonly && !@appeal.xray_facility_id? %>
+                    <div class="btn btn-success" data-toggle="modal" data-target="#change-xray-facility-modal" data-type="xray_facility">Select X-Ray Facility</div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mt-2">
+            <label class="text-primary flex-grow-1">X-ray Retake Options</label>
+
+            <% if @xray_retake&.status == "CLOSED" %>
+                <% if @pcr_review_count > 0 && @pcr_review_count < 3 %>
+                    <div id="open-dialog-2nd-3rd-opinion" class="btn btn-primary ml-2">Request <%= @pcr_review_count == 2 ? "3rd" : "2nd" %> Opinion</div>
+                <% end %>
+
+                <div id="open-dialog-repeat-xray" class="btn btn-warning ml-2">Repeat X-Ray</div>
+            <% else %>
+                <label>Pending retake completion</label>
+            <% end %>
+        </div>
+    </div>
+
+    <% xray_todos.each do |todo| %>
+        <div class="selected-todo-container my-2 d-flex" data-id="<%= todo.appeal_todo_id %>">
+            <div class="flex-grow-1">
+                <p class="mb-1"><%= todo.appeal_todo.description %></p>
+
+                <%
+                    xray_appeal_todo_status =
+                        case @xray_retake&.status
+                        when "CLOSED"
+                            "Done"
+                        when "PCR_REVIEW"
+                            "Pending PCR Audit"
+                        else
+                            "Pending Examination"
+                        end
+                %>
+
+                <p class="mb-1"><b>Status: </b><%= xray_appeal_todo_status %></p>
+            </div>
+
+            <% unless readonly || moh_readonly %>
+                <div class="flex-shrink-0 ml-2">
+                    <div class="btn btn-danger toggle-todo-buttons" data-action="remove" data-id="<%= todo.appeal_todo_id %>">Remove</div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<div class="px-4 py-4 border-bottom no-selected-placeholder <%= "hidden" if doctor_todos.present? || laboratory_todos.present? || xray_todos.present? || moh_readonly %>">
+    <label>To Do List</label>
+    <p class="text-danger mb-0">No selected to dos</p>
+</div>
+
+<% if has_permission?('VIEW_ALL_UPLOAD_DOCUMENT_APPEALS') %>
+    <div class="px-4 py-4 border-bottom no-selected-placeholder">
+        <label>Uploaded Document(s)</label>
+        <%= hidden_field_tag :remove_uploaded_file, "" %>
+        <table class="table table-bordered table-striped ">
+            <tr>
+                <th>Category</th>
+                <th>Documents</th>
+                <th>Date Uploaded</th>
+                <th>Uploaded By</th>
+                <th>Action(s)</th>
+            </tr>
+
+            <% @appeal.uploads.order(created_at: :asc).each do |upload| %>        
+                <tr>
+                    <td class="filenames" width="30%" name="uploadedfilecategory">
+                        <%
+                            category_description = upload.category
+                            MedicalAppeal::ALL_DOCUMENT_TYPES.each do |document_code, document_desc|
+                                if document_code == upload.category
+                                    category_description =  document_desc
+                                end
+                            end
+                        %>
+                        <%= category_description %>
+                    </td>
+                    <td class="filenames" width="30%" name="uploadedfilename">
+                        <% upload.documents.each do |document| %>
+                            <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                    <td class="filenames" width="15%"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                    <td class="filenames" width="25%"><%= "#{upload.creator.name} (#{upload.creator.code})" %></td>
+                    <td style="width: 150px;">
+                        <% if has_permission?('DELETE_UPLOAD_DOCUMENT_APPEALS') %>
+                            <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                        <% end %>
+                        <% if has_permission?('DELETE_MOH_APPEAL_LETTER') && upload.created_by == current_user.id %>
+                            <div class="set-deletion btn btn-danger" style="width: 120px;" data-id="<%= upload.id %>">Remove</div>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if @appeal.uploads.blank? %>
+                <tr><td colspan="5">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+        
+        <% if has_any_permission?('CREATE_UPLOAD_DOCUMENT_APPEALS','UPLOAD_MOH_APPEAL_LETTER') %>
+            <div class="form-group row">
+                <div class=" col-md-12">
+                    <div id="document-input-group">
+                        <label for="employer_uploads">Upload new document(s)</label>
+                        
+                        <div class="input-group custom-input-group d-flex">
+                            <div class="document-type flex-grow-1 p-0">
+                                <select class="form-control document-type-selector" name="appeal[uploads][][category]">
+                                    <option value="">Select option</option>
+                                    <% if current_user.role.code == "MOH_APPROVER" %>
+                                        <% MedicalAppeal::MOH_DOCUMENT_TYPES.each do |document_type, index| %>
+                                            <option value="<%= document_type %>"><%= index %></option>
+                                        <% end %>
+                                    <% else %>
+                                        <% MedicalAppeal::DOCTOR_DOCUMENT_TYPES.each do |document_type, index| %>
+                                            <option value="<%= document_type %>"><%= "DOCTOR - #{index}" %></option>
+                                        <% end %>
+                                        <% MedicalAppeal::LABORATORY_DOCUMENT_TYPES.each do |document_type, index| %>
+                                            <option value="<%= document_type %>"><%= "LAB - #{index}" %></option>
+                                        <% end %>
+                                        <% MedicalAppeal::EMPLOYER_MOH_DOCUMENT_TYPES.each do |document_type, index| %>
+                                            <option value="<%= document_type %>"><%= "EMPLOYER - #{index}" %></option>
+                                        <% end %>
+                                    <% end %>
+                                </select>
+                            </div>
+                        
+                            <div class="custom-file flex-grow-1">
+                                <input type="file" name="appeal[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" disabled>
+                                <label class="custom-file-label">Choose File</label>
+                            </div>
+
+                            <div style="width: 90px;" class="flex-shrink-0">
+                                <input type="text" style="border-radius: 0; border: 0;" readonly="readonly" class="form-control inline-file-size" placeholder="0 MB" value="">
+                            </div>
+                        
+                            <div class="flex-shrink-0">
+                                <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                            </div>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-12 col-form-label" for=""></label>
+                <div class="col-md-12">
+                    <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                </div>
+            </div>
+
+            <div class="form-group row" style="padding-left:130px;">
+                <div class="col-md-12">
+                    <%= appeal_form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+<% end %>
+
+<div class="px-4 py-4 border-bottom" <%= "hidden" if moh_readonly %> >
+    <label class="mb-4"><u>Available To Do List</u></label><br>
+
+    <table class="table-borders w-100">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">To Do</th>
+                <th class="py-1 px-2">Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @all_appeals.each_with_index do |to_do| %>
+                <%
+                    medical_appeal_todo = @appeal_todos.to_a.find {|todo| todo.appeal_todo_id == to_do.id}
+                    value               = medical_appeal_todo.present?
+                    next if !value && !to_do.is_active?
+
+                    type =
+                        if MedicalAppealTodo.lab_secondaries.include?(to_do.id)
+                            "laboratory"
+                        elsif MedicalAppealTodo.xray_secondaries.include?(to_do.id)
+                            "xray"
+                        else
+                            "doctor"
+                        end
+                %>
+
+                <tr class="appeal-todo-tr <%= "hidden" if value %>" data-id="<%= to_do.id %>" data-type="<%= type %>">
+                    <td class="py-1 px-2 todo-description"><%= to_do.description %></td>
+
+                    <td class="py-1 px-2 boolean-field-parent">
+                        <%= hidden_field_tag "appeal_to_dos[#{to_do.id}]", value ? "YES" : "NO", class: "boolean-field appeal-todos_input", data: { id: to_do.id } %>
+
+                        <% unless readonly || moh_readonly %>
+                            <div class="btn btn-success toggle-todo-buttons" data-action="add" data-id="<%= to_do.id %>">Add</div>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.toggle-todo-buttons[data-action="add"]').click(function() {
+            var action      = $(this).attr('data-action');
+            var id          = $(this).attr('data-id');
+            var row         = $(`.appeal-todo-tr[data-id="${ id }"]`);
+            var type        = $(row).attr('data-type');
+            $(row).addClass('hidden');
+            $(`.appeal-todos_input[data-id="${ id }"]`).val("YES");
+            var container   = $(`.selected-todo-container[data-id="${ id }"]`);
+            var parent      = $(`.parent-todos[data-type="${ type }"]`);
+
+            if (container.length > 0) {
+                container.removeClass('hidden').addClass('d-flex');
+            } else {
+                var descr       = $(row).find('.todo-description').text();
+
+                var appending   = `<div class="selected-todo-container my-3 d-flex" data-id="${ id }">
+                    <div class="flex-grow-1">
+                        <p class="mb-1">${ descr }</p>
+                        <p class="mb-1"><b>Status: </b>Not Done</p>
+                        <p><b>Remarks: </b><i>N/A</i></p>
+                    </div>
+
+                    <div class="flex-shrink-0 ml-2">
+                        <div class="btn btn-danger toggle-todo-buttons" data-action="remove" data-id="${ id }">Remove</div>
+                    </div>
+                </div>`;
+
+                parent.append(appending);
+                bindTodoRemoveButton(parent.find('.toggle-todo-buttons:last'));
+            }
+
+            checkContents(parent);
+        });
+
+        bindTodoRemoveButton('.toggle-todo-buttons[data-action="remove"]');
+
+        function bindTodoRemoveButton(target) {
+            $(target).click(function() {
+                var id      = $(this).attr('data-id');
+                var row     = $(`.appeal-todo-tr[data-id="${ id }"]`);
+
+                $(row).removeClass('hidden');
+                $(this).closest('.selected-todo-container').addClass('hidden').removeClass('d-flex');
+                $(`.appeal-todos_input[data-id="${ id }"]`).val("NO");
+                checkContents($(this).closest('.parent-todos'));
+            });
+        }
+
+        function checkContents(container) {
+            var length  = $(container).find('.selected-todo-container:not(.hidden)').length;
+            var anyTodo = $('.selected-todo-container:not(.hidden)').length;
+
+            if (length > 0) {
+                container.removeClass('hidden');
+            } else {
+                container.addClass('hidden');
+            }
+
+            if (anyTodo === 0) {
+                $('.no-selected-placeholder').removeClass('hidden');
+            } else {
+                $('.no-selected-placeholder').addClass('hidden');
+            }
+        }
+        
+        /**
+        * Start Documents
+        **/
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose File")
+        });
+
+        /**
+        * Function to duplicate document fields
+        **/
+        var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);  
+
+        $('#add_more_documents').click(() => {
+            clonedAttachmentInput
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-3 ')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose File")
+            bindLastDocumentTypeSelectorAndFileSelector();
+            removeAttachmentField('.removal-button:last');
+            $('#no-input-placeholder').hide();
+        });
+
+        removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                $(this).closest('.custom-input-group').remove();
+
+                if ($('.custom-input-group').length === 0) {
+                    $('#no-input-placeholder').show();
+                }
+            });
+        }
+
+        bindLastDocumentTypeSelectorAndFileSelector();
+        
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+
+        $('.set-deletion').click(function() {
+            filenames = $(this).closest('tr').find('.filenames');
+            filenames.toggleClass('text-decoration-line-through');
+            text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+            $(this).text(text).toggleClass('btn-danger btn-primary');
+
+            ids = $('.set-deletion.btn-primary').map(function() {
+                return $(this).attr('data-id');
+            }).get().join(',');
+
+            $('#remove_uploaded_file').val(ids);
+        });
+
+        /**
+        * Function to re-enable form input after selecting dom type
+        **/
+        $(".document-type-selector").change(function() {
+            let selectedValue = $("option:selected", this).val()
+
+            if (selectedValue.length > 0)
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+            else
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+        });
+
+        function validateFiles(inputFile) {
+            var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+            var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+            var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+            var extName;
+            var maxFileSize = <%= 10.megabytes %>;
+            var sizeExceeded = false;
+            var extError = false;
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var file = inputFile.files[0];
+
+            var file_size = file.size;
+
+            // check if single file exceed max file size
+
+            if (file_size && maxFileSize && file_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            // check if combine with previous file will exceed max file size
+
+            var combine_size = (file_size + total_uploaded_size) - file_size;
+
+            if (combine_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            extName = file.name.split('.').pop().toLowerCase();
+
+            if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+
+            if (sizeExceeded) {
+                window.alert(maxExceededMessage);
+                $(inputFile).val('');
+            }
+
+            if (extError) {
+                window.alert(extErrorMessage);
+                $(inputFile).val('');
+            }
+
+            // set inline size
+
+            var file_size_label = getUploadSizeLabel(file_size);
+
+            $(inputFile).closest('div').next().find('.inline-file-size').val(file_size_label);
+
+            // set label
+
+            setTotalUploadLabel();
+
+            // sync pending documents
+
+            // syncPendingDocuments();
+        }
+
+        function getTotalUploadedSize() {
+
+            var total_uploaded_size = 0;
+
+            $('.custom-file-input').each(function (index, obj) {
+
+                if (obj.files.length > 0) {
+                    total_uploaded_size = total_uploaded_size + parseFloat(obj.files[0].size);
+                }
+
+            });
+
+            return total_uploaded_size;
+        }
+
+        function setTotalUploadLabel() {
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var total_uploaded_label =  getUploadSizeLabel(total_uploaded_size);
+
+            $("#total_uploaded_label").text(total_uploaded_label);
+        }
+
+        function getUploadSizeLabel(upload_size) {
+
+            var total_mb = upload_size / 1000000;
+
+            total_mb = total_mb.toFixed(2);
+
+            var upload_size_label = total_mb + ' MB';
+
+            return upload_size_label;
+        }
+        
+        // re-sync pending documents
+
+        function syncPendingDocuments() {
+
+            var pending_uploads = getPendingUploads();
+
+            if (!pending_uploads) {
+                return false;
+            }
+
+            setPendingDocuments(pending_uploads);   
+        }
+
+        // get pending uploads depending on employer type
+
+        function getPendingUploads() {
+            var needed_validate_documents = required_documents[employer_type][region];
+
+            uploaded_category = $('.uploads_categories').map(function(idx, row){
+                return row.getAttribute('data-category');
+            });
+
+            var diff = $(needed_validate_documents).not(uploaded_category).get();
+
+            // var pending_uploads = needed_validate_documents;
+            var pending_uploads = diff.slice();
+
+            // console.log(needed_validate_documents);
+
+            $('.custom-input-group').each(function (index, obj) {
+
+                var document_type = $(obj).find('.document-type-selector').val();
+                var selected_file = $(obj).find('.custom-file-input').val();
+
+
+                // check if this document needed by current employer type
+                // if yes we need to check file exist
+
+                if (diff.includes(document_type)) {
+
+                    // if valid upload
+
+                    if (selected_file) {
+
+                        // remove from pending uploads
+
+                        for( var i = 0; i < pending_uploads.length; i++){ 
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1); 
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            return pending_uploads;
+        }
+
+        // set pending documents list
+
+        function setPendingDocuments(pending_uploads) {
+
+            var pending_list = '';
+
+            pending_uploads.forEach(function (document_type) {
+
+                var document_type_label = document_types[document_type];
+
+                pending_list = pending_list + document_type_label + '\n';
+            });
+            
+            var pending_documents = $("#appeal_pending_documents");
+
+            // reset pending list
+
+            pending_documents.val('');
+
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        // js validation
+
+        var document_types = <%= MedicalAppeal::DOCTOR_DOCUMENT_TYPES.merge(MedicalAppeal::LABORATORY_DOCUMENT_TYPES).to_json.html_safe %>;
+
+        var required_documents = {
+            doctor: [
+                ''
+            ],
+            laboratory: [
+                ''
+            ]
+        };
+
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+
+                    var pending_uploads = getPendingUploads();
+
+                    // if there is still pending documents, return false
+
+                    if (pending_uploads.length > 0) {
+
+                        // append to pending list
+
+                        setPendingDocuments(pending_uploads);
+
+                        // return false validation of there is documents pending
+
+                        return false;
+                    }
+
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+
+        $("#appeal-form").parsley({
+            errorClass: 'is-invalid text-danger',
+            errorsWrapper: '<div class="invalid-feedback"></div>',
+            errorTemplate: '<span></span>',
+            trigger: 'change'
+        });
+    </script>
+<% end %>

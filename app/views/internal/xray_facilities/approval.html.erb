@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Facilities</strong> - Approval
+    </div>
+    <%= form_for @xray_facility, url: approval_update_internal_xray_facilities_path(@xray_facility), html: {class: "#{params[:action]}_xray_facility xray_facility-form"} do |form| %>
+
+        <div class="card-body">
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <%= render "shared/approval_comments", { comments: @xray_facility.approval_request.comments } if @xray_facility.approval_request %>
+
+                    <% if @xray_facility.approval_request.category == "XRAY_FACILITY_LICENSE_EXPIRY_AMENDMENT" %>
+                        <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                    <% else %>
+                        <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: true %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_xray_facilities_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+
+        </div>
+    <% end %>
+</div>

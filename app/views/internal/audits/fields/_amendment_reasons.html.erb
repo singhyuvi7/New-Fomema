@@ -1,0 +1,8 @@
+<th><%= name.titleize %></th>
+<td>
+    <% if !value.blank? %>
+        <% value.each do |amendment_reason_id| %>
+            <div><%= AmendmentReason.find(amendment_reason_id).try(:name) %></div>
+        <% end %>
+    <% end %>
+</td>

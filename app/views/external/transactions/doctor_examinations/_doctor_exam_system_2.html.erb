@@ -1,0 +1,188 @@
+<%
+    namespacing ||= "de_attributes_#{ rand(1000) }"
+    readonly    ||= false
+%>
+
+<div class="category-switchable hidden" data-type="system_2">
+    <div class="p-4 border-bottom">
+        <h3><u>PART III. PHYSICAL EXAMINATION Section B: Systems Examination</u></h3>
+    </div>
+
+    <h5 class="px-4 py-3 border-bottom mb-0">Section B - System's Examination (cont'd)</h5>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">4</label>
+        <label class="flex-grow-1 mb-0">NERVOUS SYSTEM & MENTAL STATUS</label>
+    </div>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">4.1</label>
+        <label class="flex-grow-1 mb-0">General Mental Status (Refer to Mental Status Examination Guide)*</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% value = doctor_examination.try(:system_nervous_general_mental_status) %>
+            <%= hidden_field_tag "#{ namespacing }[system_nervous_general_mental_status]", value, class: "boolean-field" %>
+            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: true, value: true, placeholder: "Abnormal") %>
+            <%= raw boolean_field_button(active_color: "success", active: !value, readonly: true, value: false, placeholder: "Normal") %>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"></label>
+        <label class="flex-grow-1 mb-0">Mental Health Assessment by General Practitioner:</label>
+    </div>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">4.1.1</label>
+        <label class="flex-grow-1 mb-0">General Appearance</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% value = doctor_examination.try(:system_nervous_general_appearance) %>
+            <%= hidden_field_tag "#{ namespacing }[system_nervous_general_appearance]", value, class: "boolean-field auto-field-check--general-mental" %>
+            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Untidy") %>
+            <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Neat & Tidy") %>
+        </div>
+    </div>
+
+    <!-- (Start) Mood -->
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index">4.1.2</label>
+            <label class="flex-grow-1 mb-0">Mood</label>
+        </div>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">a. Depressed</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:system_nervous_mood_depressed) %>
+                <%= hidden_field_tag "#{ namespacing }[system_nervous_mood_depressed]", value, class: "boolean-field auto-field-check--general-mental" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">b. Irritable</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:system_nervous_mood_irritable) %>
+                <%= hidden_field_tag "#{ namespacing }[system_nervous_mood_irritable]", value, class: "boolean-field auto-field-check--general-mental" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <!-- (End) -->
+
+    <!--(start abnormal behaviour) -->
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index">4.1.3</label>
+            <label class="flex-grow-1 mb-0">Abnormal Behaviour</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:system_nervous_abnormal_behaviour) %>
+                <%= hidden_field_tag "#{ namespacing }[system_nervous_abnormal_behaviour]", value, class: "boolean-field auto-field-check--general-mental" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <!-- (End) -->
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"></label>
+
+        <label class="flex-grow-1 mb-0">
+            Note:<br>
+            1. The box is disabling and not allowed to tick by GP. System will tick automatically if other assessments Untidy/Yes (*).<br>
+            2. If Untidy/Yes for any of the items: 4.1.1, 4.1.2(a),4.1.2(b) or 4.1.3 and to certify as UNSUITABLE.
+        </label>
+    </div>
+
+    <% DoctorExamination.system_2_section_4.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "4.#{index + 2}" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Abnormal") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">5</label>
+        <label class="flex-grow-1 mb-0">Genitourinary system</label>
+    </div>
+
+    <% DoctorExamination.genitourinary_system.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "5.#{index + 1}" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Abnormal") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">6</label>
+        <label class="flex-grow-1 mb-0">Breast Examination</label>
+    </div>
+
+    <% DoctorExamination.breast_examinations.each_with_index do |array, index| %>
+        <%
+            field_name, label = array
+            value = doctor_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "6.#{index + 1}" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 border-bottom">
+        <div class="d-flex">
+            <label class="row-index">7</label>
+            <label class="mb-0">Comments (refer to Part III, Section B: 1.1 - 6.4)</label>
+        </div>
+
+        <%= text_area_tag "#{ namespacing }[system_comment]", doctor_examination.try(:system_comment), rows: 5, class: "mt-2", style: "margin-left: 4.5em; width: calc(100% - 4.5em);", readonly: readonly %>
+    </div>
+
+    <% unless readonly %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Yes, I have visited system exam 2 for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:visited_system_2) %>
+                <%= hidden_field_tag "#{ namespacing }[visited_system_2]", value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% end %>
+</div>

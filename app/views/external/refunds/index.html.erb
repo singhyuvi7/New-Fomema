@@ -1,0 +1,42 @@
+<div class="card">
+   <div class="card-header border-0 bg-transparent text-dark">
+       <strong>Refund</strong>
+        <div class="card-header-actions">
+        </div>
+    </div>
+    <div class="card-body">
+        <%=render "filter" %>
+        <%=render "/shared/all_flash" %>
+
+         <table class="table table-responsive-sm table_circle">
+            <thead>
+                <tr>
+                    <th>Payment Code</th>
+                    <th>Payment Date</th>
+                    <th>Category</th>
+                    <th>Amount (RM) </th>
+                    <th>Payment Status</th>
+                    <th class="module-row-actions">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @refunds.each do |refund| %>
+                    <tr>
+                        <td><%= refund.code %></td>
+                        <td><%= refund.date&.strftime("%d/%m/%Y") %></td>
+                        <td><%= Refund::CATEGORIES[refund.category] %></td>
+                        <td><%= number_to_currency(refund.amount, unit: "") %></td>
+                        <td><%= Refund::STATUSES[refund.status] %></td>
+                        <td class="module-row-actions">
+                            <a href="<%= external_refund_path refund %>" class="btn btn-blue-portal">Show</a>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+
+        <div class="row external-pagination-container">
+            <%= paginate @refunds %>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<%
+    pcr_impression      = @appeal.current_xray_retake.try(:status) == "CLOSED" ? @appeal.latest_pcr_review.try(:comment) : nil
+    latest_result       = xray_retake.pcr_reviews.to_a.sort.last&.result
+
+    if latest_result.blank? && xray_retake&.xray_examination&.transmitted_at?
+        latest_result   = xray_retake&.xray_examination&.result
+    end
+%>
+
+<label class="text-primary">Retake <%= numbering %> - Examination Status</label>
+
+<table class="table-borders w-100">
+    <tbody>
+        <tr>
+            <th class="p-2">X-ray Reference No.</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Result</th>
+            <th class="p-2">Facility Selected Date</th>
+            <th class="p-2">X-ray Taken Date</th>
+            <th class="p-2">Results Transmitted Date</th>
+        </tr>
+
+        <tr>
+            <% if xray_retake.present? %>
+                <td class="p-2"><%= raw xray_retake.code? ? xray_retake.code : "<i>N/A</i>" %></td>
+                <td class="p-2"><%= raw xray_retake.status? ? XrayRetake::APPEAL_STATUSES[xray_retake.status] : "<i>N/A</i>" %></td>
+                <td class="p-2"><%= raw latest_result ? latest_result : "<i>N/A</i>" %></td>
+                <td class="p-2"><%= raw @appeal.xray_selected_at? ? @appeal.xray_selected_at.strftime("%d/%m/%Y") : "<i>N/A</i>" %></td>
+                <td class="p-2"><%= raw xray_retake.xray_examination&.xray_taken_date? ? xray_retake.xray_examination&.xray_taken_date.strftime("%d/%m/%Y") : "<i>N/A</i>" %></td>
+                <td class="p-2"><%= raw xray_retake.completed_at? ? xray_retake.completed_at.strftime("%d/%m/%Y") : "<i>N/A</i>" %></td>
+            <% else %>
+                <%= raw 6.times.map {"<td class='p-2'><i>N/A</i></td>"}.join %>
+            <% end %>
+        </tr>
+    </tbody>
+</table>
+
+<% xray_retake.pcr_reviews.to_a.sort.each.with_index(1) do |pcr_review, index| %>
+    <label class="text-primary mt-4">Retake <%= numbering %> - PCR Review <%= index %></label>
+
+    <table class="table-borders w-100">
+        <tbody>
+            <tr>
+                <th class="p-2">PCR Pickup Date</th>
+                <th class="p-2">PCR Name</th>
+            </tr>
+
+            <tr>
+                <td class="p-2" style="border-bottom: 5px solid #d3d3d3 !important;"><%= pcr_review.created_at.strftime("%d/%m/%Y") %></td>
+                <td class="p-2" style="border-bottom: 5px solid #d3d3d3 !important;"><%= pcr_review.pcr_user&.name %></td>
+            </tr>
+
+            <tr>
+                <th class="p-2">Xray Details</th>
+                <th class="p-2">Xray Details Comment</th>
+            </tr>
+
+            <tr>
+                <td valign="top" class="p-2" style="border-bottom: 5px solid #d3d3d3 !important;"><%= pcr_review.belong? ? pcr_review.belong == "YES" ? "SAME WORKER" : "DIFFERENT WORKER" : nil %></td>
+
+                <td valign="top" class="p-2" style="border-bottom: 5px solid #d3d3d3 !important;">
+                    <% if pcr_review.belong_comment.present? %>
+                        <%= simple_format pcr_review.belong_comment %>
+                    <% else %>
+                        <i>N/A</i>
+                    <% end %>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="p-2">PCR Impression</th>
+                <th class="p-2">PCR Comment</th>
+            </tr>
+
+            <tr>
+                <td valign="top" class="p-2"><%= pcr_review.result %></td>
+
+                <td valign="top" class="p-2">
+                    <% if pcr_review.comment.present? %>
+                        <%= simple_format pcr_review.comment %>
+                    <% else %>
+                        <i>N/A</i>
+                    <% end %>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<% end %>

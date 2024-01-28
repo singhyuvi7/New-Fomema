@@ -1,0 +1,69 @@
+.card
+  .card-header
+    %strong Delayed Transactions
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: laboratory_delay_transactions_internal_mspd_reports_path, method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :lab_code, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :lab_code, class: 'form-control', value: params[:lab_code]
+              .col-md-6
+                .row.form-group
+                  = form.label :lab_name, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :lab_name, class: 'form-control', value: params[:lab_name]
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :medical_examination_date_from, 'Examination Date From', class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :medical_examination_date_from, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "medical_examination_date_from"}, value: params[:medical_examination_date_from]
+              .col-md-6
+                .row.form-group
+                  = form.label :medical_examination_date_to, 'Examination Date To', class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :medical_examination_date_to, class: 'form-control datepicker datepicker-range-filter', data: { type: "end", target: "medical_examination_date_from"}, value: params[:medical_examination_date_to]
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :specimen_taken_date_from, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :specimen_taken_date_from, class: 'form-control', class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "specimen_taken_date_from"}, value: params[:specimen_taken_date_from]
+              .col-md-6
+                .row.form-group
+                  = form.label :specimen_taken_date_to, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :specimen_taken_date_to, class: 'form-control', class: 'form-control datepicker datepicker-range-filter', data: { type: "end", target: "specimen_taken_date_from"}, value: params[:specimen_taken_date_to]
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :specimen_received_date_from, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :specimen_received_date_from, class: 'form-control', class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "specimen_received_date_from"}, value: params[:specimen_received_date_from]
+              .col-md-6
+                .row.form-group
+                  = form.label :specimen_received_date_to, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :specimen_received_date_to, class: 'form-control', class: 'form-control datepicker datepicker-range-filter', data: { type: "end", target: "specimen_received_date_from"}, value: params[:specimen_received_date_to]
+          .card-footer
+            - if has_permission?("MSPD_REPORTS")
+              .text-right
+                = link_to laboratory_delay_transactions_internal_mspd_reports_path, class: 'btn btn-sm btn-danger mx-1' do
+                  %i.icon-trash
+                  Clear
+                = link_to laboratory_delay_transactions_internal_mspd_reports_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-secondary' do
+                  %i.fa.fa-download
+                  Export
+                = form.button :filter, class: 'btn btn-primary btn-sm mx-1' do
+                  %i.icon-magnifier
+                  Filter
+
+    = render 'internal/reports/mspd/laboratory_delay_transactions/pdf_template', headers: @headers, transactions: @transactions

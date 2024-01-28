@@ -1,0 +1,408 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Appeal</strong> - <%= @appeal.id %>
+    </div>
+
+    <%= form_for @appeal, url: upload_document_update_external_appeal_path(@appeal), html: { multipart: true, class: "with-parsley" } do |form| %>
+        <%
+            has_tuberculosis_todo = false
+            @appeal.medical_appeal_todos.each do |todo|
+                has_tuberculosis_todo = true if todo.appeal_todo_id == 45
+            end
+        %>
+
+        <div class="card-body">
+            <div class="card">
+                <div class="card-body">
+                    <%=render '/shared/all_flash' %>
+                    <%= render 'shared/all_validation_flash', { model_obj: @appeal } %>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Please upload the following documents for verification.</p>
+                            <div class="" id="agency_document_list">
+                                <ol class="ol-list-portal">
+                                    <li>Specialist report <%= "(Gene Xpert report, TB QuantiFERON report, chest physician assessment report)" if has_tuberculosis_todo %></li>
+                                    <li>Other relevant document(s)</li>
+                                </ol>
+                            </div>
+                            <p>Please upload only valid files (JPG, PNG, PDF). The total sizes of all files is limited to 10 MB.</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="document-input-group" class="form-group">
+                                <div class="input-group custom-input-group">
+                                    <div class="col-md-6 document-type">
+                                        <select class="col-md-12 form-control document-type-selector" name="appeal[uploads][][category]">
+                                            <option value="">Select option</option>
+                                            <% MedicalAppeal::EMPLOYER_MOH_DOCUMENT_TYPES.each do |document_code, document_desc| %>
+                                                <option value="<%= document_code %>"><%= document_desc %></option>
+                                            <% end %>
+                                        </select>
+                                    </div>
+                                    <div class="custom-file col-md-6">
+                                        <input type="file" name="appeal[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" disabled>
+                                        <label class="custom-file-label">Choose File</label>
+                                    </div>
+                                    <div class="removal-button btn btn-danger font-weight-bold">X</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Total Uploaded Size: <span id="total_uploaded_label">0 MB</span></h6>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-md-10" style="display:none"><label class="col-form-label" style="margin-right:69px;">Pending Documents</label></div>
+                            <div class="col-md-10">
+                                <textarea class="form-control" readonly="readonly" data-parsley-uploaded-documents="" data-parsley-validate-if-empty="" name="" id="appeal_pending_document" rows="5" style="display:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <a class="btn btn-blue-portal" href="<%= external_appeals_path %>">Back</a>
+                <%= button_tag 'Submit', type: 'submit', class: 'btn btn-success', data: { disable_with: "Submiting..."} %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.custom-file-input').change(function() {
+            let filePath = $(this).val().split("\\")
+            let fileName = filePath[filePath.length - 1]
+            if (fileName != "")
+                $(this).siblings('.custom-file-label').html(fileName)
+            else
+                $(this).siblings('.custom-file-label').html("Choose File")
+        });
+
+        /**
+        * Function to duplicate document fields
+        **/
+        var clonedAttachmentInput = $('.custom-input-group:first').clone(true, true);
+
+        $('#add_more_documents').click(() => {
+            clonedAttachmentInput
+                .clone(true, true)
+                .appendTo("#document-input-group")
+                .addClass('mt-3 ')
+                .find(".custom-file-input")
+                .val("")
+                .attr("disabled", "disabled")
+            $('.custom-input-group:last')
+                .find(".custom-file-label").html("Choose File")
+            bindLastDocumentTypeSelectorAndFileSelector();
+            removeAttachmentField('.removal-button:last');
+            $('#no-input-placeholder').hide();
+        });
+
+        removeAttachmentField('.removal-button:last');
+
+        function removeAttachmentField(field) {
+            $(field).click(function() {
+                $(this).closest('.custom-input-group').remove();
+
+                if ($('.custom-input-group').length === 0) {
+                    $('#no-input-placeholder').show();
+                }
+                setTotalUploadLabel();
+            });
+        }
+
+        bindLastDocumentTypeSelectorAndFileSelector();
+
+        // Function to re-enable form input after selecting dom type & to set file name after selecting in input
+        function bindLastDocumentTypeSelectorAndFileSelector() {
+            $('.custom-file-input:last').change(function() {
+                let filePath = $(this).val().split("\\")
+                let fileName = filePath[filePath.length - 1]
+                if (fileName != "")
+                    $(this).siblings('.custom-file-label').html(fileName)
+                else
+                    $(this).siblings('.custom-file-label').html("Choose file")
+            });
+
+            $('.document-type-selector:last').change(function() {
+                let selectedValue = $("option:selected", this).val();
+                inputField = $(this).closest('.custom-input-group').find(".custom-file input");
+
+                if (selectedValue.length > 0) {
+                    inputField.removeAttr('disabled');
+                } else {
+                    inputField.attr("disabled", "disabled")
+                }
+            });
+        }
+
+        $('.set-deletion').click(function() {
+            filenames = $(this).closest('tr').find('.filenames');
+            filenames.toggleClass('text-decoration-line-through');
+            text = $(this).hasClass('btn-danger') ? 'Undo Remove' : 'Remove';
+            $(this).text(text).toggleClass('btn-danger btn-primary');
+
+            ids = $('.set-deletion.btn-primary').map(function() {
+                return $(this).attr('data-id');
+            }).get().join(',');
+
+            $('#remove_uploaded_file').val(ids);
+        });
+
+        /**
+        * Function to re-enable form input after selecting dom type
+        **/
+        $(".document-type-selector").change(function() {
+            let selectedValue = $("option:selected", this).val()
+
+            if (selectedValue.length > 0)
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+            else
+                $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+        });
+
+        function validateFiles(inputFile) {
+            var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+            var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+            var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+            var extName;
+            var maxFileSize = <%= 10.megabytes %>;
+            var sizeExceeded = false;
+            var extError = false;
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var file = inputFile.files[0];
+
+            var file_size = file.size;
+
+            // check if single file exceed max file size
+
+            if (file_size && maxFileSize && file_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            // check if combine with previous file will exceed max file size
+
+            var combine_size = (file_size + total_uploaded_size) - file_size;
+
+            if (combine_size > parseInt(maxFileSize)) {
+                sizeExceeded = true;
+            };
+
+            extName = file.name.split('.').pop().toLowerCase();
+
+            if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+
+            if (sizeExceeded) {
+                window.alert(maxExceededMessage);
+                $(inputFile).val('');
+            }
+
+            if (extError) {
+                window.alert(extErrorMessage);
+                $(inputFile).val('');
+            }
+
+            // set inline size
+
+            var file_size_label = getUploadSizeLabel(file_size);
+
+            $(inputFile).closest('div').next().find('.inline-file-size').val(file_size_label);
+
+            // set label
+
+            setTotalUploadLabel();
+
+            // sync pending documents
+
+            syncPendingDocuments();
+        }
+
+        function getTotalUploadedSize() {
+
+            var total_uploaded_size = 0;
+
+            $('.custom-file-input').each(function (index, obj) {
+
+                if (obj.files.length > 0) {
+                    total_uploaded_size = total_uploaded_size + parseFloat(obj.files[0].size);
+                }
+
+            });
+
+            return total_uploaded_size;
+        }
+
+        function setTotalUploadLabel() {
+
+            var total_uploaded_size = getTotalUploadedSize();
+
+            var total_uploaded_label =  getUploadSizeLabel(total_uploaded_size);
+
+            $("#total_uploaded_label").text(total_uploaded_label);
+        }
+
+        function getUploadSizeLabel(upload_size) {
+
+            var total_mb = upload_size / 1000000;
+
+            total_mb = total_mb.toFixed(2);
+
+            var upload_size_label = total_mb + ' MB';
+
+            return upload_size_label;
+        }
+
+        // re-sync pending documents
+
+        function syncPendingDocuments() {
+
+            var pending_uploads = getPendingUploads();
+
+            if (!pending_uploads) {
+                return false;
+            }
+
+            setPendingDocuments(pending_uploads);
+        }
+
+        // get pending uploads depending on employer type
+
+        function getPendingUploads() {
+            var needed_validate_documents = required_documents['employer'];
+
+            uploaded_category = $('.uploads_categories').map(function(idx, row){
+                return row.getAttribute('data-category');
+            });
+
+            var diff = $(needed_validate_documents).not(uploaded_category).get();
+
+            // var pending_uploads = needed_validate_documents;
+            var pending_uploads = diff.slice();
+
+            // console.log(needed_validate_documents);
+
+            $('.custom-input-group').each(function (index, obj) {
+
+                var document_type = $(obj).find('.document-type-selector').val();
+                var selected_file = $(obj).find('.custom-file-input').val();
+
+
+                // check if this document needed by current employer type
+                // if yes we need to check file exist
+
+                if (diff.includes(document_type)) {
+
+                    // if valid upload
+
+                    if (selected_file) {
+
+                        // remove from pending uploads
+
+                        for( var i = 0; i < pending_uploads.length; i++){
+                            if ( pending_uploads[i] === document_type) {
+                                pending_uploads.splice(i, 1);
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            return pending_uploads;
+        }
+
+        // set pending documents list
+
+        function setPendingDocuments(pending_uploads) {
+
+            var pending_list = '';
+
+            pending_uploads.forEach(function (document_type) {
+
+                var document_type_label = document_types[document_type];
+
+                pending_list = pending_list + document_type_label + '\n';
+            });
+
+            var pending_documents = $("#appeal_pending_document");
+
+            // reset pending list
+
+            pending_documents.val('');
+
+            pending_documents.val(pending_documents.val() + pending_list);
+        }
+
+        // js validation
+
+        var document_types = <%= MedicalAppeal::EMPLOYER_MOH_DOCUMENT_TYPES.to_json.html_safe %>;
+
+        var required_documents = {
+            employer: [
+                // 'EM_SPECIALIST_REPORT',
+                // 'EM_OTHER_DOCUMENT',
+            ],
+        };
+
+        window
+            .Parsley
+            .addValidator('uploadedDocuments', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+
+                    var pending_uploads = getPendingUploads();
+
+                    // if there is still pending documents, return false
+
+                    if (pending_uploads.length > 0) {
+
+                        // append to pending list
+
+                        setPendingDocuments(pending_uploads);
+
+                        // return false validation of there is documents pending
+
+                        return false;
+                    }
+
+                    var total_uploaded_size = parseFloat($("#total_uploaded_label").text());
+                    if (total_uploaded_size <= 0) {
+                        return false;
+                    }
+
+                    return true;
+                },
+                messages: {
+                    en: 'You must upload all the required documents',
+                }
+            });
+
+        $("#appeal-form").parsley({
+            errorClass: 'is-invalid text-danger',
+            errorsWrapper: '<div class="invalid-feedback"></div>',
+            errorTemplate: '<span></span>',
+            trigger: 'change'
+        });
+    </script>
+<% end %>

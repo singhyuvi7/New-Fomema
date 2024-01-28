@@ -1,0 +1,40 @@
+<p>
+    <b>Dear <%= @customer&.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @customer&.name %></i></b>,
+</p>
+
+<p>
+    Please be informed, your bank draft already exceed 90 days and unutilised amount will be auto generated as refund. <br>
+    <i>Dimaklumkan bahawa draf bank anda telah melebihi 90 hari dan bayaran yang tidak digunakan akan diletakkan kepada status Bayaran Balik secara auto.</i>
+</p>
+
+<p>
+    We will process your payment and refund will be credited to your account as per your registered/updated account number in our portal. <br>
+    <i>Kami akan memproses pembayaran anda dan bayaran balik akan dikreditkan ke akaun yang telah didaftar/kemaskini di portal.</i>
+</p>
+
+<p>
+    You will received an email once refund successfully being credited to your account. <br>
+    <i>Anda akan menerima e-mel setelah Bayaran Balik berjaya dikreditkan ke akaun anda.</i>
+</p>
+
+<div>
+    Bank Draft Information:<br>
+    <i>Informasi Draf Bank</i> <br>
+
+    Bank Draft No : <%= @bank_draft_number %><br>
+    <i>Nombor Draf Bank</i> <br>
+
+    Unutilised Amount : RM<%= number_with_precision(@refund_amount, precision: 2) %> <br>
+    <i>Jumlah Tidak Digunakan</i>
+</div>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

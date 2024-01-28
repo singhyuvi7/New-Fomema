@@ -1,0 +1,46 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Change Employer</div>
+        <%= form_for @employer, {url: move_fw_internal_employer_path(@employer), html: {multipart: true}} do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <%=render 'shared/all_validation_flash', { model_obj: @employer } %>
+                <%=render "/shared/all_flash" %>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :employer, class: 'required' %>
+                            <div class="input-group">
+                                <input style="display: none" name="employer_id" id="employer_id" value="<%= @employer.id %>" required></input>
+                                <div class="form-control" id="employer_display">
+                                    <%= "#{@employer.name} - #{@employer.code}" %>
+                                </div>
+                                <span class="input-group-append">
+                                    <button id="select-employer-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-employer-modal">Select employer</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /card-body -->
+
+            <div class="card-footer">
+
+                <div class="text-right">
+                    <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employers_path) %>
+                    <%=raw edit_save_button() %>
+                </div>
+
+            </div>
+        <% end %>
+    </div>
+</div>
+<%=render 'search_employer' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

@@ -1,0 +1,23 @@
+<% if has_permission?("VIEW_BLOCKED_MONITORING_TAG_IN_WORKER_INFORMATION") %>
+    <% foreign_worker = transaction.foreign_worker %>
+
+    <div class="d-flex justify-content-end mt-2">
+        <% if transaction.is_imm_blocked %>
+            <div class="btn btn-info font-weight-bold ml-2 d-flex align-items-center" data-toggle="tooltip" title="Transaction blocked from sending results to Imigresen">
+                <i class="fas fa-exclamation-circle font-size-8 mr-2"></i>Transaction IMM Blocked
+            </div>
+        <% end %>
+
+        <% if foreign_worker.blocked? %>
+            <div class="btn btn-danger font-weight-bold ml-2 d-flex align-items-center" data-toggle="tooltip" data-html="true" title="<%= foreign_worker.fw_block_details %>">
+                <i class="fas fa-exclamation-circle font-size-8 mr-2"></i>Worker Blocked
+            </div>
+        <% end %>
+
+        <% if foreign_worker.monitoring == "Y" %>
+            <div class="btn btn-warning font-weight-bold ml-2 d-flex align-items-center" data-toggle="tooltip" title="<%= foreign_worker.fw_monitoring_details %>">
+                <i class="fas fa-exclamation-circle font-size-8 mr-2"></i>Under Monitoring
+            </div>
+        <% end %>
+    </div>
+<% end %>

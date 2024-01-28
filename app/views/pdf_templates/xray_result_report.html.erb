@@ -1,0 +1,155 @@
+<!-- for debug -->
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css' %>
+<!-- end debug -->
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/xray_result_report" %>
+
+<%= render "/pdf_templates/webfonts_header" %>
+
+<%
+    xray_examination    = @transaction.xray_examination
+    @exam_not_done      = xray_examination.xray_examination_not_done == "YES"
+
+    information_column_label_1 = ["Worker Name","Country of Origin","Passport Number","Job Type","Date of X-Ray Taken","Transaction ID"]
+
+    information_column_value_1 = [
+        @transaction.fw_name,
+        @transaction.fw_country.name,
+        @transaction.fw_passport_number,
+        @transaction.fw_job_type.present? ? @transaction.fw_job_type.name : '-',
+        xray_examination.xray_taken_date? ? xray_examination.xray_taken_date.strftime('%d/%m/%Y') : '-',
+        @transaction.code
+    ]
+
+    information_column_label_2 = ["Worker Code","Date of Birth","Sex","Employer Code","Date of X-Ray Report"]
+
+    information_column_value_2 = [
+        @transaction.fw_code,
+        @transaction.fw_date_of_birth.strftime('%d/%m/%Y'),
+        ForeignWorker::GENDERS[@transaction.fw_gender],
+        @transaction.employer.code,
+        xray_examination&.transmitted_at&.strftime("%d/%m/%Y")
+    ]
+
+    report_by = "#{current_user.userable.code} (#{current_user.userable.name})"
+    xray_ref_no = xray_examination.present? ? xray_examination.xray_ref_number : '-'
+
+    if @type == XrayFacility.to_s
+        information_column_label_1 += ["X-Ray Ref No"]
+        information_column_value_1 += [xray_ref_no]
+        information_column_label_2 += ["Reported By"]
+        information_column_value_2 += [report_by]
+    elsif
+        information_column_label_1 += ["Reported By"]
+        information_column_value_1 += [report_by]
+        information_column_label_2 += ["X-Ray Ref No"]
+        information_column_value_2 += [xray_ref_no]
+    end
+
+    part_1_types = {
+        "thoracic_cage"                                 => "Thoracic Cage",
+        "heart_shape_and_size"                          => "Heart Shape and Size (CTR)",
+        "lung_fields"                                   => "Lung Fields",
+        "mediastinum_and_hila"                          => "Mediastinum and Hila",
+        "pleura_hemidiaphragms_costopherenic_angles"    => "Pleura / Hemidiaphragms / Costopherenic Angles"
+    }
+
+    part_2_types = {
+        "focal_lesion"                                  => "Focal Lesion (E.g. Old /New PTB, Cancer)",
+        "other_findings"                                => "Any Other Abnormalities"
+    }
+%>
+
+<div class="result-report page-container">
+    <div class="header-title">
+        CHEST X-RAY FINDINGS FOR (<%= @transaction.fw_code %>)
+    </div>
+
+    <div class="transaction-details">
+        <div class="information left-col">
+            <% information_column_label_1.each.with_index do |label, index| %>
+                <div class="row">
+                    <div class="label"><%= label %></div>
+                    <span class="colon">:</span><span class="value"><%= information_column_value_1[index] %></span>
+                </div>
+            <% end %>
+        </div>
+
+        <div class="information right-col">
+            <% information_column_label_2.each.with_index do |label, index| %>
+                <div class="row">
+                    <div class="label"><%= label %></div>
+                    <span class="colon">:</span><span class="value"><%= information_column_value_2[index] %></span>
+                </div>
+            <% end %>
+        </div>
+    </div>
+
+    <table>
+        <tbody>
+            <tr>
+                <th class="head-title"></th>
+                <th class="head-abnormal">ABNORMAL</th>
+                <th class="head-normal">NORMAL</th>
+                <th class="head-details">DETAILS OF ABNORMALITY</th>
+            </tr>
+
+            <% part_1_types.keys.each.with_index(1) do |type, index| %>
+                <% details = @exam_not_done ? nil : xray_examination.try("#{ type }_comment") %>
+
+                <tr>
+                    <td class="result-title"><%= index %>. <%= part_1_types[type] %></td>
+
+                    <% if @exam_not_done %>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                    <% elsif xray_examination.try(type) %>
+                        <td class="text-center"><i class="fas fa-check"></i></td>
+                        <td class="text-center"></td>
+                    <% elsif !xray_examination.try(type) %>
+                        <td class="text-center"></td>
+                        <td class="text-center"><i class="fas fa-check"></i></td>
+                    <% end %>
+
+                    <td class="details-value"><%= details.present? ? simple_format(details) : "-" %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td></td>
+                <td class="text-center">YES</td>
+                <td class="text-center">NO</td>
+                <td class="text-center">DETAILS OF ABNORMALITY</td>
+            </tr>
+
+            <% part_2_types.keys.each.with_index(6) do |type, index| %>
+                <% details = @exam_not_done ? nil : xray_examination.try("#{ type }_comment") %>
+
+                <tr>
+                    <td class="result-title"><%= index %>. <%= part_2_types[type] %></td>
+
+                    <% if @exam_not_done %>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                    <% elsif xray_examination.try(type) %>
+                        <td class="text-center"><i class="fas fa-check"></i></td>
+                        <td class="text-center"></td>
+                    <% elsif !xray_examination.try(type) %>
+                        <td class="text-center"></td>
+                        <td class="text-center"><i class="fas fa-check"></i></td>
+                    <% end %>
+
+                    <td class="details-value"><%= details.present? ? simple_format(details) : "-" %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td colspan="4">IMPRESSION :</td>
+            </tr>
+
+            <tr>
+                <td colspan="4" class="impression-value"><%= xray_examination.try(:impression).blank? ? "-" : simple_format(xray_examination.try(:impression)) %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

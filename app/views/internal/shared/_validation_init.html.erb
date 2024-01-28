@@ -1,0 +1,8 @@
+$("<%= form_element %>").parsley({
+    errorClass: 'is-invalid text-danger',
+    errorsWrapper: '<div class="invalid-feedback"></div>',
+    errorTemplate: '<span></span>',
+    trigger: 'change',
+    excluded: "input[type=button], input[type=submit], input[type=reset], [disabled]",
+    requiredMessage: 'This field is required'
+});

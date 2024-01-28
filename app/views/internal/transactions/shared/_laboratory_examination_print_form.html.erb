@@ -1,0 +1,589 @@
+<div class="card xray_report_form">
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th colspan="5">Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Start of Laboratory test not done -->
+            <tr>
+                <td colspan="5">Laboratory tests not done</td>
+
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="laboratory_test_not_done_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][laboratory_test_not_done]" id="<%= input_key %>_laboratory_test_not_done_yes" value="YES"
+                            <% if laboratory_examination_model.laboratory_test_not_done === 'YES' %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_laboratory_test_not_done_yes">
+                            YES
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="laboratory_test_not_done_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][laboratory_test_not_done]" id="<%= input_key %>_laboratory_test_not_done_no" value="NO"
+                            <% if laboratory_examination_model.laboratory_test_not_done === 'NO' %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_laboratory_test_not_done_no">
+                            NO
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Laboratory test not done -->
+
+            <!-- Start of date and time of specimen taken -->
+            <tr>
+                <td colspan="5">Date & time of specimen taken</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][specimen_taken_date]"
+                        id="<%= input_key %>_laboratory_examination_specimen_taken_date" rows="2"><%= laboratory_examination_model.specimen_taken_date %></textarea>
+                </td>
+            </tr>
+            <!--End of date and time of specimen taken -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Date & time of specimen received</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][specimen_received_date]"
+                        id="<%= input_key %>_laboratory_examination_specimen_received_date" rows="2"><%= laboratory_examination_model.specimen_received_date %></textarea>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Barcode of blood specimen</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][blood_specimen_barcode]"
+                        id="<%= input_key %>_laboratory_examination_blood_specimen_barcode" rows="2"><%= laboratory_examination_model.blood_specimen_barcode %></textarea>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of date and time of specimen received -->
+            <tr>
+                <td colspan="5">Barcode of urine specimen</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][urine_specimen_barcode]"
+                        id="<%= input_key %>_laboratory_examination_urine_specimen_barcode" rows="2"><%= laboratory_examination_model.urine_specimen_barcode %></textarea>
+                </td>
+            </tr>
+            <!--End of date and time of specimen received -->
+
+            <!-- Start of blood -->
+            <tr>
+                <td colspan="7">Blood Tests</td>
+            </tr>
+            <!--End of blood -->
+
+            <tr>
+                <th width="50">No</th>
+                <th colspan="4">Report</th>
+                <th colspan="2" class="text-center">Status</th>
+            </tr>
+
+            <!-- Start of blood group -->
+            <tr>
+                <td>1</td>
+                <td>Blood Group Type</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group]" id="<%= input_key %>_blood_group_a" value="A"
+                            <% if laboratory_examination_model.blood_group === 'A' %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_a">
+                            A
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group]" id="<%= input_key %>_blood_group_b" value="B"
+                            <% if laboratory_examination_model.blood_group === 'B' %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_b">
+                            B
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group]" id="<%= input_key %>_blood_group_ab" value="AB"
+                            <% if laboratory_examination_model.blood_group === 'AB' %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_ab">
+                            AB
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group]" id="<%= input_key %>_blood_group_o" value="O"
+                            <% if laboratory_examination_model.blood_group === 'O' %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_o">
+                            O
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group]" id="<%= input_key %>_blood_group_other" value="OTHER"
+                            <% if laboratory_examination_model.blood_group === 'OTHER' %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_other">
+                            OTHER
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of blood group -->
+
+            <!-- Start of blood group is other type -->
+            <tr>
+                <td></td>
+                <td colspan="4">If Blood Group is Other type</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][blood_group_other]"
+                        id="<%= input_key %>_laboratory_examination_blood_group_other" rows="2"><%= laboratory_examination_model.blood_group_other %></textarea>
+                </td>
+            </tr>
+            <!-- End of blood group is other type -->
+
+            <!-- Start of blood group rh -->
+            <tr>
+                <td></td>
+                <td colspan="3">Blood Group RH</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_rhesus_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group_rhesus]" id="<%= input_key %>_blood_group_rhesus_positive" value="+VE"
+                            <% if laboratory_examination_model.blood_group_rhesus === '+VE' %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_rhesus_positive">
+                            +VE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_rhesus_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group_rhesus]" id="<%= input_key %>_blood_group_rhesus_negative" value="-VE"
+                            <% if laboratory_examination_model.blood_group_rhesus === '-VE' %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_rhesus_negative">
+                            -VE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="blood_group_rhesus_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][blood_group_rhesus]" id="<%= input_key %>_blood_group_rhesus_other" value="OTHER"
+                            <% if laboratory_examination_model.blood_group_rhesus === 'OTHER' %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_blood_group_rhesus_other">
+                            OTHER
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of blood group rh -->
+
+            <!-- Start of blood group rh is other type -->
+            <tr>
+                <td></td>
+                <td colspan="4">If Blood Group RH is Other type</td>
+
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][blood_group_rhesus_other]"
+                        id="<%= input_key %>_laboratory_examination_blood_group_rhesus_other" rows="2"><%= laboratory_examination_model.blood_group_rhesus_other %></textarea>
+                </td>
+            </tr>
+            <!-- End of blood group rh is other type -->
+
+            <!-- Start of HIV -->
+            <tr>
+                <td>2</td>
+                <td colspan="4">HIV</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="elisa_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][elisa]" id="<%= input_key %>_elisa_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.elisa %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_elisa_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="elisa_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][elisa]" id="<%= input_key %>_elisa_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.elisa %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_elisa_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of HIV -->
+
+            <!-- Start of HBSAG -->
+            <tr>
+                <td>3</td>
+                <td colspan="4">HBsAg</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="hbsag_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][hbsag]" id="<%= input_key %>_hbsag_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.hbsag %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_hbsag_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="hbsag_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][hbsag]" id="<%= input_key %>_hbsag_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.hbsag %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_hbsag_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of HBSAG -->
+
+            <!-- Start of syphilis -->
+            <tr>
+                <td>4</td>
+                <td colspan="4">Syphilis (VDRL/RPR)</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="vdrl_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][vdrl]" id="<%= input_key %>_vdrl_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.vdrl %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_vdrl_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="vdrl_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][vdrl]" id="<%= input_key %>_vdrl_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.vdrl %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_vdrl_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of syphilis -->
+
+            <!-- Start of tpha -->
+            <tr>
+                <td>5</td>
+                <td colspan="4">TPHA/TPPA</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="tpha_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][tpha]" id="<%= input_key %>_tpha_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.tpha %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_tpha_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="tpha_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][tpha]" id="<%= input_key %>_tpha_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.tpha %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_tpha_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of tpha -->
+
+            <!-- Start of malaria -->
+            <tr>
+                <td>6</td>
+                <td colspan="4">Malaria (Screening)</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="malaria_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][malaria]" id="<%= input_key %>_malaria_positive" value="POSITIVE"
+                            <% if laboratory_examination_model.malaria %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_malaria_positive">
+                            POSITIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="malaria_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][malaria]" id="<%= input_key %>_malaria_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.malaria %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_malaria_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of malaria -->
+
+            <!-- Start of BFMP -->
+            <tr>
+                <td>7</td>
+                <td colspan="4">BFMP</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="bfmp_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][bfmp]" id="<%= input_key %>_bfmp_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.bfmp %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_bfmp_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="bfmp_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][bfmp]" id="<%= input_key %>_bfmp_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.bfmp %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_bfmp_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of BFMP -->
+
+            <!-- Start of urine -->
+            <tr>
+                <td colspan="7">Urine Tests</td>
+            </tr>
+            <!--End of urine -->
+
+            <!-- Start of opiates -->
+            <tr>
+                <td>8</td>
+                <td colspan="4">Opiates</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="opiates_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][opiates]" id="<%= input_key %>_opiates_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.opiates %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_opiates_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="opiates_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][opiates]" id="<%= input_key %>_opiates_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.opiates %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_opiates_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of opiates -->
+
+            <!-- Start of cannabis -->
+            <tr>
+                <td>9</td>
+                <td colspan="4">Cannabis</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="cannabis_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][cannabis]" id="<%= input_key %>_cannabis_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.cannabis %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_cannabis_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="cannabis_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][cannabis]" id="<%= input_key %>_cannabis_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.cannabis %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_cannabis_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of cannabis -->
+
+            <!-- Start of Urine Pregnancy Test -->
+            <tr>
+                <td>10</td>
+                <td colspan="4">Urine Pregnancy Test</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="pregnancy_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][pregnancy]" id="<%= input_key %>_pregnancy_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.pregnancy %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_pregnancy_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="pregnancy_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][pregnancy]" id="<%= input_key %>_pregnancy_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.pregnancy %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_pregnancy_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Urine Pregnancy Test -->
+
+            <!-- Start of Serum Beta HCG -->
+            <tr>
+                <td>11</td>
+                <td colspan="4">Serum Beta-HCG</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="pregnancy_serum_beta_hcg_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][pregnancy_serum_beta_hcg]" id="<%= input_key %>_pregnancy_serum_beta_hcg_reactive" value="REACTIVE"
+                            <% if laboratory_examination_model.pregnancy_serum_beta_hcg %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_pregnancy_serum_beta_hcg_reactive">
+                            REACTIVE
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="pregnancy_serum_beta_hcg_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][pregnancy_serum_beta_hcg]" id="<%= input_key %>_pregnancy_serum_beta_hcg_negative" value="NEGATIVE"
+                            <% if !laboratory_examination_model.pregnancy_serum_beta_hcg %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_pregnancy_serum_beta_hcg_negative">
+                            NEGATIVE
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Serum Beta HCG -->
+
+            <!-- Start of Sugar -->
+            <tr>
+                <td>12</td>
+                <td colspan="4">Sugar</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="sugar_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][sugar]" id="<%= input_key %>_sugar_present" value="PRESENT"
+                            <% if laboratory_examination_model.sugar %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_sugar_present">
+                            PRESENT
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="sugar_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][sugar]" id="<%= input_key %>_sugar_absent" value="ABSENT"
+                            <% if !laboratory_examination_model.sugar %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_sugar_absent">
+                            ABSENT
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Sugar -->
+
+            <!-- Start of Sugar Value -->
+            <tr>
+                <td></td>
+                <td colspan="4">Sugar Value</td>
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][sugar_value]"
+                        id="<%= input_key %>_laboratory_examination_sugar_value" rows="2"><%= laboratory_examination_model.sugar_value %></textarea>
+                        millimoles per litre
+                </td>
+            </tr>
+            <!--End of Sugar Value -->
+
+            <!-- Start of Albumin -->
+            <tr>
+                <td>13</td>
+                <td colspan="4">Albumin</td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="albumin_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][albumin]" id="<%= input_key %>_albumin_present" value="PRESENT"
+                            <% if laboratory_examination_model.albumin %> checked <% end %> required>
+                        <label class="form-check-label" for="<%= input_key %>_albumin_present">
+                            PRESENT
+                        </label>
+                    </div>
+                </td>
+                <td width="110" class="text-center">
+                    <div class="form-check form-check-inline">
+                        <input disabled class="albumin_status form-check-input" type="radio"
+                            name="<%= input_key %>[laboratory_examination][albumin]" id="<%= input_key %>_albumin_absent" value="ABSENT"
+                            <% if !laboratory_examination_model.albumin %> checked <% end %>>
+                        <label class="form-check-label" for="<%= input_key %>_albumin_absent">
+                            ABSENT
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <!--End of Albumin -->
+
+            <!-- Start of Albumin Value -->
+            <tr>
+                <td></td>
+                <td colspan="4">Albumin Value</td>
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][albumin_value]"
+                        id="<%= input_key %>_laboratory_examination_albumin_value" rows="2"><%= laboratory_examination_model.albumin_value %></textarea>
+                        grams per litre
+                </td>
+            </tr>
+            <!--End of Albumin Value -->
+
+            <!-- Start of Reason if abnormal -->
+            <tr>
+                <td></td>
+                <td colspan="4">Reason if abnormal</td>
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][abnormal_reason]"
+                        id="<%= input_key %>_laboratory_examination_abnormal_reason" rows="2"><%= laboratory_examination_model.abnormal_reason %></textarea>
+                </td>
+            </tr>
+            <!--End of Reason if abnormal -->
+
+            <!-- Start of Date of laboratory report -->
+            <tr>
+                <td></td>
+                <td colspan="4">Date of laboratory report</td>
+                <td colspan="2">
+                    <textarea disabled class="form-control" name="<%= input_key %>[laboratory_examination][created_at]"
+                        id="<%= input_key %>_laboratory_examination_created_at" rows="2"><%= laboratory_examination_model.created_at.strftime("%d/%m/%Y") %></textarea>
+                </td>
+            </tr>
+            <!--End of Date of laboratory report -->
+
+        </tbody>
+</table>
+</div>

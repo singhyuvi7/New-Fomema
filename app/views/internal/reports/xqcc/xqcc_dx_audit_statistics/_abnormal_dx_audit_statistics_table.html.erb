@@ -1,0 +1,36 @@
+<div class="card">
+	<div class="card-header">
+	    <strong>
+	    	ABNORMAL Digital X-ray Film Audited by PCR from 
+	    	<%= "#{@start_date.strftime("%d-%b-%Y")} to #{@end_date.strftime("%d-%b-%Y")}" %>
+    	</strong>
+	</div>
+
+	<div class="card-body">
+		<div class="w-100 pb-3" style="overflow-x: auto;">
+			
+			<table id="preview-csv-table" class="table-borders w-100">
+				<thead>
+					<% @abnormal_headers.each do |header| %>
+						<th><%= header %></th>
+					<% end %>
+				</thead>
+
+				<% if @data_abnormal.present? %>
+					<tbody>
+						<% @data_abnormal.each do |data| %>
+							<tr>
+								<td><%= data.audit_date.upcase %></td>
+								<td><%= data.abnormal %></td>
+								<td><%= data.normal %></td>
+								<td><%= data.total %></td>
+							</tr>
+						<% end %>
+					</tbody>
+				<% end %>
+			</table>
+
+		</div>
+	</div>
+
+</div>

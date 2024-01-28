@@ -1,0 +1,26 @@
+<table>
+    <% @csv[0..0].each do |date, total| %>
+        <tr>
+            <th>Date</th>
+            <th>Total Sent</th>
+        </tr>
+    <% end %>
+
+    <% @csv[1..-1].each do |date, total| %>
+        <tr>
+            <td><%= date %></td>
+            <td><%= total %></td>
+        </tr>
+    <% end %>
+</table>
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+        padding: 3px;
+    }
+</style>

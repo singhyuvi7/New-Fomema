@@ -1,0 +1,17 @@
+<tr>
+    <td class="table-items">
+        <div class="pl-1">
+            <%= form_shared.label :same_as_screening, 'Same Method & Reagent as Screening' %>
+        </div>
+    </td>
+    <td class="text-right table-acceptable">
+        <div class="btn-group btn-group-toggle w-75 same-as-btn" data-toggle="buttons" data-group-name="<%= tab_name %>" data-mirror-tab="<%= same_as %>">
+            <label class="btn btn-outline-success ">
+                <%= form_shared.radio_button :same_as_screening, 'YES', class: "#{tab_name} mirror-radio same-as-screening same-as-screening-btn" %> Yes
+            </label>
+            <label class="btn btn-outline-danger">
+                <%= form_shared.radio_button :same_as_screening, 'NO', class: "#{tab_name} mirror-radio same-as-screening-btn" %> No
+            </label>
+        </div>
+    </td>
+</tr>

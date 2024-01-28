@@ -1,0 +1,28 @@
+.hidden {
+	display: none;
+}
+
+.btn.hidden {
+    display: none;
+}
+
+span.select2-selection--single.is-invalid {
+    border-color: #f86c6b !important;
+}
+
+// All Flatpickrs with altInput are displayed as readonly. Need to set background to white.
+.datepicker[readonly="readonly"]:not([disabled="disabled"]),
+.datetimepicker[readonly="readonly"]:not([disabled="disabled"]),
+input.flatpickr-input + input[type="text"][readonly="readonly"]:not([disabled="disabled"]) {
+	background-color: #fff !important;
+}
+
+// Flatpickr does not inherit disabled status from the original input if using altInput.
+.datepicker[disabled="disabled"] + .datepicker[readonly="readonly"][disabled],
+.datetimepicker[disabled="disabled"] + .datetimepicker[readonly="readonly"][disabled] {
+	background-color: #e4e7ea !important;
+}
+
+span.select2-selection.select2-selection--multiple.is-invalid {
+    border-color: #f86c6b !important;
+}

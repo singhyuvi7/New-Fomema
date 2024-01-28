@@ -1,0 +1,1 @@
+json.partial! "internal/races/race", race: @race

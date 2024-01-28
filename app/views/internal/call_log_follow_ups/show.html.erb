@@ -1,0 +1,49 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Follow Ups</strong> - Follow Up Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Follow Up Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @call_log_follow_up.created_at&.strftime("%d/%m/%Y %I:%M:%S %p") %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Follow Up By</label>
+                    <p class="form-control-plaintext">
+                        <%= @call_log_follow_up.creator&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Comment</label>
+                    <pre class="form-control-plaintext"><%= @call_log_follow_up.comment %></pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_call_log_path(@call_log)) %>
+            <%=raw show_edit_button(edit_internal_call_log_call_log_follow_up_path(@call_log, @call_log_follow_up)) if has_permission?('EDIT_FOLLOW_UP_CALL_LOG') and !@call_log.status.eql?("CLOSE") %>
+        </div>
+    </div>
+
+</div>
+<!-- /.card -->

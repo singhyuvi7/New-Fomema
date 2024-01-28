@@ -1,0 +1,215 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @xray_dispatch } %>
+
+    <% if @action == "edit" %>
+    <div class="row">
+        <div class="col-md-12">
+            <div class='form-group'>
+                <%= form.label :code, "Dispatch Code", class: 'required' %>
+                <%= form.text_field :code, class: 'form-control', readonly: true %>
+            </div>
+        </div>
+    </div>
+    <% end %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :xray_facility_id) %>
+                <%= form.label :xray_facility_id, "X-Ray Facility", class: 'required' %>
+                <%= form.select :xray_facility_id,
+                options_from_collection_for_select(XrayFacility.select("id , name || ' (' || code || ')' as label").order(:label).all, 'id', 'label', form.object.xray_facility_id),
+                 {include_blank: form_select_option_text},
+                 required: true, class: 'form-control select2', disabled: @ctrl_disabled, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id }%>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :sent_date, "Scan Date", class: 'required' %>
+                <%= form.date_field :sent_date, class: 'form-control', readonly: @ctrl_disabled, required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :received_date, "Received Date", class: 'required' %>
+                <%= form.date_field :received_date, class: 'form-control', readonly: @ctrl_disabled, required: true %>
+            </div>
+        </div>
+    </div>
+
+    <!-- xray_dispatch_items -->
+    <div class="card">
+        <div class="card-header">
+            Dispatch Items
+            &nbsp;
+            <label class="text-danger" id="warning-text"></label>
+        </div>
+
+        <div class="card-body">
+
+            <% if @action == "edit" || @action == "new" %>
+                <div class="card-body-actions">
+                    <label>Transaction Code: </label>
+                    <input type="text" class="" name="trans_code" id="trans_code">
+                    <button type="button" id="dispatch_add_item_button" class="btn btn-sm btn-secondary" data-id="<%= @xray_dispatch.id %>" onclick="dispatch_add_item()">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            <% end %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th>Transaction Code</th>
+                                <th>Worker Code</th>
+                                <th>X-Ray Test Done Date</th>
+                                <th>Certification Status</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id = "myList">
+                            <%= form.fields_for :xray_dispatch_items do |dispatch_items_form| %>
+                                <!--  -->
+
+                                <% transaction = @transactions.to_a.find {|transaction| transaction.id == dispatch_items_form.object.transaction_id.to_i} %>
+
+                                <% if transaction.present? %>
+                                    <tr class="dispatch-items-row">
+                                        <td><%= transaction.code %></td>
+                                        <td><%= transaction.foreign_worker.code %></td>
+                                        <td><%= transaction.xray_transmit_date&.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                                        <td><%= transaction.doctor_examination&.suitability %></td>
+                                        <td>
+
+                                            <% if @action == "edit" || @action == "new" %>
+                                                <%= dispatch_items_form.hidden_field :xray_dispatch_id %>
+                                                <%= dispatch_items_form.hidden_field :transaction_id %>
+                                                <%= dispatch_items_form.link_to_remove "Remove", class: "btn btn-danger btn-sm remove-row", onclick: "$(this).closest('.dispatch-items-row').hide();" %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /xray_dispatch_items -->
+
+</div>
+
+<% if @action == "edit" || @action == "new" %>
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw edit_back_button(internal_xray_dispatches_path) %>
+            <%=raw edit_save_button() %>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+
+<script>
+var trx_arr = [];
+
+function dispatch_add_item()
+{
+    code    = $('#trans_code').val();
+    id      = $('#dispatch_add_item_button').attr('data-id');
+    if (code == null || code == '') {
+        alert("Please enter transaction code");
+        return;
+    }
+
+    $.ajax({
+        url: `/transactions/${code}/transaction_by_code`,
+        data: { xray_dispatch_id: id },
+        method: "GET",
+    }).done(function (response) {
+        date = $(response).find('table').attr('data-transmit-date');
+
+        if (response.error !== undefined) {
+            alert(`Transaction ${code} not found`);
+            $('#trans_code').val("");
+            return;
+        } else if (response.already_used) {
+            alert(`Transaction ${code} is being used in another dispatch`);
+            $('#trans_code').val("");
+            return;
+        } else if (trx_arr.indexOf(code) > -1) {
+            alert(`Transaction ${code} exists!`);
+            $('#trans_code').val("");
+            return;
+        } else if (date.length === 0) {
+            alert(`Transaction ${code} does not have transmit date`)
+            $('#trans_code').val("");
+            return;
+        }
+
+        trx_arr.push(code);
+        date        = new Date();
+        mSec        = date.getTime();
+        replaceName = response.replace(/(\[xray_dispatch_items_attributes\]\[0\])/g, `[xray_dispatch_items_attributes][${mSec}]`);
+        replaceId   = replaceName.replace(/(xray_dispatch_items_attributes_0)/g, `xray_dispatch_items_attributes_${mSec}`);
+        row         = $(replaceId).find('tr');
+        $('#myList').append(row);
+        $('#trans_code').val("");
+
+
+        row.find('.remove-row').click(function() {
+            $(this).closest('.dispatch-items-row').remove();
+            trx_arr = [];
+            $("#myList tr").each(function(){
+                trx_arr.push($(this).find("td:first").text());
+            });
+        });
+    });
+}
+
+$(document).ready(function(){
+    $('#trans_code').on("keypress", function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            dispatch_add_item();
+            $(this).val("");
+            return false;
+        }
+    });
+
+    $('.remove-row').click(function() {
+        trx_arr = [];
+        $("#myList tr:visible").each(function(){
+            trx_arr.push($(this).find("td:first").text());
+        });
+    });
+
+    $("#myList tr").each(function(){
+        trx_arr.push($(this).find("td:first").text());
+    });
+
+    $("form").submit(function(e) {
+        var rowCount = $('#myList tr:visible').length;
+        if (rowCount == 0) {
+            $("#warning-text").html("At least 1 film needs to be submitted!");
+            return false;
+        } else {
+            $("#warning-text").html("");
+        }
+    });
+
+});
+</script>
+
+<% end %>

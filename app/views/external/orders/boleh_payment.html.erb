@@ -1,0 +1,15 @@
+<form action="<%= @boleh_request.payment_url %>" method="post" id="boleh_request_form">
+    <input type="hidden" name="order_id" id="order_id" value="<%= @boleh_request.order_number %>">
+    <input type="hidden" name="amount" id="amount" value="<%= @boleh_request.amount %>">
+    <input type="hidden" name="response_url" id="response_url" value="<%= @boleh_request.response_url %>">
+    <input type="hidden" name="callback_url" id="callback_url" value="<%= @boleh_request.callback_url %>">
+    <input type="hidden" name="remark" id="remark" value="<%= @boleh_request.remark %>">
+    <input type="hidden" name="api_key" id="api_key" value="<%= ENV['BOLEH_API_KEY'] %>">
+    <input type="hidden" name="signature" id="signature" value="<%= @boleh_request.signature %>">
+</form>
+
+<% content_for :page_end_scripts do %>
+<script>
+    document.getElementById('boleh_request_form').submit();
+</script>
+<% end %>

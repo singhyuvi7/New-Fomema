@@ -1,0 +1,260 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :date_of_request, 'Date of request' %>
+            <%= form.date_field :date_of_request, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :is_urgent, 'Urgent? (Y/N)' %>
+            <%= form.text_field :is_urgent, class: 'form-control' %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :date_of_presentation, 'Date of Presentation to HOD' %>
+            <%= form.date_field :date_of_presentation, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :date_of_visit, 'Date of Visit' %>
+            <%= form.date_field :date_of_visit, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :satisfactory, 'Satisfactory (S) / NC' %>
+            <%= form.text_field :satisfactory, class: 'form-control' %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :report_by, 'Report by' %>
+            <%= form.text_field :report_by, class: 'form-control' %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :insp_type_of_visit, 'Type/Purpose of Visit (INSP - Target)' %>
+            <%= form.text_area :insp_type_of_visit, class: 'form-control' %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :mspd_type_of_visit, 'Type/Purpose of Visit (MSPD/MEDICAL/XQCC)' %>
+            <%= form.text_area :mspd_type_of_visit, class: 'form-control' %>
+        </div>
+    </div>
+</div>
+
+ <div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :spable_type, 'Service Provider Type' %>
+            <%= form.select :spable_type, options_for_select(VisitPlanRequest::SERVICE_PROVIDERS.invert, form.object.spable_type), {include_blank: "Select Option"}, class: "form-control" %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :spable_id, 'Service Provider Code' %>
+            <div class="input-group mb-3">
+                 <input id="sp_code" name="sp_code" class="form-control">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="search_service_provider">Search</button>
+                    <button class="btn btn-warning" type="button" id="clear_service_provider">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<hr>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :registered_person, 'Registered Person' %>
+           <%= form.text_field :registered_person, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :facility_name, 'Facility Name' %>
+            <%= form.text_field :facility_name, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :address1, 'Address 1' %>
+           <%= form.text_field :address1, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :address2, 'Address 2' %>
+            <%= form.text_field :address2, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :address3, 'Address 3' %>
+           <%= form.text_field :address3, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :address4, 'Address 4' %>
+            <%= form.text_field :address4, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :state_id, 'State' %>
+           <%= form.select :state_id, options_for_select(State::order(:name).pluck(:name, :id), form.object.try(:state).try(:id)), {include_blank: ""}, class: 'form-control disabled', readonly: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :town_id, 'Town' %>
+            <%= form.select :town_id, options_from_collection_for_select(Town.all, 'id', 'name', form.object.town_id), {include_blank: ''}, class: 'form-control disabled', readonly: true %>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :postcode, 'Postcode' %>
+           <%= form.text_field :postcode, class: 'form-control', readonly: true %>
+        </div>
+    </div>
+</div> 
+
+<hr>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :prepared_by, 'Prepared By' %>
+            <%= form.text_field :prepared_by, class: 'form-control' %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :date_of_meeting, 'Date of meeting' %>
+            <%= form.date_field :date_of_meeting, class: 'form-control', max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+</div>
+
+<style>
+.disabled{
+    pointer-events: none;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+    sp_type = '<%= @visit_plan_request.spable_type %>'
+    sp_id = '<%= @visit_plan_request.spable_id %>'
+
+    if(sp_id){
+        $('#sp_code').val('<%= @visit_plan_request&.spable&.code %>')
+        // show clear button
+        $('#sp_code').prop('readonly',true)
+        $('#search_service_provider').hide()
+        $('#clear_service_provider').show()
+    }else{
+        // show search button
+        $('#sp_code').val('')
+        $('#sp_code').prop('readonly',false)
+        $('#search_service_provider').show()
+        $('#clear_service_provider').hide()
+    }
+    // getGroups(selectedGroup)
+    $('#visit_plan_request_spable_type').change(function () {
+        // clear codes and address info
+        clear_sp_info();
+    });
+
+    $('#search_service_provider').click(function () {
+        search_service_provider();
+    });
+
+    $('#clear_service_provider').click(function () {
+        clear_sp_info();
+    });
+
+    function search_service_provider(){
+        sp_code = $('#sp_code').val()
+        sp_type = $('#visit_plan_request_spable_type').val()
+        if(sp_type && sp_code){
+            $.ajax({
+                url: '<%= search_service_provider_internal_inspectorate_reports_path %>?sp_type='+sp_type+'&sp_code='+sp_code,
+                method: "GET",
+                success: function (response) {
+                    if(response.error){
+                        alert(response.message)
+                    }else{
+                        sp = response.data
+                        $('#visit_plan_request_registered_person').val(sp.pic_name)
+                        $('#visit_plan_request_facility_name').val(sp.clinic_name)
+                        $('#visit_plan_request_address1').val(sp.address1)
+                        $('#visit_plan_request_address2').val(sp.address2)
+                        $('#visit_plan_request_address3').val(sp.address3)
+                        $('#visit_plan_request_address4').val(sp.address4)
+                        $('#visit_plan_request_state_id').val(sp.state_id)
+                        $('#visit_plan_request_town_id').val(sp.town_id)
+                        $('#visit_plan_request_postcode').val(sp.postcode)
+
+                        $('#sp_code').prop('readonly',true)
+                        $('#search_service_provider').hide()
+                        $('#clear_service_provider').show()
+                    }
+                },
+                fail: function(response) {
+                    alert( "error" );
+                }
+            });
+        }else{
+            alert('Please select service provider type and enter the service provider code before search')
+        }
+    }
+    function clear_sp_info(){
+        $('#sp_code').val('')
+        $('#sp_code').prop('readonly',false)
+        $('#search_service_provider').show()
+        $('#clear_service_provider').hide()
+
+        $('#visit_plan_request_registered_person').val('')
+        $('#visit_plan_request_facility_name').val('')
+        $('#visit_plan_request_address1').val('')
+        $('#visit_plan_request_address2').val('')
+        $('#visit_plan_request_address3').val('')
+        $('#visit_plan_request_address4').val('')
+        $('#visit_plan_request_state_id').val('')
+        $('#visit_plan_request_town_id').val('')
+        $('#visit_plan_request_postcode').val('')
+    }
+</script>
+<% end %>

@@ -1,0 +1,52 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+  <div class="card-header">
+    <strong>Organizations Chart</strong>
+    <%= link_to internal_organizations_path, :method => :get, class: 'btn btn-sm btn-secondary' do %>
+      Table View
+    <% end %>
+    <%= link_to internal_organizations_path + '/tree', :method => :get, class: 'btn btn-sm btn-secondary' do %>
+      Tree View
+    <% end %>
+    <%= link_to internal_organizations_path + '/chart', :method => :get, class: 'btn btn-sm btn-primary' do %>
+      Chart View
+    <% end %>
+  </div>
+
+  <!-- card-body -->
+  <div class="card-body">
+
+    <div id="chart-container"></div>
+
+  </div>
+  <!-- /card-body -->
+</div>
+
+<!--javascript-->
+
+<% content_for :page_end_scripts do %>
+  <script>
+
+      var organization_tree_json = <%= @organization_tree_json.html_safe %>;
+
+      var nodeTemplate = function (data) {
+          return `
+        <span class="office">${data.attributes.code || ''} (${data.attributes.org_type})</span>
+        <div class="title">${data.attributes.name}</div>
+        <div class="content">
+            <a class="btn btn-sm btn-primary" href="/organizations/new?organization_id=${data.attributes.id}"><i class="fa fa-plus"></i></a>
+            <a class="btn btn-sm btn-primary" href="/organizations/${data.attributes.id}/edit"><i class="fa fa-edit"></i></a>
+        </div>
+      `;
+      };
+
+      $('#chart-container').orgchart({
+          'data': organization_tree_json,
+          'nodeTemplate': nodeTemplate
+      });
+
+  </script>
+<% end %>
+
+<!--javascript-->

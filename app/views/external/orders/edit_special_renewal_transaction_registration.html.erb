@@ -1,0 +1,110 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        Order - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: external_order_path(@order), html: {id: "order_form"} do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <!-- card for order detail -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Order Code</label>
+                        <div class="col-md-9">
+                            <div class="form-control-plaintext"><%= @order.code %></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Order Date</label>
+                        <div class="col-md-9">
+                            <div class="form-control-plaintext"><%= @order.date&.strftime("%d/%m/%Y") %></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Amount</label>
+                        <div class="col-md-9">
+                            <div class="form-control-plaintext"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Category</label>
+                        <div class="col-md-9">
+                            <div class="form-control-plaintext"><%= Order::CATEGORIES[@order.category] %></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Status</label>
+                        <div class="col-md-9">
+                            <div class="form-control-plaintext"><%= @order.status %></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label required">Payment Method</label>
+                        <div class="col-md-9">
+                            <%= form.select :payment_method_id, options_from_collection_for_select(PaymentMethod.available_for_external_payment.order(:name), :id, :name, form.object.payment_method_id), {include_blank: form_select_option_text}, required: true, class: "form-control",onchange: "external_change_fee(this)" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /card for order detail -->
+
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th>Foreign Worker</th>
+                        <th>Gender</th>
+                        <th>&nbsp;</th>
+                        <th><label class="required">Comment</label></th>
+                        <th class="currency">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.each do |order_item| %>
+                        <tr>
+                            <td><%= order_item.order_itemable.name %></td>
+                            <td><%= ForeignWorker::GENDERS[order_item&.gender] %></td>
+                            <td><pre><%= order_item.additional_information["comments"] %></pre></td>
+                            <td><textarea name="comment[<%= order_item.id %>]" id="comment_<%= order_item.id %>" class="form-control" required><%= order_item.comment %></textarea></td>
+                            <td class="currency"><%= number_to_currency(order_item.amount, unit: "") %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th class="currency">
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="text-right">
+                <a class="btn btn-primary" href="<%= external_orders_path %>">Back</a>
+                <button class="btn btn-primary" type="submit" name="submit" id="submit_cancel" value="cancel" formnovalidate>Cancel order</button>
+                <button class="btn btn-primary" type="submit" name="submit" value="save" id="btn-save">Save</button>
+                <button class="btn btn-primary" type="submit" name="submit" id="submit_approval" value="save_and_proceed_to_approval">Save and proceed to approval</button>
+            </div>
+        </div>
+        <!-- /card-body -->
+    <% end %>
+</div>
+
+<%=render 'etr_search_worker' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#submit_cancel').click(function () {
+        $('#order_form textarea').prop('disabled', true);
+        $('#order_form').submit();
+    });
+</script>
+<% end %>

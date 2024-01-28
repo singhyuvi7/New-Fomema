@@ -1,0 +1,23 @@
+<% @transactions.each do |transaction| %>
+
+	<tr class="filter-table-search-results" data-type="transaction" data-id="<%= transaction.id %>"  >
+        
+        <td>
+          <%= transaction.code %>
+        </td>
+        <td><%= transaction.xray_facility.code %></td>
+        <td><%= transaction.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{transaction.foreign_worker&.code}"  %></td>
+        <td><%= transaction.foreign_worker_id.blank? ? raw('<i>N/A</i>') : "#{transaction.foreign_worker&.name}"  %></td>
+        <td><%= transaction.xray_examination&.xray_taken_date.nil? ? "N/A" : transaction.xray_examination.xray_taken_date.strftime("%d/%m/%Y") %></td>
+        <td><%= transaction.xray_examination&.result %></td>
+        <td>
+            <button type="button" class="btn btn-primary select_transaction" data-transaction_id="<%= transaction.id %>" data-transaction_code="<%= transaction.code %>">Select</button>
+        </td>
+    </tr>
+<% end %>
+
+<% if @transactions.blank? %>
+    <tr>
+        <td colspan="9">No record found with these search options</td>
+    </tr>
+<% end %>

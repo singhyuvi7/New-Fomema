@@ -1,0 +1,69 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= @module_title || @auditable.class.name.titleize %> Audits</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>ID</th>
+            <th>Version</th>
+            <th>User</th>
+            <th>Type</th>
+            <th>Date & Time</th>
+            <th>Changed Fields</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @audits.blank? %>
+            <tr>
+                <td colspan="8" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @audits.each.with_index((@audits.current_page - 1) * get_per + 1) do |audit, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= audit.id %></td>
+                    <td><%= audit.version %></td>
+                    <td><%= audit.user&.name %></td>
+                    <td><%= audit.action %></td>
+                    <td><%= audit.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                    <td><pre class="pre-scrollable"><%= audit.audited_changes.keys.join("\r\n") %></pre></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button("audits/#{audit.id}", title: 'Detail') %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @audits %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <a class="btn btn-sm btn-secondary" href=""><i class="fa fa-history"></i> Back</a>
+        </div>
+    </div>
+</div>

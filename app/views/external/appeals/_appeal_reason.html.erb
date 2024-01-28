@@ -1,0 +1,200 @@
+<div class="p-4 border-bottom d-flex justify-content-between">
+    <h3 class="flex-grow-1"><u><%= "Submitted " if readonly %>Appeal Reason & Comments</u></h3>
+
+    <% if !@transaction.medical_appeals.find_by(id: @appeal.id).nil? && !@appeal.employer_consented_at.nil? %>
+        <% if ["Employer", "Agency"].include?@appeal.registered_by_type %>
+            <%= link_to appeal_pdpa_form_internal_transaction_path(id: @transaction.id, appeal_id: @appeal.id), target: "_BLANK", class: "mr-2" do %>
+                <div class="btn btn-primary"><i class="fa fa-list mr-2"></i><%= @appeal.registered_by_type %> Consent Form</div>
+            <% end %>
+        <% end %>
+    <% end %>
+
+    <% if !@transaction.medical_appeals.find_by(id: @appeal.id).nil? && ["CLOSED"].exclude?(@appeal.status) %>
+        <%= link_to appeal_doctor_instruction_letter_external_appeal_path(@appeal.id), target: "_BLANK" do %>
+            <div class="btn btn-primary"><i class="fa fa-list mr-2"></i>Doctor Instruction Letter</div>
+        <% end %>
+    <% end %>
+</div>
+
+<%
+    indexing = 0
+    external = external || false
+%>
+
+<% if ["Doctor", "Employer", "Agency"].include? @appeal.try(:registered_by_type) %>
+    <div class="px-4 py-4 border-bottom">
+        <div>
+            <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+            <label><%= "Appeal Reason (recorded by #{@appeal.registered_by_type})" %></label>
+        </div>
+
+        <div style="margin-left: 5em;">
+            <%= simple_format @appeal.doctor_reason %>
+        </div>
+    </div>
+<% end %>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label><%= action_name == "new" ? "This worker is eligible for an appeal. Please include the appeal reason." : "Appeal Reason (recorded by PIC)" %></label>
+    </div>
+
+    <% if external && action_name == "new" %>
+        <%= appeal_form.text_area :doctor_reason, rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;", readonly: readonly %>
+    <% else %>
+        <%= appeal_form.text_area :appeal_reason, rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;", readonly: readonly %>
+    <% end %>
+</div>
+
+<% if !external %>
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"><%= indexing += 1 %></label>
+        <label class="flex-grow-1 mb-0">Doctor</label>
+
+        <div class="d-flex flex-shrink-0 align-items-center">
+            <%
+                doctor = action_name == "new" ? @transaction.doctor : @appeal.doctor
+
+                if controller_action_name == "appeals__new" && doctor&.status != "ACTIVE"
+                    doctor = nil
+                end
+            %>
+
+            <%= appeal_form.hidden_field :doctor_id, value: doctor&.id %>
+
+            <p id="selected-doctor-name-code" class="mb-0 mr-2">
+                <% if doctor.present? %>
+                    <%= doctor&.name %> (<b><%= doctor&.code %></b>)
+                <% else %>
+                    N/A
+                <% end %>
+            </p>
+
+            <% unless readonly || moh_readonly %>
+                <i id="remove-selected-doctor" title="Remove selected doctor" class="fa fa-times text-danger clickable p-2 mr-2 font-size-9"></i>
+                <div class="btn btn-success" data-toggle="modal" data-target="#change-doctor-modal" data-type="doctor">Select Doctor</div>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"><%= indexing += 1 %></label>
+        <label class="flex-grow-1 mb-0">Officer In Charge</label>
+
+        <div class="d-flex flex-shrink-0 align-items-center">
+            <% officer = @appeal.officer_in_charge %>
+
+            <% if readonly || moh_readonly %>
+                <p class="mb-0 mr-2"><%= officer.try(:name) %></p>
+            <% else %>
+                <%= appeal_form.select :officer_in_charge_id, options_for_select(@officer_list.pluck(:name, :id), officer.try(:id)), { include_blank: true }, class: "form-control form-field" %>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"><%= indexing += 1 %></label>
+        <label class="flex-grow-1 mb-0">MOH Appeal</label>
+
+        <div class="d-flex flex-shrink-0 align-items-center">
+            <%= appeal_form.hidden_field :is_moh, class: "boolean-field" %>
+            <%= raw boolean_field_button(active_color: "danger", active: @appeal.is_moh == true, readonly: readonly || moh_readonly, value: "true", placeholder: "Yes", classes: "w-em-10") %>
+            <%= raw boolean_field_button(active_color: "success", active: @appeal.is_moh == false, readonly: readonly || moh_readonly, value: "false", placeholder: "No", classes: "w-em-10") %>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index"><%= indexing += 1 %></label>
+        <label class="flex-grow-1 mb-0">Is Specialist</label>
+
+        <div class="d-flex flex-shrink-0 align-items-center">
+            <%= appeal_form.hidden_field :is_specialist, class: "boolean-field" %>
+            <%= raw boolean_field_button(active_color: "danger", active: @appeal.is_specialist == true, readonly: readonly, value: "true", placeholder: "Yes", classes: "w-em-10", name: "testtest") %>
+            <%= raw boolean_field_button(active_color: "success", active: @appeal.is_specialist == false, readonly: readonly, value: "false", placeholder: "No", classes: "w-em-10") %>
+        </div>
+    </div>
+<% end %>
+
+<% unless action_name == "new" || !external %>
+    <div class="px-4 py-4 border-bottom">
+        <div>
+            <label class="mr-4 w-em-3">2</label>
+            <label>Comments</label>
+        </div>
+
+        <table class="table-borders" style="width: calc(100% - 5em); margin-left: 5em;">
+            <thead>
+                <tr>
+                    <th class="py-1 px-2">No.</th>
+                    <th class="py-1 px-2">Date</th>
+                    <th class="py-1 px-2">MLE Name</th>
+                    <th class="py-1 px-2">Comments</th>
+                </tr>
+            </thead>
+
+            <tbody id="appeal-comment-body">
+                <% @appeal_comments.each_with_index do |comment, index| %>
+                    <tr>
+                        <td class="py-1 px-2" valign="top"><%= index + 1 %></td>
+                        <td class="py-1 px-2" valign="top"><%= comment.created_at.strftime("%d/%m/%Y") %></td>
+                        <td class="py-1 px-2" valign="top"><%= comment.user.name %></td>
+                        <td class="py-1 px-2"><%= simple_format comment.comment %></td>
+                    </tr>
+                <% end %>
+
+                <% if @appeal_comments.blank? %>
+                    <tr>
+                        <td colspan="5" class="text-center py-1 px-2">There are no comments</td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+<% end %>
+
+<div id="dialog-is-moh" class="hidden" title="Warning">
+    <p>You have changed MOH Appeal to YES.</p>
+</div>
+
+<div id="dialog-is-specialist" class="hidden" title="Warning">
+    <p>You have changed Is Specialist to YES.</p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#medical_appeal_is_moh').change(function() {
+            dialogBox   = $('#dialog-is-moh');
+
+            if ($('#medical_appeal_is_moh').val() == 'true') {
+                dialogBox.dialog({
+                    modal: true,
+                    minWidth: 600,
+                    dialogClass: `dialog__title-warning shadow`,
+                    buttons: {
+                        Close: function() {
+                        $(this).dialog('close');
+                        },
+                    }
+                });
+            }
+        });
+
+        $('#medical_appeal_is_specialist').change(function() {
+            dialogBox   = $('#dialog-is-specialist');
+
+            if ($('#medical_appeal_is_specialist').val() == 'true') {
+                dialogBox.dialog({
+                    modal: true,
+                    minWidth: 600,
+                    dialogClass: `dialog__title-warning shadow`,
+                    buttons: {
+                        Close: function() {
+                        $(this).dialog('close');
+                        },
+                    }
+                });
+            }
+        });
+    </script>
+<% end %>

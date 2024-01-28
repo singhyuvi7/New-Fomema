@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      /* Email styles need to be inline */
+      .text-right {
+        text-align: right !important;
+      }
+
+      .text-danger {
+        color: #f86c6b !important;
+      }
+
+      .w-100 {
+        width: 100%;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      thead {
+        background-color: #d0d0d0;
+      }
+
+      thead th {
+        padding: 1px 4px;
+        border: 1px solid #aaa;
+      }
+
+      tbody td {
+        padding: 1px 4px;
+        vertical-align: center;
+        border: 1px solid #aaa;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .w-600 {
+        width: 100%;
+        max-width: 600px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

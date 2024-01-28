@@ -1,0 +1,10 @@
+.card
+  .card-header
+    %strong Suspension History
+  .card-body
+    = render '/shared/all_flash'
+    = render 'internal/doctors/suspension_history/pdf_template'
+  .card-footer.text-right
+    - if has_permission?("MSPD_REPORTS")
+      = link_to 'Export', suspension_history_internal_doctor_path(@doctor, format: :xlsx), class: 'btn btn-primary btn-sm'
+      = link_to 'Download as PDF', suspension_history_internal_doctor_path(@doctor, format: :pdf), class: 'btn btn-secondary btn-sm'

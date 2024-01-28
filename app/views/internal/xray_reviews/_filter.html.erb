@@ -1,0 +1,91 @@
+<div class="card">
+    <div id="filter-transactions-toggle" class="card-header d-flex align-items-center clickable">
+        <strong class="mb-0">Filter</strong>
+        <span class="flex-grow-1"></span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <%= form_tag internal_xray_reviews_path, method: 'get', id: "filter-transactions-form" do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="transaction_code" class="col-sm-3 col-form-label">Transaction ID</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="transaction_code" id="transaction_code" value="<%= params[:transaction_code] %>">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Worker Code</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :worker_code, params[:worker_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Passport Number</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :passport_number, params[:passport_number], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="batch" class="col-sm-3 col-form-label">Batch</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="batch" id="batch" value="<%= params[:batch] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Review Status</label>
+                        <div class="col-sm-9">
+                            <select class="col-md-12 form-control select2" name="review_status">
+                                <option value="">SELECT STATUS</option>
+                                <option value="ALL" <% if params[:review_status] === "ALL" %> selected <% end %> >ALL</option>
+                                <option value="ASSIGN" <% if params[:review_status] === "ASSIGN" || params[:review_status].blank?  %> selected <% end %> >ASSIGN</option>
+                                <option value="REVIEWED_NORMAL" <% if params[:review_status] === "REVIEWED_NORMAL" %> selected <% end %> >REVIEWED - NORMAL</option>
+                                <option value="REVIEWED_SUSPICIOUS" <% if params[:review_status] === "REVIEWED_SUSPICIOUS" %> selected <% end %> >REVIEWED - SUSPICIOUS</option>
+                                <option value="REVIEWED_IDENTICAL" <% if params[:review_status] === "REVIEWED_IDENTICAL" %> selected <% end %> >REVIEWED - IDENTICAL</option>
+                                <option value="REVIEWED_WRONGLY_TRANSMITTED" <% if params[:review_status] === "REVIEWED_WRONGLY_TRANSMITTED" %> selected <% end %> >REVIEWED - WRONGLY TRANSMITTED</option>
+                                <option value="REVIEWED_RETAKE" <% if params[:review_status] === "REVIEWED_RETAKE" %> selected <% end %> >REVIEWED - RETAKE</option>
+                                <option value="REVIEWED_ABORT" <% if params[:review_status] === "REVIEWED_ABORT" %> selected <% end %> >REVIEWED - ABORT</option>
+                            </select>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_xray_reviews_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#filter-transactions-toggle').click(function() {
+    $('#filter-transactions-toggle i.fas').toggleClass('fa-chevron-down fa-chevron-left');
+    $('#filter-transactions-form').slideToggle();
+});
+</script>
+<% end %>

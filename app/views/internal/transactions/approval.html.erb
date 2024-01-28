@@ -1,0 +1,28 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Approval
+    </div>
+
+    <%= form_for @transaction, url: approval_internal_transaction_path(@transaction), method: 'patch', html: {class: "#{params[:action]}_transaction transaction-form"} do |form| %>
+
+        <div class="card-body">
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- <div><%= @transaction.approval_request.category %></div> -->
+                    <%= render 'internal/shared/approval_comment_decision', form: form %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_transactions_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+        
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,14 @@
+<%
+active_tab = local_assigns[:active_tab]
+%>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link<%= ' active show' if active_tab.eql?('workers') %>" href="<%= internal_employer_employer_workers_path employer_id: @employer.id %>">Foreign Workers</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link<%= ' active show' if active_tab.eql?('users') %>" href="<%= internal_employer_employer_users_path employer_id: @employer.id %>">Users</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link<%= ' active show' if active_tab.eql?('documents') %>" href="<%= internal_employer_employer_documents_path employer_id: @employer.id %>">Documents</a>
+    </li>
+</ul>

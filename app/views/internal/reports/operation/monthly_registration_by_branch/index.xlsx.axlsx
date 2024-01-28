@@ -1,0 +1,23 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER,
+                                 bg_color: 'b7b7b7'
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+
+  # worksheet data
+  wb.add_worksheet(name: 'monthly') do |sheet|
+    sheet.add_row ["Monthly Registration Report by Branch #{@month} #{@year}"],
+                  style: title_style
+    sheet.add_row %w[BRANCH NEW RENEWAL TOTAL],
+                  style: header_style
+
+    @data&.each do |row_data|
+      sheet.add_row row_data, style: data_style
+    end
+    sheet.add_row ['TOTAL', *@total]
+    sheet.column_widths 10, 10, 10, 10
+  end
+end

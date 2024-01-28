@@ -1,0 +1,156 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+  wrap = style.add_style alignment: {wrap_text: true}
+
+    wb.add_worksheet(name: 'Transactions') do |sheet|
+        sheet.merge_cells "A1:A1"
+        sheet.merge_cells "A2:A2"
+        # sheet.add_row([@company_name], style: [title_style])
+        # sheet.add_row([""])
+        sheet.add_row([
+            "Transaction Code",
+            "Worker Code",
+            "Worker Name",
+            "Passport Number",
+            "Country of Origin",
+            "DOB",
+            "Employer Code",
+            "Employer Name",
+            "Doctor Code",
+            "Doctor Name",
+            "Clinic Name",
+            "Lab Code",
+            "Lab Name",
+            "X-Ray Code",
+            "X-Ray Doctor Name",
+            "X-Ray Clinic Name",
+            "Registration Date",
+            "Expiry Date",
+            "Examination Date",
+            "Lab Transmit Date",
+            "Xray Transmit Date",
+            "Certification Date",
+            "Transaction Status",
+        ],
+        style: [
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            ]
+        )
+
+        my_types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+        ]
+
+        my_styles = [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+        ]
+        @transactions.find_each do |transaction|
+            sheet.add_row([
+                transaction.code,
+                transaction.fw_code,
+                transaction.fw_name,
+                transaction.fw_passport_number,
+                transaction.fw_country.name,
+                transaction.fw_date_of_birth&.strftime(get_standard_date_format),
+                transaction.employer.code,
+                transaction.employer.name,
+                transaction.doctor&.code,
+                transaction.doctor&.name,
+                transaction.doctor&.clinic_name,
+                transaction.laboratory&.code,
+                transaction.laboratory&.name,
+                transaction.xray_facility&.code,
+                transaction.xray_facility&.license_holder_name,
+                transaction.xray_facility&.name,
+                transaction.transaction_date&.strftime(get_standard_date_format),
+                transaction.expired_at&.strftime(get_standard_date_format),
+                transaction.medical_examination_date&.strftime(get_standard_date_format),
+                transaction.laboratory_transmit_date&.strftime(get_standard_date_format),
+                transaction.xray_transmit_date&.strftime(get_standard_date_format),
+                transaction.certification_date&.strftime(get_standard_date_format),
+                transaction.status == "CERTIFIED" ? transaction.final_result : transaction.displayed_status,
+
+
+
+
+                #employer.business_registration_number || employer.ic_passport_number,
+                #employer.status,
+                #employer.problematic == true ? 'Yes' : 'No',
+                #employer.document_verified == true ? 'Yes' : 'No',
+                #Employer.get_comment_logs(employer.id).try(:join,"\n\n")
+                #employer.log_created_at&.strftime(get_standard_date_format),
+                #User.find_by_id(employer.log_created_by)&.name,
+                #employer.log_comment
+            ], types: my_types, style: my_styles)
+        end
+    end
+end

@@ -1,0 +1,27 @@
+<div class="pagination-bar d-flex justify-content-between align-items-center">
+    <div class="page-previous-next">
+        <b><%= link_to_prev_page list, "Previous Page" %></b>
+        <b><%= link_to_next_page list, "Next Page" %></b>
+    </div>
+
+    <div class="d-flex align-items-center">
+        <b class="mr-3" style="white-space: nowrap;">Per page</b>
+        <%= select_tag :per, options_for_select(get_per_options, params[:per] ? params[:per] : 10), class: "get-per-link form-control" %>
+        <%= link_to "", url_for(params.except(:subdomain, :controller, :action).to_unsafe_h.merge(per: "target_amount")), id: "target-get-per-link" %>
+    </div>
+</div>
+
+<style>
+    .pagination-bar div.page-previous-next a {
+        padding-right: 2em;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#per.get-per-link').change(function() {
+            var getPerLink = $('#target-get-per-link');
+            window.location = getPerLink.attr('href').replace('target_amount', $(this).val());
+        });
+    </script>
+<% end %>

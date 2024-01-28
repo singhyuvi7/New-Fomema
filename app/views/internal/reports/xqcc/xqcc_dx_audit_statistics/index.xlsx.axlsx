@@ -1,0 +1,31 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  headers = @abnormal_headers
+
+  # worksheet data
+  wb.add_worksheet(name: "ABNORMAL") do |sheet|
+    sheet.add_row headers, style: header_style
+
+    if @data_abnormal.present?
+      @data_abnormal.each do |d|
+        sheet.add_row [d.audit_date.upcase, d.abnormal, d.normal, d.total], style: data_style
+      end
+    end
+  end
+
+  wb.add_worksheet(name: "SUSPICIOUS") do |sheet|
+    sheet.add_row headers, style: header_style
+
+    if @data_suspicious.present?
+      @data_suspicious.each do |d|
+        sheet.add_row [d.audit_date.upcase, d.abnormal, d.normal, d.total], style: data_style
+      end
+    end
+  end
+
+end

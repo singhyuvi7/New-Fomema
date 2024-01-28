@@ -1,0 +1,43 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        System Configurations - XQCC
+        <div class="card-header-actions">
+        </div>
+        <!-- /.card-header-actions -->
+    </div>
+    <!-- /.card-header -->
+
+    <%= form_tag xqcc_edit_internal_system_configurations_path, method: :patch, class: "form-horizontal" do %>
+        <div class="card-body">
+            <% SystemConfiguration::XQCCS.each do |code| %>
+                <div class="form-group row">
+                    <% if lookup_context.find_all("internal/system_configurations/form/_#{code}").any? %>
+                        <%= render "internal/system_configurations/form/#{code}" %>
+                    <% else %>
+                        <label class="col-md-4 col-form-label">
+                            <% if has_permission?("VIEW_AUDIT_SYSTEM_CONFIGURATION") %>
+                                <a href="<%= internal_system_configuration_audits_path(@system_configurations[code]) %>"><i class="fa fa-history"></i></a>
+                            <% end %>
+                            <%= @system_configurations[code].name %>
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" name="system_configuration[<%= code %>]" value="<%= @system_configurations[code].value %>" class="form-control no-uppercase">
+                            <% if @system_configurations[code].comment.present? %>
+                                <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(xqcc_internal_system_configurations_path) %>
+            <%=raw edit_save_button %>
+        </div>
+    <% end %>
+
+</div>

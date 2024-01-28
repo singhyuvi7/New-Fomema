@@ -1,0 +1,103 @@
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/lqcc_visit_summary" %>
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+    
+    action = params[:action]
+    not_summary = ['download'].include?(action)
+    visit_report_lab = @visit_report.visit_report_laboratory_summary
+    officers = @visit_report.visit_report_visitors
+%>
+
+<div class="visit-summary page-container">
+
+<%=render 'internal/visit_reports/laboratories/pdf/visit_details', {visit_report_lab: visit_report_lab, officers: officers} %>
+<hr>
+
+    <div class="visit-findings medical-results-content medical-history">
+        <h3>Part 2: Visit Findings</h3>
+
+        <% if @has_no_overall %>
+            <% @sections.each do |section| %>
+                <% if section[:has_no] %>
+                <% 
+                    _vr = section[:table] == 'visit_report_laboratory' ? @visit_report.visit_report_laboratory_summary : @visit_report.visit_report_laboratory_summary.try(section[:table])
+                %>
+                <div class="finding-section">
+                    <table>
+                        <tbody>
+                            <hr>
+                            <tr>
+                                <td class="table-name" colspan="2"><%= section[:title] %></td>
+                            </tr>
+                            <% index = 0 %>
+                            <% section[:fields].each do |field| %>
+                                <% if field[:has_no] %>
+                                    <% index += 1 %>
+                                    <% if !field[:subtitle].blank? %>
+                                        <tr>
+                                            <td class="bold table-index"><%= index %>.</td>
+                                            <td>
+                                                <div class="bold"><%= field[:subtitle] %></div>
+                                            </td>
+                                        </tr>
+                                    <% end %>
+                                    <% sub_index = 0 %>
+                                    <% field[:subfields].each do |(field_key,field_value)| %>
+                                        <% if _vr.try(field_key) == 'NO' %>
+                                            <% sub_index += 1 %>
+                                            <tr>
+                                                <td class="<%= field[:subtitle].blank? ? 'table-index' : 'table-sub-index' %> bold"><%= field[:subtitle].blank? ? "#{section[:table] == 'visit_report_laboratory' ? index : sub_index}." : "#{index}.#{sub_index}. " %></td>
+                                                <td class="table-items bold">
+                                                    <%= field_value %>
+                                                </td>
+                                            </tr>
+                                            <% if !_vr.try("#{field_key}_comment").blank? %>
+                                                <tr>
+                                                    <td class="table-index"></td>
+                                                    <td>
+                                                        <div class="finding-comment">
+                                                            <span class="bold">Comment :</span>
+                                                            <span class="unbold"><%= _vr.try("#{field_key}_comment") %></span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% end %>
+                                        <% end %>
+                                    <% end %>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+                <% end %>
+            <% end %>
+        <% else %>
+            <div class="bold"><i>***This laboratory complies with all FOMEMA requirements.***</i><div>
+        <% end %>
+
+        <%=render 'internal/visit_reports/laboratories/pdf/visit_summary/conclusion', {visit_report_lab: visit_report_lab} %>
+        
+    </div>
+    <!-- signature -->
+    <% if !not_summary %>
+        <div class="collection-signature">
+            <div class="d-flex">
+                <div class="signature-box-1">
+                    <div>Laboratory's Personnel Acknowledgement</div>
+                    <%= image_tag visit_report_lab.lab_personnel_signature, class: "signature-img" if !visit_report_lab.lab_personnel_signature.blank? %>
+                    <div>(<%= visit_report_lab.lab_personnel_name %>)</div>
+                    <div><%= visit_report_lab.lab_personnel_designation %></div>
+                </div>
+
+                <div class="signature-box-2">
+                    <div>Fomema's Officer</div>
+                    <%= image_tag visit_report_lab.fomema_officer_signature, class: "signature-img" if !visit_report_lab.fomema_officer_signature.blank? %>
+                    <div>(<%= visit_report_lab.fomema_officer_name %>)</div>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- end signature -->
+</div>

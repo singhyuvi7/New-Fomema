@@ -1,0 +1,127 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+  wrap = style.add_style alignment: {wrap_text: true}
+
+    wb.add_worksheet(name: 'Agencies') do |sheet|
+        sheet.merge_cells "A1:A1"
+        sheet.merge_cells "A2:A2"
+        # sheet.add_row([@company_name], style: [title_style])
+        # sheet.add_row([""])
+        sheet.add_row([
+            "Agency Code",
+            "Agency Name",
+            "ROC No.",
+            "Status",
+            "License Category",
+            "License Expired Date",
+            "Registration Date",
+            "Role",
+            "Account Valid Till Date",
+            "Email",
+            "PIC Phone",
+            "Phone (Office)",
+            "State",
+            "Problematic",
+            "Document Verified",
+            "Sop Acknowledge",
+            "Comment Date",
+            "Comment By",
+            "Comment"
+        ],
+        style: [
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style
+            ]
+        )
+
+        my_types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string
+        ]
+
+        my_styles = [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            #wrap
+        ]
+        @agency_comment_logs.find_each do |agency|
+
+            sheet.add_row([
+                agency.code,
+                agency.name,
+                agency.business_registration_number,
+                agency.status,
+                agency.agency_license_category&.name,
+                agency.license_expired_at&.strftime(get_standard_date_format),
+                agency.created_at&.strftime(get_standard_date_format),
+                agency&.user&.role&.name || "-",
+                agency&.expired_at&.strftime(get_standard_date_format) || "-",
+                agency&.email,
+                agency&.pic_phone,
+                agency&.phone,
+                agency.state.name,
+                agency.problematic == true ? 'Yes' : 'No',
+                agency.document_verified == true ? 'Yes' : 'No',
+                agency.sop_acknowledge == true ? 'Yes' : 'No',
+                #Agency.get_comment_logs(agency.id).try(:join,"\n\n")
+                agency.log_created_at&.strftime(get_standard_date_format),
+                User.find_by_id(agency.log_created_by)&.name,
+                agency.log_comment
+            ], types: my_types, style: my_styles)
+        end
+    end
+end

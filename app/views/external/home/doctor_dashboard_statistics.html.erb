@@ -1,0 +1,74 @@
+<div id="json-response">
+    <data id="last-refresh-timestamp" class="d-none">Last refreshed at <%= @last_refresh.strftime("%-l:%M:%S%p") %></data>
+    <p class="font-weight-bold">Yearly Performance (No. of cases)</p>
+
+    <div class="row mb-4 pb-4">
+        <% @yearly_stats.each do |hash| %>
+            <div class="col-md-4">
+                <div class="border border-<%= hash[:color] %> rounded p-3" style="border-width: 0.2em !important;">
+                    <div class="section-headers">
+                        <p class="font-size-8"><%= hash[:title] %>:</p>
+                    </div>
+
+                    <p class="font-size-13 mt-2 mb-0 text-<%= hash[:color] %>">
+                        <i class="<%= hash[:icon] %> mr-3"></i>
+                        <b><%= number_with_delimiter(hash[:data], :delimiter => ',') %></b>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <p class="font-weight-bold">Today's Pending Cases</p>
+        </div>
+        <% if ["Doctor"].include?(current_user.userable_type) %>
+            <div class="col-md-4">
+                <p class="font-weight-bold">Doctor Quota</p>
+            </div>
+        <% end %>
+   </div>
+    <div class="row">
+        <% @daily_stats.each do |hash| %>
+            <div class="col-md-4">
+                <div class="border border-<%= hash[:color] %> rounded p-3" style="border-width: 0.2em !important;">
+                    <div class="section-headers">
+                        <p class="font-size-8"><%= hash[:title] %>:</p>
+                    </div>
+
+                    <p class="font-size-13 mt-2 mb-0 text-<%= hash[:color] %>">
+                        <i class="<%= hash[:icon] %> mr-3"></i>
+                        <b><%= number_with_delimiter(hash[:data], :delimiter => ',') %></b>
+                    </p>
+                </div>
+            </div>
+        <% end %>
+        <% if ["Doctor"].include?(current_user.userable_type) %>
+            <% @doctor_quota.each do |hash| %>
+                <div class="col-md-6">
+                    <div class="border border-<%= hash[:color] %> rounded p-3" style="border-width: 0.2em !important;">
+                        Annual 500 quota per year and it will be distributed on a pro-rated basis:<br><br>
+                        <table border='1'>
+                            <tr><td><b>1st January to 31st March= 125 quota</b></td></tr>
+                            <tr><td><b>1st April to 30th June = 125 quota</b></td></tr>
+                            <tr><td><b>1st July to 30th September = 125 quota</b></td></tr>
+                            <tr><td><b>1st October to 31st December= 125 quota</b></td></tr>
+                        </table>
+                        <br>
+                        <div class="section-headers">
+                            <p class="font-size-8"><%= hash[:title] %></p>
+                        </div>
+
+                        <p class="font-size-13 mt-2 mb-0 text-<%= hash[:color] %>">
+                            <i class="<%= hash[:icon] %> mr-3"></i>
+                            <b><%= number_with_delimiter(hash[:data], :delimiter => ',') %></b>
+                        </p><br>
+                        <p><b>Disclaimer:</b><br>
+                        <i>This quarterly distribution of quota is served as general guidance. It may change from time to
+                        time based on the demand for registration of foreign workers.</i></p>
+                    </div>
+                </div>
+            <% end %>
+        <% end %>
+    </div>
+</div>

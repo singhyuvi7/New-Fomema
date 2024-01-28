@@ -1,0 +1,102 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Group Schedules</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_GROUP_SCHEDULE') %>
+                    <%= raw index_table_new_button(new_internal_group_schedule_path(
+                        {}.merge(
+                            params.key?("sp_schedulable_code") ? {sp_schedulable_code: params[:sp_schedulable_code]} : {}
+                        ).merge(
+                            params.key?("sp_schedulable_type") ? {sp_schedulable_type: params[:sp_schedulable_type]} : {}
+                        )
+                    )) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Type</th>
+                                <th>Service Provider</th>
+                                <th>Group</th>
+                                <th>Date</th>
+                                <th>Created At</th>
+                                <th>Created By</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @group_schedules.blank? %>
+                                <tr>
+                                    <td colspan="8" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                            <% @group_schedules.each.with_index((@group_schedules.current_page - 1) * get_per + 1) do
+                                |group_schedule, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td><%= SpGroupSchedule::SP_SCHEDULEABLE_TYPES[group_schedule.sp_schedulable_type] %></td>
+                                    <td><%= "#{group_schedule.sp_schedulable&.name} (#{group_schedule.sp_schedulable&.code})" %></td>
+                                    <td><%= group_schedule.service_provider_group ? group_schedule.service_provider_group.name : '-' %></td>
+                                    <td><%= group_schedule.scheduled_date.strftime("%d/%m/%Y") %></td>
+                                    <td><%= group_schedule.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                                    <td><%= User.find_by(id: group_schedule.created_by).username %></td>
+
+                                    <td class="module-row-actions">
+
+                                        <!-- show -->
+                                        <%= raw index_table_show_button(internal_group_schedule_path(group_schedule)) %>
+
+                                        <% if group_schedule.scheduled_date > Date.today %>
+                                            <!-- edit -->
+                                            <% if has_permission?('EDIT_GROUP_SCHEDULE') %>
+                                                <%= raw index_table_edit_button edit_internal_group_schedule_path(group_schedule) %>
+                                            <% end %>
+
+                                            <!-- delete -->
+                                            <% if has_permission?('DELETE_GROUP_SCHEDULE') %>
+                                                <%= raw index_table_delete_button(internal_group_schedule_path(group_schedule)) %>
+                                            <% end %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+
+                            <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @group_schedules %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<% end %>

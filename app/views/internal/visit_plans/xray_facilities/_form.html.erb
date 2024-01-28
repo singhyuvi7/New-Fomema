@@ -1,0 +1,33 @@
+
+
+<visitplanclinicform
+    inline-template
+    :visit_plan="<%= @visit_plan.to_json %>"
+    :visit_plan_categories="<%= @visit_plan.visit_plan_categories.to_json %>"
+    :visit_plan_states="<%= @visit_plan.visit_plan_states.to_json %>"
+    :visit_plan_towns="<%= @visit_plan.visit_plan_towns.to_json %>"
+    :visit_plan_items="<%= @visit_plan.visit_plan_items.to_json %>"
+    :search_route="'<%= internal_visit_plans_xray_facilities_search_providers_path %>'"
+    :create_route="'<%= internal_visit_plans_xray_facilities_create_path %>'"
+    :states="<%= State.select("name, id").all.to_json %>"
+    :categories="<%= VisitPlan::CATEGORIES.to_json %>"
+    :visit_reports="<%= @visit_plan.visit_reports.to_json %>"
+    :visit_report_details="[]"
+    :allocations_last_year="[]"
+    :allocations_current_year="[]"
+    :examined_last_year="[]"
+    :examined_current_year="[]"
+    :params="<%= params.to_json %>"
+    :visit_plan_approval="<%= @visit_plan_approval.to_json %>"
+>
+
+<div>
+
+    <%= render "/internal/visit_plans/shared/form_fields", { form_method: form_method, form_action: form_action, index_path: index_path } %>
+
+    </div>
+
+</div>
+
+</visitplanclinicform>
+

@@ -1,0 +1,22 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Status Schedules') do |sheet|
+    sheet.add_row ['SP_CODE', 'SP_NAME', 'CLINIC_NAME', 'CREATED_AT_DATE', 'STATUS', 'STATUS_REASON', 'COMMENT', 'STATE_NAME', 'TOWN_NAME', 'POSTCODE', 'ADDRESS']
+
+    if @data
+        @data.each do |row|
+            sheet.add_row [
+                row.status_scheduleable.code, 
+                row.status_scheduleable_type == 'XrayFacility' ? row.status_scheduleable.try(:license_holder_name) : row.status_scheduleable.name, 
+                row.status_scheduleable_type == 'XrayFacility' ? row.status_scheduleable.try(:name) : row.status_scheduleable.try(:clinic_name), 
+                row.created_at.try(:strftime, get_standard_date_format), 
+                row.status, 
+                Doctor::ALL_STATUS_REASONS[row.status_reason], 
+                row.comment, 
+                row.status_scheduleable.state.try(:name), 
+                row.status_scheduleable.town.try(:name), 
+                row.status_scheduleable.postcode, 
+                row.status_scheduleable.displayed_address
+            ]
+        end
+    end
+end

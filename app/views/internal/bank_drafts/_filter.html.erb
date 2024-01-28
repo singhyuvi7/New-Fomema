@@ -1,0 +1,155 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_bank_drafts_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label required">Payer Type</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :payerable_type, options_for_select(@payerable_types.invert, params[:payerable_type]), include_blank: form_select_option_text, class: 'form-control select2', required: true, onchange: "payerable_type_changed(this)" %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Payer Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="payerable_code" id="payerable_code" value="<%= params[:payerable_code] %>"<%= " disabled" if params[:payerable_type].blank? %>>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Number</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="number" id="number" value="<%= params[:number] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Bank</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :bank, options_from_collection_for_select(Bank.order(:name).all, :id, :name, params[:bank]), include_blank: form_select_option_text, class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="created_date_from" class="col-sm-3 col-form-label">Created Date From</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="created_date_from" id="created_date_from" value="<%= params[:created_date_from] %>" id="created_date_from" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="created_date_to" class="col-sm-3 col-form-label">Created Date To</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="created_date_to" id="created_date_to" value="<%= params[:created_date_to] %>" id="created_date_to" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="issue_date_from" class="col-sm-3 col-form-label">Issue Date From</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="issue_date_from" id="issue_date_from" value="<%= params[:issue_date_from] %>" id="issue_date_from" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="issue_date_to" class="col-sm-3 col-form-label">Issue Date To</label>
+                        <div class="col-sm-9">
+                            <input type="date" name="issue_date_to" id="issue_date_to" value="<%= params[:issue_date_to] %>" id="issue_date_to" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="holded" class="col-sm-3 col-form-label">Holded</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :holded, options_for_select({yes: "Yes", no: "No"}.invert, params[:holded]), include_blank: form_select_option_text, class: "form-control select2" %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="bad" class="col-sm-3 col-form-label">Bad</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :bad, options_for_select({yes: "Yes", no: "No"}.invert, params[:bad]), include_blank: form_select_option_text, class: "form-control select2" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="organization" class="col-sm-3 col-form-label">Branch</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :organization, options_from_collection_for_select(Organization.where("org_type = ?", "BRANCH").order(:name), :id, :name, params[:organization]), include_blank: form_select_option_text, class: "form-control select2" %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Order Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="order_code" id="order_code" value="<%= params[:order_code] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="is_posted" class="col-sm-3 col-form-label">Posted</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :is_posted, options_for_select(BankDraft::IS_POSTED, params[:is_posted]), include_blank: form_select_option_text, class: "form-control select2" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_bank_drafts_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+function payerable_type_changed(sel)
+{
+    if ($(sel).val().length > 0) {
+        $('#payerable_code').removeAttr('disabled');
+    } else {
+        $('#payerable_code').attr('disabled', true);
+    }
+}
+</script>
+<% end %>

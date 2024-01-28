@@ -1,0 +1,28 @@
+<% worksheet = @excel[0].map {|row| row.class == Hash ? row[:data] : nil }.compact %>
+
+<h4><%= worksheet[0][0] %></h4>
+<h4><%= worksheet[1][0] %></h4>
+
+<table>
+    <tr>
+        <% worksheet[2].each do |column| %>
+            <th><%= column %></th>
+        <% end %>
+    </tr>
+
+    <% worksheet[3..-1].each do |row| %>
+        <tr>
+            <% row.each do |column| %>
+                <td><%= column %></td>
+            <% end %>
+        <tr>
+    <% end %>
+</table>
+
+<style>
+    tr, th, td {
+        background-color: #fef0d5;
+        border: 1px solid black;
+        padding: 4px 10px;
+    }
+</style>

@@ -1,0 +1,30 @@
+<table>
+    <tbody>
+        <hr>
+        <tr>
+            <td class="table-name" colspan="2">Conclusion</td>
+            <td class="text-center bold">Yes</td>
+            <td class="text-center bold">No</td>
+        </tr>
+        <tr class="finding-row method-field">
+            <td class="table-index">1.</td>
+            <td class="row-name">
+                <div class="row-wrap">Satisfactory</div>
+            </td>
+            <td class="text-center"><%= visit_report_lab&.satisfactory == 'YES' ? @checkbox_checked : @checkbox_unchecked %></td>
+            <td class="text-center"><%= visit_report_lab&.satisfactory == 'NO'  ? @checkbox_checked : @checkbox_unchecked %></td>
+        </tr>
+        <% if !visit_report_lab&.satisfactory_comment.blank? %>
+            <tr>
+                <td class="table-index"></td>
+                <td>
+                    <div class="finding-comment">
+                        <span class="bold">Comment :</span>
+                        <span class="unbold"><%= visit_report_lab&.satisfactory_comment %></span>
+                    </div>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>

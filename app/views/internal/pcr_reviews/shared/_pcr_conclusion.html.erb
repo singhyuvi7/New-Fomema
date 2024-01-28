@@ -1,0 +1,94 @@
+<%
+    appeal ||= nil
+    colspan = 3
+    colspan += 1 unless appeal.present?
+%>
+
+<div class="card border-primary">
+    <div class="card-header">
+        PCR Review Conclusion
+    </div>
+
+    <table class="table table-card">
+        <tbody>
+            <tr>
+                <td>
+                    <label class="<%= " required" if pcr_review.belong_is_mandatory? %>">X-Ray Details</label>
+                    <div><i>Tick cases for more than one image</i></div>
+                </td>
+                <td colspan="<%= colspan %>">
+                    <div class="col-form-label">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="pcr_review[belong]" id="pcr_review_belong_YES" value="YES" data-parsley-errors-container="#belong_errors" data-parsley-error-message="Please select a option"
+                                    <% if pcr_review.belong == "YES" %> checked <% end %>
+                                    <% if pcr_review.belong_is_mandatory? %> required <% else %> disabled <% end %>
+                                >
+                                X-Ray images BELONG to the same worker
+                            </label>
+                        </div>
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="pcr_review[belong]" id="pcr_review_belong_NO" value="NO"
+                                    <% if pcr_review.belong == "NO" %> checked <% end %>
+                                    <% if pcr_review.belong_is_mandatory? %> required <% else %> disabled <% end %>
+                                >
+                                X-Ray images DO NOT BELONG to the same worker
+                            </label>
+                        </div>
+                        <div id="belong_errors"></div>
+                        <button type="button" onclick="remove_belong()" class="btn btn-sm btn-warning mt-3">Undo</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><label class="required">Decision</label></td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="pcr_review[result]" type="radio" value="NORMAL" id="pcr_review_result_normal" required
+                                <%= " checked" if pcr_review.result == 'NORMAL' %>
+                                <%= " disabled" if @must_retake %>
+                            >
+                            Normal
+                        </label>
+                    </div>
+                </td>
+
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" name="pcr_review[result]" type="radio" value="ABNORMAL" id="pcr_review_result_abnormal"
+                                <%= " checked" if pcr_review.result == 'ABNORMAL' %>
+                                <%= " disabled" if @must_retake %>
+                            >
+                            Abnormal<!-- 4020 -->
+                        </label>
+                    </div>
+                </td>
+
+                <% unless appeal.present? %>
+                    <td class="text-center">
+                        <div class="form-check">
+                            <label class="form-check-label form-check-inline">
+                                <input class="form-check-input" name="pcr_review[result]" type="radio" value="RETAKE" id="pcr_review_result_retake"
+                                    <%= " checked" if pcr_review.result == 'RETAKE' || @must_retake %>
+                                    <%= " disabled" unless @can_retake && @must_retake %>
+                                >
+                                Retake
+                            </label>
+                        </div>
+                    </td>
+                <% end %>
+            </tr>
+
+            <tr>
+                <td><label class="required" id="label_for_pcr_review_comment">Comment</label></td><!-- 4118 -->
+                <td colspan="<%= colspan %>">
+                    <textarea class="form-control" name="pcr_review[comment]" id="pcr_review_comment" rows="2" required><%= pcr_review.comment %></textarea>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,1 @@
+json.partial! 'internal/postcodes/postcode', collection: @postcodes, as: :postcode

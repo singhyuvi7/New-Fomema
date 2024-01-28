@@ -1,0 +1,12 @@
+<%= wicked_pdf_stylesheet_link_tag "internal/pdf/registration_invoice" %>
+
+<div class="invoice page-container">
+    <div class="text-center invoice-title"><b><%= @title %></b></div>
+
+    <%= render "/pdf_templates/orders/invoice_main_details" %>
+
+    <%= render "/pdf_templates/orders/invoice_item_breakdown" %>
+
+    <%=render '/pdf_templates/orders/payment_details' %>
+
+</div>

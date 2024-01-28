@@ -1,0 +1,65 @@
+<div class="card">
+    <div class="card-header">
+        <%== @bulletin.title %>
+    </div>
+    <div class="card-body">
+        <%=raw @bulletin.content %>
+        <br>
+        <% if !@bulletin.uploads.blank? %>
+        <label for="bulletin_uploads">Uploaded Documents</label>
+
+        <table class="table">
+            <tr>
+                <th>Documents</th>
+            </tr>
+
+            <% @bulletin.uploads.each do |upload| %>
+                <tr>
+                    <td class="filenames">
+                        <% upload.documents.each do |document| %>
+                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+            <% if @bulletin.uploads.blank? %>
+                <tr><td colspan="1">There are no uploaded documents</td></tr>
+            <% end %>
+        </table>
+        <% end %>
+
+        <% if @bulletin.require_acknowledge %>
+            <div class="row">
+                <div class="col-md-12">
+                    <label><input type="checkbox" onclick="acknowledge_bulletin(<%= @bulletin_user_view_log.id %>)"<%= " checked disabled" if @acknowledge_count > 0 %>> Acknowledge</label>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <div class="card-footer text-right">
+        <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+            <a href="<%= external_root_path %>" class="btn btn-blue-portal">Back</a>
+        <% else %>
+            <a href="<%= external_bulletins_path %>" class="btn btn-primary">Back</a>
+        <% end %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+function acknowledge_bulletin(bulletin_user_view_log)
+{
+    $.ajax({
+        url: `<%= acknowledge_external_bulletin_path(@bulletin) %>`,
+        method: 'GET',
+        data: {
+            bulletin_user_view_log_id: bulletin_user_view_log
+        },
+        success: function (response) {
+        },
+    })
+    event.target.disabled = true;
+}
+</script>
+<% end %>

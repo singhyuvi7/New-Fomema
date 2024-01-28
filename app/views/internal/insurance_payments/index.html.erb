@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="card-header">
+        <strong>INSURANCE - PAYMENTS</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render '/internal/insurance_payments/shared/filter' %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_INSURANCE_PAYMENT') %>
+                    <%=raw index_table_new_button(new_internal_insurance_payment_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                    <thead>
+                    <tr>
+                        <th class="module-row-numbers">#</th>
+                        <th>Batch Code</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                        <% if @batches.blank? %>
+                            <tr>
+                                <td colspan="9" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+
+                            <% @batches.each.with_index((@batches.current_page - 1) * get_per + 1) do |batch, index| %>
+                                <% insurance_payment_statuses = batch.ip_invoices.pluck(:status).uniq 
+                                    %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td><%= batch.code %></td>
+                                    <td><%= DateTime.parse(batch.start_date.to_s).strftime("%d/%m/%Y") %></td>
+                                    <td><%= DateTime.parse(batch.end_date.to_s).strftime("%d/%m/%Y") %></td>
+                                    <td><%=
+                                        if insurance_payment_statuses.include? 'FAILED'
+                                            IpInvoice::STATUSES['FAILED']
+                                        else
+                                            raw insurance_payment_statuses.map { |status| IpInvoice::STATUSES[status] }.join('<br>')
+                                        end
+                                        %>
+                                    </td>
+                                    <td class="module-row-actions">
+                                        <%=raw index_table_show_button(internal_insurance_payment_path(batch)) %>
+
+                                        <% if has_permission?('DELETE_INSURANCE_PAYMENT') %>
+                                            <%= raw index_table_delete_button(internal_insurance_payment_path(batch)) %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                        <% end %>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @batches %>
+        </div>
+
+    </div>
+    <!-- /card-body -->
+</div>

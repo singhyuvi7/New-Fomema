@@ -1,0 +1,116 @@
+<div class="card">
+ <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+        <div class="card-header border-0 bg-transparent text-dark"><strong></strong></div>
+    <% else %>
+        <div class="card-header"><strong>Filter</strong></div>
+    <% end %>
+    <form action="/orders" method="get" id="order-filter-form">
+        <input type="hidden" name="per" id="per" value="<%= params[:per] || get_per_options.first %>">
+        <div class="card-body">
+            <div class="form-group row">
+       <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <label for="filter_name" class="col-sm-2 col-form-label">Payment Code</label>
+                <div class="col-sm-3">
+                    <input type="text" name="code" id="filter_name" value="<%= params[:code] %>" id="code" class="form-control">
+                </div>
+
+                <label for="category" class="col-sm-2 col-form-label">Category</label>
+                <div class="col-sm-3">
+                    <select name="category" id="category" class="form-control">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% order_categories = current_user.role.try(:category) == 'Employer' ? Order::PORTAL_CATEGORIES : current_user.role.try(:category) == 'Agency' ? Order::PORTAL_AGENCY_CATEGORIES : Order::MERTS_CATEGORIES %>
+                        <% order_categories.each do |key, value| %>
+                            <option value="<%= key %>" <%= " selected" if params[:category] == key %>><%= value %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Date Created From</label>
+                <div class="col-sm-3">
+                    <input type="date" name="start_date" id="filter_start_date" value="<%= params[:start_date] %>" id="start_date" class="form-control">
+                </div>
+
+                <label for="filter_name" class="col-sm-2 col-form-label">Date Created To</label>
+                <div class="col-sm-3">
+                    <input type="date" name="end_date" id="filter_end_date" value="<%= params[:end_date] %>" id="end_date" class="form-control">
+                </div>
+            </div>
+              <div class="form-group row">
+                <label for="filter_name" class="col-sm-2 col-form-label">Payment From</label>
+                <div class="col-sm-3">
+                    <input type="date" name="paid_start_date" id="filter_paid_start_date" value="<%= params[:paid_start_date] %>" id="paid_start_date" class="form-control">
+                </div>
+
+                <label for="filter_name" class="col-sm-2 col-form-label">Payment To</label>
+                <div class="col-sm-3">
+                    <input type="date" name="paid_end_date" id="filter_paid_end_date" value="<%= params[:paid_end_date] %>" id="paid_end_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">Payment Status</label>
+                <div class="col-sm-3">
+                    <select name="status" id="status" class="form-control">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% Order::STATUSES.each do |key, value| %>
+                            <option value="<%= key %>" <%= " selected" if params[:status] == key %>><%= value %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+        <% else %>
+                <label for="filter_name" class="col-sm-1 col-form-label">Order Code</label>
+                <div class="col-sm-3">
+                    <input type="text" name="code" id="filter_name" value="<%= params[:code] %>" id="code" class="form-control">
+                </div>
+
+                <label for="category" class="col-sm-1 col-form-label">Category</label>
+                <div class="col-sm-3">
+                    <select name="category" id="category" class="form-control">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% order_categories = current_user.role.try(:category) == 'Employer' ? Order::PORTAL_CATEGORIES : Order::MERTS_CATEGORIES %>
+                        <% order_categories.each do |key, value| %>
+                            <option value="<%= key %>" <%= " selected" if params[:category] == key %>><%= value %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="filter_name" class="col-sm-1 col-form-label">Order From</label>
+                <div class="col-sm-3">
+                    <input type="date" name="start_date" id="filter_start_date" value="<%= params[:start_date] %>" id="start_date" class="form-control">
+                </div>
+
+                <label for="filter_name" class="col-sm-1 col-form-label">Order To</label>
+                <div class="col-sm-3">
+                    <input type="date" name="end_date" id="filter_end_date" value="<%= params[:end_date] %>" id="end_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="status" class="col-sm-1 col-form-label">Status</label>
+                <div class="col-sm-3">
+                    <select name="status" id="status" class="form-control">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% Order::STATUSES.each do |key, value| %>
+                            <option value="<%= key %>" <%= " selected" if params[:status] == key %>><%= value %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+        <% end %>
+        </div>
+       <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+            <div class="card-footer text-right border-0 bg-transparent">
+                <a href="<%= external_orders_path %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+                <button type="submit" form="order-filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+            </div>
+        <% else %>
+            <div class="card-footer text-right border-0 bg-transparent">
+                <%=raw filter_clear_button external_orders_path %>
+                <%=raw filter_button %>
+            </div>
+        <% end %>
+    </form>
+</div>

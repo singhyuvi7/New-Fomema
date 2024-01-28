@@ -1,0 +1,56 @@
+.w-100.pb-3{:style => "margin-top: 2rem;"}
+  %table.table.table-borderless.w-100
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - if @doctors.present?
+        - @doctors.each.with_index do |doctor, index|
+          %tr
+            %td= index + 1
+            %td= doctor.code
+            %td= doctor.name
+            %td= doctor.clinic_name
+            %td= doctor.state_name
+            %td= doctor.latest_status_schedule.from.strftime('%-d-%^b-%y')
+          %tr
+            %td
+            %td Reason:
+            %td= doctor.latest_status_reason_display
+            %td{ colspan: 3 }
+:css
+  th { text-align: left }
+  th:nth-child(2) { text-align: right; }
+
+  td:nth-child(2) { text-align: right; }
+
+  tr:nth-child(odd) { border-top: 1px solid #d0d0d0 }
+  tr:nth-child(even) { border-bottom: 1px solid #d0d0d0 }
+
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: none;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

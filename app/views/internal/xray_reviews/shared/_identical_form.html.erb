@@ -1,0 +1,23 @@
+<div class="card" id="identical_card" style="<%= " display: none; " unless xray_review.result == "IDENTICAL" %>">
+    <div class="card-header">Identical Case</div>
+    <table class="table table-bordered table-card" id="identical_table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>X-Ray Code</th>
+                <th>Worker Code</th>
+                <th>Worker Name</th>
+                <th>Date Pickup</th>
+                <th>X-Ray Taken Date</th>
+                <th>Decision</th>
+                <th>Batch</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% xray_review.xqcc_review_identicals.each.with_index do |xqcc_review_identical, index| %>
+                <%=render 'internal/xray_reviews/shared/identical_row', {xray_review: xqcc_review_identical.identical_xray_review, show_checkbox: false, show_remove: true} %>
+            <% end %>
+        </tbody>
+    </table>
+</div>

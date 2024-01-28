@@ -1,0 +1,61 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Doctors</strong> - Approval
+    </div>
+    <%= form_for @doctor, url: approval_update_internal_doctors_path(@doctor), html: {class: "#{params[:action]}_doctor doctor-form with-parsley"} do |form| %>
+
+        <div class="card-body">
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <%=render "shared/approval_comments", { comments: @doctor.approval_request.comments } if @doctor.approval_request %>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <%= label_tag "doctor[xray_facility_id]", 'X-Ray Facility' %>
+                                <%= select_tag "doctor[xray_facility_id]", options_from_collection_for_select(XrayFacility.where("id in (?)", @doctor.xray_facility_pairing_options + [@doctor.xray_facility_id]).all, :id, :code, @doctor.xray_facility_id), include_blank: form_select_option_text, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__doctor_xray_facility_id", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-doctor_xray_facility_id-container\"]", parsley_group: "doctor_xray_facility_id" } %>
+                                <div id="select2_parsley_error__doctor_xray_facility_id"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <%= label_tag "doctor[laboratory_id]", 'Laboratory' %>
+                                <%= select_tag "doctor[laboratory_id]", options_from_collection_for_select(Laboratory.where("id in (?)", @doctor.laboratory_pairing_options + [@doctor.laboratory_id]).all, :id, :code, @doctor.laboratory_id), include_blank: form_select_option_text, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__doctor_laboratory_id", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-doctor_laboratory_id-container\"]", parsley_group: "doctor_laboratory_id" } %>
+                                <div id="select2_parsley_error__doctor_laboratory_id"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: true %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_doctors_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+        
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('input[name="approval[decision]"]').click(function () {
+        if ($(this).val() == 'REVERT' || $(this).val() == 'REJECT') {
+            $('#doctor_xray_facility_id').attr('disabled', true);
+            $('#doctor_laboratory_id').attr('disabled', true);
+        } else if ($(this).val() == 'APPROVE') {
+            $('#doctor_xray_facility_id').attr('disabled', false);
+            $('#doctor_laboratory_id').attr('disabled', false);
+        }
+    });
+</script>
+<% end %>

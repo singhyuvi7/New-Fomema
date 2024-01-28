@@ -1,0 +1,89 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Agencies</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Agency Code</th>
+            <th>Agency Name</th>
+            <th>Business Registration Number</th>
+            <th>License Number</th>
+            <th>State</th>
+            <th>Town</th>
+            <th>Status</th>
+            <th>Role</th>
+            <th>Account Valid Till Date</th>
+            <th>Problematic</th>
+            <th>Document Verified</th>
+            <th>Sop Acknowledge</th>
+            <th>Created At</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @agencies.blank? %>
+            <tr>
+                <td colspan="14" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @agencies.each.with_index((@agencies.current_page - 1) * get_per + 1) do |agency, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= agency.code %></td>
+                    <td><%= agency.name %></td>
+                    <td><%= agency.business_registration_number %></td>
+                    <td><%= agency.license_number %></td>
+                    <td><%= agency.state.try(:name) %></td>
+                    <td><%= agency.town.try(:name) %></td>
+                    <td><%= Agency::STATUSES[agency.status] %></td>
+                    <td><%= agency&.user&.role&.name || "-" %></td>
+                    <td><%= agency&.expired_at&.strftime(get_standard_date_format) || "-" %></td>
+                    <td><%= agency.problematic == true ? 'Yes' : 'No' %></td>
+                    <td><%= agency.document_verified == true ? 'Yes' : 'No' %></td>
+                    <td><%= agency.sop_acknowledge == true ? 'Yes' : 'No' %></td>
+                    <td><%= agency.created_at&.strftime(get_standard_datetime_format) %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_agency_path(agency)) %>
+                        <% if agency.status === 'APPROVAL' and has_permission?("APPROVAL_AGENCY") %>
+                            <%=raw index_table_warning_button(registration_approval_internal_agency_path(agency), label: '<i class="fa fa-check text-white"></i>', title: 'Registration Approval') %>
+                        <% end %>
+                        <% if has_any_permission?('EDIT_NON_FINANCE_INFO_AGENCY', 'EDIT_FINANCE_INFO_AGENCY') and (['INACTIVE', 'ACTIVE', 'TEMPORARY_INACTIVE'].include?(agency.status)) %>
+                            <%=raw index_table_edit_button edit_internal_agency_path(agency) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_AGENCY') %>
+                            <%=raw index_table_delete_button(internal_agency_path(agency)) %>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_OWN_TRANSACTION") and agency.status != 'REJECTED' %>
+                            <%=raw index_table_primary_button(internal_transactions_url(agency_code: agency.code), label: '<i class="fa fa-bars"></i>', title: 'View Transactions') %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @agencies %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

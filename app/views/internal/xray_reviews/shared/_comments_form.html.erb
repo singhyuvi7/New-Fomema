@@ -1,0 +1,45 @@
+<div class="card">
+
+    <div class="card-header">
+        XQCC Comments
+    </div>
+
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+              <th>#</th>
+              <th>
+                Date
+              </th>
+              <th>Who</th>
+              <th>Comment</th>
+
+            </tr>
+
+            <% if xray_review_model.xqcc_comments.present? %>
+
+            <%
+
+              if input_key == 'first_xray_review'
+                comment_model = xray_review_model.xqcc_comments.where(is_retake: true)
+              else
+                comment_model = xray_review_model.xqcc_comments.where(is_retake: false)
+              end
+
+              comment_model.each.with_index do |xqcc_comment, index| %>
+
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= xqcc_comment.created_at.strftime("%d/%m/%Y") %></td>
+                <td><%= xqcc_comment.creator.name %></td>
+                <td><%= xqcc_comment.comment %></td>
+            </tr>
+
+            <% end %>
+
+            <% end %>
+
+        </tbody>
+    </table>
+
+</div>

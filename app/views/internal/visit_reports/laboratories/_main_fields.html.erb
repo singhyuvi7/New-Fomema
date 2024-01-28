@@ -1,0 +1,96 @@
+<%= form.hidden_field :visit_plan_item_id %>
+<%= form.hidden_field :visit_plan_id %>
+<%= form.hidden_field :visitable_type %>
+<%= form.hidden_field :visitable_id %>
+<%= form.hidden_field :laboratory_type_id %>
+
+<%= form.fields_for :visit_report_laboratory do |visit_report_laboratory| %>
+    <%= visit_report_laboratory.hidden_field :visit_report_id %>
+    <%= visit_report_laboratory.hidden_field :laboratory_id %>
+    <%= visit_report_laboratory.hidden_field :laboratory_name %>
+    <%= visit_report_laboratory.hidden_field :address_1 %>
+    <%= visit_report_laboratory.hidden_field :address_2 %>
+    <%= visit_report_laboratory.hidden_field :address_3 %>
+    <%= visit_report_laboratory.hidden_field :address_4 %>
+    <%= visit_report_laboratory.hidden_field :country_id %>
+    <%= visit_report_laboratory.hidden_field :state_id %>
+    <%= visit_report_laboratory.hidden_field :town_id %>
+    <%= visit_report_laboratory.hidden_field :postcode %>
+<% end %>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :visit_date, 'Date', class: 'required' %>
+            <%= form.date_field :visit_date, class: 'form-control non-summary', required: true, max: Time.now.strftime('%Y-%m-%d') %>
+        </div>
+    </div>
+
+    <%= form.fields_for :visit_report_laboratory do |visit_report_laboratory| %>
+        <div class="col-md-6">
+            <div class="form-group">
+                    <%= visit_report_laboratory.label :type_of_visit %>
+                    <%= visit_report_laboratory.text_field :type_of_visit, placeholder: 'test', class: 'form-control non-summary', readonly: true %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :visit_time_from, 'Visit Time From', class: 'required' %>
+            <%= form.time_field :visit_time_from, class: 'flatpickr-timepicker form-control non-summary', required: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :visit_time_to, 'Visit Time To', class: 'required' %>
+            <%= form.time_field :visit_time_to, class: 'flatpickr-timepicker form-control non-summary', required: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="visit_report_visitors[]" class="required">FOMEMA's Officers</label>
+            <select class="form-control non-summary" id="fomemaOfficers" name="visit_report_visitors[]" multiple="true" required="true">
+                <% @officers.each do |officer| %>
+                <option value="<%= officer.to_json %>">
+                    <%= officer.name %>
+                </option>
+                <% end %>
+            </select> 
+        </div>
+    </div>
+        
+    <%= form.fields_for :visit_report_laboratory do |visit_report_laboratory| %>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= visit_report_laboratory.label :moh_representative, 'MOH Representative / Others (If Any)' %>
+                <%= visit_report_laboratory.text_field :moh_representative, class: 'form-control non-summary'%>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Name & Laboratory Code</label>
+            <div><%= "#{@visit_report.visit_report_laboratory.laboratory_name} (#{@visit_report.visitable&.code})" %></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Laboratory Address</label>
+            <% 
+                address = [@visit_report.visit_report_laboratory.address_1, @visit_report.visit_report_laboratory.address_2, @visit_report.visit_report_laboratory.address_3, @visit_report.visit_report_laboratory.address_4, @visit_report.visit_report_laboratory.town&.name, @visit_report.visit_report_laboratory.postcode, @visit_report.visit_report_laboratory.state&.name].reject(&:blank?).join(", ")
+            %>
+            <div><%= address %></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="card">
+    <div class="card-header">
+        XQCC Comments
+    </div>
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Who</th>
+                <th>Comment</th>
+            </tr>
+            <% xray_review.xqcc_comments.each.with_index(1) do |xqcc_comment, index| %>
+                <tr>
+                    <td><%= index %></td>
+                    <td><%= xqcc_comment.created_at.strftime(get_standard_date_format) %></td>
+                    <td><%= xqcc_comment.creator.name %></td>
+                    <td><%= xqcc_comment.comment %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+<div class="card" id="comment_card">
+    <div class="card-header">
+        XQCC Comments <button type="button" id="add_comment" class="btn btn-sm btn-primary ml-2" title="Add Comment" data-toggle="tooltip" ><i class="fa fa-plus"></i> Add Comment</button>
+    </div>
+    <table id="comments_table" class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Who</th>
+                <th>Comment</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><%= Time.now.strftime(get_standard_date_format) %></td>
+                <td><%= current_user.name %></td>
+                <td>
+                    <textarea name="xray_review[comments][]" class="form-control xqcc_comment" id="" rows="2" <%= " required" unless xray_review.result == 'NORMAL' %>></textarea>
+                </td>
+                <td>
+                    <button type='button' class='btn btn-sm btn-danger delete_comment hidden'><i class='fa fa-trash'></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

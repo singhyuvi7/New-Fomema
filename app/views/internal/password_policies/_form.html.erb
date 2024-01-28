@@ -1,0 +1,73 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @password_policy } %>
+
+    <div class="row">
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :minimum_length, "Minimum Length", class: 'required' %>
+                <%= form.number_field :minimum_length, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :require_alphabet, "Require Alphabet" %>
+                <%= form.check_box :require_alphabet, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :require_numeric, "Require Numeric" %>
+                <%= form.check_box :require_numeric, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :require_special_characters, "Require Special Character" %>
+                <%= form.check_box :require_special_characters, class: 'form-control' %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :require_small_and_capital, "Require Small and Capital" %>
+                <%= form.check_box :require_small_and_capital, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :password_expiry, "Password Expiry (Month)", class: 'required' %>
+                <%= form.number_field :password_expiry, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :block_previous_password, "Block Previous Password", class: 'required' %>
+                <%= form.number_field :block_previous_password, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_password_policies_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

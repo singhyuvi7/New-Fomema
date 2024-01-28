@@ -1,0 +1,28 @@
+<div class="card">
+    <div class="card-header">
+        <strong>MSPD - Worker Block Send To JIM</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+        <div class="row-fluid">
+            <%= link_to '<i class="fa fa-download" aria-hidden="true"></i> Download PDF'.html_safe, worker_block_send_to_jim_internal_mspd_reports_path, class: "btn btn-sm btn-secondary with-pdf-format", id: "export_to_excel" %>
+
+            <%=render "/internal/reports/mspd/worker_block_send_to_jim/preview_table" %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-pdf-format').each(function() {
+        link = $(this).attr('href');
+        linkParts = link.split('?');
+        linkParts.splice(1, 0, '.pdf?');
+        $(this).attr('href', linkParts.join(''));
+    });
+</script>
+<% end %>

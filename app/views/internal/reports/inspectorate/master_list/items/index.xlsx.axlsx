@@ -1,0 +1,61 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: "CLINIC & X-RAY") do |sheet|
+    sheet.add_row ["MASTER LIST : CLINIC & X-RAY VISITED FOR YEAR #{@batch.start_date.strftime('%d/%m/%Y')} to #{@batch.end_date.strftime('%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+      sheet.add_row ['Visit Date',
+      'Name Of Clinic',
+      'Code', 
+      'Name Of Reg. Doctor',
+      'Location',
+      'State',
+      'Inspected By', 
+      'Serial No.', 
+      'Visit Report ID', 
+      'NC',
+      'Repeated offence (NC/Year)', 
+      "Letter ref. #", 
+      'Letter date', 
+      'Date of Faxed', 
+      'Follow-up Date', 
+      'Reminder letter', 
+      'Reply date', 
+      'Present in Meeting', 
+      'Report Date', 
+      'Report By', 
+      'Remarks'], style: header_style
+
+      @insp_master_lists.each do |item|
+        sheet.add_row [
+          item.visit_date.try(:strftime,'%d/%m/%Y'),
+          item.name_of_clinic,
+          item.sp_code,
+          item.name_of_doctor,
+          item.location,
+          item.state,
+          item.inspected_by,
+          item.serial_no,
+          item.visit_report_id,
+          item.nc,
+          item.repeated_offence,
+          item.letter_ref,
+          item.letter_date.try(:strftime,'%d/%m/%Y'),
+          item.date_of_faxed.try(:strftime,'%d/%m/%Y'),
+          item.follow_up_date.try(:strftime,'%d/%m/%Y'),
+          item.reminder_letter,
+          item.reply_date.try(:strftime,'%d/%m/%Y'),
+          item.present_in_meeting,
+          item.report_date.try(:strftime,'%d/%m/%Y'),
+          item.report_by,
+          item.remarks
+        ], style: data_style
+      end
+  end
+
+end

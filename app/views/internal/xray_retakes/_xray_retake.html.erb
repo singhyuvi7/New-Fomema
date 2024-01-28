@@ -1,0 +1,54 @@
+<div class="card">
+
+    <div class="card-header">
+        X-Ray Retake
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <% if xray_retake.requestable_type === 'XrayReview' %>
+                <div class="form-group col">
+                    <label class="required">X-Ray Facility</label>
+                    <p class="form-control-plaintext">
+                        <%= xray_retake.xray_facility&.name %> (<%= xray_retake.xray_facility&.code %>)
+                    </p>
+                </div>
+            <% end %>
+            <div class="form-group col">
+                <label class="required">Reason</label>
+                <p class="form-control-plaintext">
+                    <%= xray_retake.retake_reason&.name %>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col">
+                <label class="required">Comment</label>
+                <pre class="xray_retake form-control"><%= xray_retake.transactionz.xray_retake&.comment %></pre>
+            </div>
+        </div>
+
+        <% if !xray_retake.approval_decision.blank? %>
+            <div class="row">
+                <div class="form-group col">
+                    <label>Approval Decision</label>
+                    <p class="form-control-plaintext">
+                        <%= xray_retake.approval_decision %>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label>Approval Comment</label>
+                    <pre class="form-control text-break">
+                        <%= xray_retake.approval_comment %>
+                    </pre>
+                </div>
+            </div>
+        <% end %>
+
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

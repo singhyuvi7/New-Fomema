@@ -1,0 +1,38 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+
+    <%= form_tag employer_account_internal_finance_reports_path, method: 'get' do |form| %>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="closing_date" class="col-sm-3 col-form-label">Closing Date</label>
+                    <div class="col-sm-9">
+                        <div class="d-flex align-items-center">
+                            <%= text_field_tag "closing_date", params["closing_date"], class: "form-control datepicker flex-grow-1", placeholder: "Closing Date", data: { type: "start", target: 'closing_date' }, max: Date.today.strftime("%F"), required: true %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-right">
+            <% if has_permission?("FINANCE_REPORTS") %>
+                <%= link_to '<i class="fa fa-file-excel" aria-hidden="true"></i> Export'.html_safe, employer_account_internal_finance_reports_path, class: "btn btn-sm btn-warning with-excel-format" %>
+            <% end %>
+            <!-- <%=raw filter_button %> -->
+        </div>
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.with-excel-format').click(function(e) {
+        $(this).attr("href", this.href + ".xlsx?" + $(this).closest('form').serialize());
+    });
+</script>
+<% end %>

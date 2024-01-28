@@ -1,0 +1,526 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, alignment: {:horizontal => :center, :vertical => :center, :wrap_text => true})
+
+  wb.add_worksheet(name: "Testing Lab(Full Or Partial)") do |sheet|
+    sheet.add_row ["Masterlist - LQCC - #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+      sheet.add_row ["#",
+      "Visit Report ID",
+      "Visit Date", 
+      "Lab. Name", 
+      "Type of facilities\r(CC/Partial/Full)", 
+      "Labcode", 
+      "Address", 
+      "Town", 
+      "State", 
+      "FOMEMA Officer", 
+      "Type of Visit",
+      "Conclusion\r(Satisfactory - Yes/No)",
+      "Letter Reference #",
+      "Date of NC Letter",
+      "Date of Reminder Letter",
+      "Date of Committee Meeting",
+      "Date of Warning Letter",
+      "Compliances (YES/NO/NA)",
+      "","","","","",
+      "","","","","","",
+      "","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","","","",
+      "","","","","","","","","","","","",
+      "","","","","","","","","","","",
+      "","","","","","","","","","","","",
+      "","","","","","",
+      "","","",""
+      ], style: header_style
+
+      sheet.add_row ["","","","","","","","","","","","","","","","","",
+      "Visit & Facility Details",
+      "Facility Adequacy","","","","",
+      "Pre-analytical","","","","","",
+      "ABO blood grouping","","","","","","","","","",
+      "Malaria - Screening","","","","","","","","","","",
+      "Malaria - BFMP","","","","","","","","","",
+      "HBsAg - Screening","","","","","","","","","","",
+      "HBsAg - Verification","","","","","","","","","","",
+      "HIV - Screening","","","","","","","","","","",
+      "HIV - Verification","","","","","","","","","","",
+      "VDRL/RPR","","","","","","","","","","",
+      "TPHA/TPPA","","","","","","","","","",
+      "URINE DRUG - SCREENING","","","","","","","","","","",
+      "URINE DRUG - WET CHEMISTRY","","","","","","","","","","","","",
+      "UPT","","","","","","","","","","","",
+      "SERUM β-HCG","","","","","","","","","","",
+      "URINE BIOCHEMISTRY","","","","","","","","","","","",
+      "Specimen Storage","","","","","",
+      "Reporting/Record-Keeping","","",""], style: header_style
+
+      sheet.add_row ["","","","","","","","","","","","","","","","","",
+      "Lab close / not exist",
+      "Adequate Facility","Adequate Staff","Pathologist","Log book","Adequate\rInstrument/Material/Con\rsumables",
+      "Appropriate Specimen\rTransportation","Appropriate specimen\rpackaging","Record of Specimen\rTraceability","Specimen Registration\rRecord","Specimen Rejection\rRegister","Specimen Rejection\rCriteria",
+      "MS ISO Status","Method","Reagent Condition","Control Cell Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Test for Appeal\rcase - In-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Test for Appeal\rcase - In-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Level of Drug\rDetection\r(OPIATES)","Level of Drug Detection\r(CANNABINOIDS)","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Test for Appeal\rcase - In-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Level of hCG\rdetection","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","Verification Test - In\r-house","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Level of hCG\rdetection","Reagent Condition","Control Condition","IQA","EQA","Test Worksheet","TPM","Instrument Maintenance\rReport","TEST\rCOMPLIANCE",
+      "MS ISO Status","Method","Reagent Condition","Control Condition","IQA","EQA","Level of Urine\rSugar detected as\r'Present'","Level of Urine\rAlbumin detected as\r'Present'","Test Worksheet","TPM","Instrument Maintenance\rReport","TEST\rCOMPLIANCE",
+      "Negative\rSpecimens Kept\rfor Two (2) Days","Positive\rSpecimens for\rEight (8) weeks","Adequate Space","Appropriate\rTemperature","Negative Malaria\rSlides for Two (2)\rWeeks","Quality Check 10%\rof Negative and\r100% of Positive\rSlides to Vector\rBorne Disease\rUnit of MOH State\rLevel (Pahang /\rJohor)",
+      "Reports been\rchecked before\rtranscription/issue","Precaution taken\rto avoid\rmanipulation of\rresults","Records of\rspecimens and\rresults kept at\rthe registered\rlaboratory (last 2\ryears)","Records of\rspecimens and\rresults kept (at\rleast 7 years)"], style: header_style
+
+      sheet.merge_cells "A3:A5"
+      sheet.merge_cells "B3:B5"
+      sheet.merge_cells "C3:C5"
+      sheet.merge_cells "D3:D5"
+      sheet.merge_cells "E3:E5"
+      sheet.merge_cells "F3:F5"
+      sheet.merge_cells "G3:G5"
+      sheet.merge_cells "H3:H5"
+      sheet.merge_cells "I3:I5"
+      sheet.merge_cells "J3:J5"
+      sheet.merge_cells "K3:K5"
+      sheet.merge_cells "L3:L5"
+      sheet.merge_cells "M3:M5"
+      sheet.merge_cells "N3:N5"
+      sheet.merge_cells "O3:O5"
+      sheet.merge_cells "P3:P5"
+      sheet.merge_cells "Q3:Q5"
+      sheet.merge_cells "R3:GL3"
+      sheet.merge_cells "S4:W4"
+      sheet.merge_cells "X4:AC4"
+      sheet.merge_cells "AD4:AM4"
+      sheet.merge_cells "AN4:AX4"
+      sheet.merge_cells "AY4:BH4"
+      sheet.merge_cells "BI4:BS4"
+      sheet.merge_cells "BT4:CD4"
+      sheet.merge_cells "CE4:CO4"
+      sheet.merge_cells "CP4:CZ4"
+      sheet.merge_cells "DA4:DK4"
+      sheet.merge_cells "DL4:DU4"
+      sheet.merge_cells "DV4:EF4"
+      sheet.merge_cells "EG4:ES4"
+      sheet.merge_cells "ET4:FE4"
+      sheet.merge_cells "FF4:FP4"
+      sheet.merge_cells "FQ4:GB4"
+      sheet.merge_cells "GC4:GH4"
+      sheet.merge_cells "GI4:GL4"
+
+      sheet.column_widths *[5,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15]
+
+      @visit_report_full_partials.each.with_index(1) do |visit_report, index|
+        vr_lab = visit_report.visit_report_laboratory
+        blood_grouping = vr_lab&.blood_grouping
+        malaria_screening = vr_lab&.malaria_screening
+        malaria_bfmp = vr_lab&.malaria_bfmp
+        hbsag_screening = vr_lab&.hbsag_screening
+        hbsag_verification = vr_lab&.hbsag_verification
+        hiv_screening = vr_lab&.hiv_screening
+        hiv_verification = vr_lab&.hiv_verification
+        vdrl_rpr = vr_lab&.vdrl_rpr
+        tpha_tppa = vr_lab&.tpha_tppa
+        urine_drugs_screening = vr_lab&.urine_drugs_screening
+        urine_drugs_verification = vr_lab&.urine_drugs_verification
+        upt = vr_lab&.upt
+        serum_assay = vr_lab&.serum_assay
+        urine_biochemistry = vr_lab&.urine_biochemistry
+
+        appropriate_specimen_transportation = [vr_lab.despatch_transportation,vr_lab.transport_to_test_lab].include?('NO') ? 'No' : 'Yes'
+        appropriate_specimen_packaging = [vr_lab.despatch_bag, vr_lab.packaging_to_test_lab].include?('NO') ? 'No' : 'Yes'
+        record_specimen_traceability = [vr_lab.clinic_to_despatch,vr_lab.despatch_to, vr_lab.cc_partial_lab_to_test_lab].include?('NO') ? 'No' : 'Yes'
+
+        if vr_lab.satisfactory == 'YES'
+          letter_reference = ''
+          date_nc_letter = ''
+          date_warning_letter = ''
+          date_letter_reminder = ''
+        else
+          letter_reference = visit_report&.last_lqcc_letter&.explanation_letter_reference
+          date_nc_letter = visit_report&.last_lqcc_letter&.explanation_letter_date.try(:strftime,'%d/%m/%Y')
+          date_warning_letter = visit_report&.last_lqcc_letter&.warning_letter_date.try(:strftime,'%d/%m/%Y')
+          committee_meeting_date = visit_report&.committee_meeting_date.try(:strftime,'%d/%m/%Y')
+          date_letter_reminder = visit_report&.letter_reminder_date.try(:strftime,'%d/%m/%Y')
+        end
+
+        main_details = [index, visit_report.code, visit_report.visit_date.strftime('%d/%m/%Y'),
+        vr_lab.laboratory_name, visit_report.laboratory_type.name, 
+        vr_lab.laboratory.code, 
+        [vr_lab.address_1, vr_lab.address_2, vr_lab.address_3, vr_lab.address_4].reject(&:blank?).join(", "),
+        vr_lab.town.name,
+        vr_lab.state.name,
+        visit_report.visit_report_visitors.pluck(:name).join(','),
+        vr_lab.type_of_visit,
+        vr_lab.satisfactory,
+        letter_reference,
+        date_nc_letter,
+        date_letter_reminder,
+        committee_meeting_date,
+        date_warning_letter,
+        VisitReportLaboratory::YESNONA[vr_lab.open_during_operation_hour]]
+
+        facility_adequacy = [VisitReportLaboratory::YESNONA[vr_lab.adequate_facility],
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_staff],
+        VisitReportLaboratory::YESNONA[vr_lab.pathologist],
+        VisitReportLaboratory::YESNONA[vr_lab.logbook],
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_instrument]
+        ]
+
+        pre_analytical = [appropriate_specimen_transportation, 
+        appropriate_specimen_packaging,
+        record_specimen_traceability,
+        VisitReportLaboratory::YESNONA[vr_lab.registration_record],
+        VisitReportLaboratory::YESNONA[vr_lab.rejection_register],
+        VisitReportLaboratory::YESNONA[vr_lab.rejection_criteria]
+        ]
+
+        blood_grouping_arr = [VisitReportLaboratory::YESNONA[blood_grouping&.iso_status],
+        blood_grouping&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['blood_grouping',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?)&.join(", "),
+        VisitReportLaboratory::YESNONA[blood_grouping&.reagent_condition],
+        VisitReportLaboratory::YESNONA[blood_grouping&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[blood_grouping&.iqa],
+        VisitReportLaboratory::YESNONA[blood_grouping&.eqa],
+        VisitReportLaboratory::YESNONA[blood_grouping&.test_worksheet],
+        VisitReportLaboratory::YESNONA[blood_grouping&.tpm],
+        VisitReportLaboratory::YESNONA[blood_grouping&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[blood_grouping&.test_compliance]
+        ]
+
+        malaria_screening_arr = [VisitReportLaboratory::YESNONA[malaria_screening&.iso_status],
+        malaria_screening&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['malaria_screening',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[malaria_screening&.reagent_condition],
+        VisitReportLaboratory::YESNONA[malaria_screening&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[malaria_screening&.iqa],
+        VisitReportLaboratory::YESNONA[malaria_screening&.eqa],
+        VisitReportLaboratory::YESNONA[malaria_screening&.test_worksheet],
+        VisitReportLaboratory::YESNONA[malaria_screening&.tpm],
+        VisitReportLaboratory::YESNONA[malaria_screening&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[malaria_screening&.in_house],
+        VisitReportLaboratory::YESNONA[malaria_screening&.test_compliance]
+        ]
+
+        malaria_bfmp_arr = [VisitReportLaboratory::YESNONA[malaria_bfmp&.iso_status],
+        malaria_bfmp&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['malaria_bfmp',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.reagent_condition],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.iqa],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.eqa],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.test_worksheet],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.tpm],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[malaria_bfmp&.test_compliance]
+        ]
+
+        hbsag_screening_arr = [VisitReportLaboratory::YESNONA[hbsag_screening&.iso_status],
+        hbsag_screening&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['hbsag_screening',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[hbsag_screening&.reagent_condition],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.iqa],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.eqa],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.test_worksheet],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.tpm],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.in_house],
+        VisitReportLaboratory::YESNONA[hbsag_screening&.test_compliance]
+        ]
+
+        hbsag_verification_arr = [VisitReportLaboratory::YESNONA[hbsag_verification&.iso_status],
+        hbsag_verification&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['hbsag_verification',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[hbsag_verification&.reagent_condition],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.iqa],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.eqa],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.test_worksheet],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.tpm],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.in_house],
+        VisitReportLaboratory::YESNONA[hbsag_verification&.test_compliance]
+        ]
+
+        hiv_screening_arr = [VisitReportLaboratory::YESNONA[hiv_screening&.iso_status],
+        hiv_screening&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['hiv_screening',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[hiv_screening&.reagent_condition],
+        VisitReportLaboratory::YESNONA[hiv_screening&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[hiv_screening&.iqa],
+        VisitReportLaboratory::YESNONA[hiv_screening&.eqa],
+        VisitReportLaboratory::YESNONA[hiv_screening&.test_worksheet],
+        VisitReportLaboratory::YESNONA[hiv_screening&.tpm],
+        VisitReportLaboratory::YESNONA[hiv_screening&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[hiv_screening&.in_house],
+        VisitReportLaboratory::YESNONA[hiv_screening&.test_compliance]
+        ]
+
+        hiv_verification_arr = [VisitReportLaboratory::YESNONA[hiv_verification&.iso_status],
+        hiv_verification&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['hiv_verification',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[hiv_verification&.reagent_condition],
+        VisitReportLaboratory::YESNONA[hiv_verification&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[hiv_verification&.iqa],
+        VisitReportLaboratory::YESNONA[hiv_verification&.eqa],
+        VisitReportLaboratory::YESNONA[hiv_verification&.test_worksheet],
+        VisitReportLaboratory::YESNONA[hiv_verification&.tpm],
+        VisitReportLaboratory::YESNONA[hiv_verification&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[hiv_verification&.in_house],
+        VisitReportLaboratory::YESNONA[hiv_verification&.test_compliance]
+        ]
+
+        vdrl_rpr_arr = [VisitReportLaboratory::YESNONA[vdrl_rpr&.iso_status],
+        vdrl_rpr&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['vdrl_rpr',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.reagent_condition],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.iqa],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.eqa],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.test_worksheet],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.tpm],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.in_house],
+        VisitReportLaboratory::YESNONA[vdrl_rpr&.test_compliance]
+        ]
+
+        tpha_tppa_arr = [VisitReportLaboratory::YESNONA[tpha_tppa&.iso_status],
+        tpha_tppa&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['tpha_tppa',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[tpha_tppa&.reagent_condition],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.iqa],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.eqa],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.test_worksheet],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.tpm],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[tpha_tppa&.test_compliance]
+        ]
+
+        urine_drugs_screening_arr = [VisitReportLaboratory::YESNONA[urine_drugs_screening&.iso_status],
+        urine_drugs_screening&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['urine_drugs_screening',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.reagent_condition],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.iqa],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.eqa],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.test_worksheet],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.tpm],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.in_house],
+        VisitReportLaboratory::YESNONA[urine_drugs_screening&.test_compliance]
+        ]
+
+        urine_drugs_verification_arr = [VisitReportLaboratory::YESNONA[urine_drugs_verification&.iso_status],
+        urine_drugs_verification&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['urine_drugs_verification',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        urine_drugs_verification&.drug_level_opiates,
+        urine_drugs_verification&.drug_level_cannabinoids,
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.reagent_condition],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.iqa],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.eqa],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.test_worksheet],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.tpm],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.in_house],
+        VisitReportLaboratory::YESNONA[urine_drugs_verification&.test_compliance]
+        ]
+
+        upt_arr = [VisitReportLaboratory::YESNONA[upt&.iso_status],
+        upt&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['upt',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        upt&.hcg_level,
+        VisitReportLaboratory::YESNONA[upt&.reagent_condition],
+        VisitReportLaboratory::YESNONA[upt&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[upt&.iqa],
+        VisitReportLaboratory::YESNONA[upt&.eqa],
+        VisitReportLaboratory::YESNONA[upt&.test_worksheet],
+        VisitReportLaboratory::YESNONA[upt&.tpm],
+        VisitReportLaboratory::YESNONA[upt&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[upt&.in_house],
+        VisitReportLaboratory::YESNONA[upt&.test_compliance]
+        ]
+
+        serum_assay_arr = [VisitReportLaboratory::YESNONA[serum_assay&.iso_status],
+        serum_assay&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['serum_assay',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        serum_assay&.hcg_level,
+        VisitReportLaboratory::YESNONA[serum_assay&.reagent_condition],
+        VisitReportLaboratory::YESNONA[serum_assay&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[serum_assay&.iqa],
+        VisitReportLaboratory::YESNONA[serum_assay&.eqa],
+        VisitReportLaboratory::YESNONA[serum_assay&.test_worksheet],
+        VisitReportLaboratory::YESNONA[serum_assay&.tpm],
+        VisitReportLaboratory::YESNONA[serum_assay&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[serum_assay&.test_compliance]
+        ]
+
+        urine_biochemistry_arr = [VisitReportLaboratory::YESNONA[urine_biochemistry&.iso_status],
+        urine_biochemistry&.method&.map{ |v| VisitReportLabOption.where(:report_category => ['urine_biochemistry',nil,''], :field_name => 'method', :code => v).first&.name }&.reject(&:blank?).join(", "),
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.reagent_condition],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.control_cell_condition],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.iqa],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.eqa],
+        urine_biochemistry&.urine_sugar_level,
+        urine_biochemistry&.urine_albumin_level,
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.test_worksheet],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.tpm],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.instrument_maintenance_record],
+        VisitReportLaboratory::YESNONA[urine_biochemistry&.test_compliance]
+        ]
+
+        specimen_storage = [
+          VisitReportLaboratory::YESNONA[vr_lab.negative_specimens],
+          VisitReportLaboratory::YESNONA[vr_lab.positive_specimens],
+          VisitReportLaboratory::YESNONA[vr_lab.adequate_space],
+          VisitReportLaboratory::YESNONA[vr_lab.appropriate_temperature],
+          VisitReportLaboratory::YESNONA[vr_lab.negative_malaria],
+          VisitReportLaboratory::YESNONA[vr_lab.quality_check]
+        ]
+
+        repord_keeping = [
+          VisitReportLaboratory::YESNONA[vr_lab.checked_before_transcription],
+          VisitReportLaboratory::YESNONA[vr_lab.precaution_taken],
+          VisitReportLaboratory::YESNONA[vr_lab.records_kept_reg_lab],
+          VisitReportLaboratory::YESNONA[vr_lab.records_kept_at_least]
+        ]
+
+        row = main_details + facility_adequacy + pre_analytical + blood_grouping_arr + malaria_screening_arr + malaria_bfmp_arr + hbsag_screening_arr + hbsag_verification_arr + hiv_screening_arr + hiv_verification_arr + vdrl_rpr_arr + tpha_tppa_arr + urine_drugs_screening_arr + urine_drugs_verification_arr + upt_arr + serum_assay_arr + urine_biochemistry_arr + specimen_storage + repord_keeping
+
+        sheet.add_row row, style: data_style
+      end
+  end
+
+
+  wb.add_worksheet(name: "Collection Centre") do |sheet|
+    sheet.add_row ["Masterlist - LQCC #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+      sheet.add_row ["#",
+      "Visit Report ID",
+      "Visit Date", 
+      "Lab. Name", 
+      "Type of facilities\r(CC/Partial/Full)", 
+      "Labcode", 
+      "Address", 
+      "Town", 
+      "State", 
+      "FOMEMA Officer", 
+      "Type of Visit",
+      "Conclusion\r(Satisfactory - Yes/No)",
+      "Status Report\r(Approved,Pending\rApproval)",
+      "Letter Reference #",
+      "Date of NC Letter",
+      "Date of Reminder Letter",
+      "Date of Committee Meeting",
+      "Date of Warning Letter",
+      "Compliances (YES/NO/NA)",
+      '','','','','','','','','',''], style: header_style
+
+      sheet.add_row ['','','','','','','','','','','','','','','','','','',
+      'Visit & Facility Details',
+      'Facility Adequacy','','',
+      'Pre-analytical','','','',
+      'Specimen Storage','',
+      'Other'], style: header_style
+
+      sheet.add_row ["","","","","","","","","","","","","","","","","","",
+      "Lab close / not exist",
+      "Adequate Facility",
+      "Adequate Staff",
+      "Adequate\rInstrument/Material/Con\rsumables",
+      "Appropriate specimen\rtransportation",
+      "Appropriate specimen\rpackaging",
+      "Record of specimen\rtraceability",
+      "Pre-analytical procedure",
+      "Adequate Space",
+      "Appropriate temperature",
+      "Other"], style: header_style
+
+      sheet.merge_cells "A3:A5"
+      sheet.merge_cells "B3:B5"
+      sheet.merge_cells "C3:C5"
+      sheet.merge_cells "D3:D5"
+      sheet.merge_cells "E3:E5"
+      sheet.merge_cells "F3:F5"
+      sheet.merge_cells "G3:G5"
+      sheet.merge_cells "H3:H5"
+      sheet.merge_cells "I3:I5"
+      sheet.merge_cells "J3:J5"
+      sheet.merge_cells "K3:K5"
+      sheet.merge_cells "L3:L5"
+      sheet.merge_cells "M3:M5"
+      sheet.merge_cells "N3:N5"
+      sheet.merge_cells "O3:O5"
+      sheet.merge_cells "P3:P5"
+      sheet.merge_cells "Q3:Q5"
+      sheet.merge_cells "R3:R5"
+      sheet.merge_cells "S3:AC3"
+      sheet.merge_cells "T4:V4"
+      sheet.merge_cells "W4:Z4"
+      sheet.merge_cells "AA4:AB4"
+
+      sheet.column_widths *[5,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15]
+
+      @visit_report_collections.each.with_index(1) do |visit_report, index|
+        vr_lab = visit_report.visit_report_laboratory
+
+        appropriate_specimen_transportation = [vr_lab.despatch_transportation,vr_lab.transport_to_test_lab].include?('NO') ? 'No' : 'Yes'
+        appropriate_specimen_packaging = [vr_lab.despatch_bag, vr_lab.packaging_to_test_lab].include?('NO') ? 'No' : 'Yes'
+        record_specimen_traceability = [vr_lab.clinic_to_despatch,vr_lab.despatch_to, vr_lab.collection_centre_to_test_lab].include?('NO') ? 'No' : 'Yes'
+        pre_analytical = [vr_lab.registration_record, vr_lab.rejection_register, vr_lab.rejection_criteria].include?('NO') ? 'No' : 'Yes'
+
+        if vr_lab.satisfactory == 'YES'
+          letter_reference = ''
+          date_nc_letter = ''
+          date_warning_letter = ''
+          date_letter_reminder = ''
+        else
+          letter_reference = visit_report&.last_lqcc_letter&.explanation_letter_reference
+          date_nc_letter = visit_report&.last_lqcc_letter&.explanation_letter_date.try(:strftime,'%d/%m/%Y')
+          date_warning_letter = visit_report&.last_lqcc_letter&.warning_letter_date.try(:strftime,'%d/%m/%Y')
+          committee_meeting_date = visit_report&.committee_meeting_date.try(:strftime,'%d/%m/%Y')
+          date_letter_reminder = visit_report&.letter_reminder_date.try(:strftime,'%d/%m/%Y')
+        end
+
+        sheet.add_row [index, visit_report.code, visit_report.visit_date.strftime('%d/%m/%Y'),
+        vr_lab.laboratory_name, visit_report.laboratory_type.name, 
+        vr_lab.laboratory.code, 
+        [vr_lab.address_1, vr_lab.address_2, vr_lab.address_3, vr_lab.address_4].reject(&:blank?).join(", "),
+        vr_lab.town.name,
+        vr_lab.state.name,
+        visit_report.visit_report_visitors.pluck(:name).join(','),
+        vr_lab.type_of_visit,
+        vr_lab.satisfactory,
+        VisitReport::STATUSES[visit_report.status],
+        letter_reference,
+        date_nc_letter,
+        date_letter_reminder,
+        committee_meeting_date,
+        date_warning_letter,
+        VisitReportLaboratory::YESNONA[vr_lab.open_during_operation_hour],
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_facility],
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_staff],
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_instrument],
+        appropriate_specimen_transportation,
+        appropriate_specimen_packaging,
+        record_specimen_traceability,
+        pre_analytical,
+        VisitReportLaboratory::YESNONA[vr_lab.adequate_space],
+        VisitReportLaboratory::YESNONA[vr_lab.appropriate_temperature],
+        vr_lab.others
+        ], style: data_style
+      end
+
+  end
+end
+																
+																

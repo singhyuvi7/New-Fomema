@@ -1,0 +1,27 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        System Configurations
+        <% if has_permission? 'EDIT_SYSTEM_CONFIGURATION' %>
+        <div class="card-header-actions">
+            <%#=raw index_table_edit_button internal_system_configurations_edit_path %>
+        </div>
+        <% end %>
+    </div>
+    <%= form_tag internal_system_configurations_edit_path, method: :put, class: "form-horizontal" do %>
+        <div class="card-body">
+            <%= render "tab_header" %>
+                <div class="tab-content">
+                    <%= render "form" %>
+                </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_system_configurations_path) %>
+                <%=raw edit_submit_for_approval_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+

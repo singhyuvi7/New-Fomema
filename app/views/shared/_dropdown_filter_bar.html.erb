@@ -1,0 +1,80 @@
+<div class="card">
+    <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+        <div class="dropdown-toggle-bar card-header d-flex align-items-center clickable border-0 bg-transparent text-dark" data-target="<%= dropdown_name %>">
+            <strong class="mb-0"></strong>
+            <span class="flex-grow-1"></span>
+            <% dropdownState = cookies["dropdown_toggle_#{ dropdown_name }"] == "left" ? "left" : "down" %>
+            <i class="fas fa-chevron-<%= dropdownState %>"></i>
+        </div>
+    <% else %>
+        <div class="dropdown-toggle-bar card-header d-flex align-items-center clickable" data-target="<%= dropdown_name %>">
+            <strong class="mb-0">Filter</strong>
+            <span class="flex-grow-1"></span>
+            <% dropdownState = cookies["dropdown_toggle_#{ dropdown_name }"] == "left" ? "left" : "down" %>
+            <i class="fas fa-chevron-<%= dropdownState %>"></i>
+        </div>
+    <% end %>
+
+    <div class="dropdown-toggle-display dropdown-filter-form-holder <%= "hidden" if dropdownState == "left" %>" data-target="<%= dropdown_name %>">
+        <%= form_tag filter_link, method: :get, id: local_assigns[:id] || "filter-form" do |form| %>
+            <div class="card-body">
+                <% column_count = 0 %>
+
+                <% list.each_with_index do |hash, index| %>
+                    <% column_size, column_count, opening_row, closing_row, subcolumn_1, subcolumn_2 = setting_column_sizes(hash[:col_size], column_count, index + 1 >= list.size) %>
+                    <%= raw opening_row %>
+
+                    <div class="col-md-<%= column_size %>">
+                        <div class="form-group row">
+                            <label for="<%= hash[:field] %>" class="col-sm-<%= subcolumn_1 %> col-form-label"><%= hash[:title] %></label>
+
+                            <div class="col-sm-<%= subcolumn_2 %>">
+                                <% case hash[:type] %>
+                                <% when "text" %>
+                                    <%= text_field_tag hash[:field], params[hash[:field]], placeholder: hash[:placeholder], class: "form-control" %>
+                                <% when "date" %>
+                                    <%= text_field_tag hash[:field], params[hash[:field]], placeholder: hash[:placeholder], class: "form-control datepicker" %>
+                                <% when "select" %>
+                                    <% if hash[:remove_blank] %>
+                                        <%= select_tag hash[:field], options_for_select(hash[:options], params[hash[:field]]), class: "form-control" %>
+                                    <% else %>
+                                        <%= select_tag hash[:field], options_for_select(hash[:options], params[hash[:field]]), include_blank: "Select option", class: "form-control" %>
+                                    <% end %>
+                                <% when "date-range" %>
+                                    <div class="d-flex align-items-center">
+                                        <%= text_field_tag "#{ hash[:field] }_start", params["#{ hash[:field] }_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: hash[:field] }, max: Date.today.strftime("%F") %>
+                                        <span class="mx-3">to</span>
+                                        <%= text_field_tag "#{ hash[:field] }_end", params["#{ hash[:field] }_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: hash[:field] }, max: Date.today.strftime("%F") %>
+                                    </div>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <%= raw closing_row %>
+                <% end %>
+            </div>
+
+            <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <div class="card-footer border-0 bg-transparent text-dark">
+                    <div class="text-right">
+                        <% clear_link ||= nil %>
+                        <a href="<%= clear_link || filter_link %>" class="btn btn-red-portal"><i class="fa fa-eraser"></i> Clear</a>
+                        <button type="submit" form="filter-form" class="btn btn-blue-portal"><i class="fa fa-search"></i> Search</button>
+                    </div>
+                </div>
+            <% else%>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <% clear_link ||= nil %>
+                        <%= raw filter_clear_button clear_link || filter_link %>
+                        <%= raw filter_button %>
+                        <% if has_permission?("EXPORT_TRANSACTION") %>
+                            <button class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Export" data-original-title="Filter" type="submit" formaction="<%= export_internal_transactions_path(format: "xlsx") %>" formtarget="_BLANK"><i class="fa fa-file-excel"></i> Export</button>
+                        <% end %>
+                    </div>
+                </div>
+            <% end %>
+        <% end %>
+    </div>
+</div>

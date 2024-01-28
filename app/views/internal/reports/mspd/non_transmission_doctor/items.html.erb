@@ -1,0 +1,73 @@
+<div class="card">
+    <div class="card-header">
+        Non Transmission
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+        <%= render "/internal/reports/mspd/non_transmission_doctor/filter", formaction: non_transmission_doctor_items_internal_mspd_reports_path %>
+        <%= render "/shared/all_flash" %>
+        
+        <% if !@transactions.blank? %>
+            <div class="row">
+                <div class="col">
+                    <%= @transactions.total_count %> non transmissions found.
+                </div>
+                <div class="col mb-2">
+                    <div>Non Transmission (<%= params[:startdate].to_date.strftime(get_standard_date_format) %> to <%= params[:enddate].to_date.strftime(get_standard_date_format) %>)</div>
+                </div>
+                <div class="col text-right">
+                    <%= "Page #{@transactions.current_page} of #{@transactions.total_pages}" %>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers">#</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Registration Date</th>
+                        <th>Exam Date</th>
+                        <th>Lab Specimen Date</th>
+                        <th>Lab Submit Date</th>
+                        <th>X-Ray Taken Date</th>
+                        <th>X-Ray Submit Date</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if @transactions.blank? %>
+                        <tr>
+                            <td colspan="10" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+                        <% @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                            <tr>
+                                <td class="module-row-numbers"><%= index %></td>
+                                <td><%= transaction.fw_code %></td>
+                                <td><%= transaction.fw_name %></td>
+                                <td><%= transaction.transaction_date.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.medical_examination_datez.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.specimen_taken_datez.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.laboratory_transmit_datez.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.xray_taken_datez.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.xray_transmit_datez.try(:strftime, get_standard_date_format) || "-" %></td>
+                                <td><%= transaction.duration.to_i %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <%= paginate @transactions if !@transactions.blank? %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->

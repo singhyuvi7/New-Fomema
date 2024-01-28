@@ -1,0 +1,72 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @approval_approver } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :category, class: 'required' %>
+                <%= form.select :category, options_for_select(ApprovalApprover::CATEGORIES.invert.sort, form.object.category), {include_blank: form_select_option_text}, {class: "form-control", required: true} %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status, class: 'required' %>
+                <%= form.select :status, options_for_select(ApprovalApprover::STATUSES.invert, form.object.status), {include_blank: form_select_option_text}, class: "form-control", required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :user_id, class: 'required' %>
+                <%#= form.select :user_id, options_for_select(User.where(status: 'ACTIVE', userable_type: 'Organization').pluck("CONCAT_WS(' | ', name, email)", :id), form.object.user_id), {include_blank: form_select_option_text}, {class: "form-control select2", required: true} %>
+                <%= form.select :user_id, options_for_select(@approver_list.pluck(:name, :email, :id).map { |name, email, id| ["#{name} (#{email})", id]}, form.object.user_id), {include_blank: form_select_option_text}, {class: "form-control select2", required: true} %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_approval_approvers_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+selected_category = $('#approval_approver_category :selected').val();
+selected_user = $('#approval_approver_user_id :selected').val();
+get_approvers_by_category(selected_category, selected_user);
+
+// when change category, ajax fetch users with the permissions
+$('#approval_approver_category').change(function () {
+    get_approvers_by_category(this.value, '');
+});
+
+function get_approvers_by_category(category, selected_user)
+{
+    $('#approval_approver_user_id').html('<option value><%= form_select_option_text %></option>');
+    if (category) {
+        $.ajax({
+            url: '/approval_approvers/' + category + '/category_approvers.json',
+            method: "GET",
+        }).done(function (data) {
+            $('#approval_approver_user_id').find('option').remove().end().append('<option value="">Select option</option>').val('');
+
+            $.each(data, function (idx, user) {
+                if (user.id == selected_user) {
+                    $('#approval_approver_user_id').append('<option value="'+user.id+'" selected>'+user.name+' ('+ user.email+')</option>');
+                } else {
+                    $('#approval_approver_user_id').append('<option value="'+user.id+'">'+user.name+' ('+ user.email+')</option>');
+                }
+            });
+        });
+    }
+}
+</script>
+<% end %>

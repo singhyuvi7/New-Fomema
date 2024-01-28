@@ -1,0 +1,25 @@
+<%= form_for @visit_plan_request, url: edit_visit_plan_request_internal_inspectorate_reports_path(@visit_plan_request), html: {class: "with-parsley"}, local: true do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Inspectorate</strong> - Show Visit Plan Request
+        </div>
+        <div class="card-body">    
+            <%= render "/shared/all_flash" %>
+            <%= render 'internal/reports/inspectorate/visit_plan_request/form', { form: form } %>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(visit_plan_request_internal_inspectorate_reports_path) %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+    _action = '<%= params[:action] %>'
+    if(_action == 'show_visit_plan_request'){
+        $('input, textarea, select, button').prop('disabled', true).addClass('disabled')
+    }
+</script>
+<% end %>

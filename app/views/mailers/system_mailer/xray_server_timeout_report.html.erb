@@ -1,0 +1,23 @@
+<p>Timeout error with the digital xray provider detected.</p>
+
+<table>
+    <% @options.each do |key, value| %>
+        <tr>
+            <th style="text-align: right;"><%= key %></th>
+            <td><%= value %></td>
+        </tr>
+    <% end %>
+</table>
+
+<p>Please note that this email is sent a maximum of once every 5 minutes. To see all events of this error, please check the table error_loggers.</p>
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+        padding: 3px;
+    }
+</style>

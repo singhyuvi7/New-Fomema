@@ -1,0 +1,50 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Foreign workers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <form method="post" action="<%= bulk_action_internal_foreign_workers_path %>">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="row">
+                <!--
+                <div class="col module-actions text-left">
+                    <% if has_permission?('CREATE_TRANSACTION') %>
+                        <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-plus\"></i> Register Transaction", title: "Register Transaction", value: "register_transaction") %>
+                    <% end %>
+                </div>
+                <div class="col module-actions text-right">
+                    <% if has_permission?('CREATE_FOREIGN_WORKER') %>
+                        <%=raw index_table_new_button(new_internal_foreign_worker_path) %>
+                    <% end %>
+                </div>
+                -->
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+
+                    <%=render partial: '/internal/employer_workers/index_table' %>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <%= paginate @foreign_workers if !@foreign_workers.nil? %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('#bulk-upload-btn').click(function () {
+        $('#bulk-upload-modal').modal();
+    });
+</script>
+<% end %>

@@ -1,0 +1,131 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Employers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_EMPLOYER') %>
+                    <%=raw index_table_new_button(new_internal_employer_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Employer Code</th>
+            <th>Employer Name</th>
+            <th>Employer Type</th>
+            <th>ROC No. / IC No.</th>
+            <th>State</th>
+            <th>Town</th>
+            <th>Status</th>
+            <th>Problematic</th>
+            <th>Document Verified</th>
+            <th>Created At</th>
+            <th>Requested Date (By)</th>
+            <th>Assigned/Updated</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @employers.blank? %>
+            <tr>
+                <td colspan="13" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @employers.each.with_index((@employers.current_page - 1) * get_per + 1) do |employer, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= employer.code %></td>
+                    <td><%= employer.name %></td>
+                    <td><%= employer.employer_type.try(:name) %></td>
+                    <td>
+                        <%= employer.is_individual? ? "#{employer.ic_passport_number}" : "#{employer.business_registration_number}" %>
+                    </td>
+                    <td><%= employer.state.try(:name) %></td>
+                    <td><%= employer.town.try(:name) %></td>
+                    <td><%= Employer::STATUSES[employer.status] %>
+                        <%=raw "<div>Amendment Pending for Approval</div>" if employer.approval_status.eql?("UPDATE_PENDING_APPROVAL") %></td>
+                    <td><%= employer.problematic == true ? 'Yes' : 'No' %></td>
+                    <td><%= employer.document_verified == true ? 'Yes' : 'No' %></td>
+                    <td><%= employer.created_at&.strftime(get_standard_datetime_format) %></td>
+                    <td>
+                        <%
+
+                            approval_request = Employer.approval_requests.where('employers.id = ?', employer.id)
+                            .select('approval_requests.created_at, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id, approval_requests.respond_user_id, approval_requests.approval_at')
+                            .order('approval_requests.created_at desc').first
+                        %>
+                        <% if !approval_request.blank? %>
+                            <p>
+                                <% requester = User.find(approval_request&.request_user_id) %>
+                                [Amendment] <br>
+                                <%= "#{approval_request&.created_at.try(:strftime, get_standard_date_format)}" %> <br>
+                                <%= ["Employer"].include?(requester.userable_type) ? "(#{requester.userable_type})" : "(#{requester.code})" %>
+                            </p>
+                        <% end %>
+                    </td>
+                    <td>
+                        <%= User.find(employer&.assigned_to).name if !employer&.assigned_to.nil? %>
+                        <% if !approval_request.blank? %>
+                            <p>
+                                [Amendment] <br>
+                                <%= User.find(approval_request&.assigned_to_user_id).name if !approval_request&.assigned_to_user_id.nil? %> <br>
+                                <% if !["pending"].include?(employer.approval_request&.state) %>
+                                    <strong>
+                                        <%= "Updated by #{User.find(approval_request&.respond_user_id).name}" if !approval_request&.respond_user_id.nil? %> <br>
+                                        <%= approval_request&.approval_at.try(:strftime, get_standard_date_format) if !approval_request&.approval_at.nil? %>
+                                    </strong>
+                                <% end %>
+                            </p>
+                        <% end %>
+                    </td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_employer_path(employer)) %>
+                        <% if employer.status === 'APPROVAL' and has_permission?("APPROVAL_EMPLOYER") %>
+                            <%=raw index_table_warning_button(registration_approval_internal_employer_path(employer), label: '<i class="fa fa-check text-white"></i>', title: 'Registration Approval') %>
+                        <% end %>
+                        <% if employer.approval_status === 'UPDATE_PENDING_APPROVAL' and has_permission?("APPROVAL_EMPLOYER_CRITICAL_INFO") %>
+                            <%=raw index_table_warning_button(amendment_approval_internal_employer_path(employer), label: '<i class="fa fa-check text-white"></i>', title: 'Amendment Approval') %>
+                        <% end %>
+                        <% if has_any_permission?('EDIT_NON_FINANCE_INFO_EMPLOYER', 'EDIT_FINANCE_INFO_EMPLOYER') and (['INACTIVE', 'ACTIVE'].include?(employer.status)) %>
+                            <%=raw index_table_edit_button edit_internal_employer_path(employer) %>
+                        <% end %>
+                        <% if has_permission?('DELETE_EMPLOYER') %>
+                            <%=raw index_table_delete_button(internal_employer_path(employer)) %>
+                        <% end %>
+                        <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_BRANCH_TRANSACTION", "VIEW_OWN_TRANSACTION") and employer.status != 'REJECTED' %>
+                            <%=raw index_table_primary_button(internal_transactions_url(employer_code: employer.code), label: '<i class="fa fa-bars"></i>', title: 'View Transactions') %>
+                        <% end %>
+                        <% if has_permission?("EDIT_EMPLOYER_FOREIGN_WORKER") %>
+                            <%=raw index_table_edit_button(move_fw_internal_employer_path(employer), title: "Move Foreign Workers", label: "<i class=\"fa fa-user\"></i>") %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @employers %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

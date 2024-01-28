@@ -1,0 +1,100 @@
+<%
+    all_options = []
+
+    # Transactions Options
+        # Only show this if the link in the worker code is disabled.
+        if hide_pending_review || hide_pending_review_qa
+            all_options << index_table_show_button(internal_transaction_path(transaction))
+        end
+
+        if (transaction.approval_request and ['pending'].include?(transaction.approval_request.state))
+            if (transaction.approval_request.category.eql?("TRANSACTION_SPECIAL_RENEWAL") and has_permission?("APPROVAL_SPECIAL_RENEWAL_TRANSACTION") and transaction.expired_at > Time.now) or (transaction.approval_request.category.eql?("TRANSACTION_CHANGE_DOCTOR") and has_permission?("APPROVAL_CHANGE_DOCTOR_TRANSACTION"))
+                createdby = User.find(transaction.created_by)
+                if(["Employer", "Agency"].include?(createdby.userable_type))
+                     if(transaction.uploads.first&.remark=="SPECIAL_RENEWAL" || transaction.uploads.last&.remark=="SPECIAL_RENEWAL")
+                        all_options << index_table_approval_button(approval_internal_transaction_path(transaction))
+                    end
+                else
+                    all_options << index_table_approval_button(approval_internal_transaction_path(transaction))
+                end
+            end
+        end
+        approval_request= Transaction.approval_requests.where('transactions.id = ?', transaction.id).select('approval_requests.created_at,approval_requests.updated_at,approval_requests.category, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id,approval_requests.approval_user_id').order('approval_requests.created_at desc').first
+        if (approval_request&.category=="TRANSACTION_SPECIAL_RENEWAL" && !approval_request&.approval_decision.blank? and has_permission?("VIEW_APPROVAL_SPECIAL_RENEWAL_TRANSACTION"))
+            all_options << index_table_approval_button(view_approval_internal_transaction_path(transaction), title: "Special Renewal Approval", classes: "btn btn-sm btn-secondary", label: "<i class='icon-magnifier'></i>")
+        end
+
+
+
+    # XQCC & PCR Options
+        if (has_permission?("EDIT_XRAY_PENDING_REVIEW") && transaction.xray_status === 'XQCC_PENDING_REVIEW' && transaction.xray_pending_review_id?)
+            all_options << index_table_primary_button(edit_internal_xray_pending_review_path(transaction.xray_pending_review_id), title: "XQCC Pending Review", classes: "btn btn-sm btn-warning", label: "<i class='fa fa-tasks'></i>")
+        end
+
+        if (has_permission?("XRAY_XQCC_POOL_REVIEW_TRANSACTION") && transaction.xray_status === 'XQCC_REVIEW' && transaction.xray_review_id?)
+            all_options << index_table_primary_button(edit_internal_xray_review_path(transaction.xray_review_id), title: "XQCC Review", classes: "btn btn-sm btn-primary", label: "<i class='fab fa-readme'></i>")
+        end
+# TODO: fix to allow multiple xray_retake
+=begin
+        if (has_permission?("XRAY_XQCC_POOL_REVIEW_TRANSACTION") && transaction.xray_status === 'XQCC_REVIEW' && transaction.xray_review&.result === 'RETAKE' && transaction.xray_retake.nil?)
+            all_options << index_table_primary_button(xray_retake_request_internal_transaction_path(transaction, transaction.xray_retake), title: "XQCC Retake Request", classes: "btn btn-sm btn-warning", label: "<i class='fa fa-tasks'></i>")
+        end
+=end
+
+        if (has_permission?("EDIT_PCR_REVIEW") && transaction.xray_status === 'PCR_REVIEW' && transaction.pcr_review && transaction.pcr_review.status == 'PCR_REVIEW' && transaction.pcr_review.pcr_id == current_user.id)
+            all_options << index_table_primary_button(edit_internal_pcr_review_path(transaction.pcr_review), title: "PCR Review", classes: "btn btn-sm btn-primary", label: "<i class='fab fa-readme'></i>")
+        end
+
+        if (has_permission?("EDIT_XQCC_PENDING_DECISION") && transaction.xray_pending_decision_id? && (transaction.xray_status === 'XQCC_PENDING_DECISION' || transaction.xray_status === 'XQCC_PENDING_DECISION_REJECTED'))
+            all_options << index_table_primary_button(internal_xray_pending_decision_path(transaction.xray_pending_decision_id), title: "XQCC Pending Decision", classes: "btn btn-sm btn-warning", label: "<i class='fa fa-tasks'></i>")
+        end
+
+        if (has_permission?("EDIT_APPROVAL_XQCC_PENDING_DECISION") && transaction.xray_status === 'XQCC_PENDING_DECISION_APPROVAL' && transaction.xray_pending_decision_id?)
+            all_options << index_table_primary_button(approval_internal_xray_pending_decision_path(transaction.xray_pending_decision_id), title: "XQCC Pending Decision Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>")
+        end
+# TODO: fix allow multiple xray_retakes
+=begin
+        if (has_permission?("XQCC_RETAKE_APPROVAL_TRANSACTION") && !transaction.xray_retake.nil? && transaction.xray_retake.status === 'APPROVAL')
+            all_options << index_table_primary_button(xray_retake_approval_internal_transaction_path(transaction, transaction.xray_retake), title: "X-Ray Retake Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>")
+        end
+=end
+
+    # MLE & TCUPI Options
+        if has_permission?("EDIT_PENDING_REVIEWS") && transaction.can_work_on_medical_review(current_user)
+            all_options << index_table_primary_button(medical_review_internal_medical_path(transaction.id), title: "Pending Review", classes: "btn btn-sm btn-primary", label: "<i class='fa fa-clipboard-list'></i>")
+        elsif has_permission?("EDIT_PENDING_REVIEW_APPROVALS") && transaction.can_work_on_medical_review_approval(current_user)
+            all_options << index_table_primary_button(medical_review_internal_medical_path(transaction.id), title: "Pending Review Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>")
+        elsif has_permission?("EDIT_TCUPI_REVIEWS") && transaction.can_work_on_tcupi_review(current_user)
+            all_options << index_table_primary_button(tcupi_review_internal_medical_path(transaction.id), title: "TCUPI", classes: "btn btn-sm btn-primary", label: "<i class='fa fa-clipboard-list'></i>")
+        elsif has_permission?("EDIT_TCUPI_APPROVALS") && transaction.can_work_on_tcupi_review_approval(current_user)
+            all_options << index_table_primary_button(tcupi_review_approval_internal_medical_path(transaction.id), title: "TCUPI Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>")
+        elsif (has_permission?("EDIT_PENDING_REVIEWS_QA") && transaction.medical_status === 'PENDING_PR_QA') && transaction.can_work_on_medical_review_qa(current_user)
+                all_options << index_table_primary_button(medical_pr_qa_internal_medical_path(transaction.id), title: "Pending Review QA", classes: "btn btn-sm btn-primary", label: "<i class='fab fa-readme'></i>")
+        end
+
+    # Agency Document Approval Optionss
+        if has_permission?("APPROVAL_DOCUMENT_TRANSACTION") && transaction.transaction_verify_docs.last&.status == "APPROVAL" && transaction.transaction_verify_docs.last&.category == "AGENCY_TRANSACTION_REGISTRATION" && !['CANCELLED','REJECTED'].include?(transaction.status) && (transaction.expired_at > Time.now || transaction.ignore_expiry = true)
+            all_options << index_table_primary_button(agency_document_approval_internal_transaction_path(transaction.id), title: "Agency Document Approval", classes: "btn btn-sm btn-success", label: "<i class='fa fa-check'></i>")
+        elsif has_permission?("APPROVAL_DOCUMENT_TRANSACTION") && ['INCOMPLETE','REJECTED','APPROVED'].include?(transaction.transaction_verify_docs.last&.status) && transaction.transaction_verify_docs.last&.category == "AGENCY_TRANSACTION_REGISTRATION" && !['CANCELLED','REJECTED'].include?(transaction.status) && (transaction.expired_at > Time.now || transaction.ignore_expiry = true)
+            all_options << index_table_primary_button(agency_document_approval_internal_transaction_path(transaction.id), title: "Agency Document Approval", classes: "btn btn-sm btn-secondary", label: "<i class='icon-magnifier'></i>")
+        end
+
+    # Bypass Fingerprint Approval Options
+        doctor_bypass_request = transaction.transaction_verify_docs.where(category: "DOCTOR_TRANSACTION_BYPASS_FINGERPRINT").last
+        xray_bypass_request = transaction.transaction_verify_docs.where(category: "XRAY_TRANSACTION_BYPASS_FINGERPRINT").last
+
+        if has_permission?("APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && doctor_bypass_request&.status == "APPROVAL" && !['CANCELLED','REJECTED'].include?(transaction.status)
+            all_options << index_table_approval_button(bypass_fingerprint_approval_internal_transaction_path(transaction, transaction_verify_docs_id: doctor_bypass_request.id), title: "Biometric Document Approval")
+        end
+        if has_permission?("APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && xray_bypass_request&.status == "APPROVAL" && !['CANCELLED','REJECTED'].include?(transaction.status)
+            all_options << index_table_approval_button(bypass_fingerprint_approval_internal_transaction_path(transaction, transaction_verify_docs_id: xray_bypass_request.id), title: "Biometric Document Approval")
+        end
+        if has_permission?("VIEW_APPROVAL_BYPASS_FINGERPRINT_TRANSACTION") && (!doctor_bypass_request.blank? || !xray_bypass_request.blank?) && doctor_bypass_request&.status != "APPROVAL" && xray_bypass_request&.status != "APPROVAL"
+            all_options << index_table_primary_button(bypass_fingerprint_approval_internal_transaction_path(transaction, transaction_verify_docs_id: doctor_bypass_request&.id || xray_bypass_request&.id), title: "Biometric Document Approval", classes: "btn btn-sm btn-secondary", label: "<i class='icon-magnifier'></i>")
+        end
+%>
+
+<% all_options.each_with_index do |option_item, index| %>
+    <%= raw "<br>" if index % 5 == 0 && index > 0 %>
+    <%= raw option_item.gsub("btn ", "btn mb-1 ") %>
+<% end %>

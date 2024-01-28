@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Template Variables</strong> - Edit Template Variable
+    </div>
+    <%= form_for @template_variable, url: internal_template_variable_path(@template_variable), html: {class: "#{params[:action]}"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

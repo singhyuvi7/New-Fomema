@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bank Drafts</strong> - Replace Bad Bank Draft
+    </div>
+    <%= form_for @new_bank_draft, url: replace_internal_bank_draft_path(@bank_draft), method: :patch do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

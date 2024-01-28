@@ -1,0 +1,119 @@
+<div>
+    <p>Tuan/Puan,</p>
+    <%  condition_tuberculosis = Condition.where(code: ["3502"]).pluck(:id) %>
+    <p style="border-bottom: 2px solid black;"><b>
+    <%  if @transaction.medical_examination_details.where(condition_id: condition_tuberculosis).exists? ||  @transaction.doctor_examination_details.where(condition_id: condition_tuberculosis).exists? %>
+        KEPUTUSAN PEMERIKSAAN KESIHATAN FOMEMA DAN PEMBERITAHUAN UNTUK PENGHANTARAN PULANG PEKERJA ASING KE NEGARA ASAL JIKA GAGAL DALAM PEMERIKSAAN KESIHATAN
+    <% else %>
+        PERMOHONAN RAYUAN UNTUK PEKERJA ASING DIDAPATI TIDAK SESUAI SELEPAS PEMERIKSAAN KESIHATAN FOMEMA<br>
+    <% end %>
+    </b></p>
+    NAMA: <%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p>
+        Dengan hormatnya kami merujuk kepada perkara di atas.<br><br>
+        2. Dimaklumkan bahawa keputusan Pemeriksaan Kesihatan FOMEMA bagi pekerja asing tersebut didapati <b>"TIDAK SESUAI"</b> untuk bekerja di Malaysia kerana sebab berikut:<br>
+
+        <% @data[:failed_reasons_bm].each do |reason| %>
+            <p><b><%= reason %></b></p>
+        <% end %>
+    </p>
+        <%  if @transaction.medical_examination_details.where(condition_id: condition_tuberculosis).exists? ||  @transaction.doctor_examination_details.where(condition_id: condition_tuberculosis).exists? %>
+        <p>
+            3. Jika pihak tuan/puan berhasrat untuk memohon semakan semula oleh FOMEMA, berikut ialah langkah yang perlu dilakukan:<br><br>
+            &nbsp;&nbsp; a)	Sila klik link berikut (<a href="<%= "#{ENV["APP_URL_PORTAL"]}" %>">Portal</a>) untuk tujuan pendaftaran kes.<br>
+            &nbsp;&nbsp; b)	Sila bawa pekerja asing tersebut ke hospital pakar swasta dengan segera bagi mendapatkan laporan-laporan berikut (semua laporan perlu dimuatnaik ke portal seperti di atas untuk semakan FOMEMA):<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; i. Laporan Ujian Gene Xpert<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; ii. Laporan Ujian TB QuantiFERON<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; iii. Laporan penilaian Doktor Pakar Respiratori<br>
+            &nbsp;&nbsp;c) Sila sediakan dan muatnaik surat rayuan majikan yang mengandungi butiran lengkap berikut:<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;i. Maklumat pekerja asing (nama, warganegara, nombor pasport dan nombor kod pekerja),<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;ii. sebab rayuan dibuat<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;iii. senarai ujian/pemeriksaan tambahan yang telah dibuat<br><br>
+            4. Sekiranya pihak tuan/puan tidak berhasrat untuk memohon semakan semula, tuan/puan sebagai majikan dipohon untuk membuat persiapan dengan kadar segera serta mengemukakan tiket kapal terbang/feri untuk tindakan pengeluaran Memo Periksa Keluar (COM)
+            secara dalam talian melalui <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> ATAU di mana-mana Pejabat Imigresen terdekat bagi tujuan penghantaran pulang.<br><br>
+            5. Kerjasama dan keprihatinan pihak tuan/puan dalam perkara ini amat dihargai.<br><br><br>
+            Sekian, terima kasih.<br><br><br>
+        </p>
+        <% else %>
+        <p>
+            3. Jika pihak tuan/puan berhasrat untuk membuat rayuan, sila kemukakan permohonan rayuan tersebut dengan segera dalam tempoh 14 hari daripada tarikh notis ini dengan
+            mendaftar secara atas talian melalui Portal Majikan atau Portal Agensi. Sila berhubung dengan doktor asal yang memeriksa pekerja asing tersebut selepas pendaftaran rayuan
+            selesai bagi tindakan selanjutnya.<br><br>
+            4. Sekiranya pihak tuan/puan tidak berhasrat untuk membuat rayuan dan memerlukan slip gagal (Unsuitable slip) untuk pekerja asing di atas dengan kadar segera, pihak tuan/puan
+            boleh menghubungi FOMEMA melalui alamat emel berikut: <a href="medical@fomema.com.my">medical@fomema.com.my</a>.Sebagai makluman, FOMEMA akan menghantar slip gagal (Unsuitable Slip) pekerja asing di
+            atas kepada pihak tuan/puan jika tiada pendaftaran rayuan dibuat selepas 14 hari daripada tarikh notis ini.<br><br>
+            5. Pihak tuan/puan dipohon untuk membuat persiapan dengan kadar segera serta mengemukakan tiket kapal terbang/feri untuk tindakan pengeluaran Memo Periksa Keluar
+            (COM) secara dalam talian melalui <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> ATAU di mana-mana Pejabat Imigresen terdekat bagi tujuan penghantaran pulang secara teratur jika pekerja
+            asing ini tidak didaftarkan untuk proses rayuan ataupun jika pekerja asing ini gagal dalam proses rayuan. <br><br>
+            Kerjasama dan keprihatinan pihak tuan/puan dalam perkara ini amat dihargai.<br><br><br>
+            Sekian, terima kasih.<br><br><br>
+        </p>
+        <% end %>
+
+    <%= image_tag attachments["fomema-logo.png"].url, width: 70, height: 30 %>
+    <br><br>
+    <p>***This is an auto generated email. Do not reply to this email.***</p>
+</div>
+<hr>
+<div>
+    <p>Dear Sir/Madam,</p>
+        <p style="border-bottom: 2px solid black;"><b>
+        <%  if @transaction.medical_examination_details.where(condition_id: condition_tuberculosis).exists? ||  @transaction.doctor_examination_details.where(condition_id: condition_tuberculosis).exists? %>
+            FOMEMA MEDICAL EXAMINATION RESULT AND NOTICE OF REPATRIATION TO THE ORIGINAL COUNTRY IF FAILED IN THE MEDICAL EXAMINATION
+        <% else %>
+        APPEAL APPLICATION FOR FOREIGN WORKER WHO FAILED THE FOMEMA MEDICAL EXAMINATION<br>
+        <% end %>
+        </b></p>
+        NAME: <%= @data[:worker_name] %> / <%= @data[:worker_gender_bi] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+        <%  if @transaction.medical_examination_details.where(condition_id: condition_tuberculosis).exists? ||  @transaction.doctor_examination_details.where(condition_id: condition_tuberculosis).exists? %>
+            <p>
+                In reference to the matter above, please be informed that the result of FOMEMA medical examination for the above mentioned foreign worker is "NOT SUITABLE" to work in Malaysia due to the following reason:<br>
+                <br>
+                <% @data[:failed_reasons_bi].each do |reason| %>
+                    <p><b><%= reason %></b></p>
+                <% end %>
+
+                If you wishes to apply for a review, please do the following:<br>
+                &nbsp;&nbsp;a) Click the following link (<a href="<%= "#{ENV["APP_URL_PORTAL"]}" %>">Portal</a>)  for registration purposes.<br>
+                &nbsp;&nbsp;b) Please bring the foreign worker to the private specialist hospital immediately to obtain the following reports (all reports must be uploaded to the above portal for FOMEMA review):<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;i. Gene Xpert Test Report<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;ii. QuantiFERON TB Test Report<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;iii. Assessment report from Respiratory Specialist<br>
+                &nbsp;&nbsp;c) Please prepare and upload the employer’s appeal letter containing the following complete details:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;i. Foreign Worker’s Information (name, nationality, passport number and worker’s code number)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;ii. the grounds of the appeal<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;iii. list of additional tests/examinations that have been carried out<br><br>
+                If you did not wish to request for a review, you as the employer are advised to arrange all necessary preparation for repatriation and submit the flight/ferry ticket for the issuance of the Check-Out Memo (COM) online
+                via the <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> OR at any nearest Immigration Office for a proper repatriation of the said foreign worker.<br><br>
+                Your cooperation and concern in this matter is greatly appreciated.<br><br>
+                Thank you.<br><br><br>
+            </p>
+        <% else %>
+            <p>
+                The above subject is referred.<br><br>
+                Please be informed that the result of FOMEMA medical examination for the abovementioned foreign worker is <b>"NOT SUITABLE"</b> to work in Malaysia due to the following reason:
+            <br>
+                <% @data[:failed_reasons_bi].each do |reason| %>
+                    <p><b><%= reason %></b></p>
+                <% end %>
+                <br>
+                If you wish to appeal, please submit your online application as soon as possible within 14 days from the date of this notice via the Employer Portal or the Agency Portal. Kindly refer to
+                the original doctor who has examined the foreign worker after the appeal registration is completed for further action.<br><br>
+
+                If you did not wish to appeal and require the unsuitable slip urgently, kindly contact FOMEMA via this email address: <a href="medical@fomema.com.my">medical@fomema.com.my</a>. For your information,
+                FOMEMA will send the unsuitable slip of the above foreign worker if appeal registration is not made after 14 days from the date of this notice. <br><br>
+
+                You are advised to arrange all necessary preparation for repatriation and submit the flight/ferry ticket for the issuance of the Check-Out Memo (COM) online via
+                the <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> OR at any nearest Immigration Office for a proper repatriation of the said foreign worker if the foreign worker is not registered for appeal
+                process or if the appeal result is unsuccessful.<br><br>
+                Your cooperation in this matter is greatly appreciated.<br><br>
+                Thank You<br><br><br>
+            </p>
+        <% end %>
+
+        <%= image_tag attachments["fomema-logo.png"].url, width: 70, height: 30 %>
+        <br><br>
+        <p>***This is an auto generated email. Do not reply to this email.***</p>
+</div>

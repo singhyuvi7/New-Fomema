@@ -1,0 +1,28 @@
+<i>
+    <% if !['AGENCY_REGISTRATION', 'AGENCY_RENEWAL'].include?(@order.category) %>
+        <div><b>*Special Note :</b></div>
+    <% end %>
+    <ol type="a">
+        <% if !['INSURANCE_PURCHASE', 'AGENCY_REGISTRATION', 'AGENCY_RENEWAL'].include?(@order.category) %>
+            <li>For every foreign worker's medical examination, any request for cancellation of registration or refund will be subjected to a service fee of RM<%= number_with_precision(Fee.find_by(code: 'CANCEL_TRANSACTION').amount, :precision => 2) || 0 %> per foreign worker.</li>
+        <% end %>
+
+        <% if !@order.order_items.get_insurance_fee.blank? %>
+            <% provider_code = @order.insurance_purchases.first&.insurance_service_provider&.code || "HOWDEN" %>
+            <% if provider_code == "HOWDEN" %>
+                <li>Insurance and/or Takaful transaction is transacted via Howden Insurance Brokers Sdn. Bhd. (insurance) and/or Malene Insurance Brokers Sdn. Bhd. (takaful).</li>
+                <li>The total insurance premium and/or takaful contribution (including SST and Stamp Duties) charged are payable to Howden Insurance Brokers Sdn Bhd and/or Malene Insurance Brokers Sdn. Bhd. an Insurance & Takaful brokers licensed under the Financial Services Act 2013 and Islamic Financial Services Act.</li>
+                <li>For any request for cancelation of insurance, kindly refer to the link below for cancellation policy by Howden Insurance Brokers Sdn. Bhd. and/or Malene Insurance Brokers Sdn. Bhd.
+                <br>(<a href="<%= InsuranceService.cancellation_policy_link(provider_code: provider_code) %>" target="_blank"><%= InsuranceService.cancellation_policy_link(provider_code: provider_code) %></a>)</li>
+                <li>Separate invoice will be issued by Howden Insurance Brokers Sdn. Bhd. and/or Malene Insurance Brokers Sdn. Bhd. for the insurance/takaful purchased.</li>
+            <% elsif provider_code == "PROTECTMIGRANT" %>
+                <li>Insurance transaction is transacted via Trek4Me Sdn. Bhd.</li>
+                <li>The total insurance premium contribution (including SST and Stamp Duties) charged are payable to Trek4Me Sdn Bhd. Trek4Me Sdn. Bhd. is an insurance agent licensed under the Financial Services Act 2013 Financial Services Act.</li>
+                <li>For any request for cancelation of insurance, kindly refer to the link below for cancellation policy by Trek4Me Sdn. Bhd.
+                <br>(<a href="<%= InsuranceService.cancellation_policy_link(provider_code: provider_code) %>" target="_blank"><%= InsuranceService.cancellation_policy_link(provider_code: provider_code) %></a>)</li>
+                <li>Separate invoice will be issued by Trek4Me Sdn. Bhd. for the insurance purchased.</li>
+            <% end %>
+
+        <% end %>
+    </ol>
+</i>

@@ -1,0 +1,15 @@
+<div class="card" data-behaviour="vue" v-cloak>
+  <div class="card-header">
+    <strong>X-Ray Facility Visit Plans</strong> - <% if @visit_plan.status === 'DRAFT' || @visit_plan.status === 'REJECTED' %>Edit <% end %>X-Ray Facility Visit Plan <% if @visit_plan.status != 'DRAFT' && @visit_plan.status != 'REJECTED' %>Details<% end %>
+  </div>
+
+  <% if params[:action] == 'approval' %>
+    <div class="card-body">
+        <%= render 'internal/visit_plans/xray_facilities/form', { form_method: 'PUT', form_action: internal_visit_plan_xray_facility_approve_report_path(@visit_plan), index_path: internal_visit_plans_xray_facilities_path } %>
+    </div>
+  <% else %>
+    <div class="card-body">
+      <%= render 'internal/visit_plans/xray_facilities/form', { form_method: 'PUT', form_action: internal_visit_plan_xray_facility_update_path(@visit_plan), index_path: internal_visit_plans_xray_facilities_path } %>
+    </div>
+  <% end %>
+</div>

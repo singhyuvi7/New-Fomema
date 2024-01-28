@@ -1,0 +1,9 @@
+<div class="card" data-behaviour="vue">
+    <div class="card-header">
+        <strong>Clinic Visit Plans</strong> - New Clinic Visit Plan
+    </div>
+    <%= form_for @visit_plan, url: internal_visit_plans_path do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+
+</div>

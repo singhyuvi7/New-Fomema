@@ -1,0 +1,29 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<% if @data.present? %>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td><%= params[:date] %></td>
+						<td><%= @radiographer.name %></td>
+						<td><%= @data.size %></td>
+					</tr>
+				</tbody>
+
+				<tfoot>
+					<tr>
+						<td class="text-right" colspan="3">SUBTOTAL</td>
+						<td><%= @data.size %></td>
+					</tr>
+				</tfoot>
+			<% end %>
+		</table>
+	</div>
+</div>

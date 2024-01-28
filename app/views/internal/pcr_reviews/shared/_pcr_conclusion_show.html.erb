@@ -1,0 +1,76 @@
+<%
+    appeal ||= nil
+    colspan = 3
+    colspan += 1 unless appeal.present?
+%>
+
+<div class="pcr_conclusion_form">
+    <div class="card border-primary">
+        <div class="card-header">
+            PCR Review Conclusion
+        </div>
+
+        <table class="table table-card">
+            <tbody>
+                <tr>
+                    <td><label class="<%= " required" if pcr_review.belong_is_mandatory? %>">X-Ray Details</label></td>
+                    <td colspan="<%= colspan %>">
+                        <div class="col-form-label">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" value="YES" <% if pcr_review.belong == "YES" %> checked <% else %> disabled <%end%>>
+                                    X-Ray images BELONG to the same worker
+                                </label>
+                            </div>
+                            <div class="form-check mt-3">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" value="NO"<% if pcr_review.belong == "NO" %> checked <% else %> disabled <%end%>>
+                                    X-Ray images DO NOT BELONG to the same worker
+                                </label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Decision</td>
+
+                    <td class="text-center">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" value="NORMAL" <% if pcr_review.result === 'NORMAL' %> checked <% else %> disabled <% end %>>
+                                Normal
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="text-center">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" value="ABNORMAL" <% if pcr_review.result === 'ABNORMAL' %> checked <% else %> disabled <% end %>>
+                                Abnormal
+                            </label>
+                        </div>
+                    </td>
+
+                    <% unless appeal.present? %>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" value="RETAKE" <% if pcr_review.result === 'RETAKE' %> checked <% else %> disabled <% end %>>
+                                    Retake
+                                </label>
+                            </div>
+                        </td>
+                    <% end %>
+                </tr>
+
+                <tr>
+                    <td>Comment</td>
+                    <td colspan="<%= colspan %>">
+                        <pre class="form-control text-break"><%= pcr_review.comment %></pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

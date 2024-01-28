@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Monitor Reasons</strong> - New Monitor Reason
+    </div>
+    <%= form_for @monitor_reason, url: internal_monitor_reasons_path, html: {class: "#{params[:action]}_monitor_reason monitor_reason-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

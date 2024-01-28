@@ -1,0 +1,105 @@
+<div class="card">
+    <div class="card-header">Deletion of Digital Image</div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+        <p>This module allows you to delete uploaded digital image with the following conditions:</p>
+
+        <ul>
+            <li>Images that has been allocated to your X-Ray facility</li>
+            <li>Images which are yet to be reported</li>
+            <li>Images which are yet to be allocated to a radiologist</li>
+        </ul>
+
+        <div class="d-flex align-items-center">
+            <label>Transaction code: </label>
+            <%= text_field_tag :transaction_code, params[:transaction_code], placeholder: "Search Transaction Code", id: "xray-search-transaction-code", class: "form-control w-em-20 mx-2" %>
+            <div id="search-xray-image" class="btn btn-primary">Search</div>
+        </div>
+    </div>
+</div>
+
+<div id="dialog-xray-image-search-results" class="hidden" title="Delete Digital Image">
+    <p id="transaction-details"></p>
+
+    <div id="error-response">
+    </div>
+
+    <div id="confirm-deletion">
+        <%= form_tag delete_image_external_xray_images_path, method: :post do %>
+            <p>Digital images for the transaction code found.</p>
+            <p>Please include a reason and click on <b>Confirm</b> to delete the images.</p>
+            <%= hidden_field_tag :confirm_delete_transaction_code, "" %>
+            <%= text_area_tag :remarks, "", placeholder: "Please include a reason(s) for deleting this image.", class: "w-100 p-2", rows: 5, required: true %>
+
+            <div class="text-right">
+                <%= submit_tag "Confirm", class: "btn btn-primary font-weight-bold", id: "confirm-delete" %>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<div id="dialog-xray-image-search-timeout" class="hidden" title="Timeout error">
+    <h2>Client Timeout Error</h2>
+    <p>Could not contact the client server. Please try again later or contact Fomema.</p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('#search-xray-image').click(function() {
+            var button = $(this);
+
+            if (button.hasClass('btn-primary')) {
+                button.removeClass('btn-primary').addClass('btn-secondary');
+                var transactionCode = $('#xray-search-transaction-code').val();
+
+                $.ajax({
+                    url: '<%= search_image_external_xray_images_path %>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { transaction_code: transactionCode },
+                })
+                .done(function(response) {
+                    var errorDiv = $('#error-response');
+
+                    if (response.timeout) {
+                        openDialog({target: '#dialog-xray-image-search-timeout', type: 'danger'});
+                    } else if (response.transaction_does_not_belong) {
+                        errorDiv.html('This transaction does not belong to you.');
+                    } else if (response.assigned_to_radiologist) {
+                        errorDiv.html('This transaction has been assigned to a radiologist. Unable to delete.');
+                    } else if (response.exam_is_completed) {
+                        errorDiv.html('The examination results for this transaction have been submitted. Unable to delete.');
+                    } else if (response.images_not_found) {
+                        errorDiv.html(`Unable to find xray images for this transaction.`);
+                    } else if (response.transaction_not_found) {
+                        errorDiv.html('Transaction not found.');
+                    }
+
+                    if (response.transaction_does_not_belong || response.assigned_to_radiologist || response.exam_is_completed || response.images_not_found || response.transaction_not_found) {
+                        $('#confirm-deletion').hide();
+                        $('#error-response').show();
+                        openDialog({target: '#dialog-xray-image-search-results', type: 'danger'});
+                    } else if (response.images_found) {
+                        $('#confirm-deletion').show();
+                        $('#error-response').hide();
+                        openDialog({target: '#dialog-xray-image-search-results', type: 'primary'});
+                        $('#confirm_delete_transaction_code').val(transactionCode);
+                        $('#confirm-delete').removeAttr('disabled');
+                    }
+
+                    var transDetails = `<b class="d-inline-block w-em-12">Transaction Code</b><span>${ transactionCode }<span>`;
+
+                    if (response.images_found || response.images_not_found) {
+                        var transDetails = `${ transDetails }<br>
+                            <b class="d-inline-block w-em-12">Worker Code</b><span>${ response.worker_code }</span><br>
+                            <b class="d-inline-block w-em-12">Worker Name</b><span>${ response.worker_name }</span>`;
+                    }
+
+                    $('#dialog-xray-image-search-results #transaction-details').html(transDetails);
+                    button.addClass('btn-primary').removeClass('btn-secondary');
+                });
+            }
+        });
+    </script>
+<% end %>

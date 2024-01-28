@@ -1,0 +1,100 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Retake Approval</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+        <%=render 'shared/all_validation_flash', { model_obj: @xray_retake} %>
+
+        <% if @xray_retake.created_by.eql?(current_user.id) %>
+            <div class="alert alert-info">
+                <h6>READ ONLY. YOU CAN'T APPROVE FORM THAT WAS SUBMIT BY YOURSELF</h6>
+            </div>
+        <% end %>
+
+        <%=render 'internal/xqccs/shared/transaction_worker_info', { transaction_model: @xray_retake.transactionz } %>
+
+        <!-- tab menu -->
+        <ul class="nav nav-tabs" role="tablist">
+
+            <!-- transactions.xray_examinations -->
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= @xray_retake.transactionz.xray_examination.id %>-content">X-Ray Report <%= xqcc_result_badge(@xray_retake.transactionz.xray_examination.result) %></a>
+            </li>
+
+            <% @xray_retake.transactionz.xray_reviews.each.with_index(1) do |xray_review, index| %>
+                <!-- transactions.xray_reviews -->
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= xray_review.id %>-content">XQCC Review <%= xqcc_result_badge(xray_review.result) %></a>
+                </li>
+            <% end %>
+
+            <% @xray_retake.transactionz.pcr_reviews.each.with_index(1) do |pcr_review, index| %>
+                <!-- transactions.pcr_reviews -->
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">PCR Review <%= xqcc_result_badge(pcr_review.result) %></a>
+                </li>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#xray_retake-<%= @xray_retake.id %>-content">X-Ray Retake Request</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#xray_retake-approval-content">X-Ray Retake Approval</a>
+            </li>
+
+        </ul>
+        <!-- end of tab menu -->
+
+        <!-- tab content -->
+        <div class="tab-content">
+
+            <% @xray_retake.transactionz.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <!-- xray_examinations -->
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% @xray_retake.transactionz.xray_reviews.each do |xray_review| %>
+                <!-- xray_reviews -->
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= xray_review.id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: xray_review } %>
+                </div>
+            <% end %>
+
+            <% @xray_retake.transactionz.pcr_reviews.each do |pcr_review| %>
+                <!-- pcr_reviews -->
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <!-- xray_retakes -->
+            <div class="tab-pane fade" role="tabpanel" id="xray_retake-<%= @xray_retake.id %>-content">
+                <%=render 'internal/xray_retakes/xray_retake', { xray_retake: @xray_retake } %>
+            </div>
+
+            <!-- xray_retakes approval -->
+            <div class="tab-pane fade show active" role="tabpanel" id="xray_retake-approval-content">
+                <%= form_for @xray_retake, url: approval_internal_xray_retake_path(@xray_retake), html: {class: "with-parsley"} do |form| %>
+                    <%=render 'internal/xray_retakes/approval_form', {
+                        xray_retake: @xray_retake,
+                        form: form
+                    } %>
+                <% end %>
+            </div>
+
+        </div>
+        <!-- end of tab content -->
+
+    </div>
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(@xray_retake.index_path) %>
+    </div>
+
+</div>

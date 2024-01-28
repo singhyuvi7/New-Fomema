@@ -1,0 +1,107 @@
+.explanation-letter{
+    font-size: 14px;
+
+    #previewBg{
+        position:absolute;
+        z-index:-1;
+        background:white;
+        display:block;
+        min-height:50%; 
+        min-width:50%;
+        color:yellow;
+        color:lightgrey;
+        font-size:100px;
+        transform:rotate(300deg);
+        -webkit-transform:rotate(300deg);
+        left: 110px;
+        top: 50px;
+    }
+
+    .header{
+        .label{
+            width: 70px;
+            display: inline-block;
+        }
+    }
+
+    .letter-to{
+        padding-bottom: 1.3rem;
+    }
+
+    .content{
+        .findings{
+            .finding-list{
+                list-style-type:decimal;
+            }
+            .finding-items{
+                list-style-type: lower-roman;
+            }
+            li, .sub-finding{
+                padding-bottom: 5px;
+            }
+            .sub-finding{
+                padding-top: 1rem;
+            }
+        }
+        .clause-list{
+            list-style-type: lower-alpha;
+        }
+    }
+
+    .communicable-diseases-list{
+        list-style-type: lower-roman;
+    }
+    .communicable-diseases-example{
+        list-style-type: lower-alpha;
+    }
+
+
+    .text-left{
+        text-align: left;
+    }
+
+    .bold{
+        font-weight: bold;
+    }
+
+    .underline{
+        text-decoration: underline;
+    }
+
+    .width-100, .w-100{
+        width: 100% !important;
+    }
+
+    .d-inline{
+        display: inline-block;
+    }
+    .white-space-normal{
+        white-space: normal;
+    }
+
+    .page-break{
+        page-break-after: always;
+    }
+
+    .signature-img{
+        width: 120px;
+    }
+    .form-row{
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    .text-nowrap {
+        white-space: nowrap !important;
+    }
+    .signature-space{
+        padding-bottom: 5.5rem;
+    }
+    .raw-overflow {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+}

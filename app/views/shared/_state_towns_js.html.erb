@@ -1,0 +1,19 @@
+<% content_for :page_end_scripts do %>
+<script>
+// when change state, ajax fetch towns
+$('#state_id').change(function () {
+    // empty town and postcode
+    $('#town_id').html('<option value><%= form_select_option_text %></option>');
+    if (this.value) {
+        $.ajax({
+            url: '/states/' + this.value + '/towns.json',
+            method: "GET",
+        }).done(function (data) {
+            $.each(data, function (idx, town) {
+                $('#town_id').append('<option value="'+town.id+'" data-postcode_id="'+town.postcode_id+'" data-postcode_code="'+town.postcode_code+'">'+town.name+'</option>');
+            });
+        });
+    }
+});
+</script>
+<% end %>

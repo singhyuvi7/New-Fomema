@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Associations</strong> - New Association
+    </div>
+    <%= form_for @association, url: internal_associations_path, html: {class: "#{params[:action]}_association association-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

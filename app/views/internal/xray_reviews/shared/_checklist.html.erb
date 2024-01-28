@@ -1,0 +1,833 @@
+<div class="card">
+    <div class="card-header">
+        XQCC Checklist
+    </div>
+    <table class="table table-bordered table-card">
+        <thead>
+            <tr>
+                <th width="120">Criteria</th>
+                <th>Findings</th>
+                <th colspan="2" class="text-center">Status</th>
+                <th>Item</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- id_incomplete -->
+            <tr>
+                <td rowspan="<% if xray_review.transactionz&.xray_film_type&.downcase == 'analog' %>4<% else %>2<% end %>">ID</td>
+                <td>Incomplete</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6101") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6101") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6133") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#id_incomplete_checkbox_errors" >
+                            Clinic Name
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6134") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Worker Name
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6135") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Transaction ID
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6136") == 'Y' %> checked <% else %> disabled <% end %>>
+                            X-Ray Taken Date
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of id_incomplete -->
+
+            <!-- id_wrong -->
+            <tr>
+                <td>Wrong</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6128") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6128") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6137") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#id_wrong_checkbox_errors" >
+                            Clinic Name
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6138") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Worker Name
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6139") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Transaction ID
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6140") == 'Y' %> checked <% else %> disabled <% end %>>
+                            X-Ray Taken Date
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of id_wrong -->
+
+            <!-- only show for pyhsical film --> <% if xray_review.transactionz&.xray_film_type&.downcase == 'analog' %>
+            <!-- id_not_clear -->
+            <tr>
+                <td>Not Clear</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6102") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6102") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6152") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#id_not_clear_checkbox_errors">
+                            Blur
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6153") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Fog
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6154") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Dark
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of id_not_clear -->
+
+            <!-- id_not_printed -->
+            <tr>
+                <td>Not Printed</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6103") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6103") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6155") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#id_not_printed_checkbox_errors">
+                            Handwritten
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6156") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Sticker
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of id_not_printed -->
+
+            <!-- proc_chemical_defect  -->
+            <tr>
+                <td rowspan="4">Processing Procedure</td>
+                <td>Chemical Defect</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6104") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6104") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6157") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#proc_chemical_defect_checkbox_errors" >
+                            Weak Chemical
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6158") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Discoloration
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6159") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Stain
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6160") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Water Mark
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6105") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Poor Agitation
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of proc_chemical_defect-->
+
+            <!-- proc_marks_of_film  -->
+            <tr>
+                <td>Marks of Film</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6106") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6106")  %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6161") == 'Y' %> checked <% else %> disabled <% end %> data-parsley-errors-container="#proc_marks_of_film_checkbox_errors" >
+                            Film Guide Mark
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6162") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Scratches
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of proc_marks_of_film-->
+
+            <!-- proc_fog  -->
+            <tr>
+                <td>Fog</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6107") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6107") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6163") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#proc_fog_checkbox_errors">
+                            Partial Fog
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6164") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Base Fog
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of proc_fog-->
+
+            <!-- proc_screen_defect  -->
+            <tr>
+                <td>Screen Defect</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6108") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6108") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6165") == 'Y' %> checked <% else %> disabled <% end %> data-parsley-errors-container="#proc_screen_defect_checkbox_errors">
+                            Dirty Screen
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6166") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Spoilt Screen
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of proc_screen_defect-->
+            <% end %>
+            <!-- end of only show for pyhsical film -->
+
+            <!-- pos_roi_cut_off  -->
+            <tr>
+                <td rowspan="5">Positioning Technique</td>
+                <td>ROI Cut Off</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6141") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6141") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6110") == 'Y' %> checked <% else %> disabled <% end %> required data-parsley-errors-container="#pos_roi_cut_off_checkbox_errors" >
+                            Apices Cut
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6111") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Chest Wall Cut
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6112") == 'Y' %> checked <% else %> disabled <% end %>>
+                            CPA Cut
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of pos_roi_cut_off-->
+
+            <!-- pos_roi_not_clearly_visualized  -->
+            <tr>
+                <td>ROI not clearly visualized</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6113") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6113")  %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6142") == 'Y' %> checked <% else %> disabled <% end %> data-parsley-errors-container="#pos_roi_not_clearly_visualized_checkbox_errors" >
+                            Rotation
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6143") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Angulation
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6144") == 'Y' %> checked <% else %> disabled <% end %>>
+                            ID Obscure Apex
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of pos_roi_not_clearly_visualized-->
+
+            <!-- pos_collimation  -->
+            <tr>
+                <td>Collimation</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6115") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6115") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6145") == 'Y' %> checked <% else %> disabled <% end %> data-parsley-errors-container="#pos_collimation_checkbox_errors">
+                            Poor Collimation
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="checkbox" value="Y" <% if xray_review.get_condition_detail("6146") == 'Y' %> checked <% else %> disabled <% end %>>
+                            No Collimation
+                        </label>
+                    </div>
+                    <div></div>
+                </td>
+            </tr>
+            <!-- end of pos_collimation-->
+
+            <!-- pos_scapular_not_retracted  -->
+            <tr>
+                <td>Scapular not retracted</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6109") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6109") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of pos_scapular_not_retracted-->
+
+            <!-- pos_poor_inspiratory_effort  -->
+            <tr>
+                <td>Poor inspiratory effort</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6120") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6120") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of pos_poor_inspiratory_effort-->
+
+            <!-- exp_overexposure  -->
+            <tr>
+                <td rowspan="2">Exposure</td>
+                <td>Overexposed</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6117") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6117") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of exp_overexposure-->
+
+            <!-- exp_underexposure  -->
+            <tr>
+                <td>Underexposed</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6118") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6118") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of exp_underexposure-->
+
+            <!-- arti_processing_artifacts  -->
+            <tr>
+                <td rowspan="2">Artifacts</td>
+                <td>Processing Artifacts</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6119") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6119") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of arti_processing_artifacts-->
+
+            <!-- is_arti_poor_handling_artifacts  -->
+            <tr>
+                <td>Poor Handling Artifacts</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6131") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6131")  %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of is_arti_poor_handling_artifacts-->
+
+            <!-- super_same_thoracic_cage  -->
+            <tr>
+                <td rowspan="2">Superimposed</td>
+                <td>Same thoracic cage</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6147") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6147") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of super_same_thoracic_cage-->
+
+            <!-- super_different_thoracic_cage  -->
+            <tr>
+                <td>Different thoracic cage</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6148") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6148") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of super_different_thoracic_cage--> <% if xray_review.transactionz&.xray_film_type&.downcase == 'digital' %>
+            <!-- pam_wrong_placement  -->
+            <tr>
+                <td rowspan="2">Primary Anatomical Marker</td>
+                <td>Wrong Placement</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6149") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6149") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of pam_wrong_placement-->
+            <% end %>
+            <!-- pam_not_available  -->
+            <tr> <% if xray_review.transactionz&.xray_film_type&.downcase == 'analog' %>
+                    <td>Primary Anatomical Marker</td>
+                <% end %>
+                <td>Not Available</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6150") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6150") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of pam_not_available-->
+
+            <!-- blur_movement  -->
+            <tr>
+                <td rowspan="2">Blur</td>
+                <td>Movement</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="Y" <% if xray_review.get_condition_detail("6121") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" value="NO" <% if !xray_review.get_condition_detail("6121") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of blur_movement-->
+
+            <!-- blur_breathing  -->
+            <tr>
+                <td>Breathing</td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6132") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6132") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of blur_breathing--> <% if xray_review.transactionz&.xray_film_type&.downcase == 'analog' %>
+            <!-- improper_report  -->
+            <tr>
+                <td>Improper Report</td>
+                <td></td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6130") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6130") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <% end %>
+            <!-- end of improper_report-->
+
+            <!-- is_no_diagnostic_value  -->
+            <tr>
+                <td>No Diagnostic Value</td>
+                <td></td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if xray_review.get_condition_detail("6151") == 'Y' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </td>
+                <td width="50" class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                        <input class="form-check-input" type="radio" <% if !xray_review.get_condition_detail("6151") %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                    </div>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <!-- end of is_no_diagnostic_value-->
+        </tbody>
+    </table>
+</div>

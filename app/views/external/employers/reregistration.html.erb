@@ -1,0 +1,15 @@
+<div id="notice"><%= alert %></div>
+<div class="container">
+    <div class="employer-registration-title-container">
+        <h1>Employer Registration</h1>
+        <div class="employer-registration-title-left-bar">&nbsp;</div>
+        <div class="employer-registration-title-right-bar">&nbsp;</div><br>
+    </div>
+
+    <%= render 'shared/all_validation_flash', { model_obj: @employer } %>
+    
+    <%= form_for @employer, url: reregistration_external_employers_path, html: { multipart: true, id: 'employer-registration-form', method: :PATCH } do |f| %>
+        <input type="hidden" name="sign_up_token" value="<%= params[:token] %>">
+        <%= render 'form_register', f: f %>
+    <% end %>
+</div>

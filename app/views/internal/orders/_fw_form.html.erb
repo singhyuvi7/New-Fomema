@@ -1,0 +1,210 @@
+<%
+foreign_worker = order_item.order_itemable
+foreign_worker.assign_attributes(order_item.additional_information["foreign_worker"]) if !order_item.additional_information.blank? and order_item.additional_information.key?("foreign_worker")
+%>
+<div id="modal-fw-<%= order_item.order_itemable_id %>" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+<%= form_for foreign_worker, url: update_fw_internal_order_path(@order), method: :PATCH, html: {multipart: true, class: "with-parsley"} do |form| %>
+    <%= hidden_field_tag :order_item_id, order_item.id %>
+    <%= hidden_field_tag :foreign_worker_id, foreign_worker.id %>
+    <div class="modal-header">
+        Foreign Worker
+    </div>
+    <!-- /.modal-header -->
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :name, class: 'required' %>
+                    <div class="input-group">
+                        <%= form.text_field :name, class: 'critical-field form-control', required: true, placeholder: '', id: "name", data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z][^0-9]*", parsley_pattern_message: "Must not begin with a special characters and no numbers are allowed", parsley_errors_container: "#name-error-block-#{foreign_worker.id}" } %>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="popover" data-placement="auto" data-html="true" data-content='<%= image_tag("forms/callingvisacompany1.png", :style => "width: 300px;")%><h6>Or</h6><%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>' title="">
+                                <i class="fa fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="name-error-block-<%= foreign_worker.id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :passport_number, "Passport Number", class: 'required' %>
+                    <%= form.text_field :passport_number, class: 'critical-field form-control', required: true, placeholder: 'A123456', data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "No special characters allowed" } %>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="required">Gender</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <%= form.radio_button(:gender, "M", class: "critical-field form-check-input", required: true, disabled: !has_permission?("EDIT_GENDER_FOREIGN_WORKER")) %>
+                            <label class="form-check-label" for="foreign_worker_gender_m">Male</label>
+                            &emsp;
+                            <%= form.radio_button(:gender, "F", class: "critical-field form-check-input", required: true, disabled: !has_permission?("EDIT_GENDER_FOREIGN_WORKER")) %>
+                            <label class="form-check-label" for="foreign_worker_gender_f">Female</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :date_of_birth, "Date of Birth", class: 'required' %>
+                    <%= form.date_field :date_of_birth, class: 'critical-date critical-field form-control', required: true, min: Date.today - 70.year, max: Date.today - 18.year%>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = "#{generate_field_id(form, :country_id)}-#{foreign_worker.id}" %>
+                    <%= form.label :country_id, class: 'required' %>
+                    <%= form.select :country_id, options_from_collection_for_select(Country.where("code != ?", Country::MALAYSIA_CODE).order(:name).all, 'id', 'name', form.object.country_id), {include_blank: form_select_option_text}, required: true, class: 'critical-field form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id }, id: "foreign_worker_country_id_#{foreign_worker.id}", dropdownParent: "#modal-fw-#{foreign_worker.id}" %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :arrival_date, "Arrival Date", class: '' %>
+                    <%= form.date_field :arrival_date, class: 'critical-date critical-field form-control', required: false, max: Date.today %>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = "#{generate_field_id(form, :job_type_id)}-#{foreign_worker.id}" %>
+                    <%= form.label :job_type_id, "Job Type", class: 'required' %>
+                    <select name="foreign_worker[job_type_id]" id="foreign_worker_job_type_id-<%= foreign_worker.id %>" class="form-control select2" data-parsley-errors-container="#select2_parsley_error__<%= field_id %>" data-parsley_class_handler=".select2-selection--single[aria-labelledby=\"select2-<%= field_id %>-container\"]" data-parsley_group="<%= field_id %>" dropdownparent="#modal-fw-<%= foreign_worker.id %>" required>
+                        <option value=""><%= form_select_option_text %></option>
+                        <% JobType.order(:name).each do |jt| %>
+                            <option value="<%= jt.id %>" data-name="<%= jt.name %>"
+                            <%= " selected" if foreign_worker.job_type_id == jt.id %>
+                            <%= " disabled" if foreign_worker.is_maid_online? and jt.name != 'DOMESTIC' %>
+                            ><%= jt.name %></option>
+                        <% end %>
+                    </select>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="required">PATI / Rehiring programme</label>
+                    <div>
+                        <div class="form-check form-check-inline mr-5">
+                            <%= form.radio_button(:pati, true, class: "critical-field form-check-input") %>
+                            <label class="form-check-label" for="foreign_worker_pati_true">Yes</label>
+                            &emsp;
+                            <%= form.radio_button(:pati, false, class: "critical-field form-check-input", required: true) %>
+                            <label class="form-check-label" for="foreign_worker_pati_false">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :plks_number, "PLKS Number", class: 'required' %>
+                    <div class="input-group">
+                        <%= form.text_field :plks_number, class: 'critical-field form-control', required: true, placeholder: "0", maxlength: "3", data: { parsley_maxlength: "3", parsley_maxlength_message: "Maximum length of 3 characters", parsley_pattern: "^[0-9]*", parsley_pattern_message: "PLKS Number can only contain numbers", parsley_errors_container: "#plks-error-block-#{foreign_worker.id}" } %>
+                        <div class="input-group-append">
+                            <button type="button" data-toggle="popover" data-placement="auto" data-html="true" data-content='<%= image_tag("forms/workPermitNew.png", :style => "width: 300px;")%>' title="" class="btn btn-primary btn-sm">
+                                <i class="fa fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="plks-error-block-<%= foreign_worker.id %>"></div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <div class="col-md-6">
+                <%= form.label :programme, "Programme" %>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="programme[]" value="PRAON" onchange="is_maid_online_changed(this, <%= foreign_worker.id %>)"
+                        <%= " checked" if foreign_worker.is_maid_online? %> > 
+                        Maid Online
+                    </label>
+                    <label>
+                        <input type="checkbox" name="programme[]" value="RTK" onchange="is_maid_online_changed(this, <%= foreign_worker.id %>)"
+                        <%= "checked" if foreign_worker.is_recalibration? %> > 
+                        Recalibration
+                    </label>
+
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.modal-body -->
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+    <!-- /.modal-footer -->
+<% end %>
+<!-- /foreign worker form -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+function is_maid_online_changed(cb, fw_id)
+{
+    //foreign_worker_job_type_id-<%= foreign_worker.id %>
+    $('#foreign_worker_job_type_id-' + fw_id + ' > option').each(function (idx, opt) {
+        if (cb.val() == "PRAON") {
+            if (opt.getAttribute('data-name') == 'DOMESTIC') {
+                opt.selected = true;
+            } else {
+                opt.selected = false;
+                opt.setAttribute('disabled', true);
+            }
+        } else if (cb.val() == "RTK") {
+                if (opt.getAttribute('data-name') == 'DOMESTIC') {
+                    opt.disabled = true;
+                    opt.selected = false;
+                } else {
+                    opt.disabled = false;
+                }
+        } else {
+            opt.removeAttribute('disabled');
+        }
+    });
+
+    opt = {
+        theme: 'bootstrap',
+    }
+    if (document.getElementById('foreign_worker_job_type_id-' + fw_id).getAttribute('dropdownparent')) {
+        opt.dropdownParent = $(document.getElementById('foreign_worker_job_type_id-' + fw_id).getAttribute('dropdownparent'));
+    }
+    $('#foreign_worker_job_type_id-' + fw_id).select2(opt);
+}
+
+$('input[type="checkbox"]').on('change', function () {
+    $('input[name="programme[]"]').not(this).prop('checked', false);
+    is_maid_online_changed($('input[name="programme[]"]:checked'), '<%= foreign_worker.id %>');
+});
+
+</script>
+<% end %>

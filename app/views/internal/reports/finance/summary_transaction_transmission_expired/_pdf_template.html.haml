@@ -1,0 +1,58 @@
+- if @expired_transactions.present?
+  - @expired_transactions.each do |branch, expired_transactions|
+    = render 'internal/reports/finance/summary_transaction_transmission_expired/expired_table', branch: branch, expired_transactions: expired_transactions
+  %table.table.w-100.text-center.mt-4
+    %tbody
+      %tr.bold
+        - total_male_count, total_female_count, total_count = @grand_total
+        %td{ width: '30%' } Grand Total
+        %td{ width: '30%' }
+          - unless total_female_count.zero?
+            %div
+              Female:
+              = total_female_count
+          - unless total_male_count.zero?
+            %div
+              Male:
+              = total_male_count
+        %td{ width: '40%' }
+          - unless total_count.zero?
+            Expired:
+            = total_count
+
+:css
+  .w-100 {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 10px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 10px 5px;
+    vertical-align: center;
+    border: none;
+  }
+
+  tr:last-child {
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .mt-4{
+    margin-top: 1.5rem;
+  }

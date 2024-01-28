@@ -1,0 +1,79 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Decision Approvals</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "internal/xqccs/filters/pending_decision_approval_filter" %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label>#</label></th>
+                                <th>Transaction ID</th>
+                                <th>Worker Code</th>
+                                <th>Doctor Code</th>
+                                <th>Certify Date</th>
+                                <th>X-Ray Code</th>
+                                <th>X-Ray Date</th>
+                                <th>X-Ray Result</th>
+                                <th>PCR Result</th>
+                                <th>Pending Decision Result</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @pending_approvals.each.with_index((@pending_approvals.current_page - 1) * get_per + 1) do |pending_approval, index| %>
+                            <tr>
+                                <td class="module-row-numbers"><label><%= index %></label></td>
+                                <td>
+                                    <a href="<%= pending_decision_approval_internal_transaction_path(pending_approval.transactionz, pending_approval.id) %>"><%= pending_approval.transactionz.code %></a>
+                                </td>
+                                <td><%= pending_approval.transactionz.foreign_worker&.code %></td>
+                                <td><%= pending_approval.transactionz.doctor&.code %></td>
+                                <td><%= pending_approval.transactionz.doctor_transmit_date.strftime(get_standard_date_format) if pending_approval.transactionz.doctor_transmit_date? %></td>
+                                <td><%= pending_approval.transactionz.xray_facility&.code %></td>
+                                <td><%= pending_approval.transactionz.xray_examination&.xray_taken_date.strftime(get_standard_date_format) %></td>
+                                <td><%= pending_approval.transactionz.xray_examination&.result %></td>
+                                <td><%= pending_approval.transactionz.pcr_review&.result %></td>
+                                <td><%= pending_approval.transactionz.xray_pending_decision&.decision %></td>
+                                <td><%= pending_approval.case_review_status %></td>
+
+                                <td>
+                                    <%=raw index_table_edit_button pending_decision_approval_internal_transaction_path(pending_approval.transactionz, pending_approval.id) if has_permission?("XRAY_PENDING_DECISION_APPROVAL_TRANSACTION") and pending_approval.xray_pending_decision.reviewed_by != current_user.id %>
+                                </td>
+                            </tr>
+                            <% end %>
+
+                            <% if @pending_approvals.blank? %>
+                                <tr>
+                                    <td colspan="12" class="text-danger">No records found.<!--No active XQCC Pending Decision Approval cases.--></td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @pending_approvals %>
+        </div>
+    </div>
+</div>
+
+<style>
+
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+</script>
+<% end %>

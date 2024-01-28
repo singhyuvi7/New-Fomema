@@ -1,0 +1,30 @@
+<div id="daily-biometric-report" class="my-4">
+    <h3>AFIS ID tested by Month <%= @current_year %></h3>
+    <table class="table-borders w-100 text-center">
+        <thead class="text-center">
+            <tr>
+                <th>DATE</th>
+                <th>DOCTOR</th>
+                <th>%</th>
+                <th>XRAY</th>
+                <th>%</th>
+                <th>BOTH</th>
+                <th>%</th>
+                <th>BELOW THRESHOLD</th>
+                <th>%</th>
+                <th>NOT MATCHING</th>
+                <th>%</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @afis_id_by_month_current_year.each do |row| %>
+            <tr>
+                <% row.each do |value| %>
+                <td><%= value %></td>
+                <% end %>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,190 @@
+body {
+  margin: 0; padding: 0;
+  font-family: Arial, sans-serif;
+  color: #000000;
+  font-size: 14px;
+}
+
+div.pdf-container {
+  border: 5px solid #000000;
+  padding-left: 10px;
+  padding-bottom: 50px;
+}
+
+.form-header {
+  text-align: center;
+  font-weight: bold;
+}
+
+.form-header .subtitle {
+  font-style: italic;
+}
+
+.form-header .subtitle {
+  font-style: italic;
+}
+
+.form-header .page-counter {
+  font-size: 12px;
+}
+
+.table td, .table th {
+  border-top: 0;
+  vertical-align: top;
+}
+
+.table.form-header-table td, .table.form-header-table th {
+  padding-top: 20px;
+}
+
+.table.form-table td, .table.form-table th {
+  padding: 0;
+}
+
+.form-verifier .table td, .form-verifier .table th {
+  padding: 0;
+}
+
+.form-verifier {
+  border: 2px solid black;
+  width: 260px;
+  font-size: 12px;
+  margin-left: 25px;
+  font-weight: bold;
+  position: absolute;
+}
+
+.form-label {
+  font-weight: bold;
+  width: 140px;
+}
+
+.form-label-b {
+  font-weight: bold;
+  width: 150px;
+}
+
+.form-label-split {
+  font-weight: bold;
+  width: 90px;
+}
+
+.form-label-eng {
+  font-style: italic;
+  display: block;
+}
+
+.form-value-b {
+  width: 100px;
+}
+
+.form-value-c {
+  width: 150px;
+}
+
+td.copy-section-logo {
+  width: 30px;
+  vertical-align: middle;
+}
+
+.copy-section-logo img {
+  width: 20px;
+  margin-top: 20px;
+  margin-bottom: auto;
+}
+
+.section-divider-image {
+  margin-top: -21px;
+  margin-bottom: 5px;
+}
+
+.section-divider-image img {
+  width: 920px;
+}
+
+.section-header-image img {
+  width: 220px;
+  margin-left: -20px;
+}
+
+td.first-col {
+  width: 420px;
+}
+
+td.first-col-b {
+  width: 330px;
+}
+
+td.second-col {
+  width: 300px;
+}
+
+td.second-col-b {
+  width: 380px;
+}
+
+td.third-col-b {
+  border-left: 2px solid black;
+  width: 100px;
+}
+
+td.logo-col {
+  width: 220px;
+}
+
+td.logo-col {
+  width: 280px;
+}
+
+td.header-col {
+  width: 340px;
+}
+
+td.verifier-col {
+  width: 280px;
+}
+
+.company-logo img {
+  width: 70%;
+}
+
+.form-header .title {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.form-header .subtitle {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.barcode-section {
+  padding-left: 20px;
+  position: relative;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: visible;
+}
+
+.barcode-section .label {
+  font-weight: bold;
+}
+
+.barcode-serial {
+  -webkit-transform: rotate(90deg) scale(1.0);
+  -ms-transform: rotate(90deg) scale(1.0);
+  transform: rotate(90deg) scale(1.0);
+  position: absolute;
+  margin-top: 80px;
+  margin-left: -20px;
+  margin-right: 0;
+}
+
+.barcode-worker-code {
+
+}
+
+.barcode-worker-name {
+
+}

@@ -1,0 +1,70 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="code">Code</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.code %></p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.name %></p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="passport_number">Passport Number</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.passport_number %></p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="country">Country</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.country&.name %></p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <p class="form-control-plaintext"><%= ForeignWorker::GENDERS[@foreign_worker.gender] %></p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="monitoring">Under Monitoring</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.monitoring.eql?('Y') ? 'Yes' : 'No' %></p>
+            <% if @foreign_worker.monitoring.eql?('Y') %>
+                <% if !@foreign_worker.monitor_reason_id.blank? %>
+                    <p style="font-weight: bold">Reason for Monitoring</p>
+                    <p class="pre"><%= @foreign_worker.monitor_reason&.description %></p>
+                <% end %>
+                <% if !@foreign_worker.monitor_comment.blank? %>
+                    <p class="pre"><%= @foreign_worker.monitor_comment %></p>
+                <% end %>
+            <% elsif @foreign_worker.monitoring.eql?('N') and !@foreign_worker.unmonitor_comment.blank? %>
+                <p class="pre"><%= @foreign_worker.unmonitor_comment %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="created_at">Registered at</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.created_at.strftime('%d/%m/%Y') %></p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="created_by">Registered by</label>
+            <p class="form-control-plaintext"><%= @foreign_worker.creator&.name %></p>
+        </div>
+    </div>
+</div>

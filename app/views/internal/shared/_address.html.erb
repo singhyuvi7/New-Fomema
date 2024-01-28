@@ -1,0 +1,15 @@
+    <!-- address -->
+    <% [:address1, :address2, :address3, :address4].each_with_index do |sym, index| %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <% if index == 0 %>
+                        <%= form.label :address, class: "required" %>
+                    <% end %>
+
+                    <%= form.text_field sym, class: "form-control", required: index == 0, data: { parsley_pattern: "[a-zA-Z0-9@.&#,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@), ampersand (&), hash (#) and slashes (/) are allowed" } %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- /address -->

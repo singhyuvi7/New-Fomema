@@ -1,0 +1,93 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        This is with reference to the below worker's repeat chest X-ray film/image.<br><br>
+        Foreign worker's particulars:<br>
+    </p>
+
+    <table class="w-100" style="font-weight: bold; padding: 1em 0 1em 2.5em;">
+        <tr>
+            <td valign="top" style="width: 8em;">WORKER NAME</td>
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_name %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 8em;">WORKER CODE</td>
+
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_code %></td>
+        </tr>
+
+        <tr>
+            <td valign="top" style="width: 8em;">PASSPORT NO.</td>
+            <td valign="top" style="width: 0.8em;">:</td>
+            <td><%= @letter.worker_passport %></td>
+        </tr>
+    </table>
+
+    <p class="text-justify">
+        <% if @letter.amended_status == "Suitable" %>
+            The repeat chest X-ray that was submitted to us was audited by our panel consultant radiologist and reported as normal.<br><br>
+            As such, this worker's status has now been amended to <b>SUITABLE</b> for employment in Malaysia.<br><br>
+        <% else %>
+            The repeat chest X-ray that was submitted to us was audited by our panel consultant radiologist and showed abnormal chest X-ray findings.
+            Please refer to the attached copy of the audit report by our panel consultant radiologist for details.<br><br>
+            As such, this worker's status has now been amended to <b>UNSUITABLE</b> for employment in Malaysia.<br><br>
+            Kindly take the necessary action (if applicable).<br><br>
+        <% end %>
+
+        Thank you.<br><br><br>
+        Yours sincerely,<br><br>
+        FOMEMA Management<br><br>
+    </p>
+
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="width: 1.7em;"><p>Cc:</p></td>
+            <td colspan="2"><%= simple_format @letter.doctor_address %></td>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

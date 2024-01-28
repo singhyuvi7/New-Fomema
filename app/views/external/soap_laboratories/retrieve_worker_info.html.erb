@@ -1,0 +1,29 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Body>
+        <ns:RetrieveWorkerInfoResponse xmlns:ns="http://fomema.dbixelabs.com">
+            <ns:return>
+                <fomema_labws_response>
+                    <labws_result><%= @response[:labws_result] %></labws_result>
+                    <labws_message><%= @response[:labws_message] %></labws_message>
+
+                    <% if @response[:labws_remarks].present? %>
+                        <labws_remarks><%= @response[:labws_remarks] %></labws_remarks>
+                    <% end %>
+
+                    <% if @response[:labws_workerinfo].present? %>
+                        <labws_workerinfo>
+                            <transid><%= @response[:labws_workerinfo][:transid] %></transid>
+                            <workercode><%= @response[:labws_workerinfo][:workercode] %></workercode>
+                            <name><%= @response[:labws_workerinfo][:name] %></name>
+                            <transdate><%= @response[:labws_workerinfo][:transdate] %></transdate>
+                            <sex><%= @response[:labws_workerinfo][:sex] %></sex>
+                            <passport><%= @response[:labws_workerinfo][:passport] %></passport>
+                            <country><%= @response[:labws_workerinfo][:country] %></country>
+                            <dob><%= @response[:labws_workerinfo][:dob] %></dob>
+                        </labws_workerinfo>
+                    <% end %>
+                </fomema_labws_response>
+            </ns:return>
+        </ns:RetrieveWorkerInfoResponse>
+    </soapenv:Body>
+</soapenv:Envelope>

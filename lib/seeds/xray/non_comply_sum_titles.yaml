@@ -1,0 +1,61 @@
+analog:
+  id:
+    is_id_incomplete: 'Incomplete'
+    is_id_wrong: 'Wrong'
+    is_id_not_clear: 'Not Clear'
+    is_id_not_printed: 'Not Printed'
+  processing_procedures:
+    is_proc_chemical_defect: 'Chemical Defect'
+    is_proc_marks_of_film: 'Marks of Film'
+    is_proc_fog: 'Fog'
+    is_proc_screen_defect: 'Screen Defect'
+  positioning_techniques:
+    is_pos_roi_cut_off: 'ROI Cut Off'
+    is_pos_roi_not_clearly_visualized: 'ROI not clearly visualized'
+    is_pos_collimation: 'Collimation'
+    is_pos_scapular_not_retracted: 'Scapular not retracted'
+    is_pos_poor_inspiratory_effort: 'Poor inspiratory effort'
+  exposure_factors:
+    is_exp_overexposure: 'Over-exposed'
+    is_exp_underexposure: 'Under-exposed'
+  artifacts:
+    is_arti_processing_artifacts: 'Processing Artifacts'
+    is_arti_poor_handling_artifacts: 'Poor Handling Artifacts'
+  superimposed:
+    is_super_same_thoracic_cage: 'Same thoracic cage'
+    is_super_different_thoracic_cage: 'Different thoracic cage'
+  primary_anatomical_marker:
+    is_pam_not_available: 'Not Available'
+  blur:
+    is_blur_movement: 'Movement'
+    is_blur_breathing: 'Breathing'
+  others:
+    is_improper_report: 'Improper Report'
+    is_no_diagnostic_value: 'No Diagnostic Value'
+digital:
+  id:
+    is_id_incomplete: 'Incomplete'
+    is_id_wrong: 'Wrong'
+  positioning_techniques:
+    is_pos_roi_cut_off: 'ROI Cut Off'
+    is_pos_roi_not_clearly_visualized: 'ROI not clearly visualized'
+    is_pos_collimation: 'Collimation'
+    is_pos_scapular_not_retracted: 'Scapular not retracted'
+    is_pos_poor_inspiratory_effort: 'Poor Inspiratory effort'
+  exposure_factors:
+    is_exp_overexposure: 'Over-exposed'
+    is_exp_underexposure: 'Under-exposed'
+  artifacts:
+    is_arti_processing_artifacts: 'Processing Artifacts'
+    is_arti_poor_handling_artifacts: 'Poor Handling Artifacts'
+  superimposed:
+    is_super_same_thoracic_cage: 'Same thoracic cage'
+    is_super_different_thoracic_cage: 'Different thoracic cage'
+  primary_anatomical_marker:
+    is_pam_wrong_placement: 'Wrong Placement'
+    is_pam_not_available: 'Not Available'
+  blur:
+    is_blur_movement: 'Movement'
+    is_blur_breathing: 'Breathing'
+  others:
+    is_no_diagnostic_value: 'No Diagnostic Value'

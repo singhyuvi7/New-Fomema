@@ -1,0 +1,28 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  # header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  header_style = style.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+  headers = ['#', 'Date', 'Action', 'Reason']
+
+  # worksheet data
+  wb.add_worksheet(name: 'Suspension History') do |sheet|
+    sheet.add_row ['Suspension/Lifting History'], style: title_style
+    sheet.add_row ["Doctor Code #{@doctor.code}     Clinic Name: #{@doctor.clinic_name}"]
+    sheet.add_row ["Date: #{@date}   Time: #{@time}"]
+    sheet.add_row headers, style: header_style
+
+    if @activities.present?
+      @activities.each.with_index do |row_data, index|
+        sheet.add_row [index + 1, *row_data], style: data_style
+      end
+    end
+
+    3.times { sheet.add_row }
+
+    sheet.column_widths 5, *Array.new(9) { nil }
+  end
+end

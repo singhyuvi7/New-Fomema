@@ -1,0 +1,49 @@
+- grand_total = { transaction_registration: { male: 0, female: 0 }, transaction_cancellation: { male: 0, female: 0 },transaction_rejection: { male: 0, female: 0 }, gender_change: { male: 0, female: 0 }, gender_change_rejection: { male: 0, female: 0 }, net: { male: 0, female: 0 } }
+- if @data.present?
+  - @data.each do |branch, registrations|
+    = render 'internal/reports/finance/summary_worker_registration/registration_table', branch: branch, registrations: registrations, stats: @stats.dig(branch), grand_total: grand_total
+.w-100.mt-5
+  %table.table.w-100.text-center
+    %thead
+      %tr
+        %th Report Summary
+        %th Male
+        %th Female
+        %th Grand Total
+    %tbody
+      - grand_total&.keys&.each do |selector|
+        - male_count = grand_total[selector][:male]
+        - female_count = grand_total[selector][:female]
+        %tr
+          %td.text-left= selector.to_s.humanize.upcase
+          %td{width: '20%'}= male_count
+          %td{width: '20%'}= female_count
+          %td{width: '20%'}= [male_count, female_count].sum
+
+:css
+  .w-100 {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 10px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 10px 5px;
+    vertical-align: center;
+    border: none;
+  }
+
+  .bold {
+    font-weight: bold;
+  }

@@ -1,0 +1,52 @@
+.w-100.pb-3{:style => "margin-top: 2rem;"}
+  %table.table.w-100.text-center
+    %thead
+      %tr
+        - @headers.each do |header|
+          %th= header
+    %tbody
+      - if @transactions.present?
+        - @transactions.each_with_index do |transaction, index|
+          %tr
+            %td= index + 1
+            %td= transaction.fw_code
+            %td= transaction.fw_name
+            %td= transaction.employer_code
+            %td= transaction.transaction_date
+            %td= transaction.medical_examination_date
+            %td= transaction.certification_date
+            %td= transaction.physical_height
+            %td= transaction.physical_weight
+            %td= transaction.physical_pulse
+            %td= transaction.physical_blood_pressure_systolic
+            %td= transaction.physical_blood_pressure_diastolic
+            %td= transaction.blood_group
+            %td= transaction.blood_group_rhesus
+            %td= transaction.final_result
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: none;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

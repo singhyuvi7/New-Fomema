@@ -1,0 +1,184 @@
+<div class="modal fade select2-modals" data-type="coupling" id="edit-coupling-modal" role="dialog" aria-labelledby="doctor-pairing" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk edit coupling</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <%= form_tag bulk_coupling_update_internal_transactions_path, method: :post do %>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-3">Your workers</label>
+                            <table id="edit-coupling-table" class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left"><%= check_box_tag "toggle_all_to_be_changed_coupling", "", true %></th>
+                                        <th class="text-left">Transaction Code</th>
+                                        <th class="text-left">Worker Code</th>
+                                        <th class="text-left">Worker Name</th>
+                                        <th class="text-left">Gender</th>
+                                        <th class="text-left">Current Doctor</th>
+                                        <th class="text-left">Examination Date</th>
+                                        <th class="text-left">Current Laboratory</th>
+                                        <th class="text-left">Lab Transmit Date</th>
+                                        <th class="text-left">Current X-ray Facility</th>
+                                        <th class="text-left">Xray Transmit Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <div class="px-3 pb-3">
+                                <div class="alert alert-primary">
+                                    Leave the field blank if no change.
+                                </div>
+                            </div>
+
+                            <div class="px-3 pb-3">
+                                <label class="col-form-label">New Doctor Code</label>
+                                <%= select_tag :doctor_id, options_from_collection_for_select(Doctor.where(status: 'ACTIVE').order(:code).all, 'id', 'code', params[:doctor_id]), include_blank: form_select_option_text, required: false, class: 'form-control select2' %>
+                            </div>
+
+                            <div class="px-3 pb-3">
+                                <label class="col-form-label">New Laboratory Code</label>
+                                <%= select_tag :laboratory_id, options_from_collection_for_select(Laboratory.where(status: 'ACTIVE').order(:code).all, 'id', 'code', params[:laboratory_id]), include_blank: form_select_option_text, required: false, class: 'form-control select2' %>
+                            </div>
+
+                            <div class="px-3 pb-3">
+                                <label class="col-form-label">New X-ray Facility Code</label>
+                                <%= select_tag :xray_facility_id, options_from_collection_for_select(XrayFacility.where(status: 'ACTIVE').order(:code).all, 'id', 'code', params[:xray_facility_id]), include_blank: form_select_option_text, required: false, class: 'form-control select2' %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <%= submit_tag "Save", class: "btn btn-success", id: "save-coupling-button" %>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.coupling-modal-open').click(function() {
+            $('#edit-coupling-table tbody').empty();
+            selectedWorkers = $('[name="ids[]"]:checked');
+            tableType       = $(this).attr('data-table');
+            ableToEditCouplingArr = []
+            cancelArr = []
+            rejectedArr = []
+            newPendingApprovalArr = []
+
+            doctorIds = selectedWorkers.map(function() {
+                // Check medical examination date and expiry date
+                selectedRow = $(this).closest('tr')
+                examinationDate = selectedRow.attr('data-medical-examination_date')
+                expiredAt = moment(selectedRow.attr('data-expired-at'))
+                status = selectedRow.attr('data-status')
+                transactionCode = selectedRow.attr('data-transaction-code')
+                today = moment().startOf('day')
+
+                if(examinationDate || (expiredAt && today >= expiredAt)){
+                    ableToEditCouplingArr.push(false)
+                }else{
+                    ableToEditCouplingArr.push(true)
+                }
+
+                if(status.toLowerCase() == 'cancelled'){
+                    cancelArr.push(transactionCode)
+                }
+
+                if(status == 'REJECTED'){
+                    rejectedArr.push(transactionCode)
+                }
+
+                if(status == 'NEW_PENDING_APPROVAL'){
+                    newPendingApprovalArr.push(transactionCode)
+                }
+                // End check
+
+                return $(this).attr('data-doctor').length > 0;
+            }).get();
+
+            if (selectedWorkers.length === 0) {
+                alert('Please select workers');
+                return false;
+            } else if (tableType === 'edit' && doctorIds.includes(false)) {
+                alert('You can only edit coupling for foreign workers with a paired doctor');
+                return false;
+            }
+
+            if(ableToEditCouplingArr.includes(false)){
+                alert('Unable to edit coupling for foreign worker(s) that has already taken the medical examination or medical form that are expired');
+                return false;
+            }
+
+            if(cancelArr.length > 0){
+                alert('Transaction(s) that has been cancelled are not allow to edit coupling.');
+                return false;
+            }
+
+            if(rejectedArr.length > 0){
+                alert('Transaction(s) that has been rejected are not allow to edit coupling.');
+                return false;
+            }
+
+            if(newPendingApprovalArr.length > 0){
+                alert('Transaction(s) that are pending for approval are not allow to edit coupling.');
+                return false;
+            }
+
+            i = 0;
+            tableRows = selectedWorkers.each(function() {
+
+                tableData = $(this).closest('tr').find('.edit-coupling-table-data');
+                transactionId = $(this).val();
+
+                tds = tableData.map(function() {
+                    text = $(this).attr('data-text');
+                    return `<td>${text}</td>`
+                }).get().join();
+
+                hiddenField = `<input type="hidden" name="edit_transaction_coupling[${transactionId}]" id="edit_transaction_coupling_${transactionId}" class="edit-transaction-coupling-hidden-field">`;
+                checkField  = `<td><input type="checkbox" name="to_be_changed_coupling[${transactionId}]" data-doctor="${ $(this).attr('data-doctor') }" checked="checked"></td>`;
+                hiddenTransactionIdField  = `<input type="hidden" name="transaction_id_coupling[${transactionId}]" id="transaction_id_coupling_${transactionId}" class="transaction-id-hidden-field" value="${transactionId}">`;
+
+                $('#edit-coupling-table tbody').append(`<tr>${hiddenField}${hiddenTransactionIdField}${checkField}${tds}</tr>`);
+                i += 1;
+            });
+
+            type    = $(this).attr('data-type');
+            modal   = $(`.select2-modals[data-type="${type}"]`);
+
+            bindToBeChangedCheckboxes();
+        });
+
+        // This block of code exists in internal/transactions/internal_select_doctor_functions
+        // $('.master-checkbox').change(function() {
+        //     checked = $(this).prop('checked');
+        //     $('input[name*="ids["]').prop('checked', checked);
+        // });
+
+        function bindToBeChangedCheckboxes() {
+            $('#toggle_all_to_be_changed_coupling').change(function() {
+                checked = $(this).prop('checked');
+                $('input[name*="to_be_changed_coupling["]').prop('checked', checked);
+            });
+
+            $('input[name*="to_be_changed_coupling["]').change(function() {
+                checked = $(this).prop('checked');
+                if(!$(this).is(':checked')) {
+                    $('#toggle_all_to_be_changed_coupling').prop("checked", checked);
+                }
+            });
+        }
+    </script>
+<% end %>

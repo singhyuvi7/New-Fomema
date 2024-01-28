@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Status Schedules</strong> - New Status Schedule
+    </div>
+    <%= form_for @status_schedule, url: internal_status_schedules_path do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

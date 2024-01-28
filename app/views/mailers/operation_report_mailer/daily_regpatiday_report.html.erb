@@ -1,0 +1,21 @@
+<h1>Regpatiday Report</h1>
+
+<table>
+	<thead>
+		<tr>
+			<% @headers.each do |header| %>
+				<th><%= header %></th>
+			<% end %>
+		</tr>
+	</thead>
+
+	<tbody>
+		<% @data.each do |transaction_arr| %>
+			<tr>
+				<td><%= transaction_arr['transaction_date'].to_datetime.strftime("%d-%b-%Y") %></td>
+				<td><%= transaction_arr['branch'] %></td>
+				<td><%= transaction_arr['count'] %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

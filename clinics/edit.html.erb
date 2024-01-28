@@ -1,0 +1,25 @@
+<div data-behaviour="vue">
+
+    <visitreportclinicform inline-template
+        :visit_report="<%= @visit_report.to_json(:include => { :visit_plan_item => { :include => { :visitable => { :include => [:state, :town] } } }, :visit_plan => {}, :visit_report_doctor => {}, :visit_report_visitors => {}, :operating_hour => {} }) %>"
+        :visit_report_visitors="<%= @visit_report.visit_report_visitors.to_json %>"
+        :org_users="<%= User.select("id,name").all.to_json %>"
+        :categories="<%= VisitPlan::CATEGORIES.to_json %>" >
+
+        <div class="card">
+            <div class="card-header">
+                <strong>Clinic Visit Reports</strong> - Edit Clinic Visit Report
+            </div>
+        
+            <div class="card-body">
+                <%= render 'internal/visit_reports/clinics/form', { form_method: 'PUT', form_action: internal_visit_report_clinic_update_path(@visit_report), index_path: internal_visit_report_clinics_path } %>
+            </div>
+
+            <%= render 'internal/visit_reports/shared/card_footer', { index_path: internal_visit_report_clinics_path } %>
+
+        </div>
+
+    </visitreportclinicform>
+
+    
+</div>

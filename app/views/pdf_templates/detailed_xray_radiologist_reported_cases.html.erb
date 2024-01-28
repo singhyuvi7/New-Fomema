@@ -1,0 +1,106 @@
+<pdfbody>
+    <table class="w-100">
+        <tr>
+            <td valign="top" style="font-size: 1.3em;"><b>Digital X-Ray Detailed Report for <%= current_user.code %> for period: <%= @data[:date] %></b></td>
+            <td valign="top" style="text-align: right;"><%= "Date: #{ @data[:date_today] } Time: #{ @data[:time_today] }" %> </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table id="main-table" class="w-100 collapsed-borders">
+        <thead>
+            <tr class="grey-border" style="background-color: #d3d3d3;">
+                <td valign="top"><b>No</b></td>
+                <td valign="top"><b>Report Date</b></td>
+                <td valign="top"><b><%= @data[:column3and4] %> Code</b></td>
+                <td valign="top"><b><%= @data[:column3and4] %> Name</b></td>
+                <td valign="top"><b>Trans ID</b></td>
+                <td valign="top"><b>Worker Code</b></td>
+                <td valign="top"><b>Worker Name</b></td>
+                <td valign="top"><b>Status</b></td>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% @detailed_data.each.with_index(1) do |hash, index| %>
+                <tr class="grey-border">
+                    <td valign="top"><b><%= index %></b></td>
+                    <td valign="top"><b><%= hash[:report_date].strftime("%Y-%m-%d") %></b></td>
+                    <td valign="top"><b><%= hash[:facility_code] %></b></td>
+                    <td valign="top"><b><%= hash[:facility_name] %></b></td>
+                    <td valign="top"><b><%= hash[:transaction_code] %></b></td>
+                    <td valign="top"><b><%= hash[:worker_code] %></b></td>
+                    <td valign="top"><b><%= hash[:worker_name] %></b></td>
+                    <td valign="top"><b><%= hash[:status] %></b></td>
+                </tr>
+            <% end %>
+
+            <% if @detailed_data.blank? %>
+                <tr class="grey-border">
+                    <td colspan="8" style="text-align: center;">No records found</td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+
+    <% if @detailed_data.present? %>
+        <p style="font-size: 1.2em;"><b>Total Transactions = <%= @detailed_data.size %></b></p>
+    <% end %>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 12px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    tr.grey-border td {
+        border-bottom: 1px solid grey;
+        border-right: 1px solid grey;
+        margin: 0;
+    }
+
+    table.collapsed-borders {
+        border: 1px solid black;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+    table.collapsed-borders td {
+        padding: 5px;
+    }
+
+    tbody tr td:nth-child(1) {
+        width: 2.5em;
+    }
+
+    tbody tr td:nth-child(2) {
+        width: 6.5em;
+    }
+
+    tbody tr td:nth-child(3) {
+        width: 9em;
+    }
+
+    tbody tr td:nth-child(5) {
+        width: 9.5em;
+    }
+
+    tbody tr td:nth-child(6) {
+        width: 8em;
+    }
+
+    tbody tr td:nth-child(8) {
+        width: 7em;
+    }
+
+    table, tr, td, th, tbody, thead, tfoot {
+        page-break-inside: avoid;
+    }
+
+    /*thead { display: table-row-group }*/
+</style>

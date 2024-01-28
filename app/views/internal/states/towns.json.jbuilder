@@ -1,0 +1,1 @@
+json.partial! 'internal/towns/town_with_postcode', collection: @towns, as: :town

@@ -1,0 +1,58 @@
+<%= form_for @transaction, url: extend_internal_transaction_path(@transaction), html: {class: "with-parsley"} do |form| %>
+<div class="card">
+    <div class="card-header">
+        Transaction <%= @transaction.code %> - Extend
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class='form-group'>
+                    <label for="current_expiry_date">Current Expiry Date</label>
+                    <p class="form-control-plaintext"><%= @transaction.expired_at.strftime('%d/%m/%Y') %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class='form-group'>
+                    <label for="new_expiry_date">New Expiry Date</label>
+                    <p class="form-control-plaintext"><%= @transaction.calculate_extend_date.strftime('%d/%m/%Y') %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fee_id" class="required">Fee</label>
+                    <select name="fee_id" id="fee_id" class="form-control select2" required onchange="fee_changed(this)" data-parsley_errors_container="#select2_parsley_error__fee_id" data-parsley_class_handler=".select2-selection--single[aria-labelledby='select2-fee_id-container']" data-parsley_group="fee_id">
+                        <option value=""><%= form_select_option_text %></option>
+                        <% Fee.where("code in (?)", ["EXTEND_TRANSACTION", "FOC"]).each do |fee| %>
+                            <option value="<%= fee.id %>" data-amount="<%= fee.amount %>"<%= ' selected' if @fee.id == fee.id %>><%= fee.name %></option>
+                        <% end %>
+                    </select>
+                    <div id="select2_parsley_error__fee_id"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fee_id" class="required">Amount</label>
+                    <input type="number" step="0.01" min="0" name="amount" id="amount" value="<%= @fee.amount || 0 %>" class="form-control" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(internal_transactions_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+</div>
+<% end %>
+<% content_for :page_end_scripts do %>
+<script>
+function fee_changed(sel)
+{
+    $('#amount').val(sel.options[sel.selectedIndex].getAttribute('data-amount'));
+}
+</script>
+<% end %>

@@ -1,0 +1,132 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= @filename %></strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+        <%= render partial: "shared/reports/report_cronjob_settings" %>
+        <div>
+            <% if @link.present? %>
+                <%= link_to "link", @link, class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% end %>
+        </div>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+            <% if @download_format.present? && @download_format == :pdf %>
+                <%= link_to "Download as PDF", "#{ request.path }.pdf#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% elsif @excel.present? %>
+                <%= link_to "Download as excel", "#{ request.path }.xlsx#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% elsif @csv.present? %>
+                <%= link_to "Download CSV", "#{ request.path }.csv#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% end %>
+
+            <% if @filter_options.present? %>
+                <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+                <%= render partial: "shared/reports/report_filter_options" %>
+            <% end %>
+        <% end %>
+    </div>
+
+    <%
+        all_csvs =
+            if @excel.present?
+                @excel
+            else
+                [@csv]
+            end
+
+        @extended_headers ||= 1 # Note, @extended_headers does not work well with @excel, if @excel has more than 1 worksheet. It only works correctly if there is one row header in each worksheet.
+        @extended_customs ||= Hash.new # Please note, @extended_customs is only meant to be used with single worksheet excels, or @csv.
+    %>
+
+    <% all_csvs.compact.each do |csv| %>
+        <%
+            presplit        = csv.map {|row| row.class == Hash ? row[:data] : row }
+
+            # New support, if this array is included, then it will split it into multiple preview tables.
+            # Currently only used for NF-1325, because of user request.
+            split_up_rows   = presplit.split([:next_table])
+
+            split_up_rows.each do |rows|
+                max_size    = rows.map(&:size).max
+                rows.map! {|row| [row, Array.new(max_size - row.size)].flatten }
+                @customized_column_sizes = @extended_customs.transform_keys {|key| key < 0 ? rows.size + key : key }
+        %>
+
+        <div class="card-body">
+            <% if @displayed_size.present? %>
+                <p><%= @displayed_size %></p>
+            <% end %>
+
+            <div class="w-100 pb-3" style="overflow-x: auto;">
+                <table id="preview-csv-table" class="table-borders w-100">
+                    <thead>
+                        <% (0...@extended_headers).each do |header_index| %>
+                            <%
+                                headers = rows[header_index]
+
+                                if headers.select(&:present?).size < 2 # If there is only one or zero columns on the first row, expand it so that its at full width.
+                                    thead_span  = headers.size
+                                    headers     = headers.select(&:present?)
+                                else
+                                    thead_span  = 1
+                                end
+                            %>
+
+                            <tr>
+                                <% headers.each do |header| %>
+                                    <th colspan="<%= thead_span %>"><%= header %></th>
+                                <% end %>
+                            </tr>
+                        <% end %>
+                    </thead>
+
+                    <tbody>
+                        <% data = rows[@extended_headers..-1] %>
+
+                        <% data.each.with_index(@extended_headers) do |row, index| %>
+                            <%
+                                custom_size = @customized_column_sizes[index]
+
+                                if custom_size.present?
+                                    if custom_size.include?(:fill)
+                                        fill_index  = custom_size.find_index(:fill)
+                                        custom_size[fill_index] = row.size - (custom_size - [:fill]).sum
+                                    end
+
+                                    row = row.select(&:present?)
+                                end
+                            %>
+
+                            <tr>
+                                <% row.each_with_index do |datum, column_index| %>
+                                    <td colspan="<%= custom_size[column_index] if custom_size.present? %>"><%= datum %></td>
+                                <% end %>
+                            </tr>
+                        <% end %>
+
+                        <% if data.blank? %>
+                            <tr>
+                                <td colspan="<%= rows[-1].size %>">No data found</td>
+                            </tr>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <% end %>
+    <% end %>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

@@ -1,0 +1,27 @@
+<div class="card">
+    <div class="card-header">
+        Filter
+    </div>
+    <%= form_tag new_dxlr_internal_mspd_reports_path, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="registration_approved_at_from" class="col-sm-3 col-form-label required">Registration Approved Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" class="form-control" name="registration_approved_at_from" id="registration_approved_at_from" value="<%= params[:registration_approved_at_from] %>" required>
+                                <div class="input-group-append"><label class="input-group-text" for="registration_approved_at_to"> To </label></div>
+                                <input type="date" class="form-control" name="registration_approved_at_to" id="registration_approved_at_to" value="<%= params[:registration_approved_at_to] %>" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button new_dxlr_internal_mspd_reports_path %>
+            <%=raw filter_button %>
+        </div>
+    <% end %>
+</div>

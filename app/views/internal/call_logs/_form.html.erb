@@ -1,0 +1,151 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @call_log } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :status) %>
+                <%= form.label :status %>
+                <%= form.select :status, options_for_select(CallLog::STATUSES.invert, @call_log.status), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :callable_type, "Type", class: 'required' %>
+                <%= form.select :callable_type, options_for_select(CallLog::CALLABLE_TYPES.invert, @call_log.callable_type), {include_blank: form_select_option_text}, {class: 'form-control', required: true} %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :callable_id, "Code", class: 'required' %>
+                <%= form.text_field :callable_id, required: true, style: "display: none;", data: {parsley_errors_container: "#recipient_code_container"} %>
+                <div class="input-group">
+                    <%= text_field_tag "call_log_callable_display", @call_log.callable&.id ? "#{@call_log.callable&.name} (#{@call_log.callable&.code})" : "", class: "form-control", readonly: true %>
+                    <span class="input-group-append">
+                        <button id="select-callable-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#search-callable-modal">Select Recipient</button>
+                    </span>
+                </div>
+                <div id="recipient_code_container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :created_by) %>
+                <%= form.label :created_by, "Call By" %>
+                <%= form.select :created_by, options_from_collection_for_select(@creators, :id, :name, @call_log.created_by), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :called_at, "Call Time", class: "required" %>
+                <input type="datetime-local" name="call_log[called_at]" class="form-control" value="<%= @call_log.called_at&.strftime('%Y-%m-%dT%H:%M') %>" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :discussant_name, "Discussant Name", class: "required" %>
+                <%= form.text_field :discussant_name, class: "form-control", required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :phone, "Telephone Number", class: "required" %>
+                <%= form.text_field :phone, class: "form-control", required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :email %>
+                <%= form.text_field :email, class: "form-control" %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :fax, "Fax Number" %>
+                <%= form.text_field :fax, class: "form-control" %>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :call_log_case_type_id) %>
+                <%= form.label :call_log_case_type_id, "Case Type", class: "required" %>
+                <%= form.select :call_log_case_type_id, options_from_collection_for_select(@call_log_case_types, :id, :description, @call_log.call_log_case_type_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :issue %>
+                <%= form.text_area :issue, class: "form-control", rows: "5" %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :comment, "Remarks" %>
+                <%= form.text_area :comment, class: "form-control", rows: "5" %>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.card-body -->
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_call_logs_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#select-callable-button').click(function () {
+    $('#search_callable_type').val($('#call_log_callable_type').val());
+});
+
+function select_callable(btn)
+{
+    var callable = JSON.parse(decodeURIComponent($(btn).attr('data-callable')));
+    $('#call_log_callable_id').val(callable.id);
+    $('#call_log_callable_display').val(callable.name + " (" + callable.code + ")");
+    $('#search-callable-modal').modal('toggle');
+}
+</script>
+<% end %>

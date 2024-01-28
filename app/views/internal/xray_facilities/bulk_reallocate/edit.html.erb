@@ -1,0 +1,223 @@
+<div data-behaviour="vue">
+
+    <xrayfacilitybulkreallocateform inline-template
+    :xray_facility="<%= @xray_facility.to_json %>"
+    :doctors="<%= Doctor.where(:xray_facility_id => @xray_facility.id).all.order('status ASC, name ASC').to_json(:include => {:xray_facility => {}}) %>"
+    :xray_facilities="<%= XrayFacility.all.to_json %>"
+    :search_route="'<%= search_xray_facility_internal_xray_facilities_path %>'"
+    :states="<%= State.select("name, id").all.to_json %>"
+    >
+
+            <div class="card">
+                <div class="card-header">
+                    <strong>Xray Facility</strong> - Bulk Re-Allocation
+                </div>
+                
+                <div class="card-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Search Xray Facility</strong>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label for="xray_code" class="col-sm-3 col-form-label">Code</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="xray_code" id="xray_code"
+                                                v-model="search_data.code">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label for="xray_name" class="col-sm-3 col-form-label">Name</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="xray_name" id="xray_name"
+                                                v-model="search_data.name">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label for="state_id" class="col-sm-3 col-form-label">State</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2 w-100" name="state_id" id="state_id"
+                                                style="width: 100% !important">
+                                                <option value="">Select option</option>
+                                                <option :value="state.id" v-for="state in states">{{ state.name }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label for="town_id" class="col-sm-3 col-form-label">Town</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2 w-100" name="town_id" id="town_id"
+                                                style="width: 100% !important">
+                                                <option value="">Select option</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label for="postcode" class="col-sm-3 col-form-label">Postcode</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="postcode" id="postcode"
+                                                v-model="search_data.postcode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-sm btn-primary float-right m-1" @click="search()">Search</button>
+
+                            <!-- Xray -->
+                            <div class="table-responsive">
+                                <table class="<%= index_table_class %>">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Xray Facility Code</th>
+                                            <th>Xray Facility Name</th>
+                                            <th>State</th>
+                                            <th>Town</th>
+                                            <th>Postcode</th>
+                                            <th>Clinic(s) No.</th>
+                                            <th>Worker Allocated</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="xray_facilities.length <= 0">
+                                            <td colspan="11" class="text-danger">No records found.</td>
+                                        </tr>
+                                        <tr v-for="(xray_facility, index) in xray_facilities">
+                                            <td class="module-row-numbers">{{ index+1 }}</td>
+                                            <td>{{ xray_facility.code }}</td>
+                                            <td>{{ xray_facility.name }}</td>
+                                            <td>{{ xray_facility.state.name }}</td>
+                                            <td>{{ xray_facility.town.name }}</td>
+                                            <td>{{ xray_facility.postcode }}</td>  
+                                            <td>
+                                                <div>Total - {{ xray_facility.doctors.length }}</div>
+                                                <div>Active - {{ xray_facility.doctors.filter(x => x.status == 'ACTIVE').length }}</div>
+                                                <div>Inactive - {{ xray_facility.doctors.filter(x => x.status == 'INACTIVE').length  }}
+                                            </div>
+                                            </td>
+                                            <td>{{ totalWorkerAllocated(xray_facility.doctors) }}</td>
+                                            <td>{{ xray_facility.status }}</td>
+                                            <td>
+                                                <a class="btn btn-secondary btn-sm" target="_blank" :href="'/xray_facilities/'+xray_facility.id">Details</a>
+                                                <button class="btn btn-info btn-sm" type="button" v-on:click="apply(xray_facility)">Apply</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- end Xray -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <strong>Doctors (Total - {{ listed_doctors.length }}, Active - {{ listed_doctors.filter(x => x.status == 'ACTIVE').length }}, Inactive - {{ listed_doctors.filter(x => x.status == 'INACTIVE').length }})</strong>
+                            <button class="btn btn-secondary btn-sm float-right" type="button" v-on:click="revert"
+                                        title="Revert"><i class="fa fa-undo-alt"></i> Revert</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="<%= index_table_class %>">
+                                            <thead>
+                                                <tr>
+                                                    <th class="module-row-numbers"><input type="checkbox" v-model="selectAll"></th>
+                                                    <th class="text-center">#</th>
+                                                    <th>Doctor Code</th>
+                                                    <th>Doctor Name</th>
+                                                    <th>Clinic Name</th>
+                                                    <th>Worker Allocated</th>
+                                                    <th>Status</th>
+                                                    <th>Current Xray Facility</th>
+                                                    <th>New Xray Facility</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-if="listed_doctors.length <= 0">
+                                                    <td colspan="11" class="text-danger">No records found.</td>
+                                                </tr>
+                                                <tr v-for="(item, index) in listed_doctors">
+                                                    <td class="text-center"><input type="checkbox" :value="item" v-model="selected_doctors"></td>
+                                                    <td class="text-center">{{ index+1 }}</td>
+                                                    <td><a :href="'/doctors/'+item.id" target="_blank">{{ item.code }}</a></td>
+                                                    <td>{{ item.name }}</td>
+                                                    <td>{{ item.clinic_name }}</td>
+                                                    <td>{{ item.quota_used }}</td>
+                                                    <td>{{ item.status }}</td>
+                                                    <td><a :href="'<%= internal_xray_facility_path %>'" target="_blank">{{ item.xray_facility.name+' ('+item.xray_facility.code+')' }}</a></td>
+                                                    <td v-if="item.new_facility"><a :href="'/xray_facilities/'+item.new_facility.id" target="_blank">{{ item.new_facility.name+' ('+item.new_facility.code+')' }}</a></td>
+                                                    <td v-if="!item.new_facility">-</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+
+                <form ref="xray_facility_form" method="POST" action="<%= bulk_reallocate_update_internal_xray_facilities_path(@xray_facility) %>">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                    <input type="hidden" name="_method" value="PUT">
+
+                <select multiple name="doctors[]" id="hidden_doctors" class="hidden">
+                    <option selected="selected" v-for="(item, index) in listed_doctors" :value="JSON.stringify(item)">{{ item.name }}</option>
+                </select> 
+
+                <div class="card-footer">
+                    <div class="text-right">
+                        <%=raw edit_back_button(internal_xray_facility_path(@xray_facility)) %>
+                        <button v-if="listed_doctors.length > 0"  @click="submit" type="button" class="btn btn-warning btn-sm"><i class="icon-flag"></i>Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </xrayfacilitybulkreallocateform>
+</div>
+<script src="/js/jquery-3.4.1.slim.js"></script>
+<script>
+    $( document ).ready(function() {
+        $('#state_id').change(function () {
+
+            $('#town_id').html('<option value><%= form_select_option_text %></option>');
+
+            if (this.value) {
+                
+                $.ajax({
+                    url: '/states/' + this.value + '/towns.json',
+                    method: "GET",
+                }).done(function (data) {
+                    $.each(data, function (idx, town) {
+                        $('#town_id').append('<option value="' + town.id + '" data-postcode_id="' + town.postcode_id + '" data-postcode_code="' + town.postcode_code + '">' + town.name + '</option>');
+                    });
+                });
+            }
+        });
+    });
+</script>
+

@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "MSPD_INACTIVE_GROUP_IN_X_DAYS" %>"><%= @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "MSPD_INACTIVE_GROUP_IN_X_DAYS", @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].value %></p>
+</div>

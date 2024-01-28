@@ -1,0 +1,151 @@
+<div class="modal fade select2-modals" data-type="xray" id="change-xray-facility-modal" role="dialog" aria-labelledby="xray-pairing" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select X-Ray Facility</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <%= form_tag search_for_xray_facilities_shared_index_path, method: :post, remote: true, class: "facilities-filter-form", data: { type: "xray_facilities" } do %>
+                <div class="modal-body">
+                    <%= hidden_field_tag :per, "", class: "ajax-input" %>
+                    <%= hidden_field_tag :page, "", class: "ajax-input" %>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <label class="col-form-label mb-4">Search for X-ray Facilities</label>
+
+                            <div class="row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4"><%= text_field_tag :code, "", placeholder: "Code", class: "form-control ajax-input" %></div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4"><%= text_field_tag :name, "", placeholder: "Name", class: "form-control ajax-input" %></div>
+                            </div>
+​
+                            <%= render 'internal/shared/filter_state_postcode_town' %>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <div class="btn btn-secondary clear-filters" data-type="xray_facilities">Clear filters</div>
+                            <%= submit_tag "Search", class: "btn btn-primary filter-facilities-search", data: { type: "xray_facilities" } %>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-3">Search results</label>
+
+                            <table class="table shared-search-table-results" data-type="xray_facilities">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>State</th>
+                                        <th>Town</th>
+                                        <th>Postcode</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="xray-facilities-search-results">
+                                    <tr>
+                                        <td colspan="6">Search X-ray Facilities</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pagination-holder" class="modal-body"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.clear-filters').click(function() {
+            $(`.facilities-filter-form[data-type="xray_facilities"] .ajax-input`).val('');
+        });
+
+        $('.filter-facilities-search[data-type="xray_facilities"]').click(function(e) {
+            var type    = $(this).attr('data-type');
+            var form    = $(this).closest('form');
+            form.find('#xray-facilities-search-results').html('<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin text-primary font-size-14 text-center"></i></td></tr>')
+
+            var data    = $(`.facilities-filter-form[data-type="xray_facilities"]`).find('input.ajax-input, select.ajax-input').map(function() {
+                return {key: $(this).attr('name'), val: $(this).val()};
+            }).get().reduce(function(map, obj) {
+                map[obj.key] = obj.val;
+                return map;
+            }, {});
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: data,
+            })
+            .done(function(response) {
+                var searchResults = $(`.shared-search-table-results[data-type="xray_facilities"] tbody#xray-facilities-search-results`);
+                searchResults.html(response);
+                form.find('#pagination-holder').html($(`<div>${ response }</div>`).find('#pagination-response'));
+                $(`.filter-facilities-search[data-type="xray_facilities"]`).removeAttr('disabled');
+
+                searchResults.find('.select-xray-facility').click(function() {
+                    var btn     = $(this);
+                    var id      = btn.attr('data-id');
+                    var name    = btn.attr('data-name');
+                    var code    = btn.attr('data-code');
+                    $('#medical_appeal_xray_facility_id, #selected_xray_facility_id').val(id);
+                    $('#selected-xray-name-code').html(`${ name } (<b>${ code }</b>)`);
+                    $('#change-xray-facility-modal').modal('hide');
+
+                    var infoDialog = $('#dialog-selected-xray-facility');
+
+                    if (infoDialog.length > 0) {
+                        $(['code', 'name', 'email', 'phone', 'license_holder_name', 'address']).each(function() {
+                            $(`td[data-type="${ this }"]`).text(btn.attr(`data-${ this }`));
+                        });
+                    }
+                });
+
+                form.find('#pagination-response .dropdown-menu a.dropdown-item').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).attr('href').includes('per=')) {
+                        var perPage = $(this).attr('href').match(/per=(\d+)/)[1];
+                        form.find('#per').val(perPage);
+                    } else {
+                        form.find('#per').val('');
+                    }
+
+                    form.find('#page').val('');
+                    form.find('.filter-facilities-search').click();
+                });
+
+                form.find('#pagination-response .pagination a.page-link').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).attr('href') === undefined) {
+                        form.find('#page').val('');
+                    } else if ($(this).attr('href').includes('page=')) {
+                        var page = $(this).attr('href').match(/page=(\d+)/)[1];
+                        form.find('#page').val(page);
+                    } else {
+                        form.find('#page').val('');
+                    }
+
+                    form.find('.filter-facilities-search').click();
+                });
+            });
+        });
+    </script>
+<% end %>

@@ -1,0 +1,32 @@
+<% if has_permission?("VIEW_ADDITIONAL_INFO_ABOVE_WORKER_INFORMATION") %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Foreign Worker Details</strong>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <%
+                    [
+                        { title: "Worker Code",         value: @transaction&.fw_code },
+                        { title: "Worker Name",         value: @transaction&.fw_name },
+                        { title: "Country of Origin",   value: @transaction&.fw_country&.name },
+                        { title: "Passport Number",     value: @transaction&.fw_passport_number }
+                    ].each do |hash|
+                %>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b><%= hash[:title] %></b></p>
+                            </div>
+
+                            <div class="col-md-8">
+                                <p><%= hash[:value] %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+<% end %>

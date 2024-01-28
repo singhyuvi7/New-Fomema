@@ -1,0 +1,58 @@
+<div>
+
+    <p>Dear Sir/Madam,</p>
+    <p style="border-bottom: 2px solid black;"><b>
+        NOTICE OF REPATRIATION OF "UNSUITABLE" FOREIGN WORKERS AFTER FOMEMA MEDICAL EXAMINATION<br>
+    </b></p>
+        NAME: <%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">In reference to the matter above, please be informed that the result of FOMEMA medical examination for the abovementioned foreign worker
+        is <b>"NOT SUITABLE"</b> to work in Malaysia due to the following reason:</p>
+
+       <ul>
+            <% @data[:failed_reasons_bi].each do |reason| %>
+                <li><b><%= reason %></b></li>
+            <% end %>
+        </ul>
+    <p class="paragraph-spacing text-justify">You are advised immediately to arrange all necessary preparation for repatriation and submit the flight/ferry ticket for the issuance of the Check-Out Memo (COM) online via the
+        <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a>  OR at any nearest Immigration Office for a proper
+        repatriation of the said foreign worker.
+        <br><br>
+        Your cooperation in this matter is greatly appreciated.<br><br>
+        Thank you
+        <br>
+    <p>
+
+    <hr>
+
+    <p>Tuan/Puan,</p>
+
+    <p style="border-bottom: 2px solid black;"><b>
+        NOTIS PENGHANTARAN PULANG KE NEGARA ASAL UNTUK PEKERJA ASING DIDAPATI TIDAK SESUAI SELEPAS PEMERIKSAAN KESIHATAN FOMEMA<br>
+    </b></p>
+    NAMA: <%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %>
+
+    <p class="paragraph-spacing text-justify">
+        Merujuk kepada perkara di atas, dengan dukacitanya dimaklumkan bahawa keputusan pemeriksaan kesihatan (FOMEMA) bagi pekerja asing tersebut
+        adalah <b>"TIDAK SESUAI”</b>untuk bekerja di Malaysia kerana sebab yang berikut:</p>
+
+        <ul>
+            <% @data[:failed_reasons_bm].each do |reason| %>
+                <li><b><%= reason %></b></li>
+            <% end %>
+        </ul>
+
+    <p class="paragraph-spacing text-justify">
+        Pihak tuan/puan dinasihatkan untuk melakukan segala persiapan penghantaran pulang pekerja asing tersebut dengan kadar segera serta mengemukakan tiket penerbangan/feri
+        secara dalam talian melalui <a href="https://imigresen-online.imi.gov.my/">https://imigresen-online.imi.gov.my/</a> ATAU di mana-mana Pejabat
+        Imigresen terdekat bagi mendapatkan Memo Periksa Keluar (COM) bagi tujuan penghantaran pulang secara teratur.
+        <br><br>
+        Kerjasama dan keprihatinan pihak tuan/puan dalam perkara ini amat dihargai.<br><br>
+        Sekian, terima kasih.
+        <br>
+    </p>
+
+    <%= image_tag attachments["fomema-logo.png"].url, width: 70, height: 30 %>
+    <br><br>
+    <p>***This is an auto generated email. Do not reply to this email.***</p>
+</div>

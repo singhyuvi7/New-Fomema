@@ -1,0 +1,35 @@
+<p>
+    <b>Dear <%= @customer&.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @customer&.name %></i></b>,
+</p>
+
+<% if @refund.approval_decision == 'APPROVE' %>
+    <p>
+        Please be informed that your refund already being created and being process for our next action.
+    </p>
+<% else %>
+    <p>
+        Please be informed, we already receive your refund application. Unfortunately, your request had been rejected. <br>
+        <i>Dimaklumkan bahawa proses permohonan Bayaran Balik anda telah diterima. Permohonan anda gagal.</i>
+    </p>
+
+    <p>
+        Upon checking, there is no payment being credited to our account as per your payment slip attached. <br>
+        <i>Setelah diperiksa, tiada pembayaran yang dikreditkan ke akaun kami seperti pembayaran slip yang dilampirkan.</i>
+    </p>
+
+    <p>
+        Kindly verify your account statement and provide correct bank in slip for our reference. <br>
+        <i>Sila periksa penyata akaun anda dan kemukakan pembayaran slip bank yang betul untuk rujukan kami.</i>
+    </p>
+<% end %>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih.</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

@@ -1,0 +1,691 @@
+<div class="card-body">
+
+    <%=render "/shared/all_flash" %>
+    <%=render 'shared/all_validation_flash', { model_obj: @doctor } %>
+
+    <% if ["edit", "update"].include?(params[:action]) && @doctor.change_address_pending_order %>
+        <div class="alert alert-danger">
+            There is an order <%= @doctor.change_address_pending_order.code %> is pending for payment. Kindly check before proceed with the changes.
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_NON_FINANCE_INFO_DOCTOR" %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :title_id, "Title" %>
+                    <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :name, "Name", class: 'required' %>
+                    <%= form.text_field :name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z][^0-9]*", parsley_pattern_message: "Must not begin with a special characters and no numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :icno, "ICNO", class: 'required' %>
+                    <%= form.text_field :icno, class: 'form-control', required: true, data: { parsley_maxlength: "20", parsley_maxlength_message: "Maximum length of 20 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "No special characters allowed" } %>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :clinic_name, "Clinic Name", class: 'required' %>
+                    <%= form.text_field :clinic_name, class: 'form-control', required: true, data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :nationality_id, "Nationality", class:'required'%>
+                    <%= form.select :nationality_id, options_from_collection_for_select(Country.order(:name).all, 'id', 'name', form.object.nationality_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :race_id, "Race/Ethnic", class:'required'%>
+                    <%= form.select :race_id, options_from_collection_for_select(Race.order(:name).all, 'id', 'name', form.object.race_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :gender,"Gender", class: "required" %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline">
+                            <%= form.radio_button(:gender, "M", class: "critical-field form-check-input", required: true) %>
+                            <label class="form-check-label" for="doctor_gender_m">Male</label>
+                            &emsp;
+                            <%= form.radio_button(:gender, "F", class: "critical-field form-check-input", required: true) %>
+                            <label class="form-check-label" for="doctor_gender_f">Female</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :company_name, "Company Name" %>
+                    <%= form.text_field :company_name, class: 'form-control', data: { parsley_maxlength: "150", parsley_maxlength_message: "Maximum length of 150 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :business_registration_number, "Business Registration Number", class: "#{"required" if !form.object.company_name.blank?}" %>
+                    <%= form.text_field :business_registration_number, class: 'form-control', required: !form.object.company_name.blank?, data: { parsley_maxlength: "30", parsley_maxlength_message: "Maximum length of 30 characters", parsley_pattern: "[a-zA-Z0-9]+", parsley_pattern_message: "No special characters allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- address -->
+        <% [:address1, :address2, :address3, :address4].each_with_index do |sym, index| %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <% if index == 0 %>
+                            <%= form.label :address, class: "required" %>
+                        <% end %>
+
+                        <%= form.text_field sym, class: "form-control", required: index == 0, data: { parsley_pattern: "[a-zA-Z0-9@.&#,()-/\s]+", parsley_pattern_message: "Only alphabets, numbers, hypens (-), fullstops (.), comma (,), alias (@), ampersand (&), hash (#) and slashes (/) are allowed" } %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+        <!-- /address -->
+
+        <%= render 'internal/shared/form_state_postcode_town', {form: form} %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :phone, "Phone Number", class: 'required' %>
+                    <%= form.text_field :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :fax, "Fax Number" %>
+                    <%= form.text_field :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :mobile, "Mobile Number" %>
+                    <%= form.text_field :mobile, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :email, class: 'required' %>
+                    <%= form.email_field :email, class: 'form-control', required: true, data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :qualification, class: 'required' %>
+                    <%= form.text_field :qualification, class: 'form-control', required: true, data: { parsley_maxlength: "50", parsley_maxlength_message: "Maximum length of 50 characters", parsley_pattern: "^[a-zA-Z0-9].*", parsley_pattern_message: "Must not begin with a special characters" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :renewal_agreement_date, "Renewal Agreement Date" %>
+                    <%= form.date_field :renewal_agreement_date, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :apc_number, "APC Number", class: 'required' %>
+                    <%= form.text_field :apc_number, class: 'form-control', required: true, maxlength: '7', data: { parsley_maxlength: "7", parsley_maxlength_message: "Maximum length of 7 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :apc_year, "APC Year", class: 'required' %>
+                    <%= form.number_field :apc_year, class: 'form-control', required: true, min: 1900, max: 2099, maxlength: '4', data: { parsley_maxlength: "4", parsley_maxlength_message: " Maximum length of 4 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :doctor_association, "Doctor's Association",class: 'required' %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_doctor_association,true, class: "has_doctor_association form-check-input", required:true %>
+                            <label class="form-check-label" for="doctor_has_doctor_association_true">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_doctor_association,false, class: "has_doctor_association form-check-input" %>
+                            <label class="form-check-label" for="doctor_has_doctor_association_false">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :associations) %>
+                    <%= form.label :associations, "Name Of Association", class: 'name_of_association' %>
+                    <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Add Selection"><i class="fa fa-info"></i></span>
+                    <select name="doctor[associations][]" id="doctor_associations" class="form-control select2" required multiple data-parsley-multiple="doctor[associations][]" data-select2-id="doctor_associations" data-parsley-errors-container="#select2_parsley_error__<%= field_id %>" data-parsley-class-handler='.select2-selection--multiple' data-parsley-group="doctor_associations">
+                        <%
+                            arrAssociation=[]
+                            if !form.object.associations.nil?
+                                form.object.associations["association"].each do |association_id|
+                                    if !association_id.blank?
+                                        arrAssociation << association_id
+                                    end
+                                end
+                            end
+                        %>
+                        <% Association.order(name: :asc).all().each do |ar| %>
+                            <option value="<%= ar.id %>" data-code="<%= ar.code %>"<%= " selected" if (arrAssociation || []).include?(ar.id.to_s) %>><%= ar.name %></option>
+                        <% end %>
+                    </select>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :district_health_office_id, "Nearest District Health Office" %>
+                    <%= form.select :district_health_office_id, options_from_collection_for_select(DistrictHealthOffice.order(:name).all, 'id', 'name', form.object.district_health_office_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :fp_device) %>
+                    <%= form.label :fp_device, "FP Device", class: 'required' %>
+                    <%= form.select :fp_device, options_for_select(Doctor::FP_DEVICES.invert, form.object.fp_device), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :paid_biometric_device, "Paid for Biometric Device",class: 'required' %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :paid_biometric_device, true, class: "paid_biometric_device form-check-input", required:true %>
+                            <label class="form-check-label" for="paid_biometric_device_true">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :paid_biometric_device, false, class: "paid_biometric_device form-check-input" %>
+                            <label class="form-check-label" for="paid_biometric_device_false">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :annual_quota, class: 'required' %>
+                    <%= form.text_field :quota, class: 'form-control', required: true, maxlength: '4', data: { parsley_maxlength: "4", parsley_maxlength_message: "Maximum length of 4 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }, onClick: "$('#annual_quota_tooltip').fadeIn();" %>
+                    <br>
+
+                    <% if @doctor.persisted? %>
+                        <p class="border p-2" id="annual_quota_tooltip" style="display: none;">You are not advised to increase quota in this field. Please do so using the <b>Assign Quota</b> button in the <%= link_to "Doctor's Listing page", internal_doctors_path %></p>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Assigned Quota</label>
+                    <!-- <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.3em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="Additional quota assigned to this doctor. If the value is negative, it lowers the quota instead. Resets to 0 at the start of each year."></i> -->
+                    <p><%= @doctor.quota_modifier %></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Used Quota</label>
+                    <!-- <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.3em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="Quota already used for this doctor this year. Resets to 0 at the start of each year."></i> -->
+                    <p><%= @doctor.quota_used + @doctor.quota_pending_on_order %></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Quota</label>
+                    <!-- <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.3em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="This is the quota that user's see. It is calculated by 'Annual quota' + 'Assigned quota'."></i> -->
+                    <p><%= @doctor.displayed_quota %></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Available Quota</label>
+                    <!-- <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.3em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="This is the available quota that the doctor has remaining. It is calculated by 'Annual quota' + 'Assigned quota' - 'Used quota'."></i> -->
+                    <p><%= @doctor.available_quota %></p>
+                </div>
+
+                <br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :solo_clinic, "No of Solo Clinics" %>
+                    <%= form.number_field :solo_clinic, class: 'form-control' %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :group_clinic, "No of Group Clinics" %>
+                    <%= form.number_field :group_clinic, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :has_xray, "Own X-Ray Clinic" %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_xray, true, class: "form-check-input" %>
+                            <label class="form-check-label" for="doctor_has_xray_true">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_xray, false, class: "form-check-input" %>
+                            <label class="form-check-label" for="doctor_has_xray_false">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :has_selected_re_medical, "Selected For Re-Medical " %>
+                    <div class="col-form-label">
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_selected_re_medical, true, class: "form-check-input" %>
+                            <label class="form-check-label" for="doctor_has_selected_re_medical_true">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-3">
+                            <%= form.radio_button :has_selected_re_medical, false, class: "form-check-input" %>
+                            <label class="form-check-label" for="doctor_has_selected_re_medical_false">No</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% if has_permission?("EDIT_PAIRING_DOCTOR") and !["new", "create"].include?(params[:action]) %>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :xray_facility_id, "X-Ray Facility" %>
+                        <%= form.select :xray_facility_id, options_from_collection_for_select(XrayFacility.order(:code).all, 'id', 'code', @doctor.xray_facility_id), {include_blank: form_select_option_text}, class: 'form-control select2',input_html: { "data-tooltip" => true, :class => "has-tip", :title => "Bla bla bla" } %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :laboratory_id, "Laboratory" %>
+                        <%= form.select :laboratory_id, options_from_collection_for_select(Laboratory.order(:code).all, 'id', 'code', @doctor.laboratory_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary pairing-modal-open float-right" data-toggle="modal" data-target="#xray-pairing-modal" data-type="xray">Edit</button>
+                    <%= form.label :xray_facility_pairing_recommendations, "X-Ray Facility Pairing Recommendations" %>
+                    <%= hidden_field_tag :xray_facility_pairing_recommendations, @xray_facilities.map(&:id).join(","), class: "pairing-input-field", data: {type: "xray"} %>
+                    <p class="ml-4 blank-selected-placeholder <%= "hidden" if @xray_facilities.present? %>" data-type="xray">No x-ray facilities selected</p>
+
+                    <ul class="list-parent" data-type="xray" id="xray-list">
+                        <% @xray_facilities.map(&:name).each do |name| %>
+                            <li><%= name %></li>
+                        <% end %>
+                    </ul>
+                    <p id="xray-warning"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary pairing-modal-open float-right" data-toggle="modal" data-target="#laboratory-pairing-modal" data-type="laboratory">Edit</button>
+                    <%= form.label :laboratory_pairing_recommendations, "Laboratory Pairing Recommendations" %>
+                    <%= hidden_field_tag :laboratory_pairing_recommendations, @laboratory_facilities.map(&:id).join(","), class: "pairing-input-field", data: {type: "laboratory"} %>
+                    <p class="ml-4 blank-selected-placeholder <%= "hidden" if @laboratory_facilities.present? %>" data-type="laboratory">No laboratories selected</p>
+
+                    <ul class="list-parent" data-type="laboratory" id="laboratory-list">
+                        <% @laboratory_facilities.map(&:name).each do |name| %>
+                            <li><%= name %></li>
+                        <% end %>
+                    </ul>
+                    <p id="laboratory-warning"></p>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_FINANCE_INFO_DOCTOR" %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :male_rate, "Male Worker Rate (RM)", class: 'required' %>
+                    <%= form.text_field :male_rate, class: 'form-control', required: true %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :female_rate, "Female Worker Rate (RM)", class: 'required' %>
+                    <%= form.text_field :female_rate, class: 'form-control', required: true %>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :payment_method_id) %>
+                    <%= form.label :payment_method_id, "Payment Method", class: 'required' %>
+                    <%= form.select :payment_method_id, PaymentMethod.where("category = 'OUT'").order(:name).all.map{ |c| [c.name, c.id, { 'data-code' => c.code} ] }, {include_blank: form_select_option_text}, {class: "form-control select2",required: true, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id} } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <% field_id = generate_field_id(form, :bank_id) %>
+                    <%= form.label :bank_id, class: 'bank-id' %>
+                    <%= form.select :bank_id, options_from_collection_for_select(Bank.where(status: 'ACTIVE').where.not(routing: [nil, '']).order(:name).all, 'id', 'name', form.object.bank_id), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                    <div id="select2_parsley_error__<%= field_id %>"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_account_number, "Bank Account Number", class: 'bank-account-number' %>
+                    <%= form.text_field :bank_account_number, class: 'form-control' %>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :bank_payment_id, "Bank Payment ID", class: 'bank_payment_id' %>
+                    <%= form.text_field :bank_payment_id, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= form.label :email_payment, "Email (Payment)", class: 'email_payment' %>
+                    <%= form.email_field :email_payment, class: 'form-control', data: { parsley_maxlength: "100", parsley_maxlength_message: "Maximum length of 100 characters" } %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if has_permission? "EDIT_NON_FINANCE_INFO_DOCTOR" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label :comment %>
+                    <%= form.text_area :comment, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if ["edit", "update"].include?(params[:action]) %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= label_tag :fee_id, "Fee" %>
+                    <%= select_tag :fee_id, options_from_collection_for_select(Fee.where(code: ["DOCTOR_CHANGE_ADDRESS", "FOC"]), 'id', 'name', params[:fee_id]), include_blank: form_select_option_text, class: "form-control" %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <%=render "shared/approval_comments", { comments: @doctor.approval_request.comments } if @doctor.approval_request %>
+</div>
+
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_doctors_path) %>
+        <%=raw edit_save_draft_button if has_any_permission?("CREATE_DRAFT_DOCTOR", "EDIT_DRAFT_DOCTOR") %>
+        <%=raw edit_submit_for_approval_button if has_any_permission?("CREATE_SUBMIT_APPROVAL_DOCTOR", "EDIT_SUBMIT_APPROVAL_DOCTOR") %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+// $('#draft_submit').click(function (){
+//     $('.doctor-form').attr('novalidate', 'novalidate').submit();
+// });
+
+/* $('#approval_submit').click(function (e) {
+    if ($('#xray-list').length > 0 && $('#xray-list li').length == 0) {
+        $('#xray-warning').html("<li class='text-danger'>At least 1 xray facility pairing recommendations must be selected</li>");
+        e.preventDefault(e);
+    };
+});
+
+$('#approval_submit').click(function (e) {
+    if ($('#laboratory-list').length > 0 && $('#laboratory-list li').length == 0) {
+        $('#laboratory-warning').html("<li class='text-danger'>At least 1 laboratory pairing recommendations must be selected</li>");
+        e.preventDefault(e);
+    };
+}); */
+
+var i = $("input[type=radio][name='doctor[has_doctor_association]']:checked").val();
+    if (i == "true"){
+        $('.name_of_association').addClass("required");
+        $('#doctor_associations').removeAttr('disabled');
+        $('#doctor_associations').prop('required',true);
+    } else if (i == "false"){
+        $('.name_of_association').removeClass("required");
+        $('#doctor_associations').removeClass("required");
+        $('#doctor_associations').attr('disabled','disabled');
+        $('#doctor_associations').prop('required',false);
+    }
+
+$('.filter-facilities-search').click(function() {
+    type        = $(this).attr('data-type');
+    form        = $(this).closest('form');
+    selected    = mapSelectedFacilitiesFieldValue(type, 'id');
+
+    data = $(`.facilities-filter-form[data-type="${type}"]`).find('input.ajax-input, select.ajax-input').map(function() {
+        return {key: $(this).attr('name'), val: $(this).val()};
+    }).get().reduce(function(map, obj) {
+        map[obj.key] = obj.val;
+        return map;
+    }, {});
+
+    data.selected = selected;
+
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: data,
+    })
+    .done(function(response) {
+        $(`.search-facilities-table[data-type="${type}"] tbody#search-results`).html(response);
+        $(`.filter-facilities-search[data-type="${type}"]`).removeAttr('disabled');
+        bindSelectableFacilities();
+    });
+});
+
+$('.update-facilities').click(function() {
+    type        = $(this).attr('data-type');
+    ids         = mapSelectedFacilitiesFieldValue(type, 'id').join(',');
+    $(`.pairing-input-field[data-type="${type}"]`).val(ids);
+    $(this).closest('.modal-footer').find('button[data-dismiss="modal"]').click();
+    names       = mapSelectedFacilitiesFieldValue(type, 'name');
+    blankSign   = $(`.blank-selected-placeholder[data-type="${type}"]`);
+    names.length ? blankSign.addClass('hidden') : blankSign.removeClass('hidden');
+
+    listItems   = $(names).map(function() {
+        return `<li>${this}</li>`;
+    }).get().join('');
+
+    $(`ul.list-parent[data-type="${type}"]`).html(listItems);
+});
+
+function mapSelectedFacilitiesFieldValue(type, field) {
+    return $(`.selected-facilities[data-type="${type}"] .filter-table-search-results.bg-selected`).map(function() {
+        return $(this).attr(`data-${field}`);
+    }).get();
+}
+
+function bindSelectableFacilities() {
+    $('tr.filter-table-search-results input').change(function() {
+        type                = $(this).closest('.filter-table-search-results').attr('data-type');
+        checked             = $(this).prop('checked');
+        tableRow            = $(this).closest('tr');
+        selectedContainer   = $(`.selected-facilities[data-type="${type}"]`);
+
+        if (checked) {
+            tableRow.addClass('bg-selected');
+            selectedContainer.append(tableRow.clone());
+            rebindSelectedFacilities(type);
+        } else {
+            tableRow.removeClass('bg-selected');
+            selectedContainer.find(`.filter-table-search-results.bg-selected[data-id="${$(this).val()}"]`).remove();
+        }
+
+        checkForSelectedInFacilities(type);
+    });
+}
+
+rebindSelectedFacilities('xray');
+rebindSelectedFacilities('laboratory');
+
+function rebindSelectedFacilities(type) {
+    $(`.selected-facilities[data-type="${type}"] input`).unbind('change');
+
+    $(`.selected-facilities[data-type="${type}"] input`).change(function() {
+        input = $(`tr.filter-table-search-results[data-type="${type}"] input[value="${$(this).val()}"]`)
+        input.prop('checked', false);
+        input.closest('tr').removeClass('bg-selected');
+        $(this).closest('tr').remove();
+        checkForSelectedInFacilities(type);
+    });
+}
+
+function checkForSelectedInFacilities(type) {
+    selectedContainer   = $(`.selected-facilities[data-type="${type}"]`);
+
+    if (selectedContainer.find('tr.filter-table-search-results').length > 0) {
+        selectedContainer.find(`.no-selected-facilities[data-type="${type}"]`).remove();
+    } else {
+        selectedContainer.empty();
+        selectedContainer.prepend(`<tr class="no-selected-facilities" data-type="${type}"><td colspan="6">No x-ray facilities selected</td></tr>`);
+    }
+}
+
+$('.clear-filters').click(function() {
+    type = $(this).attr('data-type');
+    $(`.facilities-filter-form[data-type="${type}"] .ajax-input`).val('');
+    $(`.facilities-filter-form[data-type="${type}"] .select2`).select2();
+});
+
+$('.pairing-modal-open').click(function() {
+    type    = $(this).attr('data-type');
+    modal   = $(`.select2-modals[data-type="${type}"]`);
+
+    // Set listeners when opening modals, so that Selec2 can be initialized when the modal is ready.
+    checkForModalShow = setInterval(function() {
+        if (modal.hasClass('show')) {
+            clearInterval(checkForModalShow);
+        }
+    }, 50);
+});
+
+$('#draft_submit').click(function() {
+    // $('form.with-parsley').parsley().destroy();
+    $('form.with-parsley').parsley().validate();
+});
+
+$('#approval_submit').click(function() {
+    $('form.with-parsley').parsley().validate();
+});
+
+$('label[for="doctor_company_name"]')
+$('input[name="doctor[company_name]"]').change(function(){
+    if ($('#doctor_company_name').val().length > 0) {
+        $('#doctor_business_registration_number').attr('required',true) && $('label[for="doctor_business_registration_number"]').addClass("required");
+    } else {
+        $('#doctor_business_registration_number').attr('required',false) && $('label[for="doctor_business_registration_number"]').removeClass("required");
+    }
+});
+
+check_payment_method($('#doctor_payment_method_id').find(":selected").data("code"))
+
+$('#doctor_payment_method_id').change(function(){
+    code = $('#doctor_payment_method_id').find(":selected").data("code")
+    check_payment_method(code)
+});
+
+function check_payment_method(code){
+    if(code == 'OUT_CASHORDER' || code == 'OUT_CHEQUE'){
+        $('#doctor_bank_id').attr('data-parsley-required',false);
+        $('.bank-id').removeClass("required");
+        $('#doctor_bank_account_number').attr('data-parsley-required',false);
+        $('.bank-account-number').removeClass("required");
+        $('#doctor_email_payment').attr('data-parsley-required',false);
+        $('.email_payment').removeClass("required");
+        $('#doctor_bank_payment_id').attr('data-parsley-required',false);
+        $('.bank_payment_id').removeClass("required");
+
+    }else{
+        $('#doctor_bank_id').attr('data-parsley-required',true);
+        $('.bank-id').addClass("required");
+        $('#doctor_bank_account_number').attr('data-parsley-required',true);
+        $('.bank-account-number').addClass("required");
+        $('#doctor_email_payment').attr('data-parsley-required',true);
+        $('.email_payment').addClass("required");
+        $('#doctor_bank_payment_id').attr('data-parsley-required',true);
+        $('.bank_payment_id').addClass("required");
+    }
+}
+
+$(".has_doctor_association").change(function () {
+    var has_doctor_association = $(this).val();
+    if (has_doctor_association == "true") {
+        $('.name_of_association').addClass("required");
+        $('#doctor_associations').removeAttr('disabled');
+        $('#doctor_associations').prop('required',true);
+    } else if (has_doctor_association == "false") {
+        $('.name_of_association').removeClass("required");
+        $('#doctor_associations').prop('required',false);
+        $('#doctor_associations').removeClass("required", true);
+        $('#doctor_associations').attr('disabled','disabled');
+        $('#doctor_associations').val(false).trigger( "change" );
+    }
+});
+</script>
+<% end %>

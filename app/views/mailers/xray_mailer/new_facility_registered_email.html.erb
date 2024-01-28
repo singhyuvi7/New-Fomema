@@ -1,0 +1,23 @@
+<p>
+    <b>To Whom It May Concern,</b><br>
+</p>
+
+<p>
+    Please be informed that the following new x-ray facility has been approved.
+</p>
+
+<p>
+    X-Ray Code: <%= @xray_facility.code || "-" %><br>
+    Clinic Name: <%= @xray_facility.name %><br>
+    Phone: <%= @xray_facility.phone %><br>
+    Town: <%= @xray_facility.town.name %><br>
+    State: <%= @xray_facility.state.name %>
+</p>
+
+<p>
+    Thank you.<br>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+</p>

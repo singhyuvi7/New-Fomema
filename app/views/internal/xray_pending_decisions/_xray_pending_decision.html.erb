@@ -1,0 +1,67 @@
+<%=render 'internal/xray_pending_decisions/shared/mle_info', {xray_pending_decision: xray_pending_decision} %>
+
+<%=render 'internal/xray_pending_decisions/shared/finding_checklist', {xray_pending_decision: xray_pending_decision} %>
+
+<div class="card border-primary">
+    <div class="card-header">
+        Final X-Ray Result
+    </div>
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th class="text-center" colspan="2" width="50%">Decision</th>
+                <th width="50%">Comment</th>
+            </tr>
+            <tr>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="SUITABLE"<%if xray_pending_decision.decision === 'SUITABLE' %> checked <% else %> disabled <% end %>>
+                            <%= XrayPendingDecision::DECISIONS["SUITABLE"] %>
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="UNSUITABLE"<%if xray_pending_decision.decision === 'UNSUITABLE' %> checked <% else %> disabled <% end %>>
+                            <%= XrayPendingDecision::DECISIONS["UNSUITABLE"] %>
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <pre class="form-control text-break"><%= xray_pending_decision.comment %></pre>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-center" colspan="2" rowspan="2">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="form-check-input" type="radio" value="PCR"<% if xray_pending_decision.decision === 'PCR' %> checked <% else %> disabled <% end %>>
+                            <%= XrayPendingDecision::DECISIONS["PCR"] %>
+                        </label>
+                    </div>
+                </td>
+                <th>PCR</th>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pcr-decision-pcr-options">
+                        <select class="form-control select2" disabled>
+                            <option value="">Select PCR</option>
+                            <% (@pcrs || User.active.search_permission("PICKUP_PCR_POOL").order(:name)).each do |pcr, idx| %>
+                                <option value="<%= pcr.id %>"<%= " selected" if xray_pending_decision.pcr_id == pcr.id %>><%= pcr.name %></option>
+                            <% end %>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="card-footer text-right">
+    </div>
+</div>
+
+<% if xray_pending_decision.status == "TRANSMITTED" %>
+    <%=render 'internal/xray_pending_decisions/approval', {xray_pending_decision: xray_pending_decision} %>
+<% end %>

@@ -1,0 +1,26 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  sub_style = s.add_style :b=>true, :sz=>11, :u=>true, :fg_color=>'ff0000', :i => true, :alignment => {:vertical=> :center}
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  total_style = s.add_style(sz: 11, fg_color:'ff0000')
+
+  wb.add_worksheet(name: 'employer account balance') do |sheet|
+    sheet.add_row ["Employer Account Balance as at #{@closing_date.strftime('%d-%b-%Y')}"], style: title_style
+    sheet.add_row ["**Employer accounts with zero(0) balance are excluded."], style: sub_style
+    sheet.column_widths 10
+
+    sheet.add_row
+
+    sheet.add_row ['No.', 'Employer Code', 'Employer Name', 'Balance'], style: header_style
+
+    if @data.present?
+      @data.each.with_index(1) do |employer, index|
+        sheet.add_row [index, employer['employer_code'], employer['name'], employer['amount']], style: data_style
+      end
+
+      sheet.add_row ['','','Total:',@data.sum { |a| a['amount'].to_f }], style: total_style
+    end
+  end
+end

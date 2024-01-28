@@ -1,0 +1,13 @@
+---
+# The authentication token for the application.
+authentication: Fiz6vmmtu9IQZxyfUQpPIgABjt6CefiZNqu0RLRo8sY
+development:
+  env: development
+staging:                                 # Rails environment
+  env: staging # Skylight environment
+production1:
+  env: production1
+production2:
+  env: production2
+production3:
+  env: production3

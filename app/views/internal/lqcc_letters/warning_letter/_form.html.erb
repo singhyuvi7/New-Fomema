@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :reply_date, class: 'required' %>
+            <div class="input-group">
+                 <%= form.date_field :reply_date, class: 'form-control', required: true, max: Time.now.strftime('%Y-%m-%d') %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :warning_clauses, 'Clauses', class: 'required' %>
+            <div class="input-group">
+                <%= form.text_area :warning_clauses, class: 'letter-wysiwyg form-control', required: true, value: @letter.warning_clauses.try(:html_safe), data: { parsley_errors_container: "#select2_parsley_error__wysiwyg_box", parsley_class_handler: ".note-editor.note-frame" } %>
+                <div id="select2_parsley_error__wysiwyg_box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%
+=begin%>
+ <%=render 'internal/lqcc_letters/warning_letter/warning_signature_modal', {form: form} %> 
+<%
+=end%>
+
+<%=render 'summernote_liststyle_script' %>
+<% content_for :page_end_scripts do %>
+<script>
+$('.letter-wysiwyg').summernote({
+    height: 100,
+    width: 550,
+    toolbar: [
+        [ 'font', [ 'bold', 'italic', 'underline', 'strikethrough'] ],
+        ['para', ['ul', 'ol', 'listStyles', 'indent', 'outdent']],
+        [ 'view', [ 'codeview' ] ]
+    ]
+});
+</script>
+<% end %>

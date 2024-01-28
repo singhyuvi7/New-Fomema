@@ -1,0 +1,32 @@
+<%
+=begin %>
+<%= form_for @order, url: payment_internal_order_path(@order) do |form| %>
+    <div>Code: <%= @order.code %></div>
+    <div>Amount: <%= number_to_currency(@order.amount, unit: "") %></div>
+    <div><a href="<%= internal_orders_path %>">Back</a> <button type="submit">Paid</button></div>
+<% end %>
+<%
+=end %>
+<form action="<%= @ipay88_request.payment_url %>" method="post" id="ipay88_request_form">
+    <input type="hidden" name="MerchantCode" id="MerchantCode" value="<%= @ipay88_request.merchant_code %>">
+    <input type="hidden" name="PaymentId" id="PaymentId" value="<%= @ipay88_request.payment_id %>">
+    <input type="hidden" name="RefNo" id="RefNo" value="<%= @ipay88_request.reference_number %>">
+    <input type="hidden" name="Amount" id="Amount" value="<%= number_to_currency(@ipay88_request.amount, unit: "") %>">
+    <input type="hidden" name="Currency" id="Currency" value="<%= @ipay88_request.currency %>">
+    <input type="hidden" name="ProdDesc" id="ProdDesc" value="<%= @ipay88_request.product_description %>">
+    <input type="hidden" name="UserName" id="UserName" value="<%= @ipay88_request.user_name %>">
+    <input type="hidden" name="UserEmail" id="UserEmail" value="<%= @ipay88_request.user_email %>">
+    <input type="hidden" name="UserContact" id="UserContact" value="<%= @ipay88_request.user_contact %>">
+    <input type="hidden" name="Remark" id="Remark" value="<%= @ipay88_request.remark %>">
+    <input type="hidden" name="Lang" id="Lang" value="<%= @ipay88_request.lang %>">
+    <input type="hidden" name="SignatureType" id="SignatureType" value="<%= @ipay88_request.signature_type %>">
+    <input type="hidden" name="Signature" id="Signature" value="<%= @ipay88_request.signature %>">
+    <input type="hidden" name="ResponseURL" id="ResponseURL" value="<%= @ipay88_request.response_url %>">
+    <input type="hidden" name="BackendURL" id="BackendURL" value="<%= @ipay88_request.backend_url %>">
+</form>
+
+<% content_for :page_end_scripts do %>
+<script>
+    document.getElementById('ipay88_request_form').submit();
+</script>
+<% end %>

@@ -1,0 +1,13 @@
+<div id="notice"><%= alert %></div>
+<div class="container" style="padding-top:50px;">
+    <div class="employer-registration-title-container bg-transparent">
+      <h1>EMPLOYER REGISTRATION</h1>
+      <div class="employer-registration-title-left-bar" >&nbsp;</div>
+        <div class="employer-registration-title-right-bar">&nbsp;</div><br>  
+    </div>
+
+    <%= form_for @employer, url: external_employers_path, html: { multipart: true, id: 'employer-registration-form' } do |f| %>
+        <input type="hidden" name="sign_up_token" value="<%= params[:token] || params[:sign_up_token] %>">
+        <%= render 'form', f: f %>
+    <% end %>
+</div>

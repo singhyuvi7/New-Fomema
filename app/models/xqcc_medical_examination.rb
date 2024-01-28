@@ -1,0 +1,2 @@
+class XqccMedicalExamination < ApplicationRecord
+end

@@ -1,0 +1,74 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <%= form_tag internal_system_configurations_approval_path, method: :put, class: "form-horizontal" do %>
+
+        <% if has_permission?("APPROVAL_SYSTEM_CONFIGURATION")  %>
+        <div class="card-header">
+            Non - Finance
+            <% if has_permission? 'EDIT_SYSTEM_CONFIGURATION' %>
+            <div class="card-header-actions">
+            </div>
+            <% end %>
+        </div>
+        <div class="card-body">
+            <% @pending_approvals.where(code: SystemConfiguration::CODES).each do |sc| %>
+                <div class="form-group row">
+                    <%= render "internal/system_configurations/approval/#{sc.code}" %>
+                </div>
+            <% end %>
+        </div>
+        <% end %>
+
+        <% if has_permission?("APPROVAL_FINANCE_SYSTEM_CONFIGURATION") %>
+        <div class="card-footer card-header">
+            Finance
+            <% if has_permission? 'EDIT_SYSTEM_CONFIGURATION' %>
+            <div class="card-header-actions">
+            </div>
+            <% end %>
+        </div>
+        <div class="card-body">
+            <% @pending_approvals.where(code: SystemConfiguration::FINANCE).each do |sc| %>
+                <div class="form-group row">
+                    <%= render "internal/system_configurations/approval/#{sc.code}" %>
+                </div>
+            <% end %>
+        </div>
+         <% end %>
+
+        <div class="card-footer card-header">
+            <% if has_permission? 'EDIT_SYSTEM_CONFIGURATION' %>
+            <div class="card-header-actions">
+            </div>
+            <% end %>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <label class="col-md-4 col-form-label">
+                    Decision
+                </label>
+                <div class="col-md-8">
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input" id="decision_APPROVE" type="radio" value="APPROVE" name="decision" required>
+                        <label class="form-check-label" for="decision_APPROVE">APPROVE</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <input class="form-check-input" id="decision_REJECT" type="radio" value="REJECT" name="decision" required>
+                        <label class="form-check-label" for="decision_REJECT">REJECT</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw edit_back_button(internal_system_configurations_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+
+

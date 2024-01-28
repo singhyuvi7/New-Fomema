@@ -1,0 +1,115 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Radiologists</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class='col'>
+                <% if has_permission?("MSPD_REPORTS") %>
+                    <%= link_to(internal_radiologists_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-primary') do %>
+                        <i class='fa fa-download'></i>
+                        Export
+                    <% end %>
+                <% end %>
+            </div>
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_DRAFT_RADIOLOGIST') %>
+                    <%=raw index_table_new_button(new_internal_radiologist_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Code</th>
+            <th>Doctor Name</th>
+            <th>Facility Name</th>
+            <th>ICNO</th>
+            <th>State</th>
+            <th>Postcode</th>
+            <th>Town</th>
+            <th>Activated</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @radiologists.blank? %>
+            <tr>
+                <td colspan="12" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @radiologists.each.with_index((@radiologists.current_page - 1) * get_per + 1) do |radiologist, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= radiologist.code or raw '<i>N/A</i>' %></td>
+                    <td><%= radiologist.name %></td>
+                    <td><%= radiologist.xray_facility_name %></td>
+                    <td><%= radiologist.icno %></td>
+                    <td><%= radiologist.try(:state).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= radiologist.postcode or raw '<i>N/A</i>' %></td>
+                    <td><%= radiologist.try(:town).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= radiologist.activated_at.nil? ? (raw '<i>N/A</i>') : radiologist.activated_at.strftime('%d/%m/%Y') %></td>
+                    <td>
+                        <div><%= Radiologist::STATUSES[radiologist.status] %></div>
+                        <div class="font-italic"><small><%= radiologist.status_display %></small></div>
+                    </td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_radiologist_path(radiologist)) %>
+
+                        <% if can_request_update?(radiologist) && has_permission?('EDIT_RADIOLOGIST') %>
+                            <% if radiologist.approval_status.eql?("NEW_REJECTED") %>
+                                <%=raw index_table_primary_button(reject_renew_internal_radiologist_path(radiologist), label: '<i class="fa fa-question"></i>', title: 'Restart new request') %>
+                            <% else %>
+                                <%=raw index_table_edit_button edit_internal_radiologist_path(radiologist) %>
+                            <% end %>
+                        <% end %>
+
+                        <% if can_continue_draft?(radiologist, any_user: true) && has_any_permission?("CREATE_DRAFT_RADIOLOGIST", "CREATE_SUBMIT_APPROVAL_RADIOLOGIST") %>
+                            <%=raw index_table_draft_button(draft_internal_radiologist_path(radiologist)) %>
+                        <% end %>
+
+                        <% if can_cancel_approval?(radiologist) %>
+                            <%=raw index_table_cancel_button(cancel_internal_radiologists_path(radiologist)) %>
+                        <% end %>
+
+                        <% if can_do_approval?(radiologist) %>
+                            <%=raw index_table_approval_button(approval_internal_radiologists_path(radiologist)) %>
+                        <% end %>
+
+                        <% if can_do_approval2?(radiologist) %>
+                            <%=raw index_table_approval_button(concur_internal_radiologists_path(radiologist), title: "Concur") %>
+                        <% end %>
+
+                        <% if has_permission?('DELETE_RADIOLOGIST') %>
+                            <%=raw index_table_delete_button(internal_radiologist_path(radiologist)) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @radiologists %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

@@ -1,0 +1,50 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: '808080', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  summary_header_style = s.add_style(b: true, sz: 11, bg_color: '808080', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  grand_total = { transaction_registration: { male: 0, female: 0 }, special_renewal_transaction_registration: { male: 0, female: 0 }, transaction_cancellation: { male: 0, female: 0 }, transaction_rejection: { male: 0, female: 0 }, gender_change: { male: 0, female: 0 }, gender_change_rejection: { male: 0, female: 0 }, net: { male: 0, female: 0 } }
+
+  wb.add_worksheet(name: 'registrations') do |sheet|
+    sheet.add_row ["#{@company_name.to_s.upcase} - #{@date}"], style: title_style
+    sheet.add_row ["SUMMARY WORKER REGISTRATION REPORT FROM #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} TO #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL STATE'}"], style: title_style
+    sheet.add_row
+
+    if @data.present?
+      @data.each.with_index do |(branch, collection), index|
+        sheet.add_row [branch]
+        sheet.add_row @headers, style: header_style
+        collection&.sort { |a, b| a[0].to_date <=> b[0].to_date }&.each do |registration|
+          registration.delete_at(1)
+          sheet.add_row registration, style: data_style
+        end
+
+        # branch_summary
+        stats = @stats.dig(branch)
+        if stats.present?
+          sheet.add_row ['Branch Summary', 'Male', 'Female', 'Total'], style: summary_header_style
+          stats.each do |row_data|
+            _, title, male_count, female_count, = row_data
+            selector = title.parameterize(separator: '_').to_sym
+            grand_total[selector][:male] += male_count
+            grand_total[selector][:female] += female_count
+            row_data.delete_at(0)
+            sheet.add_row row_data, style: data_style
+          end
+          2.times { sheet.add_row } if index != (@data.size - 1)
+        end
+      end
+    end
+
+    # grand_total
+    sheet.add_row
+    sheet.add_row
+    sheet.add_row ['Report Summary', 'Male', 'Female', 'Grand Total'], style: summary_header_style
+    grand_total.keys.each do |selector|
+      male_count = grand_total[selector][:male]
+      female_count = grand_total[selector][:female]
+        sheet.add_row [selector.to_s.humanize.upcase, male_count, female_count, [male_count, female_count].sum], style: data_style
+    end
+  end
+end

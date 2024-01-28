@@ -1,0 +1,45 @@
+<% vr_lab = @visit_report.visit_report_laboratory %>
+
+<div class="row">
+    <label class="col-md-2 col-form-label">Laboratory Name & Code</label>
+    <div class="col-md-4">
+        <div class="form-control-plaintext"><%= "#{vr_lab.laboratory_name} (#{@visit_report.visitable&.code})" %></div>
+    </div>
+    <label class="col-md-2 col-form-label">Laboratory Address</label>
+    <div class="col-md-4">
+        <div class="form-control-plaintext">
+            <% if !vr_lab.address_1.blank? %><%= vr_lab.address_1 %><br><% end %>
+            <% if !vr_lab.address_2.blank? %><%= vr_lab.address_2 %><br><% end %>
+            <% if !vr_lab.address_3.blank? %><%= vr_lab.address_3 %><br><% end %>
+            <% if !vr_lab.address_4.blank? %><%= vr_lab.address_4 %><br><% end %>
+            <%= vr_lab.town.name %><br>
+            <%= "#{vr_lab.postcode}, #{vr_lab.state.name}" %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 col-form-label">Visit Date</label>
+    <div class="col-md-4">
+        <div class="form-control-plaintext"><%= @visit_report.visit_date.strftime('%d/%m/%Y') %></div>
+    </div>
+
+    <% if ['LAB_CLOSED_NOT_EXIST'].include?(@letter.explanation_type) %>
+        <label class="col-md-2 col-form-label">Visit Time</label>
+        <div class="col-md-4">
+            <div class="form-control-plaintext"><%= @visit_report.visit_time_from.strftime("%I:%M%p") %></div>
+        </div> 
+    <% end %>
+
+    <% if ['NON_COMPLIANCE'].include?(@letter.explanation_type) %>
+        <label class="col-md-2 col-form-label">Laboratory Personnel</label>
+        <div class="col-md-4">
+           <div class="form-control-plaintext"><%= @visit_report&.visit_report_laboratory_summary&.lab_personnel_name %></div>
+        </div>
+    <% end %>
+</div>
+
+<!-- operating hours -->
+<%=render 'operating_hour', { form: form } if ['LAB_CLOSED_NOT_EXIST'].include?(@letter.explanation_type) %>
+
+<hr>

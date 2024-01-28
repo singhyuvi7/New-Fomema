@@ -1,0 +1,203 @@
+# <minute> <hour> <day> <month> <day of week>
+# https://crontab.guru - This is called crontab syntax - Joey
+
+status_schedule_from:
+  class: "StatusScheduleFromWorker"
+  cron: "30 0 * * *"
+
+status_schedule_to:
+  class: "StatusScheduleToWorker"
+  cron: "30 23 * * *"
+
+partition_table:
+  class: "PartitionTableWorker"
+  cron: "0 21 1 * *"
+
+#doctor_quota_yearly_reimbursement:
+#  class: "DoctorQuotaYearlyReimbursementWorker"
+#  cron: "0 0 1 JAN *"
+
+doctor_quota_quarterly_reimbursement:
+  class: "DoctorQuotaQuarterlyReimbursementWorker"
+  cron: "0 0 1 1,4,7,10 *"
+
+sp_group_schedule:
+  class: "ServiceProviderGroupWorker"
+  cron: "0 23 * * *"
+
+## enable [NF-1998][NF-1925]
+refund:
+  class: "BankDraftRefundWorker"
+  cron: "0 2 * * *"
+
+daily_afisid_report:
+  class: "DailyAfisidReportWorker"
+  cron: "0 7 * * *"
+
+daily_biometric_report:
+  class: "DailyBiometricReportWorker"
+  cron: "0 7 * * *"
+
+daily_operation_report:
+  class: "DailyOperationReportsWorker"
+  cron: "30 5 * * *"
+
+daily_operation_regpatiday_report:
+  class: "DailyOperationReportsRegpatidayWorker"
+  cron: "0 6 * * *"
+
+daily_operation_ytd_report:
+  class: "DailyOperationReportsYtdWorker"
+  cron: "45 5 * * *"
+
+BatchDailyOperationReportsInterimWorker:
+  class: "BatchDailyOperationReportsInterimWorker"
+  cron: "0 0 * * *"
+
+daily_collection:
+  class: "DailyCollectionWorker"
+  cron: "0 2 * * *"
+
+daily_void_collection:
+  class: "DailyVoidCollectionWorker"
+  cron: "10 2 * * *"
+
+daily_revenue:
+  class: "DailyRevenueWorker"
+  cron: "0 3 * * *"
+
+refresh_mv_imm_blocked_transaction:
+  class: "RefreshMvImmBlockedTransactionWorker"
+  cron: "0 5 * * *"
+
+# For testing. Set cron at Dec 2021 temprarily.
+employers_transaction_reminder:
+  class: "EmployersTransactionReminderWorker"
+  # cron: "0 5 * * *"
+  cron: "0 5 * * *"
+
+myimms:
+  class: "MyimmsWorker"
+  cron: "30 23 * * *"
+
+myimms_error_report:
+  class: "MyimmsErrorReportWorker"
+  cron: "55 23 * * *"
+
+xray_license_status:
+  class: "XrayLicenseStatusWorker"
+  cron: "0 22 * * *"
+
+yearly_reset_tcupi_letter_sequence:
+  class: "YearlyResetTcupiLetterSequence"
+  cron: "0 0 1 JAN *"
+
+yearly_reset_xqcc_letters_sequences:
+  class: "YearlyResetXqccLettersSequences"
+  cron: "0 0 1 JAN *"
+
+# Medical Module - by Joey.
+monthly_medical_appeal_reports_worker:
+  class: "MonthlyMedicalAppealReportsWorker"
+  cron: "0 11 1 * *"
+
+monthly_appeal_type_of_diseases_reports_worker:
+  class: "MonthlyAppealTypeOfDiseasesReportsWorker"
+  cron: "0 11 1 * *"
+
+monthly_medical_statistics_reports_worker:
+  class: "MonthlyMedicalStatisticsReportsWorker"
+  cron: "0 7 1 * *"
+
+weekly_moh_notification_diseases_worker:
+  class: "WeeklyMohNotificationDiseasesSeedWorker"
+  cron: "30 7 * * 0"
+
+weekly_medical_moh_notification_reports_worker:
+  class: "WeeklyMedicalMohNotificationReportsWorker"
+  cron: "30 8 * * 1"
+
+# Disabled. Replace with monthly_transaction_certify_static_seed_worker
+# monthly_transaction_static_seed_worker:
+#   class: "MonthlyTransactionStaticSeedWorker"
+#   cron: "30 3 1 * *"
+
+monthly_transaction_certify_static_seed_worker:
+  class: "MonthlyTransactionCertifyStaticSeedWorker"
+  cron: "30 3 1 * *"
+
+# This must always run after MonthlyTransactionStaticSeedWorker.
+# This must always run after MonthlyTransactionCertifyStaticSeedWorker.
+monthly_mspd_moh_medical_reports_worker:
+  class: "MonthlyMspdMohMedicalReportsWorker"
+  cron: "15 4 1 * *"
+
+active_record_session_trim:
+  class: "ActiveRecordSessionTrim"
+  cron: "00 4 * * *"
+
+daily_unsuitable_slip_worker:
+  class: "DailyUnsuitableSlipWorker"
+  cron: "5 0 * * *"
+
+# Runs every 10 minutes.
+# change to run at midnight once a day
+update_custom_query_options:
+  class: "UpdateCustomQueryOptions"
+  cron: "45 4 * * *"
+
+report_diff_bloodgroup_seeder:
+  class: "ReportDiffBloodgroupSeeder"
+  cron: "*/30 * * * *"
+
+agency_renewal_reminder:
+  class: "AgencyRenewalReminderWorker"
+  cron: "0 8 * * *"
+
+agency_renewal_unpaid:
+  class: "AgencyRenewalUnpaidWorker"
+  cron: "15 8 * * *"
+
+agency_license_expiry_reminder:
+  class: "AgencyLicenseExpiryReminderWorker"
+  cron: "30 8 * * *"
+
+agency_license_expired:
+  class: "AgencyLicenseExpiredWorker"
+  cron: "45 8 * * *"
+
+lab_license_expired:
+  class: "LabLicenseExpiryReminderWorker"
+  cron: "30 8 * * *"
+
+refund_payment_failed_reminder:
+  class: "DailyRefundPaymentFailedReminderWorker"
+  cron: "0 9 * * *"
+
+daily_mspd_group_schedule_inactive:
+  class: "DailyMspdGroupScheduleInactive"
+  cron: "0 8 * * *"
+
+daily_disable_ignore_expiry:
+  class: "DailyDisableIgnoreExpiryWorker"
+  cron: "0 0 * * *"
+
+appeal_conditional_success_reminder:
+  class: "AppealConditionalSuccessReminderWorker"
+  cron: "0 7 * * *"
+
+xray_license_expired:
+  class: "XrayLicenseExpiryReminderWorker"
+  cron: "30 8 * * *"
+
+daily_amended_notifiable_transaction_notification:
+  class: "DailyAmendedNotifiableTransactionWorker"
+  cron: "30 8 * * *"
+
+daily_unblock_imm_for_expired_agency_transaction:
+  class: "DailyUnblockImmWorker"
+  cron: "10 0 * * *"
+
+daily_balance_full_quota:
+  class: "DailyBalanceFullQuota"
+  cron: "30 8 * * *"

@@ -1,0 +1,25 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+       <strong> Bulletins </strong>
+    </div>
+   
+    <div class="card-body">
+        <ul class="list-group">
+                <input type="hidden" name="login_user" value="service_provider">
+            <% @recent_bulletins.each do |bulletin| %>
+                <a class="list-group-item d-flex list-group-item-action justify-content-between align-items-center" href="<%= external_bulletin_path bulletin.id %>">
+                    <%= bulletin.title %>
+
+                    <% if bulletin.created_at.to_date > '2020-08-18'.to_date %>
+                        <% if bulletin.bulletin_user_view_logs.where(user_id: current_user.id).count == 0 %>
+                            <span class="badge badge-success badge-pill float-right">NEW!</span>
+                        <% end %>
+                    <% end %>
+
+                    <span class="badge badge-primary badge-pill float-right"><%= bulletin.created_at.strftime("%d/%m/%Y") %></span>
+                </a>
+            <% end %>
+        </ul>
+
+    </div>
+</div>

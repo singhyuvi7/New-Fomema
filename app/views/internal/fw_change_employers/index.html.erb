@@ -1,0 +1,96 @@
+<div class="card">
+    <div class="card-header">
+        <strong>FW Change Employers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Worker Name / Worker Code</th>
+                                <th>Passport Number / Country</th>
+                                <th>Gender</th>
+                                <th>Old Employer</th>
+                                <th>New Employer</th>
+                                <th>Status</th>
+                                <th>Requested Date</th>
+                                <th>Requested By</th>
+                                <th>Approval Comment</th>
+                                <th>Assigned To</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @fw_change_employers.blank? %>
+                                <tr>
+                                    <td colspan="12" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @fw_change_employers.each.with_index((@fw_change_employers.current_page - 1) * get_per + 1) do |fw_change_employer, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td>
+                                            <%= fw_change_employer.foreign_worker.name %> <br>
+                                            <strong><%= fw_change_employer.foreign_worker.code %></strong>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.foreign_worker.passport_number %> <br>
+                                            <strong><%= fw_change_employer.foreign_worker.country.name %></strong>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.foreign_worker.gender_name %>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.old_employer.name %> <br>
+                                            <strong><%= fw_change_employer.old_employer.code %></strong>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.new_employer.name %> <br>
+                                            <strong><%= fw_change_employer.new_employer.code %></strong>
+                                        </td>
+                                        <td>
+                                            <%= FwChangeEmployer::STATUSES[fw_change_employer.status] %>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.requested_at.try(:strftime, get_standard_date_format) %>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.request_user.name %> <br>
+                                            <strong><%= fw_change_employer.request_user.code %></strong>
+                                        </td>
+                                        <td>
+                                            <strong><%= fw_change_employer.approval_user&.name %></strong>
+                                            <%= fw_change_employer.approval_comment %>
+                                        </td>
+                                        <td>
+                                            <%= fw_change_employer.assigned_to_user&.name %>
+                                        </td>
+                                        <td class="module-row-actions">
+                                            <%=raw index_table_show_button(internal_fw_change_employer_path(fw_change_employer)) %>
+                                            <% if has_permission?("CHANGE_EMPLOYER_APPROVAL_FOREIGN_WORKER") && ["APPROVAL"].include?(fw_change_employer.status) && fw_change_employer.foreign_worker.can_do_change_employer_approval? %>
+                                                <%= link_to '<i class="fa fa-check text-white"></i>'.html_safe, approval_change_employer_internal_employer_employer_workers_path(fw_change_employer.foreign_worker.employer_id, fw_change_employer.foreign_worker), class: 'btn btn-sm btn-success approval-fw',title: 'Change Employer Approval', 'data-toggle' => 'tooltip', 'data-html' => 'true', 'data-fw-code' => fw_change_employer.foreign_worker.code, 'data-latest-transaction-unsuitable' => fw_change_employer.foreign_worker&.latest_transaction&.final_result == 'UNSUITABLE' || false %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @fw_change_employers if !@fw_change_employers.nil? %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

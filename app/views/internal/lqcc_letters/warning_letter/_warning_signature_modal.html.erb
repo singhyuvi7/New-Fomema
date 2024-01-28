@@ -1,0 +1,30 @@
+<div class="modal fade" id="signatureModal" tabindex="-1" role="dialog" aria-labelledby="signatureModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Signature</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <h3 class="text-center">E-Signature</h3>
+            <div class="wrapper">
+                <%= form.signature_field :warning_signature %>
+                <%= image_tag @letter.warning_signature, class: "signature-img" if !@letter.warning_signature.blank? %>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap personnel-acknowledge-details text-center">
+                <%= form.text_field :warning_signature_name, class: 'form-control personnel-detail-input', placeholder: 'Full Name', required: true %>
+                <%= form.text_field :warning_signature_designation, class: 'form-control personnel-detail-input', placeholder: "Designation", required: true %>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+        <button type="button" class="btn btn-warning signature-clear-btn">Clear</button>
+        <button type="button" class="btn btn-warning signature-cancel-edit-btn">Cancel</button>
+        <button type="button" class="btn btn-warning signature-edit-btn">Edit</button>
+        <button type="submit" class="btn btn-primary signature-save-btn" name="submit_action" value="submit_with_signature" formnovalidate>Save</button>
+      </div>
+    </div>
+  </div>
+</div>

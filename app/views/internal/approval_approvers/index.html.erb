@@ -1,0 +1,75 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Approval Approvers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_APPROVAL_APPROVER') %>
+                    <%=raw index_table_new_button(new_internal_approval_approver_path) %>
+                <% end %>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Category</th>
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @approval_approvers.blank? %>
+                                <tr>
+                                    <td colspan="7" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @approval_approvers.each.with_index((@approval_approvers.current_page - 1) * get_per + 1) do |approver, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= ApprovalApprover::CATEGORIES[approver.category] %></td>
+                                        <td><%= User.find(approver.user_id).name %></td>
+                                        <td><%= ApprovalApprover::STATUSES[approver.status] %></td>
+                                        <td class="module-row-actions">
+                                            <%=raw index_table_show_button(internal_approval_approver_path(approver)) %>
+
+                                            <% if has_permission?('EDIT_APPROVAL_APPROVER') %>
+                                                <%=raw index_table_edit_button edit_internal_approval_approver_path(approver) %>
+                                            <% end %>
+
+                                            <% if has_permission?('DELETE_APPROVAL_APPROVER') %>
+                                                <%=raw index_table_delete_button(internal_approval_approver_path(approver)) %>
+                                            <% end %>
+
+                                            <% if has_permission?("VIEW_AUDIT_APPROVAL_APPROVER") %>
+                                                <%=raw index_table_primary_button(internal_approval_approver_path(approver), label: '<i class="fa fa-bars"></i>', title: 'View Audit') %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <%= paginate @approval_approvers %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

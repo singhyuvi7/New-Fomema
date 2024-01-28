@@ -1,0 +1,233 @@
+<div class="card">
+    <div class="card-header"><strong>Manual Payment</strong></div>
+
+    <div class="card-body">
+        <%
+            list = [
+                { title: "Worker Code", field: "worker_code", type: "text", placeholder: "Worker Code" },
+                { title: "Transaction Code", field: "code", type: "text", placeholder: "Trancaction Code"}
+            ]
+
+            empty_colspan   = 25
+            headers         = ["Trans Code","Worker Code","Worker Name","Gender","Doctor Code","Doctor Name","Clinic Name","Xray Code","Xray Name","Lab Code","Lab Name","Employer Code","Employer Name","Examination Date","Xray Submit Date","Lab Submit Date","Certify Date","Physical Test Done","IMM IND.","Payment Status"]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-transactions-index", filter_link: internal_manual_payment_view_transactions_path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <a href="#" class="btn btn-sm btn-primary" id="export"><i class="fas fa-download"></i> Export</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table id="internal-transactions-index-table" class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers"><label>#</label></th>
+
+                                <% headers.each do |header| %>
+                                    <th><%= header %></th>
+                                <% end %>
+
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <%
+                                @transactions.each.with_index((@transactions.current_page - 1) * get_per + 1) do |transaction, index| %>
+                                <%
+                                    worker           = transaction.foreign_worker
+                                    doctor           = transaction.doctor
+                                    xray             = transaction.xray_facility
+                                    laboratory       = transaction.laboratory
+                                    employer         = transaction.employer
+                                    doctor_payment   = transaction.sp_transactions_payments.where(:service_providable_type => Doctor.to_s).first
+                                    xray_payment     = transaction.sp_transactions_payments.where(:service_providable_type => XrayFacility.to_s).first
+                                    lab_payment      = transaction.sp_transactions_payments.where(:service_providable_type => Laboratory.to_s).first
+                                %>
+
+                                <tr>
+                                    <td class="module-row-numbers"><label><%= index %></label></td>
+
+                                    <td>
+                                        <%= transaction.code %>
+                                    </td>
+
+                                    <td><%= transaction&.fw_code %></td>
+                                    <td><%= transaction&.fw_name %></td>
+                                    <td><%= ForeignWorker::GENDERS[transaction&.fw_gender] %></td>
+
+                                    <td><%= doctor&.code %></td>
+                                    <td><%= doctor&.name %></td>
+                                    <td><%= doctor&.clinic_name %></td>
+
+                                    <td><%= xray&.code %></td>
+                                    <td><%= xray&.name %></td>
+
+                                    <td><%= laboratory&.code %></td>
+                                    <td><%= laboratory&.name %></td>
+
+                                    <td><%= employer&.code %></td>
+                                    <td><%= employer&.name %></td>
+
+                                    <td>
+                                        <%= transaction.medical_examination_date.present? ? transaction.medical_examination_date.strftime("%d/%m/%Y") : '-' %>
+                                    </td>
+
+                                    <td>
+                                        <%= transaction.xray_transmit_date.present? ? transaction.xray_transmit_date.strftime("%d/%m/%Y") : '-' %>
+                                    </td>
+
+                                    <td>
+                                        <%= transaction.laboratory_transmit_date.present? ? transaction.laboratory_transmit_date.strftime("%d/%m/%Y") : '-' %>
+                                    </td>
+
+                                    <td>
+                                        <%= transaction.certification_date.present? ? transaction.certification_date.strftime("%d/%m/%Y") : '-' %>
+                                    </td>
+
+                                    <td>
+                                        <%
+                                            if transaction.certification_date.present?
+                                                physical_exam_done = transaction.physical_exam_not_done != true ? 'Yes' : 'No'
+                                            else
+                                                physical_exam_done = transaction.physical_exam_not_done == false ? 'Yes' : 'No'
+                                            end
+                                        %>
+                                        <%= physical_exam_done %>
+                                    </td>
+
+                                    <td>
+                                        <%= transaction.ignore_expiry ? 'Yes' : 'No' %>
+                                    </td>
+
+                                    <td>
+                                        <% payment_made = []
+                                        if transaction.certification_date.present? and transaction.physical_exam_not_done != true
+                                            # certified and physical exam done
+                                            payment_made << 'Auto'
+                                        else
+                                            if doctor_payment.present?
+                                                payment_made << 'D'
+                                            end
+
+                                            if xray_payment.present?
+                                                payment_made << 'X'
+                                            end
+
+                                            if lab_payment.present?
+                                                payment_made << 'L'
+                                            end
+                                        end
+                                        %>
+                                        <%= payment_made.join(', ') %>
+                                    </td>
+
+                                    <td>
+                                        <%
+                                        all_options = []
+                                        if has_permission?("EDIT_MANUAL_PAYMENT")
+                                            if transaction.certification_date.blank? ||  transaction.physical_exam_not_done == true
+                                                if doctor_payment.nil?
+                                                    all_options << index_table_primary_button(internal_manual_payment_edit_payment_doctor_path(transaction), title: "Update Doctor Payment", classes: "btn btn-sm btn-warning", label: "<i class='fas fa-stethoscope'></i>")
+                                                else
+                                                    all_options << index_table_primary_button(internal_manual_payment_view_payment_doctor_path(transaction), title: "View Doctor Payment Details", classes: "btn btn-sm btn-success", label: "<i class='fas fa-stethoscope'></i>")
+                                                end
+                                                if xray_payment.nil?
+                                                    all_options << index_table_primary_button(internal_manual_payment_edit_payment_xray_path(transaction), title: "Update X-Ray Payment", classes: "btn btn-sm btn-warning", label: "<i class='fas fa-bone'></i>")
+                                                else
+                                                    all_options << index_table_primary_button(internal_manual_payment_view_payment_xray_path(transaction), title: "View X-Ray Payment Details", classes: "btn btn-sm btn-success", label: "<i class='fas fa-bone'></i>")
+                                                end
+                                                if lab_payment.nil?
+                                                    all_options << index_table_primary_button(internal_manual_payment_edit_payment_lab_path(transaction), title: "Update Laboratory", classes: "btn btn-sm btn-warning", label: "<i class='fas fa-vial'></i>")
+                                                else
+                                                    all_options << index_table_primary_button(internal_manual_payment_view_payment_lab_path(transaction), title: "View Laboratory Payment Details", classes: "btn btn-sm btn-success", label: "<i class='fas fa-vial'></i>")
+                                                end
+                                            end
+                                        end
+                                        %>
+                                        <% all_options.each_with_index do |option_item, index| %>
+                                            <%= raw "<br>" if index % 5 == 0 && index > 0 %>
+                                            <%= raw option_item.gsub("btn ", "btn mb-1 ") %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @transactions.blank? %>
+                                <tr>
+                                    <td colspan="<%= empty_colspan %>" class="text-danger">No records found.</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @transactions %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .scrollable-menu-box {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        z-index: 1;
+        border: none;
+        opacity: 0.9;
+        padding: 0;
+        background-color: #f3f3f3;
+    }
+
+    th {
+        vertical-align: middle !important;
+        text-align: center;
+    }
+
+    .comment-reader {
+        width: 200px;
+    }
+
+    .old-tcupi {
+        background-color: #FFDDAA !important;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+
+        tableHeight = $('.table-responsive').height() - 10;
+        setMaxHeight = Math.min(tableHeight, 320);
+        dropdownMenus = $('.dropdown-menu.in-table-dropdown').css('max-height', setMaxHeight);
+
+        $('.dropdown-menu.in-table-dropdown').map(function() {
+            menuHeight = $(this).height();
+            contentHeight = $(this).find('')
+        });
+
+        if (setMaxHeight < 320) {
+            $('.dropdown-menu.in-table-dropdown').scroll(function() {
+                if (this.scrollTop > 0) {
+                    $(this).find('.scrollable-menu-box').hide();
+                } else {
+                    $(this).find('.scrollable-menu-box').show();
+                }
+            });
+        }
+
+        $('#export').click(function(e) {
+            export_url = "<%= internal_manual_payment_export_manual_payment_path + '.csv?' %>"+ $('form').serialize()
+            $(this). attr("href", export_url);
+        });
+    </script>
+<% end %>

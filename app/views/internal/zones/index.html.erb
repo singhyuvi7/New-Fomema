@@ -1,0 +1,66 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Zones</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_ZONE') %>
+                    <%=raw index_table_new_button(new_internal_zone_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="table-responsive">
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @zones.blank? %>
+            <tr>
+                <td colspan="4" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @zones.each.with_index((@zones.current_page - 1) * get_per + 1) do |zone, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= zone.code %></td>
+                    <td><%= zone.name %></td>
+                    <td class="module-row-actions">
+                    <%=raw index_table_show_button(internal_zone_path(zone)) %>
+                    <% if has_permission?('EDIT_ZONE') %>
+                        <%=raw index_table_edit_button edit_internal_zone_path(zone) %>
+                    <% end %>
+                    <% if has_permission?('DELETE_ZONE') %>
+                        <%=raw index_table_delete_button(internal_zone_path(zone)) %>
+                    <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+
+        </div>
+
+        <div class="row">
+            <%= paginate @zones %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

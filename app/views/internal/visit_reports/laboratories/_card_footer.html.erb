@@ -1,0 +1,55 @@
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_visit_reports_laboratories_path) %>
+
+        <% if !['NEW'].include?(@visit_report.status) %>
+            <% if !@is_summary %>
+                <% if @visit_report&.visit_report_laboratory_summary.blank? && ['edit'].include?(params[:action]) %>
+                    <button id="summary_submit" class="btn btn-sm btn-warning" type="button"><i class="fa fa-book"></i> Submit Summary</button>
+                    <button id="summarySubmitBtn" class="d-none" type="submit" name="submit_action" value="summary">
+                <% end %>
+            <% else %>
+                <div class="dropdown show d-inline">
+                    <a class="btn btn-sm btn-success dropdown-toggle" href="#" role="button" id="signatureMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    E-Signature
+                    </a>
+
+                    <div class="dropdown-menu" aria-labelledby="signatureMenuLink">
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#labPersonnelModal">Laboratory's Personnel</button>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#fomemaOfficerModal">Fomema's Officer</button>
+                    </div>
+                </div>
+
+                <% if !@visit_report.visit_report_laboratory.lab_personnel_name.blank? && !@visit_report.visit_report_laboratory.lab_personnel_designation.blank? && !@visit_report.visit_report_laboratory.lab_personnel_signature.blank? && !@visit_report.visit_report_laboratory.fomema_officer_name.blank? && !@visit_report.visit_report_laboratory.fomema_officer_signature.blank?%>
+                    <button id="submit_to_lab" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#labEmailModal" type="button">Submit to Lab</button>
+                <% end %>
+
+                <button id="summary_save" class="btn btn-sm btn-warning" type="submit" name="submit_action" value="summary">Save Summary</button>
+            <% end %>
+        <% end %>
+
+        <% if ['DRAFT','NEW','REJECTED'].include?(@visit_report.status) && !@is_summary %>
+            <button id="draft_submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Save draft" data-original-title="Save draft" type="submit" name="submit_action" value="draft" data-disable-with="Save" formnovalidate><i class="icon-pencil"></i> Save draft</button>
+            <button id="approval_submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Submit for approval" data-original-title="Submit for approval" type="button" data-disable-with="Save">
+                    <i class="icon-pencil"></i> Submit for approval
+            </button> 
+            <button id="submitBtn" class="d-none" type="submit" name="submit_action" value="submit">
+        <% end %>
+
+        <% if ['approval'].include? params[:action] %>
+            <button type="submit" class="btn btn-warning btn-sm">
+                <i class="icon-flag"></i> Submit Decision
+            </button>
+        <% end %>
+
+        <!-- after approval done -->
+        <% if has_permission?('CREATE_LQCC_LETTER') && ['LEVEL_2_APPROVED'].include?(@visit_report.status) && @visit_report.visit_report_laboratory&.satisfactory == 'NO' && ['show'].include?(params[:action]) %>
+            <%= link_to "Create Explanation Letter (Non-Compliance)", new_internal_lqcc_letter_path(:visit_report_id => @visit_report.id, :letter_type => 'NON_COMPLIANCE'), class: "btn btn-sm btn-primary" %>
+            <%= link_to "Create Explanation Letter (Laboratory Close/Not Exist)", new_internal_lqcc_letter_path(:visit_report_id => @visit_report.id, :letter_type => 'LAB_CLOSED_NOT_EXIST'), class: "btn btn-sm btn-primary" %>
+        <% end %>
+
+        <% if ['LEVEL_2_APPROVED'].include?(@visit_report.status) && ['show'].include?(params[:action]) %>
+            <%= link_to "Download", internal_visit_report_laboratory_download_path(@visit_report.id), target: "_blank", class: "btn btn-sm btn-danger" %>
+        <% end %>
+    </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @status_schedule } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status_scheduleable_type, "Service Provider", class: 'required' %>
+                <%= form.select :status_scheduleable_type, options_for_select(StatusSchedule::STATUS_SCHEDULEABLE_TYPES.invert, form.object.status_scheduleable_type), {include_blank: form_select_option_text}, class: 'form-control', required: true, disabled: ["edit", "update"].include?(params[:action]) %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status_scheduleable_id, "Service Provider Code", class: 'required' %>
+                <%= form.hidden_field :status_scheduleable_id %>
+                <%= text_field_tag :status_scheduleable_code, @status_scheduleable_code, class: 'form-control', required: true, disabled: ["edit", "update"].include?(params[:action]) %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :from, class: 'required' %>
+                <%= form.date_field :from, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :to %>
+                <%= form.date_field :to, class: 'form-control' %>
+                <span class="help-block">Please create new status schedule if you wish to select past date</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status, class: 'required' %>
+                <%= form.select :status, options_for_select(@statuses.invert, form.object.status), {include_blank: form_select_option_text}, class: 'form-control', required: true %>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <%= form.label :status_reason, "Status Reason", class: 'required' %>
+                <%= form.select :status_reason, options_for_select(@status_reasons.invert, form.object.status_reason), {include_blank: form_select_option_text}, class: 'form-control', required: true, disabled: @status_reasons.count == 0 %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :comment %>
+                <%= form.text_area :comment, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_status_schedules_path(
+            {}.merge(
+                params.key?("status_scheduleable_code") ? {status_scheduleable_code: params[:status_scheduleable_code]} : {}
+            ).merge(
+                params.key?("status_scheduleable_type") ? {status_scheduleable_type: params[:status_scheduleable_type]} : {}
+            ).merge(
+                (params.key?("status_schedule") and params[:status_schedule].key?("status_scheduleable_type")) ? {status_scheduleable_type: params[:status_schedule][:status_scheduleable_type]} : {}
+            )
+        )) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#status_schedule_status_scheduleable_type').change(function () {
+    $.ajax({
+        url: "/status_schedules/scheduleable_statuses/" + this.value,
+        method: "GET",
+        success: function (response) {
+            $('#status_schedule_status').html('<option value="">Select option</option>');
+            response.statuses.forEach(function (row, index) {
+                $('#status_schedule_status').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+            });
+        },
+    });
+});
+
+$('#status_schedule_status').change(function () {
+    $.ajax({
+        url: "/status_schedules/scheduleable_status_reasons/" + $('#status_schedule_status_scheduleable_type').val() + '/' + this.value + '.json',
+        method: "GET",
+        success: function (response) {
+            $('#status_schedule_status_reason').html('<option value="">Select option</option>');
+            if (response.status_reasons.length == 0) {
+                $('#status_schedule_status_reason').prop('disabled', true);
+            } else {
+                $('#status_schedule_status_reason').prop('disabled', false);
+                response.status_reasons.forEach(function (row, index) {
+                    $('#status_schedule_status_reason').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+                });
+            }
+        },
+    });
+});
+</script>
+<% end %>

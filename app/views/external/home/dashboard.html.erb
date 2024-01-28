@@ -1,0 +1,130 @@
+<%= render "/shared/all_flash" %>
+
+<div class="row">
+    <div class="col-md-4">
+        <%= render "/external/home/home_bulletins" %>
+    </div>
+
+    <% if ["Doctor", "Laboratory", "XrayFacility"].include?(current_user.userable_type) %>
+        <div class="col-md-8">
+            <%= render "/external/home/doctor_dashboard" %>
+        </div>
+    <% end %>
+
+    <% if ["Employer"].include?(current_user.userable_type) %>
+        <div class="col-md-8">
+        <%= render "/external/home/employer_dashboard" %>
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center p-4">
+                        <%= image_tag("forms/EmployerBulletinsSection.png", :style => "width: 80%;")%>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% unless current_user.unconfirmed_email.blank? %>
+            <div id="dialog-email-reminder" class="hidden" title="Confirm your email address">
+                <p>Email address recently updated, please verify it by clicking the <b>"confirm account"</b> link that has been send to your email <b><%= current_user.unconfirmed_email %></b> on <b><%= current_user.confirmation_sent_at&.strftime(get_standard_date_format) %></b>.</p>
+                <% if !current_user.confirmation_sent_at.blank? && current_user.confirmation_sent_at >= '2022-08-15' %>
+                    <div class="d-flex justify-content-center">
+                        <button class="text-center">
+                            <%= link_to destroy_external_user_session_path(user_type: current_user.userable_type), :method => :delete, :title => "OK", class:'dropdown-item' do %>
+                                <i class="fa fa-lock"></i> OK
+                            <% end %>
+                        </button>
+                    </div>
+                <% end %>
+            </div>
+
+            <% content_for :page_end_scripts do %>
+                <script>
+                    <% if !current_user.confirmation_sent_at.blank? && current_user.confirmation_sent_at >= '2022-08-15' %>
+                        openDialog_logout({target: '#dialog-email-reminder', type: 'warning'});
+                    <% else %>
+                        openDialog({target: '#dialog-email-reminder', type: 'warning'});
+                    <% end %>
+                </script>
+            <% end %>
+        <% end %>
+    <% elsif ["Agency"].include?(current_user.userable_type) %>
+        <div class="col-md-8">
+        <%= render "/external/home/employer_dashboard" %>
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center p-4">
+                        <%= image_tag("forms/Agency_Registration_Flow.png", :style => "width: 80%;")%>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% if flash[:pending_appeal_message] %>
+    <div id="dialog-pending-appeals" class="hidden" title="Pending Appeals">
+        <p><%= flash[:pending_appeal_message] %></p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-pending-appeals', type: 'primary'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if flash[:notice_to_employer] %>
+    <div id="dialog-roc_ic_no" class="hidden" title="Reminder to update your Profile">
+        <p><%= flash[:notice_to_employer] %> </p>
+    </div>
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-roc_ic_no', type: 'warning'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if flash[:notice_to_agency] %>
+    <div id="dialog-sop" class="hidden" title="Reminder to acknowledge Standard Operating Procedure">
+        <p><%= flash[:notice_to_agency] %> </p>
+    </div>
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-sop', type: 'warning'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if flash[:pending_notifiable_cases_message] %>
+    <div id="dialog-pending-notifies" class="hidden" title="Pending Notification of Notifiable Disease">
+        <p><%= flash[:pending_notifiable_cases_message] %></p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-pending-notifies', type: 'primary'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if flash[:notice_reminders] %>
+<% if ["XrayFacility"].include?(current_user.userable_type) %>
+    <div id="dialog-expired-xrays" class="hidden" title="Reminder to update Field X-Ray Licence Expire Date">
+        <p><%= flash[:notice_reminders] %> Hello <b><%= current_user.name %></b>,<br>Your X-ray licence nearly expires. Please do the renewal with the relevant authorities as soon as possible, so that your information keep update. Failure with, FOMEMA will take the necessary action to your X-ray service. <br><br>Click below to Update <br><a class="dropdown-item" href="<%= external_profile_path %>"><i class="fa fa-arrow-right"></i> Profile</a></p>
+    </div>
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-expired-xrays', type: 'warning'});
+        </script>
+    <% end %>
+    <% end %>
+<% if ["Laboratory"].include?(current_user.userable_type) %>
+    <div id="dialog-expired-labs" class="hidden" title="Reminder to update Field SAMM Expire Date">
+        <p><%= flash[:notice_reminders] %> Hello <b><%= current_user.name %></b>,<br>Your accreditation scheme with SAMM is nearly to be expire. Please do the renewal with the relevant authorities as soon as possible, so that your information keep update. <br><br>Click below to Update <br><a class="dropdown-item" href="<%= external_profile_path %>"><i class="fa fa-arrow-right"></i> Profile</a></p>
+    </div>
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-expired-labs', type: 'warning'});
+        </script>
+    <% end %>
+    <% end %>
+<% end %>

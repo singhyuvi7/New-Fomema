@@ -1,0 +1,47 @@
+<p>
+    <b>Dear Respected Panel Doctor,</b><br>
+</p>
+
+<p>
+    <% if @appeal.registered_by_type == "Employer" %>
+        Please be informed that the below employer has successfully registered an appeal for his/her foreign worker via FOMEMA's Employer Portal:<br>
+    <% else %>
+        Please be informed that the following worker has been registered for appeal.
+    <% end %>
+</p>
+
+<p>
+    <% if ["Employer", "User"].include?(@appeal.registered_by_type) %>
+        Name of Employer: <b><%= @appeal.transactionz.employer.name %></b><br>
+    <% elsif @appeal.registered_by_type == "Agency" %>
+        Name of Agency: <b><%= @appeal.transactionz.agency.name %></b><br>
+    <% end %>
+    Name of Foreign Worker: <b><%= @appeal.transactionz.fw_name %></b><br>
+    Worker Code: <b><%= @appeal.transactionz.fw_code %></b><br>
+</p>
+
+<p>
+    Details of this appeal case and <a href="<%= @url %>">doctor instruction letter</a> can be viewed in the list of appeal cases in the Doctor Appeal Module via MERTS.<br>
+    The employer has been advised to contact the original doctor/clinic for the next action (kindly refer to Appeal Guidelines or appeal instruction in the system).<br>
+</p>
+
+<p>
+    For your information, upload of complete appeal form is no longer required for all appeal cases registered via Employer Portal because it already been signed digitally during the registration process.<br>
+</p>
+
+<p>
+    Thank you for your kind attention, cooperation and continuous support.<br>
+</p>
+
+<p>
+    Regards,<br>
+</p>
+
+<p>
+    <b>Medical Review and Appeal Department</b><br>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***Email dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

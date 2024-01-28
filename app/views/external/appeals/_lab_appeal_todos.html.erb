@@ -1,0 +1,50 @@
+<div class="p-4 border-bottom">
+    <h3><u>Laboratory To Do Tasks</u></h3>
+</div>
+
+<div class="px-4 py-4 border-bottom">
+    <table class="table-borders w-100">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">Confirm Task</th>
+                <th class="py-1 px-2">No.</th>
+                <th class="py-1 px-2">To Do</th>
+                <th class="py-1 px-2">Sent At</th>
+                <th class="py-1 px-2">Completed At</th>
+                <th class="py-1 px-2">Remarks</th>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @lab_todos.each_with_index do |todo, index| %>
+                <% todo_code = todo.appeal_todo %>
+
+                <tr>
+                    <td class="py-1 px-2">
+                        <%= check_box_tag "laboratory_todos[]", todo.id, todo.secondary_sent_at?, class: "font-size-6" %>
+                    </td>
+
+                    <td class="py-1 px-2"><%= index + 1 %></td>
+                    <td class="py-1 px-2"><%= todo_code.description %></td>
+                    <td class="py-1 px-2"><%= todo.secondary_sent_at? ? todo.secondary_sent_at.strftime("%d/%m/%Y") : nil %></td>
+                    <td class="py-1 px-2"><%= todo.completed_at? ? todo.completed_at.strftime("%d/%m/%Y") : nil %></td>
+                    <td class="py-1 px-2"><%= todo.comment %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<div class="px-4 py-2 d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="flex-grow-1 mb-0">Please specify the Laboratory that will conduct the To Do Tasks</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <% lab = @appeal.laboratory || @transaction.laboratory %>
+        <%= appeal_form.hidden_field :laboratory_id, value: lab.id %>
+        <p id="selected-lab-name-code" class="mb-0 mr-3"><%= lab.name %> (<b><%= lab.code %></b>)</p>
+    </div>
+</div>
+
+<div id="lab-todo-save-prompt" class="px-4 py-2 border-bottom text-danger hidden">
+    Please click <b>Save</b> to update the changes.
+</div>

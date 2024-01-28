@@ -1,0 +1,103 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>X-Ray Facility</strong> - Summary Loading Statistic
+    </div>
+    <!-- /.card-header -->
+
+    <div class="card-body">
+        <table class="table table-bordered table-sm w-auto mx-auto">
+            <tr>
+                <th>&nbsp;</th>
+                <th>Previous Year (<%= @previous_year.year %>)</th>
+                <th>Current Year (<%= @current_year.year %>)</th>
+            </tr>
+            <tr>
+                <th># of worker allocated</th>
+                <td><%= @xray_facility.transactions.where("transaction_date between ? and ?", @previous_year.beginning_of_year, @previous_year.end_of_year).count %></td>
+                <td><%= @xray_facility.transactions.where("transaction_date between ? and ?", @current_year.beginning_of_year, @current_year.end_of_year).count %></td>
+            </tr>
+            <tr>
+                <th># of x-ray results submitted</th>
+                <td><%= @xray_facility.transactions.joins(:xray_examinations).where("transactions.transaction_date between ? and ? and xray_examinations.transmitted_at is not null and xray_examinations.sourceable_type = 'Transaction'", @previous_year.beginning_of_year, @previous_year.end_of_year).count %></td>
+                <td><%= @xray_facility.transactions.joins(:xray_examinations).where("transactions.transaction_date between ? and ? and xray_examinations.transmitted_at is not null and xray_examinations.sourceable_type = 'Transaction'", @current_year.beginning_of_year, @current_year.end_of_year).count %></td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div class="card-body">
+        <p align="center"><b>Total Worker Allocated By Provider</b></p>
+        <table class="table table-bordered table-sm w-auto mx-auto">
+            <tr>
+                <th>Provider Name</th>
+                <th>Previous Year (<%= @previous_year.year %>)</th>
+                <th>Current Year (<%= @current_year.year %>)</th>
+            </tr>
+            <% DigitalXrayProvider.all.order(:id).pluck(:id, :name, :code).each do |id, name, code| %>
+                <tr>
+                    <th><%= name %></th>
+                    <td>
+                        <%= @xray_facility.transactions.where("transaction_date between ? and ?", @previous_year.beginning_of_year, @previous_year.end_of_year).where(digital_xray_provider_id: id).count%>
+                    </td>
+                    <td>
+                        <%= @xray_facility.transactions.where("transaction_date between ? and ?", @current_year.beginning_of_year, @current_year.end_of_year).where(digital_xray_provider_id: id).count%>
+                    </td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+
+    <!-- same data as above but in different table format -->
+    <div class="card-body" style="display:none;">
+        <%= label_tag :total_worker_allocated_by_provider, "Total Worker Allocated By Provider Year " + + Time.now.year.to_s %>
+        <table class="<%= index_table_class %>">
+            <tr>
+                <th>Provider</th>
+                <th>Count</th>
+            <tr>
+            <% @xray_facility.total_worker_allocated_by_provider.each do |provider, count| %>
+                <% if !provider.blank? %>
+                    <tr>
+                        <td><%= provider.blank? ? "" : DigitalXrayProvider.find(provider).name %></td>
+                        <td><%= count %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+            <% if @xray_facility.total_worker_allocated_by_provider.blank? %>
+                <tr>
+                    <td colspan="2" class="text-danger">No records found.</td>
+                </tr>
+            <% end %>
+        </table>
+
+        <%= label_tag :total_worker_allocated_last_year_by_provider, "Total Worker Allocated By Provider Year " + Time.now.last_year.year.to_s %>
+        <table class="<%= index_table_class %>">
+            <tr>
+                <th>Provider</th>
+                <th>Count</th>
+            <tr>
+            <% @xray_facility.total_worker_allocated_last_year_by_provider.each do |provider, count| %>
+                <% if !provider.blank? %>
+                    <tr>
+                        <td><%= provider.blank? ? "" : DigitalXrayProvider.find(provider).name %></td>
+                        <td><%= count %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+            <% if @xray_facility.total_worker_allocated_last_year_by_provider.blank? %>
+                <tr>
+                    <td colspan="2" class="text-danger">No records found.</td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw show_back_button(internal_xray_facilities_path) %>
+    </div>
+    <!-- /.card-footer -->
+
+</div>
+<!-- /.card -->

@@ -1,0 +1,69 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent">
+        <b>Payment</b> - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: external_order_path(@order) do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%= render "external/orders/shared/order_detail", {order: @order, form: form} %>
+            <%= render "swipe_reminder.html.erb" %>
+            <%= render "boleh_reminder.html.erb" if @order.payment_method&.code == "BOLEH" %>
+
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="bulk-toggle" data-target="#etr-table input.bulk"></th>
+                        <th>Worker Name</th>
+                        <th>New Gender</th>
+                        <th class="currency">Amount (RM) </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.joins("join fees on order_items.fee_id = fees.id
+                    left join foreign_workers on order_items.order_itemable_id = foreign_workers.id and order_items.order_itemable_type = 'ForeignWorker'")
+                    .select("order_items.*, case when order_items.order_itemable_type = 'ForeignWorker' then 1
+                    when fees.code in ('IPAY_FPX_B2B', 'IPAY_FPX_B2C','SWIPE_FPX_B2B', 'SWIPE_FPX_B2C', 'PAYNET_FPX_B2B', 'PAYNET_FPX_B2C', 'BOLEH', 'BOLEH_WEB') then 3
+                    else 2 end as sort1, foreign_workers.name as sort2, case when fees.code in ('FOREIGN_WORKER_GENDER_AMENDMENT') then 1
+                    else 2 end as sort3")
+                    .where.not("fees.code" => ["INSURANCE_SST", "INSURANCE_STAMP_DUTY", "INSURANCE_ADMINFEES", "INSURANCE_ADMINFEES_SST"])
+                    .order("sort1 asc, sort2 asc, sort3 asc").includes(:fee, :order_itemable, :insurance_purchase).each do |order_item| %>
+                        <%=render "external/orders/#{order_item.fee.code.downcase}", {order_item: order_item} %>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">&nbsp;</th>
+                        <th class="currency">
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="row">
+                <div class="col text-right">
+                    <button class="btn btn-blue-portal" type="submit" name="submit" value="save" id="btn-save">Save</button>
+                    <% if @order_valid %>
+                        <button class="btn btn-blue-portal" type="submit" name="submit" value="save_and_proceed_to_payment" id="btn-save_and_proceed_to_payment">Pay now</button>
+                    <% end %>
+                    <a class="btn btn-blue-portal" href="<%= external_orders_path %>">Back</a>
+                    <button class="btn btn-red-portal" type="submit" name="submit" value="cancel" id="btn-cancel" formnovalidate>Cancel payment</button>
+                </div>
+            </div>
+        </div>
+        <!-- /card-body -->
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

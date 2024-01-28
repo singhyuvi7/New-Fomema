@@ -1,0 +1,7 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Worker</strong> - New Foreign Worker</div>
+  <%= form_for @foreign_worker, {url: internal_foreign_workers_path, html: {multipart: true}} do |form| %>
+    <%= render 'form', { form: form } %>
+  <% end %>
+</div>
+ 

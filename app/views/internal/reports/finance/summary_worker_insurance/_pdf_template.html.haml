@@ -1,0 +1,80 @@
+- grand_total = { transaction_registration: { male: 0, female: 0 }, transaction_cancellation: { male: 0, female: 0 }, gender_change: { male: 0, female: 0 }, net: { male: 0, female: 0 } }
+- if @data.present?
+  - @data.each do |branch, insurances|
+    .w-100{:style => "margin-top: 2rem;"}
+    %h1= branch
+    %table.table.w-100.text-center.mb-0
+      %thead
+        %tr
+          - @headers.each.with_index do |header, index|
+            %th{width: index == 1 ? '20%' : '20%'}= header
+      %tbody
+        - if insurances.present?
+          - insurances.each do |insurance|
+            %tr
+              %td= insurance.paid_date
+              %td="Insurance"
+              %td= insurance.gender
+              %td= insurance.count
+              %td= insurance.sum
+    .w-100
+      %table.table.w-100.text-center.mb-0
+        %thead
+          %tr
+            %th{colspan:2,width: '20%'}= 'Branch Summary'
+            %th{width: '20%'} Male
+            %th{width: '20%'} Female
+            %th{width: '20%'} Total 
+            %th{width: '20%'} Total 
+        %tbody
+          %tr
+            %td{colspan:2}= "Insurance"
+            %td= insurances.map {|s| s['gender'] == 'M' ? s['count'] : 0}.sum
+            %td= insurances.map {|s| s['gender'] == 'F' ? s['count'] : 0}.sum
+            %td= insurances.map {|s| s['count']}.sum
+            %td= insurances.map {|s| s['sum']}.sum
+
+.w-100.mt-5
+  %table.table.w-100.text-center
+    %thead
+      %tr
+        %th{colspan:2,width: '20%'}= 'Report Summary'
+        %th{width: '20%'} Male
+        %th{width: '20%'} Female
+        %th{width: '20%'} Grand Total
+        %th{width: '20%'} Grand Total
+    %tbody
+      %tr
+        %td{colspan:2}= 'Insurance'
+        %td= @grand_total_male
+        %td= @grand_total_female
+        %td= @grand_total_count
+        %td= @grand_total_sum
+
+:css
+  .w-100 {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #d0d0d0;
+  }
+
+  thead th {
+    padding: 10px 3px;
+    border: 1px solid #aaa;
+  }
+
+  tbody td {
+    padding: 10px 5px;
+    vertical-align: center;
+    border: none;
+  }
+
+  .bold {
+    font-weight: bold;
+  }

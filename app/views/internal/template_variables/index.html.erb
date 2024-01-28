@@ -1,0 +1,57 @@
+<div class="card">
+  <div class="card-header">
+    <strong>Template Variables</strong>
+  </div>
+
+  <div class="card-body">
+
+      <%=render "filter" %>
+
+      <%=render '/shared/all_flash' %>
+
+        <div class="table-responsive">
+            <table class="<%= index_table_class %>">
+            <thead>
+            <tr>
+              <th class="module-row-numbers">#</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Value</th>
+              <th class="module-row-actions">Action(s)</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <% if @template_variables.blank? %>
+              <tr>
+                <td colspan="4" class="text-danger">No records found.</td>
+              </tr>
+            <% else %>
+
+              <% @template_variables.each.with_index((@template_variables.current_page - 1) * get_per + 1) do |template_variable, index| %>
+                <tr>
+                  <td class="module-row-numbers"><%= index %></td>
+                  <td><%= template_variable.name %></td>
+                  <td><%= template_variable.description %></td>
+                  <td><%= template_variable.value %></td>
+                  <td class="module-row-actions">
+                    <%=raw index_table_show_button(internal_template_variable_path(template_variable)) %>
+                    <% if has_permission?('EDIT_TEMPLATE_VARIABLE') %>
+                      <%=raw index_table_edit_button edit_internal_template_variable_path(template_variable) %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="row">
+          <%= paginate @template_variables %>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

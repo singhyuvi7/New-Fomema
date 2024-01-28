@@ -1,0 +1,109 @@
+<div class="modal fade transaction-cart" id="transaction-cart" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Selected Foreign Workers</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="post" action="<%= form_action %>">
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                <div class="modal-body" style="max-height: 600px; overflow-y: scroll;">
+                    <% if current_user.userable_type.eql?("Agency")%>
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-6"><font color="red">Note: Please ensure the worker selected is registered under the same employer code.</font></label>
+                        </div>
+                    <% end %>
+
+                    <% if max_count = SystemConfiguration.get('MAX_ORDER_ITEM_COUNT').to_i > 0 %>
+                        <p style='color:red'><strong>Note: You may select up to 25 workers only per transaction.</strong></p>
+                        <% if current_user.employer_supplement_id.present? %>
+                            <p style='color:red'><strong>Note: Please note that you cannot buy FOMEMA if worker not in your account.</strong></p>
+                        <% end %>
+                    <% end %>
+
+                    <table class="table">
+                        <tr>
+                            <th><label><input type="checkbox" class="master-checkbox" data-target="transaction-cart-cb"> <span class="ml-1">#</span></label></th>
+                            <% if current_user.userable_type.eql?("Agency")%>
+                                 <th>Employer Code</th>
+                                   <th>Employer Name</th>
+                            <% end %>
+                            <th>Name</th>
+                            <th>Passport Number</th>
+                            <th>Worker Code</th>
+                            <% if current_user.employer_supplement_id.present? %>
+                                <th>Account Name</th>
+                            <% end %>
+                        </tr>
+                        <% if @transaction_carts %>
+                            <% @transaction_carts.each.with_index(1) do |tc, index| %>
+                                <tr>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" class="transaction-cart-cb" name="ids[]" id="ids_<%= tc.id %>" value="<%= tc.id %>" <% if ["Employer"].include?(current_user.userable_type) %>checked="checked"<% end %>>
+                                            <span class="ml-1"><%= index %></span>
+                                        </label>
+                                    </td>
+                                    <% if current_user.userable_type.eql?("Agency")%>
+                                           <td><%= tc.empcode%></td>
+                                             <td><%= tc.empname%></td>
+                                    <% end %>
+                                    <td><%= tc.name %></td>
+                                    <td><%= tc.passport_number %></td>
+                                    <td><%= tc.code %></td>
+                                    <% if current_user.employer_supplement_id.present? %>
+                                        <td><%= tc.employer_supplement_name %></td>
+                                    <% end %>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <% if !current_user.userable_type.eql?("Employer") && !current_user.userable_type.eql?("Agency") %>
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit" name="bulk_action" value="remove_cart">Remove</button>
+                    <% else %>
+                        <button class="btn btn-blue-portal" type="button" data-dismiss="modal">Close</button>
+                        <button class="btn btn-red-portal" type="submit" name="bulk_action" value="remove_cart">Remove</button>
+                    <% end %>
+
+                    <% if has_permission?("CREATE_INSURANCE_PURCHASE") %>
+                        <% if site == "PORTAL" %>
+                            <%= render partial: "/shared/insurance_menu", locals: {button_class: "btn btn-blue-portal dropdown-toggle"} %>
+                        <% else %>
+                            <%= render partial: "/shared/insurance_menu", locals: {button_class: "btn btn btn-primary dropdown-toggle"} %>
+                        <% end %>
+                    <% end %>
+
+                    <% if site == "PORTAL" %>
+                        <% if has_permission?("CREATE_TRANSACTION") && has_permission?('CREATE_SPECIAL_RENEWAL_TRANSACTION') %>
+                            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="register_transaction"><i class="fa fa-file"></i> Buy FOMEMA </button>
+                        <% elsif has_permission?("CREATE_TRANSACTION") %>
+                            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="register_transaction_no_special"><i class="fa fa-file"></i> Buy FOMEMA </button>
+                        <% end %>
+                    <% elsif site == "NIOS" %>
+                        <% if has_permission?("CREATE_TRANSACTION") %>
+                            <button class="btn btn-primary" type="submit" name="bulk_action" value="register_transaction_no_special">Purchase Medical Form (Skip Special Renewal Case)</button>
+                        <% end %>
+                        <% if has_permission?("CREATE_SPECIAL_RENEWAL_TRANSACTION") %>
+                            <button class="btn btn-primary" type="submit" name="bulk_action" value="register_transaction">Purchase Medical Form (Including Special Renewal Case)</button>
+                        <% end %>
+                    <% end %>
+
+                    <% if has_permission?("EDIT_EMPLOYER_SUPPLEMENT_FOREIGN_WORKER") && @employer.has_supplement_account? %>
+                        <% if !current_user.userable_type.eql?("Employer") %>
+                            <button class="btn btn-primary" type="submit" name="bulk_action" value="transfer_worker"><i class="fa fa-user"></i> Transfer Worker(s)</button>
+                        <% else %>
+                            <button class="btn btn-blue-portal" type="submit" name="bulk_action" value="transfer_worker"><i class="fa fa-user"></i> Transfer Worker(s)</button>
+                        <% end %>
+                    <% end %>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>

@@ -1,0 +1,175 @@
+<%
+    # Will receive undefined error unless set
+    skip_visited        ||= nil # Used for appeals.
+    readonly            ||= false
+    doctor_examination  ||= nil
+    namespacing         ||= "xe_attributes_#{ rand(1000) }"
+    hide_not_done       ||= false
+    any_abnormal        = false
+%>
+
+<%= hidden_field_tag "#{ namespacing }[id]", xray_examination.id %>
+
+<% if ["XrayFacility", "Radiologist"].include?(current_user.userable_type) %>
+    <h5 class="px-4 py-3 border-bottom mb-0">Examination</h5>
+<% else %>
+    <div class="p-4 border-bottom">
+        <h3><u>PART IV. INVESTIGATIONS Section B: X-Ray Findings</u></h3>
+    </div>
+<% end %>
+
+<div class="px-4 py-2 boolean-field-parent <%= hide_not_done ? "hidden" : "d-flex" %> flex-wrap justify-content-end align-items-center border-bottom ">
+    <label class="row-index"></label>
+    <label class="flex-grow-1 mb-0">X-ray examination not done</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%
+            value = xray_examination.try(:xray_examination_not_done) == "YES"
+            @examination_disabled = value
+        %>
+
+        <%= hidden_field_tag "#{ namespacing }[xray_examination_not_done]", value ? "YES" : "NO", class: "boolean-field" %>
+        <p class="mb-0 mr-2">(Check <b>YES</b> if x-ray examination was not done for this worker)</p>
+        <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: "YES", placeholder: "Yes") %>
+        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: "NO", placeholder: "No") %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="row-index"></label>
+    <label class="flex-grow-1 mb-0">Date of x-ray taken</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%
+            date_value  = xray_examination.try(:xray_taken_date)
+            formatted   = date_value.present? ? readonly ? date_value.strftime("%d/%m/%Y") : date_value.strftime("%F") : nil
+
+            min_value   =
+                if @sourceable.class == Transaction && @sourceable.medical_examination_date?
+                    @sourceable.medical_examination_date.strftime("%F")
+                elsif @sourceable.present?
+                    @sourceable.created_at.strftime("%F")
+                end
+        %>
+
+        <% if (!Rails.env.production? && params[:calendar] == "y") || @sourceable&.xray_film_type != "DIGITAL" %>
+            <%= text_field_tag "#{ namespacing }[xray_taken_date]", formatted, placeholder: "Select date", class: "w-em-16 form-control rounded-0 px-2 datepicker exam-done-toggle", min: min_value, max: Date.today.strftime("%F"), autocomplete: "off", readonly: readonly, disabled: @examination_disabled %>
+        <% elsif @is_digital %>
+            <%= text_field_tag "#{ namespacing }[xray_taken_date]", formatted, placeholder: "dd/mm/yyyy", class: "w-em-16 form-control rounded-0 px-2", autocomplete: "off", readonly: true %>
+        <% end %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="row-index"></label>
+    <label class="flex-grow-1 mb-0">X-ray Reference Number</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%= text_field_tag "#{ namespacing }[xray_ref_number]", xray_examination.xray_ref_number, placeholder: "Xray Reference", class: "w-em-16 form-control rounded-0 px-2 exam-done-toggle", readonly: true, disabled: true %>
+    </div>
+</div>
+
+<h5 class="px-4 py-3 border-bottom mb-0">Report</h5>
+
+<div id="report-fields">
+    <% XrayExamination.xray_checks.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            value               = xray_examination.try(field_name)
+            comment             = xray_examination.try("#{field_name}_comment")
+            any_abnormal        = true if value
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent boolean-detail-fields d-flex flex-wrap justify-content-end border-bottom <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"><%= "#{ index + 1 }" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field xray-exam-normal-field-wipe" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Abnormal") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Normal", classes: "mr-4") %>
+                </div>
+
+                <%= text_area_tag "#{ namespacing }[#{field_name}_comment]", comment, placeholder: "Details of abnormality", class: "w-em-40 p-2 comment-field", rows: 5, disabled: @examination_disabled || !value, readonly: readonly %>
+            </div>
+        </div>
+    <% end %>
+
+    <% XrayExamination.xray_checks_yes_no_fields.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            value               = xray_examination.try(field_name)
+            comment             = xray_examination.try("#{field_name}_comment")
+            any_abnormal        = true if value
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent boolean-detail-fields d-flex flex-wrap justify-content-end border-bottom <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"><%= "#{ index + 6 }" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field xray-exam-normal-field-wipe" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No", classes: "mr-4") %>
+                </div>
+
+                <%= text_area_tag "#{ namespacing }[#{field_name}_comment]", comment, placeholder: "Details of findings", class: "w-em-40 p-2 comment-field", rows: 5, disabled: @examination_disabled || !value, readonly: readonly %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom except-this">
+        <label class="row-index"></label>
+        <label class="flex-grow-1 mb-0">Impression</label>
+        <%
+            impression_value = xray_examination.try(:impression).presence || (any_abnormal ? "" : "NORMAL")
+        %>
+
+        <div class="d-flex flex-shrink-0">
+            <%= text_area_tag "#{ namespacing }[impression]", impression_value, rows: 5, placeholder: "Impression of this worker", class: "p-2 main-impression-box", style: "width: 40em", readonly: readonly %>
+        </div>
+    </div>
+
+    <% if readonly && xray_examination.transmitted_at? %>
+        <div class="border-bottom pt-3 pb-2">
+            <div class="px-4 pb-2 boolean-field-parent d-flex flex-wrap justify-content-between align-items-center">
+                <label class="row-index"></label>
+                <label class="flex-grow-1 mb-0">Date of x-ray report: <%= xray_examination.transmitted_at.strftime("%d/%m/%Y") %></label>
+            </div>
+        </div>
+    <% end %>
+
+    <%
+        if @skip_visited.present? || skip_visited
+            nil
+        elsif doctor_examination.present?
+    %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-between align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Yes, I have visited X-ray results for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.visited_xray_facility_result %>
+                <%= hidden_field_tag "de_attributes[visited_xray_facility_result]", value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% else %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-between align-items-center border-bottom except-this">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0"><%= @sourceable&.xray_reporter_type == "RADIOLOGIST" && current_user.userable_type == "XrayFacility" ? "Acknowledge the x-ray findings reported by the radiologist" : "Viewed digital x-ray and confirmed the x-ray findings" %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = xray_examination.transmitted_at? || (current_user.userable_type == "Radiologist" && xray_examination.radiologist_transmitted_at?) %>
+                <%= hidden_field_tag :visited_xray, value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% end %>
+</div>

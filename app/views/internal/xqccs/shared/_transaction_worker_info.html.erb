@@ -1,0 +1,69 @@
+<%# copied to view/internal/xray_pending_reviews/shared/_transaction_summary.html.erb %>
+<div class="card">
+    <div class="card-header">
+        <%= transaction_model.xray_film_type&.titlecase %> X-Ray Review Details
+    </div>
+    <table class="table table-bordered table-card table-sm">
+        <tbody>
+            <tr>
+                <td class="font-weight-bold" >Worker Name</td>
+                <td><%= transaction_model.fw_name %></td>
+                <td class="font-weight-bold" >X-Ray Facility</td>
+                <td><%= transaction_model.xray_facility&.name %></td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Worker Code</td>
+                <td><%= transaction_model.fw_code %></td>
+                <td class="font-weight-bold" >X-Ray Code</td>
+                <td><%= transaction_model.xray_facility&.code %></td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Passport No.</td>
+                <td><%= transaction_model.fw_passport_number %></td>
+                <td class="font-weight-bold" >Transaction ID</td>
+                <td>
+                    <%= transaction_model.code %>
+                    <%# if has_permission?("VIEW_ALL_TRANSACTION") %>
+                        <a class="btn btn-primary btn-sm" href="<%= internal_transaction_path(transaction_model) %>">
+                            View <i class="fa fa-external-link-alt"></i>
+                        </a>
+                    <%# end %>
+                </td>
+            </tr>
+
+            <% xray_examination_model = transaction_model.xray_examination %>
+
+            <tr>
+                <td class="font-weight-bold">X-Ray Taken Date</td>
+                <td>
+                    <%= xray_examination_model.try(:xray_taken_date).blank? ? "N/A" : xray_examination_model.xray_taken_date.strftime(get_standard_date_format) %>
+                </td>
+                <td class="font-weight-bold">X-Ray Report Date</td>
+                <td>
+                    <%= xray_examination_model.try(:transmitted_at).blank? ? "N/A" : xray_examination_model.transmitted_at.strftime(get_standard_date_format) %>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="font-weight-bold" >Doctor Certification</td>
+                <td colspan="3"><%= transaction_model.doctor_examination&.suitability %></td>
+<%
+=begin %>
+                <% if transaction_model.xray_film_type&.downcase === 'digital' %>
+                    <td class="font-weight-bold" >Digital X-Ray Image</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: xray_examination_model&.id, user_id: current_user.id) %>"><%= transaction_model.code %> <i class="fa fa-external-link-alt"></i></a>
+                    </td>
+                <% else %>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                <% end %>
+<%
+=end %>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,89 @@
+<div class="card">
+    <div class="card-body">
+        <%=render partial: '/internal/employers/shared/employer' %>
+
+        <%=render partial: '/internal/employers/shared/tabs', locals: {active_tab: "users"} %>
+
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <%=render "filter" %>
+
+                <%=render '/shared/all_flash' %>
+
+                <div class="row">
+                    <div class="col module-actions text-left">
+                    </div>
+                    <div class="col module-actions text-right">
+                        <% if false and has_permission?('CREATE_USER_EMPLOYER') %>
+                            <%=raw index_table_new_button(new_internal_employer_employer_user_path, label: '<i class="fa fa-plus"></i> New User', title: "New User") %>
+                        <% end %>
+                        <% if ["COMPANY"].include?(@employer.employer_type.name) and has_permission?('CREATE_SUPPLEMENTAL_USER_EMPLOYER') %>
+                            <%=raw index_table_new_button(new_internal_employer_employer_user_path(supplemental: 1), label: '<i class="fa fa-plus"></i> New Supplemental User', title: 'New Supplemental User') %>
+                            <%=raw index_table_new_button(bulk_supplement_internal_employer_employer_users_path, label: '<i class="fa fa-plus"></i> Bulk Supplemental User', title: 'Bulk Supplemental User') %>
+                        <% end %>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @users.blank? %>
+            <tr>
+                <td colspan="7" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @users.each.with_index((@users.current_page - 1) * get_per + 1) do |user, index| %>
+                <tr>
+                    <td class="module-row-numbers">
+                        <label><%= index %></label>
+                    </td>
+                    <td><%= user.name %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.role.name %></td>
+                    <td><%= user.status %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_employer_employer_user_path(@employer, user)) %>
+
+                        <% if has_permission?('EDIT_USER_EMPLOYER') %>
+                            <%=raw index_table_edit_button edit_internal_employer_employer_user_path(@employer, user) %>
+                        <% end %>
+
+                        <% if has_permission?('DELETE_USER_EMPLOYER') %>
+                            <%=raw index_table_delete_button internal_employer_employer_user_path(@employer, user) %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <%= paginate @users %>
+                </div>
+
+            </div>
+            <!-- /tab-pane -->
+        </div>
+        <!-- /tab-content -->
+    </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Roles</strong> - Role Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Category</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.category %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.status %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Sites</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.site %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="role_code">Password policy</label>
+                    <p class="form-control-plaintext">
+                        <%= @role.password_policy_id %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <label class="col-md-9 col-sm-6">Permissions</label>
+                <input type="text" class="form-control col-md-3 col-sm-6" placeholder="Filter permission" id="role-permission-filter">
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <% Role::MODULE_PERMISSIONS.each.with_index do |perm, idx| %>
+                    <div class="col-lg-4 col-md-6 permission-filterable" data-keywords=" <%= perm[1].join(' ').gsub('_', ' ') %> ">
+                        <div class="card">
+                            <div class="card-header">
+                                <label><input type="checkbox" class="permission-module-title"<%= ' checked' if @role.has_all_permission? perm[1] %>  disabled> <%= perm[0].upcase %></label>
+                            </div>
+                            <div class="card-body">
+                                <% perm[1].each do |permission| %>
+                                    <div class="permission-filterable" data-keywords=" <%= permission.gsub('_', ' ') %> ">
+                                        <div class="form-check checkbox">
+                                            <input type="checkbox" class="form-check-label" name="role[permissions][]" id="role_permissions_<%= permission.downcase %>" value="<%= permission %>"<%= ' checked' if @role.current_permissions.include? permission %> disabled>
+                                            <label class="form-check-label" for="role_permissions_<%= permission.downcase %>"><%= permission %></label>
+                                        </div>
+                                    </div>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_roles_path) %>
+            <% if has_permission?('EDIT_ROLE') %>
+                <%=raw show_edit_button(edit_internal_role_path(@role)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

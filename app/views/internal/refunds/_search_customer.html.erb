@@ -1,0 +1,171 @@
+<div class="modal fade" id="search-employer-modal" tabindex="-1" role="dialog" aria-labelledby="search-employer" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Search employer</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-employer-form">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="code" id="code">
+                                </div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="name" id="name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="button" id="search-employer-search-button" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table id="search-employer-table" class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Search employer</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<div class="modal fade" id="search-agency-modal" tabindex="-1" role="dialog" aria-labelledby="search-agency" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Search agency</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-agency-form">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="agency_code" id="agency_code">
+                                </div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="agency_name" id="agency_name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="button" id="search-agency-search-button" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table id="search-agency-table" class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Search agency</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#search-employer-search-button').click(function () {
+    var data = {
+        code: $('#code').val(),
+        name: $('#name').val(),
+    };
+    if ($('#code').val().length < 1 && $('#name').val().length < 1) {
+        alert('Please key in code or name');
+        return;
+    }
+    $.ajax({
+        url: '<%= internal_employers_path %>.json',
+        method: 'GET',
+        data: data,
+        success: function (response) {
+            $('#search-employer-table tbody').html('');
+            for (var i=0, j = response.length; i < j; i ++){
+                $('#search-employer-table tbody').append('<tr><td>' + response[i].code + '</td><td>' + response[i].name + '</td><td class="text-right"><button type="button" class="btn btn-primary" data-employer="' + encodeURIComponent(JSON.stringify(response[i])) + '" onclick="select_employer(this)">Select</button></td></tr>');
+            }
+        },
+    });
+});
+
+$('#search-agency-search-button').click(function () {
+    var data = {
+        code: $('#agency_code').val(),
+        name: $('#agency_name').val(),
+    };
+    if ($('#agency_code').val().length < 1 && $('#agency_name').val().length < 1) {
+        alert('Please key in code or name');
+        return;
+    }
+    $.ajax({
+        url: '<%= internal_agencies_path %>.json',
+        method: 'GET',
+        data: data,
+        success: function (response) {
+            $('#search-agency-table tbody').html('');
+            for (var i=0, j = response.length; i < j; i ++){
+                $('#search-agency-table tbody').append('<tr><td>' + response[i].code + '</td><td>' + response[i].name + '</td><td class="text-right"><button type="button" class="btn btn-primary" data-agency="' + encodeURIComponent(JSON.stringify(response[i])) + '" onclick="select_agency(this)">Select</button></td></tr>');
+            }
+        },
+    });
+});
+
+function select_employer(btn)
+{
+    var employer = JSON.parse(decodeURIComponent($(btn).attr('data-employer')));
+    $('#refund_customerable_id').val(employer.id);
+    $('#refund_customerable_display').html(employer.name + " (" + employer.code + ")");
+    $('#search-employer-modal').modal('toggle');
+}
+
+function select_agency(btn)
+{
+    var agency = JSON.parse(decodeURIComponent($(btn).attr('data-agency')));
+    $('#refund_customerable_id').val(agency.id);
+    $('#refund_customerable_display').html(agency.name + " (" + agency.code + ")");
+    $('#search-agency-modal').modal('toggle');
+}
+</script>
+<% end %>

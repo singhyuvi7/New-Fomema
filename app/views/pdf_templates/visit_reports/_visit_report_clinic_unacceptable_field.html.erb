@@ -1,0 +1,29 @@
+<% if is_others == true %>
+    <tr>
+        <td class="table-index"></td>
+        <td class="bold">If Unacceptable, Please Specify :</td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>
+
+<% unacceptable_fields[field_name].delete_if { |k,v| k.include? "_comment" }.each do |key,value| %>
+    <tr>
+        <td class="table-index"></td>
+        <td class="unacceptable-field">
+            <%= value == true ? @checkbox_checked : @checkbox_unchecked %><span class="bold"> <%= field_list[key] %></span>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+    <% if !@unacceptable_fields_with_comments[field_name]["#{key}_comment"].blank? %>
+        <tr>
+            <td class="table-index"></td>
+            <td class="unacceptable-field">
+                <div class="finding-comment">
+                    <span class="bold">Comment :</span>
+                    <span class="unbold"><%= @unacceptable_fields_with_comments[field_name]["#{key}_comment"] %></span>
+                </div>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+    <% end %>
+<% end %>

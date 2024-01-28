@@ -1,0 +1,109 @@
+<!-- for debug -->
+<%= stylesheet_link_tag 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css' %>
+<!-- end debug -->
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/doctor_result_report" %>
+
+<% if @debug == false %>
+    <%= render "/pdf_templates/webfonts_header" %>
+<% end %>
+
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+    @doctor_exam        = @transaction.doctor_examination
+    @lab_exam           = @transaction.laboratory_examination
+    @xray_exam          = @transaction.xray_examination
+    @medical_review     = @transaction.latest_medical_review
+    @xray_pending_decisions = @transaction.xray_pending_decisions
+    @pcr_comments           = @transaction.pcr_reviews
+
+    information_column_label_1 = ["Worker Name","Country of Origin","Passport Number","Job Type","Doctor Code","Transaction ID"]
+
+    information_column_value_1 = [
+        @transaction.fw_name,
+        @transaction.fw_country.name,
+        @transaction.fw_passport_number,
+        @transaction.fw_job_type.present? ? @transaction.fw_job_type.name : '-',
+        @transaction.doctor.code,
+        @transaction.code
+    ]
+
+    information_column_label_2 = ["Worker Code","Date of Birth","Gender","Employer Code","Physical Examination Date","Certification Date"]
+
+    information_column_value_2 = [
+        @transaction.fw_code,
+        @transaction.fw_date_of_birth.strftime('%d/%m/%Y'),
+        ForeignWorker::GENDERS[@transaction.fw_gender],
+        @transaction.employer.code,
+        @transaction.medical_examination_date.present? ? @transaction.medical_examination_date.strftime('%d/%m/%Y') : '-',
+        @transaction.certification_date.present? ? @transaction.certification_date.strftime('%d/%m/%Y') : '-'
+    ]
+%>
+
+<div class="doctor-result-report page-container">
+    <div class="header-title">
+        FOMEMA REPORT <span class="page"></span>
+    </div>
+
+    <%= render "/pdf_templates/doctor_examination_results/disclaimer" %>
+
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART I. FOREIGN WORKER INFORMATION</b>
+    </div>
+    <div class="transaction-details">
+        <div class="information left-col">
+            <% information_column_label_1.each.with_index do |label, index| %>
+                <div class="row">
+                    <div class="label"><%= label %></div>
+                    <span class="colon">:</span><span class="value"><%= information_column_value_1[index] %></span>
+                </div>
+            <% end %>
+        </div>
+        <div class="information right-col">
+            <% information_column_label_2.each.with_index do |label, index| %>
+                <div class="row">
+                    <div class="label"><%= label %></div>
+                    <span class="colon">:</span><span class="value"><%= information_column_value_2[index] %></span>
+                </div>
+            <% end %>
+        </div>
+    </div>
+
+    <!-- part 2 medical history -->
+
+    <%= render "/pdf_templates/doctor_examination_results/medical_history" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/medical_history_2" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/physical_examination" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/physical_examination_2" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/laboratory_xray_results" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/certification_by_doctor" %>
+
+    <div class="page-break"></div>
+
+    <%= render "/pdf_templates/doctor_examination_results/follow_up_by_doctor" %>
+
+    <% if @medical_review.present? || @xray_pending_decisions.present? || @pcr_comments.present? %>
+        <div class="page-break"></div>
+
+        <%= render "/pdf_templates/doctor_examination_results/review" %>
+    <% end %>
+
+    <%= render "/pdf_templates/doctor_examination_results/end_report" %>
+
+</div>

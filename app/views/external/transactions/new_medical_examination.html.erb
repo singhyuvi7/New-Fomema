@@ -1,0 +1,379 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - Medical Examination
+    </div>
+
+    <%= form_for @transaction, url: medical_examination_external_transactions_path(@transaction), html: {class: "#{params[:action]}_transaction transaction-form"} do |form| %>
+
+    <!-- .card-body -->
+    <div class="card-body">
+        <!-- .card (worker information) -->
+        <div class="card">
+            <div class="card-header">
+                Worker's Information
+            </div>
+            <!-- .card-body (worker information) -->
+            <div class="card-body">
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Worker Name</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.name %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Worker Code</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.code %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Gender</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= ForeignWorker::GENDERS[@transaction.fw_gender] %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Date of Birth</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.date_of_birth.strftime('%d/%m/%Y') %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Passport Number</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.passport_number %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">Country of Origin</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.country.name %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Arrival Date</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= !@transaction.foreign_worker.arrival_date.nil? ? @transaction.foreign_worker.arrival_date.strftime('%d/%m/%Y') : (raw '<i>N/A</i>') %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">PLKS Number</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.plks_number || (raw '<i>N/A</i>') %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Job Type</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.job_type.name %></p>
+                    </div>
+                    <label class="col-md-2 col-form-label">PATI / Rehiring Programme</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.foreign_worker.pati ? 'Yes' : 'No' %></p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-0 row">
+                    <label class="col-md-2 col-form-label">Programme</label>
+                    <div class="col-md-4">
+                        <p class="form-control-plaintext"><%= @transaction.programme_indicator %></p>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-body (worker information) -->
+        </div>
+        <!-- /.card (worker information) -->
+
+        <% if @transaction.foreign_worker.afis_id.present? && (current_user.userable.fp_device == 1 && @transaction.doctor_fp != true) %>
+            <p class="alert alert-info" id="verify-info">PLEASE VERIFY FINGERPRINT. <span id="instruction"></span></p>
+        <% else %>
+            <p class="alert alert-info">PROCEED WITH PASSPORT VERIFICATION.</p>
+        <% end %>
+
+        <%= render "/shared/all_flash" %>
+
+        <!-- for fingerprint script alert -->
+        <p class="alert alert-success d-none"></p>
+        <p class="alert alert-danger device-alert d-none">
+            <span class="error-msg"></span>
+            <br>PLEASE CAPTURE THE ERROR MESSAGE AND THE FULL FRONT PAGE OF THE PASSPORT FOR THE SPECIFIED WORKER. THEN, CLICK ON THE "<b>FINGERPRINT ERROR</b>" BUTTON TO SUBMIT A REQUEST TO BYPASS THE FINGERPRINT VERIFICATION.
+            <button type="button" data-toggle="popover" data-placement="right" data-html="true" data-content='<%= image_tag("fingerprint_guide/sample_passport.png", :style => "width: 200px;")%><br><br><%= image_tag("fingerprint_guide/error_doctor.png", :style => "width: 250px;")%>' title="" class="btn btn-danger btn-sm">
+                <i class="fa fa-info-circle"></i>
+            </button>
+        </p>
+        <p class="alert alert-danger init-alert d-none"></p>
+        <!-- end for -->
+
+        <%= render "/shared/all_flash" %>
+
+        <% if @transaction.foreign_worker.afis_id.blank? || current_user.userable.fp_device != 1 || @transaction.doctor_fp == true %>
+            <div class="form-group mb-0 row">
+                <label class="col-md-3 col-form-label required">Worker is a match</label>
+                <div class="col-md-9 col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= radio_button "transaction", "worker_matched", false, class: "form-check-input", required: true %>
+                        <%= label "transaction", "worker_matched", "No", value: false, class: "form-check-label" %>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= radio_button "transaction", "worker_matched", true, class: "form-check-input", required: true %>
+                        <%= label "transaction", "worker_matched", "Yes, worker's info matched", value: true, class: "form-check-label" %>
+                    </div>
+                </div>
+            </div>
+        <% else %>
+            <input type="hidden" name="transaction[worker_matched]" id="worker_matched" value="true">
+        <% end %>
+
+        <div class="form-group mb-0 row">
+            <label class="col-md-3 col-form-label required">Worker's consent</label>
+            <div class="col-md-9 col-form-label">
+                <div class="form-check form-check-inline mr-3">
+                    <input type="hidden" name="transaction[worker_consented]" id="transaction_worker_consented_false" value="false">
+                    <%= check_box "transaction", "worker_consented", checked_value: true, unchecked_value: false, class: "form-check-input", required: true %>
+                    <%= label "transaction", "worker_consented", "Yes, worker has consented", class: "form-check-label" %>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-0 row">
+            <label class="col-md-3 col-form-label required">Medical Examination Date</label>
+
+            <% end_date = [@transaction.laboratory_examination.try(:specimen_taken_date), @transaction.xray_examination.try(:xray_taken_date), Date.today].compact.min %>
+
+            <div class="col-md-9 col-form-label">
+                <div class="form-check form-check-inline mr-3">
+                    <%= form.text_field :medical_examination_date, class: "datepicker form-check-input", min: @transaction.transaction_date.strftime("%F"), max: end_date.strftime("%F") %>
+                </div>
+            </div>
+        </div>
+        <% if [nil,''].include?(@transaction.foreign_worker.afis_id) || current_user.userable.fp_device != 1 || @transaction.doctor_fp === true %>
+            <div class="form-group mb-0 row">
+                <label class="col-md-3 col-form-label required">Confirm Worker's identity</label>
+                <div class="col-md-9 col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <input type="hidden" name="transaction[worker_identity_confirmed]" id="transaction_worker_identity_confirmed_false" value="false">
+                        <%= check_box "transaction", "worker_identity_confirmed", checked_value: true, unchecked_value: false, class: "form-check-input", required: true %>
+                        <%= label "transaction", "worker_identity_confirmed", "Yes, Worker's identity confirmed", class: "form-check-label" %>
+                    </div>
+                </div>
+            </div>
+        <% else %>
+            <input type="hidden" name="transaction[worker_identity_confirmed]" id="transaction_worker_identity_confirmed_false" value="true">
+        <% end %>
+
+        <% if @transaction.previous_transaction_remedical&.is_next_transaction_re_medical == true %>
+            <div class="form-group mb-0 row">
+                <label class="col-md-3 col-form-label required">Confirm Worker's Image</label>
+                <div class="col-md-9 col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <input type="hidden" name="transaction[worker_image_confirmed]" id="transaction_worker_image_confirmed_false" value="false">
+                        <%= check_box "transaction", "worker_image_confirmed", checked_value: true, unchecked_value: false, class: "form-check-input", required: true %>
+                        <%= label "transaction", "worker_image_confirmed", "Yes, Worker's Image confirmed ", class: "form-check-label" %>
+                        <% @transaction.foreign_worker.uploads.where(category: "FOREIGN_WORKER_IMAGE").limit(1).order(created_at: :desc).each do |upload| %>
+                            <% document= upload.documents.each do |document| %>
+                                <% if upload.category == 'FOREIGN_WORKER_IMAGE' %>
+                                    &nbsp;(<%= link_to "View Worker Image",  rails_blob_url(document), target: "_blank" , id: "view-image-link"%> ) </div>
+                                <% end %>
+                            <% end %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="form-group mt-3 mb-0 row">
+            <ul>
+                <li>You <b>MUST</b> submit <b>date of physical examination</b> (within 24 hours of examination of foreign worker) into MERTS before laboratory and x-ray are allowed to submit their results into MERTS</li>
+                <li>You cannot enter a date of physical examination later than today's date or earlier than registration/renewal date</li>
+                <li>You will not be able to enter and transmit your medical examination results for this foreign worker until BOTH lab results and x-ray report for this foreign worker had been transmitted (via the Internet System)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="text-center"><img id="fingerprint-image"></img></div>
+    <!-- /.card-body -->
+
+    <!-- .card-footer -->
+    <div class="card-footer">
+        <div class="text-right">
+            <a href="<%= external_transactions_path %>" class="btn btn-secondary">Back</a>
+            <% if @transaction.foreign_worker.afis_id.present? && current_user.userable.fp_device == 1 && @transaction.doctor_fp != true %>
+                <% if has_permission?("CREATE_BYPASS_FINGERPRINT_REQUEST") %>
+                    <a class="btn btn-danger text-right" href="<%= bypass_fingerprint_external_transaction_path %>">Fingerprint Error</a>
+                <% end %>
+                <button class="btn btn-info" type="button" id="scan">Scan Fingerprint</button>
+            <% end %>
+            <button class="btn btn-primary <%= (@transaction.foreign_worker.afis_id.present? && current_user.userable.fp_device == 1 && @transaction.doctor_fp != true) ? 'd-none' : '' %>" type="submit" name="submit" value="Save" id="submit-btn" data-disable-with="Saving">Save</button>
+        </div>
+    </div>
+    <!-- /.card-footer -->
+
+    <% end %>
+</div>
+
+<!-- Popup if new medical examination details have been saved, but not worker matched. -->
+<% if !@transaction.worker_matched? && (@transaction.medical_examination_date.present? && @transaction.worker_consented && @transaction.worker_identity_confirmed) %>
+    <div id="dialog-worker-matched-reminder" class="hidden" title="Foreign Worker Matched Reminder">
+        <p>Worker is a match is <b>No</b>. The laboratory and xray exams cannot start unless you have matched the identity of the worker.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-worker-matched-reminder', type: 'warning'});
+        </script>
+    <% end %>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+    afis_id = '<%= @transaction.foreign_worker.afis_id %>'
+    doctor_code = '<%= current_user.userable.code %>'
+    fp_device = '<%= current_user.userable.fp_device %>'
+    doctor_fp = '<%= @transaction.doctor_fp %>'
+    fp_availability_status = '<%= @transaction.foreign_worker.biodata_responses.last ? @transaction.foreign_worker.biodata_responses.last.fp_availability_status : 'N' %>'
+    fingerprint_types = '<%= BiodataResponse::FINGERPRINT_TYPES.to_json %>'
+    fingerprint_types = JSON.parse(fingerprint_types.replace(/&quot;/g,'"'))
+    fp_availability = ''
+    selected_fingerprint = ''
+
+    if(afis_id.length != 0 && fp_device == '1' && doctor_fp != 'true'){
+
+        fp_availability = '<%= @transaction.foreign_worker.biodata_responses.last ? @transaction.foreign_worker.biodata_responses.last.fp_avail : '' %>'
+
+        if(fp_availability){
+            if(fp_availability.charAt(0) == '[')
+                fp_availability = JSON.parse(fp_availability.replace(/&quot;/g,'"'))
+            else
+                fp_availability = fp_availability.replace(/\s/g,"").split(",")
+        }else
+            fp_availability = ''
+
+        //loop all fingerprint
+        selected_fingerprint = $.map(fp_availability, function(value) {
+            if(fingerprint_types[value.toUpperCase()])
+                return fingerprint_types[value.toUpperCase()]
+            if(fingerprint_types[value.toLowerCase()]){
+                return fingerprint_types[value.toLowerCase()]
+            }
+        });
+
+        if(selected_fingerprint.length){
+            selected_fingerprint = selected_fingerprint.slice(0, selected_fingerprint.length - 1).join(', ') + " and " + selected_fingerprint.slice(-1)
+            instruction_str = "CLICK ON <b>'SCAN FINGERPRINT'</b> BUTTON AND PLACE WORKER <b>'"+selected_fingerprint+"'</b> ON TO THE DEVICE WHEN THE LIGHT STARTS BLINKING"
+            $('#instruction').html(instruction_str.toUpperCase())
+        }else{
+            instruction_str = "NO FINGERPRINT AVAILABLE FOR THE CURRENT WORKER"
+            $('#verify-info').html(instruction_str.toUpperCase())
+        }
+
+        // configure and init device
+        var configuration = {
+            doctorCode: doctor_code,
+            defaultThreshold: '<%= ENV["FP_DEFAULT_THRESHOLD"] %>',
+            scanDuration: '<%= ENV["FP_SCAN_DURATION"] %>',
+            enableLiveness: '<%= ENV["FP_ENABLE_LIVENESS"] %>'
+        }
+        BiometricService.init(configuration,getInitResult);
+        // end
+
+        $("#scan").click(function(e){
+            $(this).prop('disabled',true)
+            $('.init-alert').attr('style', 'display: none !important')
+            BiometricService.scan(getSuccessResult,getFailResult)
+        });
+    }
+
+    function getInitResult(response){
+        message = response.statusMessage
+        if(message.toLowerCase() == 'success'){
+            console.log('init')
+            // allow scanning to continue - show scan button
+        }else{
+            alert = $('.init-alert')
+            alert.html(message.toUpperCase())
+            alert.attr('style', 'display: block !important')
+        }
+    }
+
+    function getSuccessResult(response){
+        data = {
+            id : '<%= @transaction.foreign_worker.id %>',
+            transaction_id : '<%= @transaction.id %>',
+            ip : '<%= request.ip %>',
+            device_serial : response.serialNumber,
+            computer_name : response.computerName,
+            mac : response.macAddress,
+            fp_thumbnail : response.fpThumbnail,
+            fp_data : response.fpData,
+            score : response.fpScore,
+            liveness : response.fpLiveness,
+            selected_fingerprint : selected_fingerprint,
+            type : 'doctor'
+        }
+        convertImage(response.fpThumbnail);
+        // send results to backend
+        $.post( "/transactions/verify_fingerprint",data, function(data) {
+            message = data.message.toUpperCase()
+            if(data.status == 'success'){
+                alert = $('.alert-success')
+                alert.html(message)
+                alert.attr('style', 'display: block !important')
+                $('#submit-btn').attr('style','display: inline-block !important')
+                $('#scan').attr('style','display: none !important')
+                $('.alert-danger').attr('style','display: none !important')
+                $('.alert-info').attr('style','display: none !important')
+            }else if(data.status == 'bypass'){
+                location.reload()
+            }else{
+                alert = $('.device-alert')
+                $('.error-msg').html(message)
+                alert.attr('style', 'display: block !important')
+            }
+        }).fail(function(e) {
+            alert = $('.init-alert')
+            alert.html('NETWORK ERROR OCCURRED. PLEASE REFRESH THE PAGE AND TRY AGAIN.')
+            alert.attr('style', 'display: block !important')
+        }).done(function( data ) {
+            $('#scan').prop('disabled',false)
+        });
+    }
+    function getFailResult(response){
+        data = {
+            id : '<%= @transaction.foreign_worker.id %>',
+            transaction_id : '<%= @transaction.id %>',
+            ip : '<%= request.ip %>',
+            device_serial : response.serialNumber,
+            computer_name : response.computerName,
+            mac : response.macAddress,
+            fp_thumbnail : response.fpThumbnail,
+            fp_data : response.fpData,
+            score : response.fpScore,
+            liveness : response.fpLiveness,
+            selected_fingerprint : selected_fingerprint,
+            type : 'doctor'
+        }
+        convertImage(response.fpThumbnail);
+        // send results to backend
+        $.post( "/transactions/verify_fingerprint",data, function(data) {
+        }).done(function( data ) {
+            if(data.status == 'bypass'){
+                location.reload();
+            }
+            message = response.statusMessage.toUpperCase()
+            alert = $('.device-alert')
+            $('.error-msg').html(message)
+            alert.attr('style', 'display: block !important')
+            $('#scan').prop('disabled',false)
+        });
+    }
+    function convertImage(text){
+        if (text){
+            document.getElementById("fingerprint-image").setAttribute('src', "data:image/jpg;base64," + text);
+        }else{
+            document.getElementById("fingerprint-image").removeAttribute('src');
+        }
+    }
+
+    $('#transaction_worker_image_confirmed').change(function() {
+        if($("#transaction_worker_image_confirmed").is(':checked')){
+            document.getElementById("view-image-link").click();
+        }
+    });
+
+    </script>
+<% end %>

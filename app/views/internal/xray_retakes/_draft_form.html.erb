@@ -1,0 +1,65 @@
+<div class="card">
+    <div class="card-header">
+        Retake Form
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <% if xray_retake.requestable_type == 'XrayReview' %>
+                <div class="form-group col">
+                    <label for="" class="required">X-Ray Facility</label>
+                    <select required name="xray_retake[xray_facility_id]" id="xray_retake_xray_facility_id" class="xray_retake form-control select2" data-parsley-errors-container="#xray_facility_id_errors">
+                        <option value="">Select X-Ray Facility</option>
+                        <% (@xray_facilities || XrayFacility.select("id", "name || ' (' || code || ')' as label").where(status: "ACTIVE").order(:label).all).each do |xray_facility, index| %>
+                            <option value="<%= xray_facility.id %>"<%= " selected" if xray_retake.xray_facility_id == xray_facility.id %>>
+                            <%= xray_facility.label %></option>
+                        <% end %>
+                    </select>
+                    <div id="xray_facility_id_errors"></div>
+                </div>
+            <% end %>
+            <div class="form-group col">
+                <label for="" class="required">Reason</label>
+                <select required name="xray_retake[retake_reason_id]" id="xray_retake_reason_id"
+                    class="xray_retake form-control select2" data-parsley-errors-container="#reason_errors" >
+                    <option value="">Select Reason</option>
+                    <% RetakeReason.order(:name).all.each do |retake_reason, index| %>
+                        <option value="<%= retake_reason.id %>"<%= " selected" if xray_retake.retake_reason_id == retake_reason.id %>><%= retake_reason.name %></option>
+                    <% end %>
+                </select>
+                <div id="reason_errors"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col">
+                <label for="" class="required">Comment</label>
+                <textarea class="xray_retake form-control" name="xray_retake[comment]" id="xray_retake_comment" rows="2" required><%= xray_retake.comment %></textarea>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(case xray_retake.requestable_type
+            when "PcrReview"
+                pcr_internal_xray_retakes_path
+            when "XrayReview"
+                xqcc_internal_xray_retakes_path
+            end
+        ) %>
+        <%=raw edit_save_button() %>
+    </div>
+    <!-- /.card-footer -->
+
+</div>
+<!-- /.card -->
+
+<% content_for :page_end_scripts do %>
+<script>
+setTimeout(() => {
+    $('#xray_retake_xray_facility_id').select2();
+}, 1000);
+</script>
+<% end %>

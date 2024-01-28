@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("XQCC_XRAY_RETAKE") %>
+                <li class="list-group-item">
+                    <%= link_to "XQCC", xqcc_internal_xray_retakes_path %>
+                </li>
+            <% end %>
+            <% if has_permission?("PCR_XRAY_RETAKE") %>
+                <li class="list-group-item">
+                    <%= link_to "PCR", pcr_internal_xray_retakes_path %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

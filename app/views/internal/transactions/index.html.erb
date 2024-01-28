@@ -1,0 +1,516 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong></div>
+
+    <div class="card-body">
+        <%
+            transaction_statuses = [
+                ["Special Renewal Pending Approval", :new_special_renewal_pending_approval],
+                ["Special Renewal Pending Document", :new_special_renewal_pending_document],
+                ["Special Renewal Approved", :new_special_renewal_approved],
+                ["Special Renewal Rejected", :new_special_renewal_rejected],
+                ["Pending Select Clinic", :new_pending_select_clinic],
+                ["Cancel Pending Payment", :cancel_pending_payment],
+                ["Cancelled", :cancelled],
+                ["Change Doctor Pending Approval", :change_doctor_pending_approval],
+                ["Pending Examination", :pending_examination],
+                ["Pending for Lab & X-Ray Transmission", :pending_lab_and_xray],
+                ["Pending for Lab Transmission", :pending_lab],
+                ["Pending for X-ray Transmission", :pending_xray],
+                ["Pending Certification", :certification],
+                ["Document Approval-Pending", :document_approval_pending],
+                ["Document Approval-Incomplete", :document_approval_incomplete],
+                ["Document Approval-Rejected", :document_approval_rejected],
+                ["Document Approval-Approved", :document_approval_approved],
+                ["Bypass Pending Approval", :bypass_fp_pending_approval],
+                ["Bypass Approved/Rejected", :bypass_fp_approved_rejected],
+                ["Review", :review],
+                ["Unsuitable", :unsuitable],
+                ["Suitable", :suitable],
+                ["Expired", :expired]
+            ]
+
+            transaction_statuses    += [["Communicable Diseases Cases", :inspectorate_cases]] if has_permission?("VIEW_COMMUNICABLE_DISEASES_FILTER_OPTIONS")
+            pending_review_statuses = []
+
+            if has_permission?("VIEW_PENDING_REVIEWS")
+                pending_review_statuses += [
+                    ["Pending Review", :pending_review],
+                    ["Pending Review Approval", :pending_review_approval],
+                    ["Pending Review & Review Approval", :pending_review_and_review_approval],
+                    ["Pending Review QA", :pending_pr_qa],
+                    ["Review QA", :review_qa]
+                ]
+            end
+
+            pending_review_statuses += [["TCUPI", :tcupi]]                                      if has_permission?("VIEW_TCUPI_REVIEWS")
+            pending_review_statuses += [["TCUPI Approval", :tcupi_approval]]                    if has_permission?("VIEW_TCUPI_APPROVALS")
+            field_set_options       =  [["Paired Doctors", :doctors]]
+            field_set_options       += [["TCUPI Cases", :tcupi]]                                if has_any_permission?("VIEW_TCUPI_REVIEWS", "VIEW_TCUPI_APPROVALS")
+            field_set_options       += [["Communicable Diseases Cases", :inspectorate_cases]]   if has_permission?("VIEW_COMMUNICABLE_DISEASES_FILTER_OPTIONS")
+
+            list = [
+                { title: "Worker Code",                 field: "worker_code",               type: "text",   placeholder: "Worker Code" },
+                { title: "Worker Name",                 field: "worker_name",               type: "text",   placeholder: "Worker Name" },
+                { title: "Passport Number",             field: "passport_number",           type: "text",   placeholder: "Passport" },
+                { title: "Gender",                      field: "gender",                    type: "select", options: [["Male", :M], ["Female", :F]] },
+                { title: "Country",                     field: "country_id",                type: "select", options: Country.order(:name).pluck(:name, :id) },
+                { title: "Transaction Code",            field: "code",                      type: "text",   placeholder: "Transaction Code" },
+                { title: "Registration Date",           field: "transaction_date",          type: "date-range" },
+                { title: "Examination Date",            field: "medical_examination_date",  type: "date-range" },
+                { title: "Certification Date",          field: "certification_date",        type: "date-range" },
+                { title: "Transaction Status",          field: "certification_status",      type: "select", options: transaction_statuses },
+                { title: "XQCC/PCR Status",             field: "xray_status",               type: "select", options: Transaction::XRAY_STATUSES.invert }
+            ]
+
+            list += [{ title: "Pending Review Status", field: "review_status", type: "select", options: pending_review_statuses }] if pending_review_statuses.present?
+
+            list += [
+                { title: "Order Code",                  field: "order_code",                type: "text",   placeholder: "Order Code" },
+                { title: "Field Sets",                  field: "field_set",                 type: "select", options: field_set_options },
+                { title: "Branch",                      field: "branch_id",                 type: "select", options: Organization.where(:org_type => 'BRANCH').order(:name).pluck(:name, :id) },
+                { title: "Employer State",              field: "employer_state_id",         type: "select", options: State.order(:name).pluck(:name, :id) },
+                { title: "Employer Code",               field: "employer_code",             type: "text",   placeholder: "Employer Code" },
+                { title: "Doctor Code",                 field: "doctor_code",               type: "text",   placeholder: "Doctor Code"},
+                { title: "Assigned To",                 field: "assigned_to",               type: "select", options: ApprovalApprover.active_and_recently_inactive.where(:category => ['TRANSACTION_SPECIAL_RENEWAL', 'TRANSACTION_BYPASS_FINGERPRINT']).joins(:approval_approver_user).order(:name).pluck(:name, :user_id)},
+                { title: "Requested Date From",         field: "request_start_date",        type: "date" },
+                { title: "Requested Date To",           field: "request_end_date",          type: "date" }
+            ]
+
+            empty_colspan   = 9
+            headers         = ["Worker Name / Code", "Programme", "Passport Number / Country", "Status", "Dates","Requested Date (By)","Assigned/Updated"]
+
+            case params[:field_set]
+            when "inspectorate_cases"
+                headers         += ["Unsuitable Reason", "Comments", "Pending Review Comment"]
+                empty_colspan   += 3
+            when "tcupi"
+                headers.unshift("Duration")
+                empty_colspan   += 1
+            when "doctors"
+                headers         += ["Doctor Name/Code"]
+                empty_colspan   += 1
+            end
+
+            # Override feature (manually typed in url), to display transaction code.
+            if params[:with_transaction] == "y"
+                headers         += ["Transaction Code"]
+                empty_colspan   += 1
+            end
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-transactions-index", filter_link: internal_transactions_path, list: list } %>
+        <!--<input type="hidden" name="employer_code" form="filter-form" value="<%= params[:employer_code] %>">-->
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions d-flex justify-content-end align-items-center">
+                <p class="mb-0 flex-grow-1"><%= @display_total %></p>
+
+                <% unless params[:review_status].present? || params[:certification_status] == "inspectorate_cases" %>
+                    <% if has_permission?("CREATE_TRANSACTION") && false %>
+                        <%= raw index_table_new_button(new_internal_transaction_path) %>
+                    <% end %>
+
+                    <% if has_permission?("PRINT_MEDICAL_EXAMINATION_FORM") %>
+                        <button id="bulk_print_medform" type="button" class="btn btn-primary btn-sm ml-1">Bulk Print Medical Examination Form</button>
+                    <% end %>
+
+                    <% if has_permission?("ASSIGN_DOCTOR_TRANSACTION") %>
+                        <button type="button" class="btn btn-success btn-sm pairing-modal-open ml-1" data-toggle="modal" data-target="#change-doctor-modal" data-type="doctor" data-table="new">Select Doctors</button>
+                    <% end %>
+
+                    <% if has_permission?("CHANGE_DOCTOR_TRANSACTION") %>
+                        <button type="button" class="btn btn-primary btn-sm pairing-modal-open ml-1" data-toggle="modal" data-target="#change-doctor-modal" data-type="doctor" data-table="edit">Change Doctors</button>
+                    <% end %>
+
+                    <% if has_permission?("BULK_EDIT_COUPLING_TRANSACTION") %>
+                        <button type="button" class="btn btn-primary btn-sm coupling-modal-open ml-1" data-toggle="modal" data-target="#edit-coupling-modal" data-type="coupling" data-table="edit">Edit Coupling</button>
+                    <% end %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+
+<table id="internal-transactions-index-table" class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th>
+
+            <% headers.each do |header| %>
+                <th><%= header %></th>
+            <% end %>
+
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @trans_ids.each.with_index((@trans_ids.current_page - 1) * get_per + 1) do |trans_id, index| %>
+            <%
+                transaction_array   = @transactions.to_a
+                transaction         = transaction_array.find {|transaction| transaction.id == trans_id.id }
+                # older_than_14       = ["TCUPI", "TCUPI_PENDING_APPROVAL"].include?(transaction.medical_status) && transaction.tcupi_date? && transaction.tcupi_date < 14.days.ago
+                # has_amendment      = transaction.pending_transaction_amendment
+                hide_pending_review = params[:review_status] == "pending_review_and_review_approval" && transaction.latest_medical_review.present? && transaction.latest_medical_review.medical_mle1_id == current_user.id
+                hide_pending_review_qa = params[:review_status] == "pending_pr_qa" && transaction.latest_medical_review.present? && transaction.latest_medical_review.medical_mle1_id == current_user.id
+                previous_transaction = transaction.previous_transaction
+            %>
+
+            <tr class="<%= "old-tcupi" if transaction.older_than_14? %>"
+                data-medical-examination_date="<%= transaction.medical_examination_date %>"
+                data-expired-at="<%= transaction.expired_at %>"
+                data-doctor-changed-at="<%= transaction.transaction_change_sps.where(status: "APPROVED").order(approval_at: :desc).first&.approval_at %>"
+                data-transaction-code="<%= transaction.code %>"
+                data-status="<%= transaction.status %>"
+                data-is-blood-group-benchmark="<%= transaction.is_blood_group_benchmark %>"
+                data-ignore_renewal_rule="<%= transaction.previous_transaction&.ignore_renewal_rule %>"
+                data-previous-transaction-id="<%= transaction.previous_transaction&.id %>"
+                data-is-re-medical="<%= transaction.previous_transaction_remedical&.is_next_transaction_re_medical %>">
+
+                <td class="module-row-numbers"><label><input type="checkbox" class="child-checkbox" name="ids[]" value="<%= transaction.id %>" data-doctor="<%= transaction.doctor_id %>"></label></td>
+                <% if params[:field_set] == "tcupi" %>
+                    <td><%= raw transaction.tcupi_duration_days %></td>
+                <% end %>
+
+                <td>
+                    <!-- Select/Change Doctors  -->
+                    <data class="select-doctor-table-data" data-text="<%= transaction.code %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= transaction.is_blood_group_benchmark ? 'Yes' : 'No' %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= transaction.previous_transaction_remedical&.is_next_transaction_re_medical ? 'Yes' : 'No' %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= transaction.try(:fw_code) %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= transaction.try(:fw_name) %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= ForeignWorker::GENDERS[transaction.try(:fw_gender)] %>"></data>
+                    <data class="select-doctor-table-data" data-text="<%= transaction.doctor.try(:name) %>" data-type="doctor"></data>
+
+                    <!-- Edit Coupling -->
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.code %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.try(:fw_code) %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.try(:fw_name) %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= ForeignWorker::GENDERS[transaction.try(:fw_gender)] %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.doctor.try(:code) %>" data-type="doctor"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.medical_examination_date&.strftime(get_standard_date_format) || "-" %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.laboratory.try(:code) %>" data-type="laboratory"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.laboratory_transmit_date&.strftime(get_standard_date_format) || "-" %>"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.xray_facility.try(:code) %>" data-type="xray_facility"></data>
+                    <data class="edit-coupling-table-data" data-text="<%= transaction.xray_transmit_date&.strftime(get_standard_date_format) || "-" %>"></data>
+
+                    <%= raw transaction&.fw_name %><br>
+
+                    <% if hide_pending_review || hide_pending_review_qa%>
+                        <b><%= transaction&.fw_code %></b>
+                    <% #elsif has_any_permission?("EDIT_PENDING_REVIEWS", "EDIT_PENDING_REVIEW_APPROVALS") && params[:review_status] == "pending_review_and_review_approval" %>
+                        <b><%#= link_to transaction&.fw_code, medical_review_internal_medical_path(transaction.id) %></b>
+                    <% else %>
+                        <b><%= link_to transaction&.fw_code, internal_transaction_path(transaction) %></b>
+                    <% end %>
+                </td>
+
+                <td class="text-center"><%= transaction.programme_indicator %></td>
+
+                <td>
+                    <%= transaction&.fw_passport_number %><br>
+                    <b><%= transaction&.fw_country&.name %></b>
+                </td>
+
+                <td>
+                    <%
+                        # transaction_status  = Transaction::STATUSES[transaction.status]
+                        # medical_status      = Transaction::MEDICAL_STATUSES[transaction.medical_status]
+                        # xray_status         = Transaction::XRAY_STATUSES[transaction.xray_status]
+                    %>
+
+                    <div>
+                        <b>Transaction Status</b><br>
+
+                        <% if transaction.status == "CERTIFIED" %>
+                            <%= transaction.final_result %> <span class="text-primary"><%= "(Amendment Approval)" if transaction.pending_transaction_amendment %></span>
+                        <% else %>
+                            <%= transaction.displayed_status %>
+                        <% end %>
+
+                        <% if transaction.approval_status.eql?("UPDATE_PENDING_APPROVAL") %>
+                            <div><%= case transaction.approval_request&.category
+                            when "TRANSACTION_CHANGE_DOCTOR"
+                                "Change Doctor Pending Approval"
+                            end %></div>
+                        <% elsif transaction.approval_status.eql?("NEW_PENDING_APPROVAL") && (transaction.expired_at > Time.now || transaction.ignore_expiry = true) %>
+                            <div><%= case transaction.approval_request&.category
+                            when "TRANSACTION_SPECIAL_RENEWAL"
+                                if !transaction.uploads.blank? && transaction.uploads.first&.remark == "SPECIAL_RENEWAL"
+                                    "Special Renewal Pending Approval"
+                                else
+                                    "Special Renewal Pending Document"
+                                end
+                            end %></div>
+                        <% end %>
+
+                        <% if transaction.status == 'NEW' && transaction.approval_status == 'UPDATE_REJECTED' && (transaction.expired_at > Time.now || transaction.ignore_expiry = true) %>
+                            <div><small><i>Change Clinic Rejected</i></small></div>
+                        <% end %>
+
+                        <% if transaction.transaction_verify_docs.last&.status == "APPROVAL" && transaction.transaction_verify_docs.last&.category == "AGENCY_TRANSACTION_REGISTRATION" && !['CANCELLED','REJECTED'].include?(transaction.status) && (transaction.expired_at > Time.now || transaction.ignore_expiry = true) %>
+                            <div style="color:red">Pending Document Approval</div>
+                        <% end %>
+                    </div>
+
+                    <% if transaction.medical_status? %>
+                        <div class="mt-2">
+                            <b>Medical Status</b>
+
+                            <div class="<%= "text-primary" if transaction.medical_status != "CERTIFIED" %>">
+                                <%= transaction.displayed_medical_status %>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <% if transaction.xray_status? %>
+                        <div class="mt-2">
+                            <b>X-Ray Status</b>
+
+                            <div class="<%= "text-primary" if transaction.xray_status != "CERTIFIED" %>">
+                                <%= transaction.displayed_xqcc_pcr_status %>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <% if transaction.myimms_transaction.present? %>
+                        <div class="mt-2">
+                            <b>IMM Send Status</b>
+                            <div><%= transaction.myimms_transaction.try(:displayed_status) %></div>
+                        </div>
+                    <% end %>
+                </td>
+
+                <td>
+                    <div><b>Registration Date</b></div>
+                    <%= raw transaction.transaction_date? ? transaction.transaction_date.strftime("%d/%m/%Y") : "<i>N/A</i>" %>
+
+                    <div class="mt-2"><b>Examination Date</b></div>
+                    <%= raw transaction.medical_examination_date? ? transaction.medical_examination_date.strftime("%d/%m/%Y") : "<i>N/A</i>" %>
+
+                    <div class="mt-2"><b>Certification Date</b></div>
+                    <%= raw transaction.certification_date? ? transaction.certification_date.strftime("%d/%m/%Y") : "<i>N/A</i>" %>
+
+                    <div class="mt-2"><b>IMM Send Date</b></div>
+                    <%= raw transaction.myimms_transaction&.is_success_failed? ? "#{ transaction.myimms_transaction.updated_at.strftime("%d/%m/%Y") }" : "<i>N/A</i>" %>
+                </td>
+
+                <% if params[:field_set] == "inspectorate_cases" %>
+                    <td><%= simple_format transaction.display_communicable_diseases_list, class: "mb-0" %></td>
+                    <td><%= raw transaction.doctor_examination.try(:certification_comment) %></td>
+                    <td><%= raw transaction.latest_medical_review.try(:medical_mle1_comment) %></td>
+                <% end %>
+
+                <% if params[:field_set] == "doctors" %>
+                    <td>
+                        <div data-toggle="tooltip"
+                        data-html="true"
+                        title="<%= transaction.laboratory_id ? "Laboratory: #{transaction.laboratory&.name} (#{transaction.laboratory&.code})" : "" %>
+                        <%= transaction.xray_facility_id ? "| X-Ray Facility: #{transaction.xray_facility&.name} (#{transaction.xray_facility&.code})" : "" %>
+                        <%= transaction.radiologist_id ? "| Radiologist: #{transaction.radiologist&.name} (#{transaction.radiologist&.code})" : "" %>">
+                            <%= raw transaction.doctor&.name %><br>
+                            <b><%= transaction.doctor&.code %></b>
+                        </div>
+                    </td>
+                <% end %>
+
+                <% if params[:with_transaction] == "y" %>
+                    <td><%= transaction.code %></td>
+                <% end %>
+
+                <%
+                    approval_request = Transaction.approval_requests.where('transactions.id = ?', transaction.id)
+                    .select('approval_requests.created_at, approval_requests.updated_at, approval_requests.category, approval_requests.approval_decision, approval_requests.state, approval_requests.request_user_id, approval_requests.assigned_to_user_id, approval_requests.approval_user_id, approval_requests.approval_at')
+                    .order('approval_requests.created_at desc').first
+
+                    transaction_verify_doc = Transaction.transaction_verify_docs.where('tvs.transaction_id = ?', transaction.id)
+                    .select('tvs.submitted_by, tvs.submitted_at, tvs.category, tvs.approval_by, tvs.approval_at, tvs.decision, tvs.status, tvs.assigned_to')
+                    .order('tvs.submitted_at desc').first
+                %>
+
+                <td width="15">
+                    <% if !approval_request.blank? %>
+                        <p>
+                            <% if approval_request&.category =='TRANSACTION_SPECIAL_RENEWAL' %>
+                                [SPECIAL RENEWAL] <br>
+                            <% end %>
+                            <% requester = User.find(approval_request&.request_user_id) %>
+                            <%= "#{approval_request&.created_at.try(:strftime, get_standard_date_format)}" %> <br>
+                            <%= ["Employer", "Agency"].include?(requester.userable_type) ? "(#{requester.userable_type})" : "(#{requester.code})" %>
+                        </p>
+                    <% end %>
+
+                    <% if !transaction_verify_doc.blank? %>
+                        <p>
+                            <% if transaction_verify_doc&.category == 'AGENCY_TRANSACTION_REGISTRATION' %>
+                                [AGENCY DOCUMENT APPROVAL] <br>
+                            <% elsif ['DOCTOR_TRANSACTION_BYPASS_FINGERPRINT', 'XRAY_TRANSACTION_BYPASS_FINGERPRINT'].include?(transaction_verify_doc&.category) %>
+                                [BYPASS FINGERPRINT] <br>
+                            <% end %>
+                            <% requester = User.find(transaction_verify_doc&.submitted_by) %>
+                            <%= "#{transaction_verify_doc&.submitted_at.try(:strftime, get_standard_date_format)}" %> <br>
+                            <%= ["Employer", "Agency"].include?(requester.userable_type) ? "(#{requester.userable_type})" : "(#{requester.code})" %>
+                        </p>
+                    <% end %>
+                </td>
+
+                <td width="15">
+                    <% if !approval_request.blank? %>
+                        <p>
+                            <% if approval_request&.category == 'TRANSACTION_SPECIAL_RENEWAL' %>
+                                [SPECIAL RENEWAL] <br>
+                            <% end %>
+                            <%= approval_request&.assigned_to_user_id.nil? ? "-" : User.find(approval_request&.assigned_to_user_id).name %> <br>
+                            <% if !["pending"].include?(transaction.approval_request&.state) %>
+                                <strong>
+                                    <%= "Updated by #{User.find(approval_request&.approval_user_id).name}" if !approval_request&.approval_user_id.nil? %> <br>
+                                    <%= "#{approval_request&.updated_at.try(:strftime, get_standard_date_format)}" if !approval_request&.approval_at.nil? %> <br>
+                                </strong>
+                            <% end %>
+                        </p>
+                    <% end %>
+
+                    <% if !transaction_verify_doc.blank? %>
+                        <p>
+                            <% if transaction_verify_doc&.category == 'AGENCY_TRANSACTION_REGISTRATION' %>
+                                [AGENCY DOCUMENT APPROVAL] <br>
+                            <% elsif ['DOCTOR_TRANSACTION_BYPASS_FINGERPRINT', 'XRAY_TRANSACTION_BYPASS_FINGERPRINT'].include?(transaction_verify_doc&.category) %>
+                                [BYPASS FINGERPRINT] <br>
+                            <% end %>
+                            <%= transaction_verify_doc&.assigned_to.nil? ? "-" : User.find(transaction_verify_doc&.assigned_to).name %> <br>
+                            <% if !["APPROVAL"].include?(transaction_verify_doc&.status) %>
+                                <strong>
+                                    <%= "Updated by #{User.find(transaction_verify_doc&.approval_by).name}" if !transaction_verify_doc&.approval_by.nil? %> <br>
+                                    <%= "#{transaction_verify_doc&.approval_at.try(:strftime, get_standard_date_format)}" %> <br>
+                                </strong>
+                            <% end %>
+                        </p>
+                    <% end %>
+                </td>
+
+                <td>
+                    <%= render partial: "/internal/transactions/table_actions_column", locals: { transaction: transaction, hide_pending_review: hide_pending_review, hide_pending_review_qa: hide_pending_review_qa } %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% if @trans_ids.blank? %>
+            <tr>
+                <td colspan="<%= empty_colspan %>" class="text-danger">No records found.</td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+
+                </div>
+            </div>
+        </div>
+
+        <%= render partial: "layouts/pagination_custom", locals: { list: @trans_ids } %>
+    </div>
+</div>
+
+<%= render "internal/transactions/internal_select_doctor_functions" %>
+<%= render "internal/transactions/bulk_edit_coupling" %>
+
+<% if flash[:review_rejected].present? %>
+    <div id="dialog-review_rejected" class="hidden" title="Notification">
+        <p><%= flash[:review_rejected] %>.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#dialog-review_rejected', type: 'danger'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if params[:print_form].present? %>
+    <div id="dialog-print-forms" class="hidden" title="Print Medical Form">
+        <p>Doctors successfully paired. Click the button below to print the medical exam forms.</p>
+
+        <%= link_to bulk_print_medical_form_internal_transactions_path(ids: params[:print_form]), target: :_blank, class: "btn btn-primary text-white px-2 font-size-5" do %><i class="far fa-file-pdf mr-2"></i>Bulk Print Medical Exam Form
+            <% end %>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+    <script>
+        openDialog({
+            target: '#dialog-print-forms',
+            type: 'success'
+        });
+    </script>
+    <% end %>
+<% end %>
+
+<style>
+.scrollable-menu-box {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: 0;
+    z-index: 1;
+    border: none;
+    opacity: 0.9;
+    padding: 0;
+    background-color: #f3f3f3;
+}
+
+th {
+    vertical-align: middle !important;
+    text-align: center;
+}
+
+.comment-reader {
+    width: 200px;
+}
+
+.old-tcupi {
+    background-color: #FFDDAA !important;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+tableHeight = $('.table-responsive').height() - 10;
+setMaxHeight = Math.min(tableHeight, 320);
+dropdownMenus = $('.dropdown-menu.in-table-dropdown').css('max-height', setMaxHeight);
+
+$('.dropdown-menu.in-table-dropdown').map(function() {
+    menuHeight = $(this).height();
+    contentHeight = $(this).find('')
+});
+
+if (setMaxHeight < 320) {
+    $('.dropdown-menu.in-table-dropdown').scroll(function() {
+        if (this.scrollTop > 0) {
+            $(this).find('.scrollable-menu-box').hide();
+        } else {
+            $(this).find('.scrollable-menu-box').show();
+        }
+    });
+}
+
+$('#bulk_print_medform').click(function() {
+
+    var selected_transactions = getSelectedTransactions();
+
+    selected_transaction_ids = selected_transactions.join(",");
+
+    var url = '<%= bulk_print_medical_form_internal_transactions_path %>' + '?ids=' + selected_transaction_ids;
+
+    window.open(url);
+});
+
+function getSelectedTransactions() {
+    var transactions = $('.child-checkbox:checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+
+    return transactions;
+}
+</script>
+<% end %>

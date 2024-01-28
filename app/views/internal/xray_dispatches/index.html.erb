@@ -1,0 +1,73 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Dispatches</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_XRAY_DISPATCH') %>
+                    <%=raw index_table_new_button(new_internal_xray_dispatch_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th class="module-row-numbers">#</th>
+                            <th>Dispatch Code</th>
+                            <th>X-Ray Facility</th>
+                            <th>Film Count</th>
+                            <th>Received Count</th>
+                            <th>Send Date</th>
+                            <th>Received Date</th>
+                            <th class="module-row-actions">Action(s)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% if @xray_dispatches.blank? %>
+                            <tr>
+                                <td colspan="8" class="text-danger">No records found.</td>
+                            </tr>
+                        <% else %>
+
+                            <% @xray_dispatches.each.with_index((@xray_dispatches.current_page - 1) * get_per + 1) do |xray_dispatch, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td><%= xray_dispatch.code %></td>
+                                    <td><%= xray_dispatch.xray_facility.name %></td>
+                                    <td><%= xray_dispatch.film_count %></td>
+                                    <td><%= xray_dispatch.received_count %></td>
+                                    <td><%= xray_dispatch.sent_date %></td>
+                                    <td><%= xray_dispatch.received_date %></td>
+                                    <td class="module-row-actions">
+                                        <%=raw index_table_show_button(internal_xray_dispatch_path(xray_dispatch)) %>
+                                        <% if has_permission?('EDIT_XRAY_DISPATCH') %>
+                                            <%=raw index_table_edit_button edit_internal_xray_dispatch_path(xray_dispatch) %>
+                                        <% end %>
+                                        <% if has_permission?('DELETE_XRAY_DISPATCH') %>
+                                            <%=raw index_table_delete_button(internal_xray_dispatch_path(xray_dispatch)) %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @xray_dispatches %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

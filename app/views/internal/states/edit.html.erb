@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>States</strong> - Edit State
+    </div>
+    <%= form_for @state, url: internal_state_path(@state), html: {class: "#{params[:action]}_state state-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

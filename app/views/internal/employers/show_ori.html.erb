@@ -1,0 +1,157 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Employers</strong> - Employer Detail
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Code</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.code %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Name</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.name %></div>
+            </div>
+        </div>
+        <% if @employer.is_individual? %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">ICNO / Passport Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.ic_passport_number %></div>
+                </div>
+            </div>
+        <% else %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Business Registration Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.business_registration_number %></div>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Person In Charge Name</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.pic_name %></div>
+                </div>
+                <label class="col-md-2 col-form-label">Person In Charge Phone</label>
+                <div class="col-md-4">
+                    <div class="form-control-plaintext"><%= @employer.pic_phone %></div>
+                </div>
+            </div>
+        <% end %>
+
+        <!-- address -->
+        <div class="row">
+            <label class="col-md-2 col-form-label">Address</label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @employer.address1 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @employer.address2 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @employer.address3 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label"></label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext"><%= @employer.address4 %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label">State</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.state&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Postcode</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.postcode %></div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 col-form-label">Town</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.town&.name %></div>
+            </div>
+        </div>
+        <!-- /address -->
+
+        <!-- uploaded documents -->
+        <div class="card">
+            <div class="card-header">Uploaded Documents</div>
+            <div class="card-body">
+                <% if @employer.uploads.count > 0 %>
+                    <table class="table">
+                        <tr>
+                            <th>Category</th>
+                            <th>Documents</th>
+                        </tr>
+                        <% @employer.uploads.each do |upload| %>
+                            <tr>
+                                <td><%= upload.category %></td>
+                                <td>
+                                    <div class="row">
+                                    <% upload.documents.each do |document| %>
+                                        <% if false && document.content_type.in?(["image/png", "image/jpg"]) %>
+                                            <div><%= image_tag document, style: "max-width:100px; max-height: 100px" %></div>
+                                        <% end %>
+                                        <div class="col"><%= document.filename %></div>
+                                        <div class="col text-right"><%= link_to("Download", rails_blob_url(document), target: "_blank") %></div>
+                                    <% end %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% end %>
+                    </table>
+                <% else %>
+                    <p>No upload documents</p>
+                <% end %>
+            </div>
+        </div>
+        <!-- /uploaded documents -->
+
+        <!-- upload bulk foreign worker -->
+        <div class="card">
+            <div class="card-body">
+                <form id="bulk-upload-form" method="post" action="<%= bulk_upload_foreign_worker_internal_employers_path @employer %>" enctype="multipart/form-data">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Upload foreign workers</label>
+                        <div class="col-md-5">
+                            <input type="file" name="foreign_workers" id="foreign_workers" required>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <div class="btn-group">
+                                <%=raw edit_save_button(label: "<i class=\"icon-pencil\"></i> Upload", title: "Upload") %>
+                                <a href="<%= bulk_upload_foreign_worker_template_internal_employers_path %>" target="_blank" class="btn btn-secondary">Download template</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /upload bulk foreign worker -->
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_employers_path) %>
+            <% if has_any_permission?('EDIT_NON_FINANCE_INFO_EMPLOYER', 'EDIT_FINANCE_INFO_EMPLOYER') %>
+                <%=raw show_edit_button(edit_internal_employer_path(@employer)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

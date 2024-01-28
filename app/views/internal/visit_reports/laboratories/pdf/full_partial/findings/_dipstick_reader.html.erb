@@ -1,0 +1,17 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">Dipstick Reader</td>
+    <td colspan="3"></td>
+</tr>
+<tr>
+    <td class="table-index"></td>
+    <td class="checkbox-field">
+        <% options.each do |option| %>
+            <div class="option">
+                <%= finding[:dipstick_reader].include?(option.code) ? @checkbox_checked : @checkbox_unchecked %>
+                <div><%= option.name %></div>
+            </div>
+        <% end %>
+    </td>
+    <td colspan="3"></td>
+</tr>

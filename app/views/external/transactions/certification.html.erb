@@ -1,0 +1,632 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions</strong> - Doctor Medical Examination</div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                medical: "Medical History",
+                physical: "Physical Examination",
+                system: "System Exam",
+                laboratory: "Laboratory",
+                xray: "X-ray",
+                certification: "Certification"
+            }
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",        parent: "information",      title: "Worker Information"},
+                {type: "category_1",    parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",    parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",      parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",      parent: "system",           title: "System Exam 1"},
+                {type: "system_2",      parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",    parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",          parent: "xray",             title: "X-ray"},
+                {type: "condition",     parent: "certification",    title: "Condition"},
+                {type: "certification", parent: "certification",    title: "Certification"},
+                {type: "follow_up",     parent: "certification",    title: "Follow Up"}
+            ]
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 1}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= nested_form_for @transaction, url: medical_examination_external_transactions_path(@transaction), html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <%= hidden_field_tag :commit_type, "" %>
+        <%= render "/shared/transactions_tab_params" %>
+        <%= render partial: "external/transactions/doctor_examinations/worker_information", locals: { form: form } %>
+        <% doctor_examination = @transaction.doctor_examination %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+
+        <div class="category-switchable hidden" data-type="laboratory">
+            <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true, doctor_examination: doctor_examination } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true, doctor_examination: doctor_examination } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="condition">
+            <%= render partial: "external/transactions/doctor_examinations/certification_condition_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="certification">
+            <%= render partial: "external/transactions/doctor_examinations/certification_certification_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="follow_up">
+            <%= render partial: "external/transactions/doctor_examinations/certification_follow_up_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination } %>
+        </div>
+
+        <div class="card-footer text-right">
+            <%= form.submit "Save", class: "btn btn-primary", value: "Save", id: "save-submit" %>
+            <%= form.submit "Save and Transmit", class: "btn btn-primary", value: "Save and Transmit", id: "save-and-transmit-submit" %>
+        </div>
+    <% end %>
+</div>
+
+<%
+    if @past_exams.present?
+        examination_history = @past_exams.map do |transaction|
+            { date: transaction.transaction_date.strftime("%d/%m/%Y"), title: "Transaction ##{ transaction.code }", path: previous_examination_history_external_transaction_path(transaction.id)}
+        end
+    end
+%>
+
+<% if examination_history.present? %>
+    <div class="card">
+        <div class="card-header"><strong>Previous Certified Transaction(s)</strong></div>
+        <div class="card-body">
+                <p>The other certified transaction(s) that belong to this foreign worker</p>
+
+                <% examination_history.each.with_index(1) do |hash, index| %>
+                    <span class="d-inline-block w-em-2"><%= index %>.</span>
+
+                    <%= link_to hash[:path], target: :_blank do %>
+                        <b><%= hash[:date] %></b> - <%= hash[:title] %>
+                    <% end %><br>
+                <% end %>
+            </div>
+    </div>
+<% end %>
+
+<div id="dialog-date-fill" class="hidden" title="Please include dates">
+    <p>You must include the dates for the fields marked as <b>YES</b> before you can save.</p>
+</div>
+
+<div id="dialog-visited-fill" class="hidden" title="Please complete all sections">
+    <p>Please ensure that you have visited all the categories and examinations for this foreign worker before transmitting.</p>
+</div>
+
+<div id="dialog-physical-fill" class="hidden" title="Please complete physical measurements">
+    <p>Please ensure that the physical measurements of the foreign worker in <b>Physical Examination, Section A: 1 - 4</b> are completed.</p>
+</div>
+
+<div id="dialog-unsuitability-fill" class="hidden" title="Please include unsuitability reason">
+    <p>Please state the reason if worker considered not suitable for employment.</p>
+</div>
+
+<div id="dialog-system-other-fill" class="hidden" title="Please include comments">
+    <p>
+        You will need to write a comment because<br>
+        <b class="appendable-reasons"></b>.</p>
+</div>
+
+<div id="dialog-condition-other-fill" class="hidden" title="Please include certification comment">
+    <p>You will need to write a comment because the field <b>Other</b> in <b>Part IV - Certification Condition</b> has been set to <b>YES</b>.</p>
+</div>
+
+<div id="dialog-measurement-range-transmit" class="hidden" title="Double check entered value">
+    <label></label>
+    <p>The normal value range for this field is: <span></span>. Please recheck this field.</p>
+</div>
+
+<div id="dialog-medical-review-flagged-fill" class="hidden" title="Discrepancy in results found">
+    <p>There are some discrepancies to the submitted results.<br>Below are the details:</p>
+    <ol></ol>
+    <p>You may still <b>Transmit</b>, this will put the transaction under <b>Pending Review</b>.</p>
+</div>
+
+<div id="dialog-suitability-selected" class="hidden" title="Please select suitability">
+    <p>You will need to specify if the Foreign Worker is <b>Suitable</b> or <b>Unsuitable</b>.</p>
+</div>
+
+<div id="dialog-condition-selected" class="hidden" title="Please select condition">
+    <p>Must specify at least a condition as <b>Yes</b> if you are certifying this Foreign Worker as <b>Unsuitable</b>.</p>
+</div>
+
+<div id="dialog-vision-unaided-left-fill" class="hidden" title="Please indicate vision unaided left acuity">
+    <p>Please indicate vision unaided left acuity if is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-unaided-right-fill" class="hidden" title="Please indicate vision unaided right acuity">
+    <p>Please indicate vision unaided right acuity if is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-left-fill" class="hidden" title="Please indicate vision aided left acuity">
+    <p>Please indicate vision aided left acuity if is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-left-acuity" class="hidden" title="Vision aided left acuity">
+    <p>The aided left acuity must be more than 6/12 if it is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-right-fill" class="hidden" title="Please indicate vision aided right acuity">
+    <p>Please indicate vision aided right acuity if is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-right-acuity" class="hidden" title="Vision aided right acuity">
+    <p>The aided right acuity must be more than 6/12 if it is marked as <b>DEFECTIVE</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-right-fill-Normal" class="hidden" title="Please indicate vision aided right acuity">
+    <p>Please indicate vision aided right acuity if is marked as <b>Normal</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-right-acuity-Normal" class="hidden" title="Vision aided right acuity">
+    <p>The aided right acuity must be lower than 6/12 if it is marked as <b>Normal</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-left-fill-Normal" class="hidden" title="Please indicate vision aided left acuity">
+    <p>Please indicate vision aided left acuity if is marked as <b>NORMAL</b>.</p>
+</div>
+
+<div id="dialog-vision-aided-left-acuity-Normal" class="hidden" title="Vision aided left acuity">
+    <p>The aided left acuity must be lower than 6/12 if it is marked as <b>NORMAL</b>.</p>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        initializeToggleableFields('doctor examination');
+        loadParentCategoryTabSelection();
+        loadCategoryTabSelection();
+
+        $('#save-and-transmit-submit').click(function() {
+            hideSubmitButton();
+            setTimeout(showSubmitButton, 3000); // Show button after 5 seconds.
+        });
+
+        $('input[type="submit"]').click(function() {
+            $('form.medical_examination_transaction').attr('commit-type', $(this).val());
+        });
+
+        $('form.medical_examination_transaction').submit(function(e) {
+            commitType      = $(this).attr('commit-type');
+            commitAnyway    = $(this).attr('commit-anyway') === 'Transmit anyway';
+
+            // Executes when trying to transmit.
+            if (commitType === 'Save and Transmit') {
+                action                  = $(this).attr('action');
+                serializedParams        = $(this).serialize();
+                params                  = `${serializedParams}&process_type%5D=checking`;
+                conditionOther          = $('#de_attributes_condition_other').val() === 'true';
+                conditionComment        = $('#de_attributes_certification_comment').val().trim();
+                unsuitability           = $('.unsuitability-bool').val() === 'UNSUITABLE';
+                unsuitabilityComment    = $('.unsuitability-comment').val().trim();
+                selectedSuitability     = $('#de_attributes_suitability').val();
+                systemComment           = $('#de_attributes_system_comment').val().trim();
+                visionAidedLeft         = $('#de_attributes_physical_vision_test_aided_left').val() === 'true';
+                visionAidedLeftA        = $('#de_attributes_physical_vision_test_aided_left_a_value').val().trim();
+                visionAidedLeftB        = $('#de_attributes_physical_vision_test_aided_left_b_value').val().trim();
+                visionAidedRight        = $('#de_attributes_physical_vision_test_aided_right').val() === 'true';
+                visionAidedRightA       = $('#de_attributes_physical_vision_test_aided_right_a_value').val().trim();
+                visionAidedRightB       = $('#de_attributes_physical_vision_test_aided_right_b_value').val().trim();
+                visionUnaidedLeft       = $('#de_attributes_physical_vision_test_unaided_left').val() === 'true';
+                visionUnaidedLeftA      = $('#de_attributes_physical_vision_test_unaided_left_a_value').val().trim();
+                visionUnaidedLeftB      = $('#de_attributes_physical_vision_test_unaided_left_b_value').val().trim();
+                visionUnaidedRight      = $('#de_attributes_physical_vision_test_unaided_right').val() === 'true';
+                visionUnaidedRightA     = $('#de_attributes_physical_vision_test_unaided_right_a_value').val().trim();
+                visionUnaidedRightB     = $('#de_attributes_physical_vision_test_unaided_right_b_value').val().trim();
+
+                visionAcuityBenchmark   = 0.5;
+                visionAidedLeftAcuity   = parseFloat(visionAidedLeftA) / parseFloat(visionAidedLeftB);
+                visionAidedRightAcuity  = parseFloat(visionAidedRightA) / parseFloat(visionAidedRightB);
+
+                conditionsCheck         = $('.condition-check').map(function() {
+                   return $(this).val();
+                }).get().includes('true');
+
+                unfilledDates = $('.date-field-check.flatpickr-input:not([disabled="disabled"])').filter(function() {
+                    return $(this).val().trim() === '';
+                }).map(function() {
+                    return $(this).closest('.boolean-field-parent')[0];
+                });
+
+                unfilledPhysical = $('.must-fill').filter(function() {
+                    return $(this).val().trim() === '';
+                }).map(function() {
+                    return $(this).closest('.boolean-field-parent')[0];
+                });
+
+                var systemCommentTriggers = [
+                    { name: '1.3 Cardiovascular System - Other Findings', field: '#de_attributes_system_cardiovascular_other_findings' },
+                    { name: '2.2 Respiratory System - Other Findings', field: '#de_attributes_system_respiratory_other_findings' },
+                    { name: '3.6 Gastrointestinal System - Other Findings', field: '#de_attributes_gastrointestinal_other' },
+                    { name: '4.8 Nervous System & Mental Health - Others', field: '#de_attributes_system_nervous_other' },
+                    { name: '5.2 Discharge', field: '#de_attributes_system_genitourinary_sores_ulcers' },
+                    { name: '5.3 Sore/Ulcers', field: '#de_attributes_system_genitourinary_discharge' },
+                    { name: '6.4 Breast Examination - Others', field: '#de_attributes_system_breast_other' }
+                ]
+
+                var systemCommentTriggered = $(systemCommentTriggers).map(function() {
+                    if ($(this.field).val() === 'true') {
+                        return `${ this.name } is marked as ${ this.value }`;
+                    }
+                }).get();
+
+                if (unfilledDates.length > 0) {
+                    firstField  = $(unfilledDates[0]);
+                    category    = firstField.closest('.category-switchable').attr('data-type');
+                    openDialogAndPreventSubmit('#dialog-date-fill', e);
+
+                    $('#dialog-date-fill').on('dialogclose', function(event, ui) {
+                        tab = $(`.category-tab[data-type="${category}"]`);
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement($(unfilledDates[0]), 500);
+                        highlightElement(unfilledDates, '#facf7f', 'slow');
+                        delayedHighlightField(unfilledDates, '#fff', 'slow', 5000);
+                    });
+                } else if (unfilledPhysical.length > 0) {
+                    openDialogAndPreventSubmit('#dialog-physical-fill', e);
+
+                    $('#dialog-physical-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement($(unfilledPhysical[0]), 500);
+                        highlightElement(unfilledPhysical, '#facf7f', 'slow');
+                        delayedHighlightField(unfilledPhysical, '#fff', 'slow', 5000);
+                    });
+                } else if (visionUnaidedLeft && (!visionUnaidedLeftA || !visionUnaidedLeftB)) {
+                    openDialogAndPreventSubmit('#dialog-vision-unaided-left-fill', e);
+
+                    $('#dialog-vision-unaided-left-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_unaided_left_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (visionUnaidedRight && (!visionUnaidedRightA || !visionUnaidedRightB)) {
+                    openDialogAndPreventSubmit('#dialog-vision-unaided-right-fill', e);
+
+                    $('#dialog-vision-unaided-right-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_unaided_right_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (visionAidedLeft && (!visionAidedLeftA || !visionAidedLeftB)) {
+                    openDialogAndPreventSubmit('#dialog-vision-aided-left-fill', e);
+
+                    $('#dialog-vision-aided-left-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_aided_left_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (visionAidedLeft && visionAidedLeftAcuity >= visionAcuityBenchmark) {
+                    openDialogAndPreventSubmit('#dialog-vision-aided-left-acuity', e);
+
+                    $('#dialog-vision-aided-left-acuity').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_aided_left_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (visionAidedRight && (!visionAidedRightA || !visionAidedRightB)) {
+                    openDialogAndPreventSubmit('#dialog-vision-aided-right-fill', e);
+
+                    $('#dialog-vision-aided-right-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_aided_right_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (visionAidedRight && visionAidedRightAcuity >= visionAcuityBenchmark) {
+                    openDialogAndPreventSubmit('#dialog-vision-aided-right-acuity', e);
+
+                    $('#dialog-vision-aided-right-acuity').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="physical"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        focusField = $('#de_attributes_physical_vision_test_aided_right_a_value').closest('.boolean-field-parent');
+                        scrollToElement(focusField, 500);
+                        highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                        delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                    });
+                } else if (!visionAidedLeft && visionUnaidedLeft && (!visionAidedLeftA || !visionAidedLeftB)) {
+                       openDialogAndPreventSubmit('#dialog-vision-aided-left-fill-Normal', e);
+
+                        $('#dialog-vision-aided-left-fill-Normal').on('dialogclose', function(event, ui) {
+                            tab = $('.category-tab[data-type="physical"]');
+                            $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                            tab.click();
+                            focusField = $('#de_attributes_physical_vision_test_aided_left_a_value').closest('.boolean-field-parent');
+                            scrollToElement(focusField, 500);
+                            highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                            delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                        });
+                } else if (!visionAidedLeft && visionAidedLeftAcuity < visionAcuityBenchmark) {
+                        openDialogAndPreventSubmit('#dialog-vision-aided-left-acuity-Normal', e);
+
+                        $('#dialog-vision-aided-left-acuity-Normal').on('dialogclose', function(event, ui) {
+                            tab = $('.category-tab[data-type="physical"]');
+                            $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                            tab.click();
+                            focusField = $('#de_attributes_physical_vision_test_aided_left_a_value').closest('.boolean-field-parent');
+                            scrollToElement(focusField, 500);
+                            highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                            delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                        });
+                } else if (!visionAidedRight && visionUnaidedRight && (!visionAidedRightA || !visionAidedRightB)) {
+                            openDialogAndPreventSubmit('#dialog-vision-aided-right-fill-Normal', e);
+
+                            $('#dialog-vision-aided-right-fill-Normal').on('dialogclose', function(event, ui) {
+                                tab = $('.category-tab[data-type="physical"]');
+                                $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                                tab.click();
+                                focusField = $('#de_attributes_physical_vision_test_aided_right_a_value').closest('.boolean-field-parent');
+                                scrollToElement(focusField, 500);
+                                highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                                delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                            });
+                } else if (!visionAidedRight && visionAidedRightAcuity < visionAcuityBenchmark) {
+                            openDialogAndPreventSubmit('#dialog-vision-aided-right-acuity-Normal', e);
+
+                            $('#dialog-vision-aided-right-acuity-Normal').on('dialogclose', function(event, ui) {
+                                tab = $('.category-tab[data-type="physical"]');
+                                $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                                tab.click();
+                                focusField = $('#de_attributes_physical_vision_test_aided_right_a_value').closest('.boolean-field-parent');
+                                scrollToElement(focusField, 500);
+                                highlightElement(focusField.closest('.boolean-field-parent'), '#facf7f', 'slow');
+                                delayedHighlightField(focusField.closest('.boolean-field-parent'), '#fff', 'slow', 5000);
+                            });
+                } else if (systemCommentTriggered.length > 0 && !systemComment) {
+                    $('#dialog-system-other-fill .appendable-reasons').html(systemCommentTriggered.join('<br>'));
+                    openDialogAndPreventSubmit('#dialog-system-other-fill', e);
+                    commentField = $('#de_attributes_system_comment');
+
+                    $('#dialog-system-other-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="system_2"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(commentField, 500);
+                        highlightElement(commentField, '#facf7f', 'slow');
+                        delayedHighlightField(commentField, '#fff', 'slow', 5000);
+                    });
+                } else if (conditionOther && !conditionComment) {
+                    openDialogAndPreventSubmit('#dialog-condition-other-fill', e);
+                    commentField = $('.certification-comment-container');
+
+                    $('#dialog-condition-other-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="certification"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(commentField, 500);
+                        highlightElement(commentField, '#facf7f', 'slow');
+                        delayedHighlightField(commentField, '#fff', 'slow', 5000);
+                    });
+                } else if (unsuitability && !unsuitabilityComment) {
+                    openDialogAndPreventSubmit('#dialog-unsuitability-fill', e);
+                    commentField = $('.unsuitability-comment').closest('.boolean-field-parent');
+
+                    $('#dialog-unsuitability-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="certification"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement($(commentField[0]), 500);
+                        highlightElement(commentField, '#facf7f', 'slow');
+                        delayedHighlightField(commentField, '#fff', 'slow', 5000);
+                    });
+                } else if (!selectedSuitability) {
+                    openDialogAndPreventSubmit('#dialog-suitability-selected', e);
+                    suitabilityField = $('#de_attributes_suitability').closest('.boolean-field-parent');
+
+                    $('#dialog-suitability-selected').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="certification"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(suitabilityField, 500);
+                        highlightElement(suitabilityField, '#facf7f', 'slow');
+                        delayedHighlightField(suitabilityField, '#fff', 'slow', 5000);
+                    });
+                } else if ($('#de_attributes_suitability').val() === 'UNSUITABLE' && !conditionsCheck) {
+                    openDialogAndPreventSubmit('#dialog-condition-selected', e);
+
+                    $('#dialog-condition-selected').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="condition"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                    });
+                } else if ($('.visited-bool[value!="true"]').length > 0) {
+                    boolField   = $($('.visited-bool[value!="true"]')[0]).closest('.boolean-field-parent');
+                    category    = boolField.closest('.category-switchable').attr('data-type');
+                    openDialogAndPreventSubmit('#dialog-visited-fill', e);
+
+                    $('#dialog-visited-fill').on('dialogclose', function(event, ui) {
+                        tab = $(`.category-tab[data-type="${category}"]`);
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(boolField, 500);
+                        highlightElement(boolField, '#facf7f', 'slow');
+                        delayedHighlightField(boolField, '#fff', 'slow', 5000);
+                    });
+                } else if (!commitAnyway) {
+                    e.preventDefault();
+
+                   $.ajax({
+                        url: action,
+                        type: 'PATCH',
+                        async: true,
+                        data: params,
+                    })
+                    .done(function(response) {
+                        $('#de_attributes_id').val(response.doctor_examination_id);
+
+                        if (response.flagged) {
+                            $('#dialog-medical-review-flagged-fill ol').html(response.flagged_criteria);
+
+                            $('#dialog-medical-review-flagged-fill').dialog({
+                                modal: true,
+                                minWidth: 600,
+                                dialogClass: 'dialog__title-warning shadow',
+                                buttons: {
+                                    'Cancel': function() {
+                                       $(this).dialog('close');
+                                    },
+                                    'Transmit': function() {
+                                        $(this).remove();
+                                        trueSubmit();
+                                    }
+                                }
+                            });
+                        } else {
+                            trueSubmit();
+                        }
+                    });
+                }
+            }
+        });
+
+        // Need to submit twice, the first time, the process_type is 'checking'. It will check in the controller to see if this transaction hits any quarantine rules.
+        function trueSubmit() {
+            $('#commit_type').val('certification transmit');
+            $('form.medical_examination_transaction').attr('commit-anyway', 'Transmit anyway');
+            $('form.medical_examination_transaction').submit();
+            hideSubmitButton();
+            setInterval(hideSubmitButton, 100); // Must ensure that the transmit button never shows up again.
+        }
+
+        function hideSubmitButton() {
+            if ($('.spinner-load-icon').length === 0) {
+                $('<i class="spinner-load-icon fas fa-spinner fa-spin text-primary font-size-11 text-center"></i>').insertAfter('#save-and-transmit-submit');
+            }
+
+            $('#save-and-transmit-submit').hide();
+        }
+
+        function showSubmitButton() {
+            $('.spinner-load-icon').remove();
+            $('#save-and-transmit-submit').show();
+        }
+
+        var listOfTriggerTypes = [
+            {
+                triggerFields:  ".auto-field-check--speech",
+                resultField:    "#de_attributes_system_nervous_speech_quality"
+            },
+            {
+                triggerFields:  ".auto-field-check--general-mental",
+                resultField:    "#de_attributes_system_nervous_general_mental_status"
+            },
+            {
+                triggerFields:  ".auto-field-check--thoughts",
+                resultField:    "#de_attributes_system_nervous_thought"
+            },
+            {
+                triggerFields:  ".auto-field-check--orientation",
+                resultField:    "#de_attributes_system_nervous_orientation"
+            },
+            {
+                triggerFields:  ".auto-field-check--suicidal-secondary",
+                resultField:    "#de_attributes_system_nervous_thought_suicidality"
+            },
+            {
+                triggerFields:  ".auto-field-check--heart", // Please note this is the only extra critieria from doctor_examination.html.erb
+                resultField:    "#de_attributes_condition_heart_diseases",
+                button:         "toggle-boolean-field-btn"
+            }
+        ]
+
+        for(i = 0; i < listOfTriggerTypes.length; ++i) {
+            var triggerHash = listOfTriggerTypes[i];
+            setupTriggerButtons(triggerHash);
+        }
+
+        function setupTriggerButtons(triggerHash) {
+            $(triggerHash.triggerFields).change(function() {
+                var state = $(triggerHash.triggerFields).map(function() {
+                    return $(this).val() === 'true';
+                }).get().includes(true);
+
+                var input           = $(triggerHash.resultField);
+                // Please note that buttons for danger and success is different from doctor_examination.html.erb. This is because in Certification, there is criteria for auto clicking, but then it can still be toggled, so it is not always a boolean-field-btn-dummy. This condition is the heart_sounds condition.
+                var dangerButton    = $(input).closest('.boolean-field-parent').find(`.${ triggerHash.button ? triggerHash.button : 'boolean-field-btn-dummy' }[data-type="true"]`);
+                var successButton   = $(input).closest('.boolean-field-parent').find(`.${ triggerHash.button ? triggerHash.button : 'boolean-field-btn-dummy' }[data-type="false"]`);
+                dangerButton.removeClass('btn-danger');
+                successButton.removeClass('btn-success');
+
+                if (state) {
+                    input.val(true);
+                    dangerButton.addClass('btn-danger');
+                } else {
+                    input.val(false);
+                    successButton.addClass('btn-success');
+                }
+
+                input.trigger('change');
+            });
+        }
+
+        $('#de_attributes_physical_blood_pressure_systolic, #de_attributes_physical_blood_pressure_diastolic').change(function() {
+            var systolic        = parseInt($('#de_attributes_physical_blood_pressure_systolic').val());
+            var diastolic       = parseInt($('#de_attributes_physical_blood_pressure_diastolic').val());
+            var input           = $('#de_attributes_condition_hypertension');
+            var dangerButton    = $(input).closest('.boolean-field-parent').find(`.toggle-boolean-field-btn[data-type="true"]`);
+            var successButton   = $(input).closest('.boolean-field-parent').find(`.toggle-boolean-field-btn[data-type="false"]`);
+            dangerButton.removeClass('btn-danger');
+            successButton.removeClass('btn-success');
+
+            if ((systolic && systolic >= 140) || (diastolic && diastolic >= 90)) {
+                input.val('true');
+                dangerButton.addClass('btn-danger');
+            } else {
+                input.val('false');
+                successButton.addClass('btn-success');
+            }
+        });
+
+        $('.doc-exam-vision-aided-wipe').change(function() {
+            var value = $(this).val();
+
+            if (value === 'false') {
+                $(`#${ $(this).attr('id') }_a_value`).val('');
+                $(`#${ $(this).attr('id') }_b_value`).val('');
+            }
+        });
+    </script>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

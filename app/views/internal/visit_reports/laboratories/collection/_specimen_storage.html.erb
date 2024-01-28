@@ -1,0 +1,66 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-index"></th>
+                <th class="table-items"></th>
+                <th colspan="3" class="text-center table-acceptable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2">1.</td>
+                <td>
+                    <div class="font-weight-bold">Specimen Storage</div>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :adequate_space_comment, '1.1 Adequate Space' %>
+                        <%= visit_report_laboratory.text_area :adequate_space_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="specimen_storage">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :adequate_space, 'YES', class: 'specimen_storage' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :adequate_space, 'NO', class: 'specimen_storage' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :adequate_space, 'NA', class: 'specimen_storage' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="pl-1">
+                        <%= visit_report_laboratory.label :appropriate_temperature_comment, '1.2 Appropriate Temperature' %>
+                        <%= visit_report_laboratory.text_area :appropriate_temperature_comment, class: 'form-control', placeholder: 'If NO, please specify' %>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="specimen_storage">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :appropriate_temperature, 'YES', class: 'specimen_storage' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :appropriate_temperature, 'NO', class: 'specimen_storage' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :appropriate_temperature, 'NA', class: 'specimen_storage' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>
+                    <%= visit_report_laboratory.label :others, 'Others' %>
+                    <%= visit_report_laboratory.text_area :others, class: 'form-control comment-field', placeholder: 'Please specify' %>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

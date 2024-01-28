@@ -1,0 +1,111 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_xray_facilities_path, method: 'get' do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="license_holder_name" class="col-sm-3 col-form-label">License Holder Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="license_holder_name" id="license_holder_name" value="<%= params[:license_holder_name] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Facility Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="icno" class="col-sm-3 col-form-label">NRIC</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="icno" id="icno" value="<%= params[:icno] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="state_id" class="col-sm-3 col-form-label">State</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: form_select_option_text, class: 'form-control' do %>
+                                State
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="activated" class="col-sm-3 col-form-label">Town</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :town_id, options_from_collection_for_select(Town.where(state_id: params[:state_id]).order(:name).all, 'id', 'name',  params[:town_id]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="postcode" class="col-sm-3 col-form-label">Postcode</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="postcode" id="postcode" value="<%= params[:postcode] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="activated" class="col-sm-3 col-form-label">Status</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :status, options_for_select(XrayFacility::FILTER_STATUSES.invert, params[:status]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="service_provider_group_id" class="col-sm-3 col-form-label">Group</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :service_provider_group_id, options_for_select(ServiceProviderGroup.where(category: "XrayFacility").order(:name).pluck(:name, :id).prepend(["* NON GROUP", "* NON GROUP"]), params[:service_provider_group_id]), include_blank: form_select_option_text, class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="activated" class="col-sm-3 col-form-label">Activated</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :activated, options_for_select(['YES', 'NO'], params[:activated]), include_blank: form_select_option_text, class: 'form-control' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_xray_facilities_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<%=render '/shared/state_towns_js' %>

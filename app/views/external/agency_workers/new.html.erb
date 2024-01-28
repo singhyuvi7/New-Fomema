@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Register Worker</strong> - New Worker <%=@employer.code%>
+    </div>
+    <%= form_for @foreign_worker, url: external_agency_workers_path, html: { multipart: true, class: "with-parsley" } do |form| %>
+        <%= render 'form', { form: form, is_change_employer: @is_change_employer } %>
+    <% end %>
+</div>

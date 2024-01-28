@@ -1,0 +1,38 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<% if @data.present? %>
+				<tbody>
+					<td><%= @data[:xf_code] %></td>
+					<td><%= @data[:xf_name] %></td>
+					<td><%= @data[:total_xray_viewed] %></td>
+					<td><%= @data[:non_compliance_percentage] %></td>
+					<td>
+						<% @data[:non_compliance_details].each do |ncd| %>
+							<%= ncd %> <br>
+						<% end %>
+					</td>
+				</tbody>
+			<% end %>
+
+		</table>
+	</div>
+</div> 
+
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

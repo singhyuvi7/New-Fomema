@@ -1,0 +1,62 @@
+<div class="card">
+    <div class="card-header">
+        <strong class="mb-0">Insurance - Optional</strong>
+    </div>
+
+    <div class="card-body">
+        <div class="row ">
+          <div class="radio-group">
+            <label for="insurance" class="control-label pl-2">Insurance Provider</label>
+            <div class="d-flex flex-row">
+              <% ForeignWorker::INSURANCE.each do |obj| %>
+                <div class="form-check d-flex align-items-center" style="padding: 3px 30px;">
+                  <input class="form-check-input" type="radio" name="insurance_provider" id="<%= obj['ins_id'] %>" value="<%= obj['id'] %>" data-insurance="<%= JSON(obj) %>">
+                  <label class="form-check-label" for="<%= obj['ins_id'] %>">
+                    <img style="width: 70px;height: 70px;" src="<%= image_path('insurances/'+obj['img'])%>">
+                  </label>
+                </div>
+              <% end %>   
+            </div>
+          </div>
+
+            <div class="col d-flex align-items-center">
+                <button class="btn btn-primary" type="button" id="insuranceBtn">Foreign Workers Online Insurance</button>
+            </div>
+        </div>
+
+        <form id="insuranceForm" name="insuranceForm" method="POST" target="_blank">
+            <input type="hidden" name="jsondata" id="jsondata">
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade-in" tabindex="-1" role="dialog" id="insurance_confirm_modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Worker's Insurance</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>To protect your worker and your investment and time, we have partnered with
+        several insurance service providers to allow you to purchase the required insurance
+        for your workers easily and quickly.</p>
+        
+        <p>When you click OK below, we will share your data
+        and your worker's information with the selected insurance service provider so that
+        you don't have to input the same data at the insurance service provider.</p>
+        
+        <p>The selected insurance provider is <b id="insuranceName">QBE INSURANCE MALAYSIA</b>.</p>
+        
+        <p>Do you wish to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="submitInsurance">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>

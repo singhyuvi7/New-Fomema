@@ -1,0 +1,502 @@
+.visit-summary{
+    padding: 0px;
+    .header-title{
+        font-size: 20px;
+        font-weight: bold;
+        border: 1px solid black;
+        text-align: center;
+        padding: 5px;
+    }
+
+    .sub-title{
+        font-size: 17px;
+        margin-bottom: 1.5rem;
+        b{
+            border-bottom: 1px solid black;
+        }
+    }
+
+    .subtitle-top-margin{
+        margin-top: 3.5rem;
+    }
+
+    .text-left{
+        text-align: left;
+    }
+
+    .bold{
+        font-weight: bold;
+    }
+    .unbold{
+        font-weight: normal;
+    }
+
+    .underline{
+        text-decoration: underline;
+    }
+
+    .width-100, .w-100{
+        width: 100% !important;
+    }
+
+    .d-inline{
+        display: inline-block;
+    }
+    .white-space-normal{
+        white-space: normal;
+    }
+
+    .note-list{
+        padding-inline-start: 12px;
+        margin: 0;
+        line-height: 18px;
+    }
+
+    ol.note-list{
+        padding-inline-start: 18px;
+    }
+
+    .page-break{
+        page-break-after: always;
+    }
+
+    .transaction-details{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        font-size: 16px;
+
+        .information{
+            width: 50%;
+            display: flex;
+            flex-direction: column;  
+            // flex-grow: 1;          
+
+            .row{
+                display: flex;
+                padding: 10px 5px;
+
+                .label{
+                    width: 205px;
+                    font-weight: bold;
+                }
+                .value{
+                    width: 195px;
+                    text-align: left;
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .colon{
+                    padding-right: 5px;
+                }
+            }
+        }
+    }
+
+    .medical-results-content{
+        font-size: 15px;
+        padding-top: 0.3rem;
+    }
+
+    table {
+        width: 100%;
+        color: #23282c;
+        margin-bottom: 0.5rem;
+        border-collapse: collapse;
+        // border: 1px solid black;
+        font-size: 13px;
+
+        thead {
+            display: table-header-group;
+            vertical-align: middle;
+            border-color: inherit;
+
+            th {
+                vertical-align: bottom;
+                // border-bottom: 1px solid black;
+            }
+        }
+
+        tbody {
+            display: table-row-group;
+            vertical-align: middle;
+            border-color: inherit;
+
+            .result-title{
+                padding: 1.3rem 10px;
+            }
+            .details-value{
+                font-weight: normal;
+            }
+            .impression-value{
+                padding: 1.3rem 10px;
+                font-weight: normal;
+            }
+        }
+
+        .head-index{
+            width: 5%;
+        }
+        .head-note{
+            width: 95%;
+        }
+
+        .with-date{
+            .head-title{
+                width: 50%;
+            }
+            .head-checkbox{
+                width: 15%;
+            }
+            .head-date{
+                width: 15%;
+            }
+        }
+
+        .without-date{
+            .head-title{
+                width: 65%;
+            }
+            .head-checkbox{
+                width: 15%;
+            }
+        }
+
+        .value{
+            white-space: normal;
+        }
+    }
+
+    th,
+    td {
+        white-space: nowrap;
+        padding: 1.5px 0px;
+        // border: 1px solid black;
+    }
+
+    thead th,
+    thead td {
+        border-bottom-width: 1px;
+    }
+
+    // part 3 physical examination
+    .general-non-checkbox-title{
+        width: 100px;
+    }
+    .sub-disease{
+        &.name{
+            width:60%;
+        }
+        &.sub-name{
+            width:5%;
+        }
+    }
+    .section-b-mental-health-tbl{
+        table-layout: fixed;
+    }
+
+    // part 4 lab and xray results
+    .lab-xray-content{
+        font-size: 13px;
+    }
+    .section-title{
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    .laboratory-result-details, .xray-result-details{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        .column{
+            width: 50%;
+            .row{
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                padding: 5px 0;
+                .label{
+                    width: 250px;
+                }
+            }
+        }
+    }
+    .lab-xray-done-tbl{
+        .head-title{
+            width: 85%;
+        }
+        .head-checkbox{
+            width: 15%;
+        }
+    }
+    .blood-details{
+        div.label{
+            display: inline-block;
+        }
+    }
+    .xray-finding-report{
+        .head-title{
+            width: 20%;
+        }
+        .head-checkbox{
+            width: 10%;
+        }
+        .head-details{
+            width: 55%;
+        }
+    }
+
+    // part 5 certification by doctor
+    .certified-details{
+        font-size: 13.5px;
+        .row{
+            display: flex;
+            flex-direction: row;
+            padding: 10px 0px;
+            .label{
+                width: 250px;
+            }
+            .value{
+                white-space: normal;
+                width: 600px;
+                span{
+                    border-bottom: 1px solid black;
+                }
+                small{
+                    font-size: 11px;
+                    padding: 5px 0px;
+                }
+            }
+        }
+    }
+    .certification-doctor-2-tbl{
+        margin-top: 2rem;
+    }
+    .certification-doctor-note{
+        font-size: 13px;
+        margin: 1.5rem 0;
+    }
+    .review-tbl{
+        .text-input{
+            td{
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+        }
+    }
+    .follow-up-tbl{
+        .checkbox-input{
+            td{
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+        }
+    }
+
+    //newly added
+    table {
+        border-collapse: collapse;
+    }
+
+    // table,
+    // th,
+    // td {
+    //     border: 1px solid black;
+    // }
+
+    .workers-table {
+        padding: 1rem 0px;
+    }
+
+    thead {
+        background-color: #c8ced3;
+    }
+
+    thead th {
+        padding: 3px;
+    }
+
+    tbody td {
+        padding: 1px 2px;
+        vertical-align: center;
+        height: 20px;
+    }
+    .row{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+    .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto {
+        position: relative;
+        width: 100%;
+        min-height: 1px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+    .col-6{
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .d-inline{
+        display: inline-block;
+    }
+    .field-name{
+        font-weight: bold;
+        width: 170px;
+        vertical-align: top;
+    }
+    .colon{
+        font-weight: bold;
+        vertical-align: top;
+    }
+    .visit-details-field{
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+    .visit-details-list{
+        margin: 5px;
+    }
+    .table-index{
+        width: 4%;
+        font-weight: bold;
+    }
+    .table-name{
+        width: 80%;
+        font-weight: bold;
+        font-size: 15px;
+    }
+    .finding-comment{
+        padding: 5px 0px;
+    }
+
+    .d-flex{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: nowrap;
+        flex-wrap: nowrap;
+        width: 100%;
+        justify-content: center;
+        -webkit-box-pack: center;
+    }
+    .collection-signature{
+        margin-top: 3rem;
+    }
+    .signature{
+        margin-top: 3rem;
+    }
+    .signature-img{
+        width: 200px;
+    }
+    .signature-line{
+        margin-top: 80px;
+    }
+    .signature-box-1{
+        padding: 10px 30px;
+        width: 300px;
+    }
+    .signature-box-2{
+        padding: 10px 30px;
+        width: 200px;
+    }
+
+    .section-header-row{
+        font-size: 15.5px;
+        td{
+            padding-top: 1rem;
+        }
+    }
+    .row-name{
+        // width: 76%;
+        font-weight: bold;
+    }
+    .row-wrap{
+        width: 80%;
+        white-space: pre-wrap;
+    }
+
+    .mso-iso-status{
+        td{
+            padding-top: 1rem;
+        }
+    }
+    .finding-row{
+        td{
+            padding: 3px 0px;
+        }
+    }
+    .checkbox-field{
+        display: flex;
+        display: -webkit-box;
+        flex-direction: row;
+        border: none;
+        .option{
+            img{
+                margin-right: 5px;
+            }
+            padding-right: 1rem;
+            display: flex;
+            display: -webkit-flex;
+            flex-direction: row;
+            align-items: center;
+            -webkit-align-items: center;
+        }
+    }
+    .listing{
+        ul{
+            margin: 0px;
+            padding-left: 25px;
+        }
+    }
+    .acceptable-checkbox{
+        flex-direction: row;
+        display: flex;
+        display: -webkit-flex;
+        justify-content: center;
+        -webkit-justify-content: center;
+        font-weight: bold;
+        .acceptable{
+            margin-right: 10px;
+        }
+        .not-acceptable{
+            margin-left: 10px;
+        }
+    }
+    .acceptable-checkbox-field{
+        flex-direction: row;
+        display: flex;
+        display: -webkit-flex;
+        font-weight: bold;
+        .acceptable{
+            margin-left: 30px;
+        }
+        .not-acceptable{
+            margin-left: 85px;
+        }
+    }
+    .yes-no-checkbox{
+        flex-direction: row;
+        display: flex;
+        display: -webkit-flex;
+        font-weight: bold;
+        .acceptable{
+            margin-left: 25px;
+        }
+        .not-acceptable{
+            margin-left: 83px;
+        }
+    }
+    .table-sub-index{
+        font-weight: bold;
+        text-align: right;
+    }
+    .row-sub-name{
+        font-weight: bold;
+    }
+}

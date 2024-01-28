@@ -1,0 +1,129 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Decision</strong>
+    </div>
+
+    <div class="card-body">
+        <%=render "internal/xray_pending_decisions/filter" %>
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Transaction ID</th>
+            <th>Worker Code</th>
+            <th>Doctor Code</th>
+            <th>Certify Date</th>
+            <th>X-Ray Code</th>
+            <th>X-Ray Date</th>
+            <th>X-Ray Result</th>
+            <th>PCR Result</th>
+            <th>Status</th>
+            <th>Decision</th>
+            <th>Approval Decision</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @xray_pending_decisions.each.with_index((@xray_pending_decisions.current_page - 1) * get_per + 1) do |xray_pending_decision, index| %>
+            <tr>
+                <td class="module-row-numbers"><label><%= index %></label></td>
+                <td>
+                    <a href="<%= case xray_pending_decision.status
+                    when "XQCC_PENDING_DECISION"
+                        edit_internal_xray_pending_decision_path(xray_pending_decision.id)
+                    else
+                        internal_xray_pending_decision_path(xray_pending_decision.id)
+                    end %>"><%= xray_pending_decision.transactionz.code %></a>
+                </td>
+                <td><%= xray_pending_decision.transactionz.foreign_worker&.code %></td>
+                <td><%= xray_pending_decision.transactionz.doctor&.code %></td>
+                <td><%= xray_pending_decision.transactionz.doctor_transmit_date.strftime(get_standard_date_format) if xray_pending_decision.transactionz.doctor_transmit_date? %></td>
+                <td><%= xray_pending_decision.transactionz.xray_facility&.code %></td>
+                <td><%= xray_pending_decision.transactionz.xray_examination&.xray_taken_date&.strftime(get_standard_date_format) %></td>
+                <td><%= xray_pending_decision.transactionz.xray_examination&.result %></td>
+                <td><%= xray_pending_decision.transactionz.pcr_review&.result %></td>
+                <td><%= xray_pending_decision.case_review_status %></td>
+                <td><%= xray_pending_decision.decision %></td>
+                <td><%= xray_pending_decision.case_approval_status %></td>
+                <td>
+                    <% if xray_pending_decision.status == "XQCC_PENDING_DECISION" %>
+                        <%=raw index_table_edit_button edit_internal_xray_pending_decision_path(xray_pending_decision.id) %>
+                    <% else %>
+                        <%=raw index_table_show_button internal_xray_pending_decision_path(xray_pending_decision.id) %>
+                    <% end %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% if @xray_pending_decisions.blank? %>
+            <tr>
+                <td colspan="13" class="text-danger">No records found.<!--No active XQCC Pending Review cases.--></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @xray_pending_decisions %>
+        </div>
+    </div>
+</div>
+
+<style>
+.scrollable-menu-box {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: 0;
+    z-index: 1;
+    border: none;
+    opacity: 0.9;
+    padding: 0;
+    background-color: #f3f3f3;
+}
+</style>
+
+<% content_for :page_end_scripts do %>
+<script>
+    tableHeight = $('.table-responsive').height() - 10;
+    setMaxHeight = Math.min(tableHeight, 320);
+    dropdownMenus = $('.dropdown-menu.in-table-dropdown').css('max-height', setMaxHeight);
+
+    $('.dropdown-menu.in-table-dropdown').map(function() {
+        menuHeight = $(this).height();
+        contentHeight = $(this).find('')
+    });
+
+    if (setMaxHeight < 320) {
+        $('.dropdown-menu.in-table-dropdown').scroll(function() {
+            if (this.scrollTop > 0) {
+                $(this).find('.scrollable-menu-box').hide();
+            } else {
+                $(this).find('.scrollable-menu-box').show();
+            }
+        });
+    }
+
+    $('.table-dropdown-trigger').click(function() {
+        trigger = this;
+
+        setTimeout(function() {
+            dropdown = $(trigger).closest('.dropdown').find('.in-table-dropdown');
+            noScroll = dropdown[0].scrollHeight <= dropdown.height() + 1;
+
+            if (noScroll) {
+                dropdown.find('.scrollable-menu-box').hide();
+            }
+        }, 10);
+    });
+</script>
+<% end %>

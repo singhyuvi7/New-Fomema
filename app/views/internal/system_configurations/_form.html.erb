@@ -1,0 +1,248 @@
+<% if has_permission?("EDIT_FINANCE_SYSTEM_CONFIGURATION") && !has_permission?("EDIT_SYSTEM_CONFIGURATION") %>
+    <input type="hidden" name="activate_finance" id="activate_finance" value="1"/>
+<% end %>
+
+<div class="tab-pane active" id="sc-basic" role="tabpanel">
+    <% ["COMPANY_NAME", "COMPANY_REGNO", "COMPANY_ADDR", "COMPANY_PHONE", "COMPANY_FAX"].each do |code| %>
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="<%= code %>"><%= @system_configurations[code].name %></label>
+        <div class="col-md-8">
+            <%= text_field_tag code, @system_configurations[code].value, class: "form-control", required: true %>
+            <% if @system_configurations[code].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <% end %>
+</div>
+<div class="tab-pane" id="sc-policy" role="tabpanel">
+    <!-- employer registration require approval -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["EMPLOYER_APPROVAL"].name %></label>
+        <div class="col-md-8">
+            <div class="form-check form-check-inline">
+                <%= radio_button_tag "EMPLOYER_APPROVAL", "1", @system_configurations["EMPLOYER_APPROVAL"].value == "1", required: true, class: "form-check-input" %>
+                <label class="form-check-label" for="EMPLOYER_APPROVAL_1">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <%= radio_button_tag "EMPLOYER_APPROVAL", "0", @system_configurations["EMPLOYER_APPROVAL"].value == "0", required: true, class: "form-check-input" %>
+                <label class="form-check-label" for="EMPLOYER_APPROVAL_0">No</label>
+            </div>
+            <% if @system_configurations["EMPLOYER_APPROVAL"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["EMPLOYER_APPROVAL"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- AGENCY registration require approval -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["AGENCY_APPROVAL"].name %></label>
+        <div class="col-md-8">
+            <div class="form-check form-check-inline">
+                <%= radio_button_tag "AGENCY_APPROVAL", "1", @system_configurations["AGENCY_APPROVAL"].value == "1", required: true, class: "form-check-input" %>
+                <label class="form-check-label" for="AGENCY_APPROVAL_1">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <%= radio_button_tag "AGENCY_APPROVAL", "0", @system_configurations["AGENCY_APPROVAL"].value == "0", required: true, class: "form-check-input" %>
+                <label class="form-check-label" for="AGENCY_APPROVAL_0">No</label>
+            </div>
+            <% if @system_configurations["AGENCY_APPROVAL"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["AGENCY_APPROVAL"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- password policy require approval -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["PASSWORDPOLICY_APPROVAL"].name %></label>
+        <div class="col-md-8">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="PASSWORDPOLICY_APPROVAL_1" type="radio" value="1" name="PASSWORDPOLICY_APPROVAL" required%<%= " checked" if @system_configurations["PASSWORDPOLICY_APPROVAL"].value == '1' %>>
+                <label class="form-check-label" for="PASSWORDPOLICY_APPROVAL_1">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="PASSWORDPOLICY_APPROVAL_0" type="radio" value="0" name="PASSWORDPOLICY_APPROVAL" required<%= " checked" if @system_configurations["PASSWORDPOLICY_APPROVAL"].value == '0' %>>
+                <label class="form-check-label" for="PASSWORDPOLICY_APPROVAL_0">No</label>
+            </div>
+            <% if @system_configurations["PASSWORDPOLICY_APPROVAL"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["PASSWORDPOLICY_APPROVAL"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- xqcc pickup method -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["XQCC_PICKUPMETHOD"].name %></label>
+        <div class="col-md-8">
+            <%= select_tag "XQCC_PICKUPMETHOD", options_for_select(SystemConfiguration::XQCC_PICKUP_METHODS.invert, @system_configurations["XQCC_PICKUPMETHOD"].value), {required: true, include_blank: form_select_option_text, class: "form-control"} %>
+            <% if @system_configurations["XQCC_PICKUPMETHOD"].comment.present? %>
+            <p class="form-control-plaintext"><%= @system_configurations["XQCC_PICKUPMETHOD"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- xqcc number of bundle assignment -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="XQCC_FIFO_BUNDLEASSIGN"><%= @system_configurations["XQCC_FIFO_BUNDLEASSIGN"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "XQCC_FIFO_BUNDLEASSIGN", @system_configurations["XQCC_FIFO_BUNDLEASSIGN"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["XQCC_FIFO_BUNDLEASSIGN"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["XQCC_FIFO_BUNDLEASSIGN"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="XQCC_MAID_BUNDLEASSIGN"><%= @system_configurations["XQCC_MAID_BUNDLEASSIGN"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "XQCC_MAID_BUNDLEASSIGN", @system_configurations["XQCC_MAID_BUNDLEASSIGN"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["XQCC_MAID_BUNDLEASSIGN"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["XQCC_MAID_BUNDLEASSIGN"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- xqcc iqa -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="XQCC_IQA"><%= @system_configurations["XQCC_IQA"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "XQCC_IQA", @system_configurations["XQCC_IQA"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["XQCC_IQA"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["XQCC_IQA"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- medical pr iqa -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="MEDICAL_PR_IQA"><%= @system_configurations["MEDICAL_PR_IQA"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "MEDICAL_PR_IQA", @system_configurations["MEDICAL_PR_IQA"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["MEDICAL_PR_IQA"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["MEDICAL_PR_IQA"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- number of recent bulletin -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="BULLETIN_RECENT"><%= @system_configurations["BULLETIN_RECENT"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "BULLETIN_RECENT", @system_configurations["BULLETIN_RECENT"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["BULLETIN_RECENT"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["BULLETIN_RECENT"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- transaction expiry days -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="TRANSACTION_EXPIRY_DAYS"><%= @system_configurations["TRANSACTION_EXPIRY_DAYS"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "TRANSACTION_EXPIRY_DAYS", @system_configurations["TRANSACTION_EXPIRY_DAYS"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["TRANSACTION_EXPIRY_DAYS"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["TRANSACTION_EXPIRY_DAYS"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- number of days to reply -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS"><%= @system_configurations["EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS", @system_configurations["EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["EMPLOYER_REGISTER_APPROVAL_REPLY_DAYS"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="AGENCY_REGISTER_APPROVAL_REPLY_DAYS"><%= @system_configurations["AGENCY_REGISTER_APPROVAL_REPLY_DAYS"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "AGENCY_REGISTER_APPROVAL_REPLY_DAYS", @system_configurations["AGENCY_REGISTER_APPROVAL_REPLY_DAYS"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["AGENCY_REGISTER_APPROVAL_REPLY_DAYS"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["AGENCY_REGISTER_APPROVAL_REPLY_DAYS"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- JIM Biodata Timeout -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="JIM_BIODATA_TIMEOUT"><%= @system_configurations["JIM_BIODATA_TIMEOUT"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "JIM_BIODATA_TIMEOUT", @system_configurations["JIM_BIODATA_TIMEOUT"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["JIM_BIODATA_TIMEOUT"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["JIM_BIODATA_TIMEOUT"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- statistics pending order month portal -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="STAT_PENDING_ORDER_MONTHS"><%= @system_configurations["STAT_PENDING_ORDER_MONTHS"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "STAT_PENDING_ORDER_MONTHS", @system_configurations["STAT_PENDING_ORDER_MONTHS"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["STAT_PENDING_ORDER_MONTHS"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["STAT_PENDING_ORDER_MONTHS"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- mspd inactive group email -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="MSPD_INACTIVE_GROUP_IN_X_DAYS"><%= @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].name %></label>
+        <div class="col-md-8">
+            <%= number_field_tag "MSPD_INACTIVE_GROUP_IN_X_DAYS", @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].value, class: "form-control", required: true, min: 0 %>
+            <% if @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["MSPD_INACTIVE_GROUP_IN_X_DAYS"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- foreign worker amendment require upload document -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["WORKER_AMENDREQDOC"].name %></label>
+        <div class="col-md-8">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="WORKER_AMENDREQDOC_1" type="radio" value="1" name="WORKER_AMENDREQDOC" required%<%= " checked" if @system_configurations["WORKER_AMENDREQDOC"].value == '1' %>>
+                <label class="form-check-label" for="WORKER_AMENDREQDOC_1">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="WORKER_AMENDREQDOC_0" type="radio" value="0" name="WORKER_AMENDREQDOC" required<%= " checked" if @system_configurations["WORKER_AMENDREQDOC"].value == '0' %>>
+                <label class="form-check-label" for="WORKER_AMENDREQDOC_0">No</label>
+            </div>
+            <% if @system_configurations["WORKER_AMENDREQDOC"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["WORKER_AMENDREQDOC"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <!-- employer portal bulk registration require comment -->
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label"><%= @system_configurations["EMPLOYER_BULKCOMMENT"].name %></label>
+        <div class="col-md-8">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="EMPLOYER_BULKCOMMENT_1" type="radio" value="1" name="EMPLOYER_BULKCOMMENT" required%<%= " checked" if @system_configurations["EMPLOYER_BULKCOMMENT"].value == '1' %>>
+                <label class="form-check-label" for="EMPLOYER_BULKCOMMENT_1">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="EMPLOYER_BULKCOMMENT_0" type="radio" value="0" name="EMPLOYER_BULKCOMMENT" required<%= " checked" if @system_configurations["EMPLOYER_BULKCOMMENT"].value == '0' %>>
+                <label class="form-check-label" for="EMPLOYER_BULKCOMMENT_0">No</label>
+            </div>
+            <% if @system_configurations["EMPLOYER_BULKCOMMENT"].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations["EMPLOYER_BULKCOMMENT"].comment %></p>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="tab-pane" id="sc-finance" role="tabpanel">
+    <% SystemConfiguration::FINANCE.each do |code| %>
+    <div class="form-group row">
+        <label class="col-md-4 col-form-label" for="<%= code %>"><%= @system_configurations[code].name %></label>
+        <div class="col-md-8">
+            <%= text_field_tag code, @system_configurations[code].value, class: "form-control", required: true %>
+            <% if @system_configurations[code].comment.present? %>
+                <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+            <% end %>
+        </div>
+    </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    if ($("#activate_finance").val() == 1) {
+        $("#sc-basic").removeClass("active");
+        $("#sc-finance").addClass("active");
+    }
+
+</script>
+<% end %>

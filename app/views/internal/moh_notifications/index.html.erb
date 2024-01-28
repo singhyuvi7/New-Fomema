@@ -1,0 +1,96 @@
+<div class="card">
+    <div class="card-header">
+        <strong>MOH Notifications</strong>
+    </div>
+
+    <div class="card-body">
+        <%
+            list = [
+                { title: "Result Date",     field: "result_date",       type: "date-range" },
+                { title: "Displayed Cases", field: "displayed_cases",   type: "select", options: ["Unreleased", "Released", "All", "Released - Y", "Released - N"], remove_blank: true }
+            ]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-moh-notifications-index", filter_link: internal_moh_notifications_path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag release_notification_internal_moh_notifications_path, method: :post, class: "" do %>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <%= hidden_field_tag :result_date_start, params[:result_date_start] %>
+                <%= hidden_field_tag :result_date_end, params[:result_date_end] %>
+
+                <p class="mb-0">Found <%= @total_count %> case(s)</p>
+
+                <% if has_permission?("EDIT_MOH_NOTIFICATIONS") && @notifications.present? %>
+                    <%= submit_tag "Submit", class: "btn btn-success font-weight-bold" %>
+                <% end %>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="<%= index_table_class %>">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Worker Code</th>
+                                    <th>Worker Name</th>
+                                    <th>Transaction ID</th>
+                                    <th>Result Date</th>
+                                    <th>Certify Date</th>
+                                    <th>Transaction Date</th>
+                                    <th>Create Date</th>
+                                    <th>Disease</th>
+                                    <th>Release</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% @notifications.each.with_index((@noti_ids.current_page - 1) * get_per + 1) do |notification, index| %>
+                                    <%
+                                        transaction = notification.transactionz
+                                        result_date = @moh_notification_checks[transaction.id]
+                                    %>
+
+                                    <tr>
+                                        <td><%= index %></td>
+                                        <td><%= transaction.fw_code %></td>
+                                        <td><%= transaction.fw_name %></td>
+                                        <td><%= transaction.code %></td>
+                                        <td><%= result_date.strftime("%d/%m/%Y") if result_date %></td>
+                                        <td><%= transaction.certification_date.strftime("%d/%m/%Y") if transaction.certification_date? %></td>
+                                        <td><%= transaction.transaction_date.strftime("%d/%m/%Y") if transaction.transaction_date? %></td>
+                                        <td><%= notification.created_at.strftime("%d/%m/%Y") %></td>
+                                        <td><%= notification.disease %></td>
+
+                                        <% if has_permission? "EDIT_MOH_NOTIFICATIONS" %>
+                                            <td><%= select_tag "notifications[#{ notification.id }]release", options_for_select(["Y", "N"], notification.release_flag), include_blank: form_select_option_text, class: 'form-control' %></td>
+                                        <% else %>
+                                            <td><%= notification.release_flag %></td>
+                                        <% end %>
+                                    </tr>
+                                <% end %>
+
+                                <% if @notifications.blank? %>
+                                    <tr>
+                                        <td colspan="10" class="text-danger">No records found.</td>
+                                    </tr>
+                                <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="row">
+            <%= paginate @noti_ids %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+
+    </script>
+<% end %>

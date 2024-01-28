@@ -1,0 +1,1 @@
+json.array! @service_provider_groups

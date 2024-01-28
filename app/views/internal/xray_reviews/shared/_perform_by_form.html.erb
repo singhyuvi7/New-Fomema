@@ -1,0 +1,49 @@
+<div class="card">
+
+    <div class="card-header">
+        Perform By
+    </div>
+
+    <table class="table table-bordereda table-card">
+        <tbody>
+            <tr>
+                <td width="120"><span class="condition-code">6125</span>Taken By: </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="finding_item form-check-input" name="xray_review_detail[6125]" type="radio" value="G" id="xray_review_detail_6125_g" <% if xray_review.get_condition_detail("6125") == 'G' %> checked <% end %> required>
+                            GP
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="finding_item form-check-input" name="xray_review_detail[6125]" type="radio" value="C" id="xray_review_detail_6125_c" <% if xray_review.get_condition_detail("6125") == 'C' %> checked <% end %>>
+                            CR
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td width="120"><span class="condition-code">6126</span>Reported By: </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="finding_item form-check-input" name="xray_review_detail[6126]" type="radio" value="G" id="xray_review_detail_6126_g" <% if xray_review.get_condition_detail("6126") == 'G' %> checked <% end %> required>
+                            GP
+                        </label>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline">
+                            <input class="finding_item form-check-input" name="xray_review_detail[6126]" type="radio" value="C" id="xray_review_detail_6126_c" <% if xray_review.get_condition_detail("6126") == 'C' %> checked <% end %>>
+                            CR
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

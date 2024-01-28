@@ -1,0 +1,101 @@
+<!-- lab -->
+<div class="card">
+
+    <div class="card-header">
+        <strong>Doctor - Laboratory Coupling History</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Date</th>
+                                <th>Laboratory Code</th>
+                                <th>Laboratory Name</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @lab_allocates.blank? %>
+                                <tr>
+                                    <td colspan="7" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @lab_allocates.each.with_index(1) do |allocate, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td><%= allocate.created_at.strftime('%d/%m/%Y') %></td>
+                                    <td><%= link_to allocate&.old_allocatable&.code, internal_laboratory_path(allocate&.old_allocatable), target: "_BLANK" %>
+                                    </td>
+                                    <td><%= allocate&.old_allocatable&.name %></td>
+                                    <td><%= allocate&.old_allocatable&.state&.name %></td>
+                                </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- xray -->
+<div class="card">
+
+    <div class="card-header">
+        <strong>Doctor - Xray Coupling History</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Date</th>
+                                <th>Xray Code</th>
+                                <th>Xray Name</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @lab_allocates.blank? %>
+                                <tr>
+                                    <td colspan="7" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @xray_allocates.each.with_index(1) do |allocate, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= allocate.created_at.strftime('%d/%m/%Y') %></td>
+                                        <td><%= link_to allocate&.old_allocatable&.code, internal_xray_facility_path(allocate&.old_allocatable), target: "_BLANK" %>
+                                        </td>
+                                        <td><%= allocate&.old_allocatable&.name %></td>
+                                        <td><%= allocate&.old_allocatable&.state&.name %></td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-right">
+        <%=raw show_back_button(internal_doctor_path(@doctor)) %>
+    </div>
+</div>

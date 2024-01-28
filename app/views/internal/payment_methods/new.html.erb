@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Payment Methods</strong> - New Payment Method
+    </div>
+    <%= form_for @payment_method, url: internal_payment_methods_path, html: {class: "#{params[:action]}_payment_method payment_method-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,33 @@
+<p>
+    <b>Dear <%= @agency.name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @agency.name %></i></b>,
+</p>
+
+<p>This is a friendly reminder of annual fee which will be due on <%= @agency.expired_at.try(:strftime,'%d/%m/%Y') %>. The total
+<br>amount is <%= "RM #{@renewal_fee}" %> and can be paid by clicking on the link below or copy and paste
+<br>the link into your browser. Failing to do so will result in your account being temporarily suspended.</p>
+<p>Kindly sign the attached ‘Agreement Letter’ and post to the following address. A copy 
+ <br>of the stamped agreement letter will be posted to you.</p>
+<p>The stamping agreement process will be taken place once your registration payment is successful.</p>
+<p><i>Ini adalah peringatan yuran tahunan yang akan luput pada <%= @agency.expired_at.try(:strftime,'%d/%m/%Y') %>. Jumlah yang perlu
+<br>dibayar adalah <%= "RM #{@renewal_fee}" %> dan bayaran boleh dibuat melalui pautan di bawah atau 
+<br>sila salin dan tampal semula paparan ke dalam pelayar web anda: Sekiranya gagal dibuat, akaun 
+<br>anda akan disekat buat sementara waktu.</i></p>
+<p><i>Sila tandatangani ‘Surat Perjanjian’ yang telah dilampirkan dan hantarkan ke alamat yang berikut.
+<br>Salinan surat perjanjian yang disahkan akan dihantarkan semula melalui pos kepada anda.</i></p>
+<p><i>Proses pengesahan perjanjian akan dilakukan setelah pembayaran pendaftaran anda berjaya.</i></p>
+<p>FOMEMA SDN BHD<br>Support Service Department<br>Lot 49 & 51,<br>Jalan Kampung Pandan<br>55100 Kuala Lumpur</p>
+
+<p>
+    <%= @renewal_order_link %>
+</p>
+
+<p>
+    Thank you.<br> 
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

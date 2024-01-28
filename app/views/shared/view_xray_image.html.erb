@@ -1,0 +1,20 @@
+<p><b>Multiple images found. Please choose image to view.<b></p>
+
+<% @date_images.each do |date, xray_url| %>
+    <%= link_to date.to_date.strftime("%d-%m-%Y"), xray_url, class: "btn", target: :_blank  %>
+<% end %>
+
+<style>
+    .btn {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 7px 14px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 8px;
+        margin-right: 5px;
+    }
+</style>

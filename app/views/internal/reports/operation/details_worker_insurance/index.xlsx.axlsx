@@ -1,0 +1,44 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+  # worksheet styles
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'c8ced3', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style border: Axlsx::STYLE_THIN_BORDER
+  total_style = s.add_style(b: true, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  # worksheet data
+  wb.add_worksheet(name: 'Detailed Report') do |sheet|
+    # sector statistics data
+    sheet.add_row ["#{@company_name.to_s.upcase}"], style: title_style
+    sheet.add_row ["DETAILS WORKER INSURANCE REPORT FROM #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} TO #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL BRANCH'}"], style: title_style
+    sheet.column_widths 15
+
+    sheet.add_row
+
+    sheet.add_row ['DATE','BRANCH','CREATED_BY','ORDER CODE','EMPLOYER CODE','EMPLOYER NAME','EMPLOYER STATE','WORKER CODE','WORKER NAME','GENDER','COUNTRY','JOB TYPE','INSURANCE PROVIDER','INSURER','GROSS PREMIUM','SST','STAMP DUTY','ADMIN FEES','ADMIN FEES SST','TOTAL'], style: header_style
+
+    if @data.present?
+      @data.each do |order|
+        sst = order.order_items.get_insurance_sst.sum('order_items.amount')
+        stamp_duty = order.order_items.get_insurance_stamp_duty.sum('order_items.amount')
+        adminfees = order.order_items.get_insurance_adminfees.sum('order_items.amount')
+        adminfees_sst = order.order_items.get_insurance_adminfees_sst.sum('order_items.amount')
+        total_gross_premium = order.order_items.get_insurance_gross_premium.sum('order_items.amount')
+
+        order.order_items.get_insurance_gross_premium.each.with_index(1) do |order_item,index|
+          insurance_purchase = order_item.insurance_purchase
+          first_row = [order.paid_at.try(:to_date).try(:strftime,'%d/%m/%Y'), order.organization.name, User.find(order.created_by).code, order.code, insurance_purchase&.emp_code, insurance_purchase&.emp_name, order.customerable&.state&.name]
+          other_row = ['','','','','','','']
+          row_details = [insurance_purchase&.fw_code, insurance_purchase&.fw_name, insurance_purchase&.fw_gender, insurance_purchase&.fw_country&.name, insurance_purchase&.fw_job_type&.name, InsuranceServiceProvider.find_by(id: insurance_purchase&.insurance_service_provider_id)&.display_name, insurance_purchase&.insurance_provider, order_item.amount,'','','','','']
+
+          sheet.add_row  (index == 1 ? first_row+row_details : other_row+row_details), style: data_style, :types => [nil,nil, :string]
+        end
+        sheet.add_row ['','','','','','','','','','','','','','TOTAL',total_gross_premium,sst, stamp_duty, adminfees, adminfees_sst, [sst,stamp_duty,total_gross_premium,adminfees,adminfees_sst].sum], style: total_style
+        sheet.add_row ['','','','','','','','','','','','','','','','','','','',''], style: data_style
+      end
+    end
+
+    sheet.add_row ['','','','','','','','','','','','','','GRAND TOTAL',@total_gross_premium,@total_sst,@total_stamp_duty,@total_adminfees, @total_adminfees_sst, [@total_gross_premium,@total_sst,@total_stamp_duty,@total_adminfees, @total_adminfees_sst].sum], style: total_style
+  end
+end

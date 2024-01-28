@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="noindex">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'external/application', media: 'all' %>
+    <title>FAQ</title>
+    <style>
+    /* .accordion > .card .card-header {
+        margin-bottom: 0px;
+    } */
+    .accordion > .card:first-of-type, .accordion .card:not(:first-of-type):not(:last-of-type) {
+        border-bottom: 1px solid #c8ced3;
+    }
+    .space{
+        padding-top:30px;
+    }
+    </style>
+</head>
+<body class="bg-portal space">
+    <div class="container-fluid">
+        <div class="container text-center">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="row justify-content-center">
+            <hr class="navbar-sep-1">
+            <hr class="navbar-sep-2">
+        </div>
+
+        <div class="container margin-top-30">
+            <div class="accordion" id="accordionFomema">
+                <% qno = 0 %>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="true" aria-controls="collapse<%= qno %>">
+                            <%= qno %>. What is the function of FOMEMA Web Portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Our portal allows user to:
+                            <ol type="a">
+                                  <li>Purchase medical form</li>
+                                  <li>Purchase insurance</li>
+                                  <li>Purchase insurance and medical form together</li>
+                                  <li>Request to amend foreign workers’ information</li>
+                                  <li>Generate invoice for the registration made online </li>
+                                  <li>Request to refund for the registration made online</li>
+                                  <li>Check online medical result</li>
+                                  <li>Check appeal status </li>
+                                  <li>Update employer’s information </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                            <%= qno %>. What documents do I need to upload to sign up?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            <i>Individual</i>
+                            <ol>
+                                <li>Copy of your NRIC for Malaysian / Copy of your passport if you are non-Malaysian</li>
+                                <li>Copy of calling visa/ visit pass of your worker</li>
+                            </ol>
+
+                            <i>Company</i>
+                            <ol>
+                                <li>Copy of your company's registration documents (Form 9 or equivalent)</li>
+                                <li>Copy of the NRIC/Passport of contact person</li>
+                                <li>Copy of the letter authorizing the contact person to perform worker registrations</li>
+                                <li>Copy of calling visa for one worker</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                            <%= qno %>. What kind of files I can upload?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            We only accept images with extension (jpg, pdf, png) for registration.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                            <%= qno %>. What is the maximum file size accepted?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The maximum upload file size is 10MB.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What browser shall I use to access FOMEMA web portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            At the moment, only Google Chrome is supported.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Can I still go to FOMEMA branch for registration?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may still visit the nearest FOMEMA branch and continue to register your worker for the medical examination. The FOMEMA web portal makes it easier for you to perform the same transaction without going to the branch at all!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have more than one company, how can I register my worker?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may register each company as a separate employer. Each company must have a unique ROC company number. However, subsidiary company's first-time registration must be done at any FOMEMA branches.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How long does it take for my registration to be approved?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            It will take up to 2 working days for FOMEMA to process your employer registration request. Please note that working days may differ by state in Malaysia.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have registered before, but I forgot my Email / employer code, what do I do?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may contact our Customer Service & Support Department during business hours to retrieve your login credentials.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I never registered before, but the error prompt "Business registration no / NRIC has been taken", what do I do?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            It means that your record has already exist with us. You may contact our Customer Service & Support Department during business hours to retrieve your login credentials.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Previously I went to FOMEMA branch for registration, this is my first visit to the new FOMEMA web portal, how do I proceed?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Please refer to the previous medical examination form and use the employer code to log in.
+                            Fill in your employer code > leave the password blank > click on login > update your details and email for first time login > the reset password link will be sent to your email
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have registered online before, how do I reset my password?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            To reset your password, click on “Forgot Your Password” found under the Login button. This will allow you to request for a password reset.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have updated my details and email address, but I did not receive any email to reset password.
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Please check the email in your spam/ junk email
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have clicked on forgot password, however I received a link for another employer. Why is this happening?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            One email address can only be used for one employer code uniquely. You may not share the same email address for another employer.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. The registered email is no longer in use, how can I update my email address?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Please email to <a href="mailto: cs@fomema.com.my">cs@fomema.com.my</a> the following document to update your email address. Official letter to request to change email address (the letter should indicate the following details):
+                            <ul>
+                                <li>New Email address</li>
+                                <li>Employer's Contact Number</li>
+                                <li>Employer's Signature</li>
+                            </ul>
+                            Please attach together with:
+                            <ul>
+                                <li>Copy of employer's IC (Individual)</li>
+                                <li>Copy of SSM form 9 (Company)</li>
+                                <li>Worker's permit for one worker</li>
+                                <li>Worker's passport for one worker</li>
+                            </ul>
+                            The process will take up to 3 working days. Please note that working days may differ by state in Malaysia.<br>Once it has been updated, you will receive an email to reset your password.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What are the steps to purchase medical form?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            There are 4 main steps to purchase medical form.<br>
+                            Step 1: Register Worker<br>
+                            Step 2: Make Payment<br>
+                            Step 3: Select your panel clinic<br>
+                            Step 4: Print medical form
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How can I register more than one foreign worker?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Company: Go to the “Register Worker” > find the worker you wish to register > tick on the worker check box > click “Add to List”> repeat until you have added all your worker in the list > click view list > click on “Buy FOMEMA”<br>
+                            Individual: Go to the “Register Worker” > find the worker you wish to register > tick on the worker check box > click on “Buy FOMEMA”
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Does bulk registration available if I have many foreign workers to register?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The csv template and batch upload specification can be obtained upon click on bulk upload new worker.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I amend my foreign worker's information in the portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Register Worker” > find your worker > click on amendment > change the information > upload copy of passport and copy of permit > submit your amendment.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What kind of files I can upload for amendment?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            We only accept images with extension (jpg, pdf, png) for amendment request.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Why I am unable to amend the details in the portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            If the worker’s data has been verified with JIM (Jabatan Imigresen Malaysia), please proceed for amendment manually.<br><br>
+                            Please email the following documents to <a href="mailto: cs@fomema.com.my">cs@fomema.com.my</a>
+                            <ol>
+                                <li>Download & fill in Request to Amend Foreign Worker's Information form at <a href="https://www.fomema2u.com.my/forms/">https://www.fomema2u.com.my/forms/</a></li>
+                                <li>Copy of passport (old & new for updating passport number)</li>
+                                <li>Copy of work permit</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How long will it take to get the amendment approved?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The amendment process will take up to 3 working days. Please note that working days may differ by state in Malaysia.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I check if my amendment request has been approved?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to the “Register Worker”> find your worker > refer to the “Amendment Status” Column You will also receive an email once the amendment is approved/ rejected
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I update my information in FOMEMA web portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may click on the profile icon on top of your right to update your information such as tel. no, address, bank account etc.
+                            You are not allowed to amend critical information such as Employer Type, Employer Name, NRIC/ROC and e-mail address online.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How can I review the workers that I have chosen before I proceed with the payment?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may click “Payment” > click “Show” to review the foreign worker name before the payment is done
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Where should I click if I had chosen a wrong foreign worker and the payment code has been created for this worker.
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to "Payment" > Click "Show" > Click "Cancel payment"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>.	Does the payment need to be done immediately?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Payment can be done later even if the worker has been selected, just go to “Payment” > click “Show” to confirm on the worker details > click “Edit payment” > click “Pay now”
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>.	How do I check if the payment made is successful?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Payment” > refer to the status of payment
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>.	Where should I click to generate the invoice after payment has been made.
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may go to “Payment” > click on “Invoice” to generate the invoice for the following transaction made via FOMEMA web portal.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Why is the invoice issued by FOMEMA Global Sdn Bhd and not FOMEMA Sdn Bhd?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            FOMEMA Global is the authorized collection agent for FOMEMA Sdn Bhd.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>.	Where do I click to select the clinic after payment?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Registration History” > tick the checkbox for the selected foreign worker > click “Select Clinic”
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Should I enter all the information required for the selection of doctor?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may just fill in the field that you know. For the selection of doctor choose the state or town > click search and the list of clinics will be available for you to select the doctor and save accordingly.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Where should I click to print the medical examination form?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may click on the “Registration History” > refer to action column > click “Print”. The button will only appear after you have selected the clinic.
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How can I proceed with refund process after payment and selection of clinic has been made?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Registration History” > tick on the check box for the selected foreign worker > click refund > update employer profile (bank account number and bank name)
+                            The bank details should belong to the registered employer. Any representative account number is not allowed.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Can I change to a different clinic after I had printed the medical examination form?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may need to refund for the previous transaction that has been made via FOMEMA web portal and you have to perform a new medical registration with the full medical examination fee. For every refund request, RM25.00 per worker will be imposed as service fee and the balance will be credited to the respective employer’s account.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>.	Why there is no refund button for my worker?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Refund is not allowed after medical examination has been carried out or after the expiry date of the form.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How long will the refund process take place from the date of request done via the FOMEMA web portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Refund process will take place within 14 days from the date the request has been submitted.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Can I purchase my worker’s insurance in FOMEMA Web Portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Our portal allows user to purchase insurance only or purchase medical form and insurance together.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What is the insurer available at your portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Three insurer options available at the moment.
+                            <ol type="a">
+                                <li>Liberty Insurance Berhad</li>
+                                <li>QBE Insurance (M) Berhad</li>
+                                <li>Chubb Insurance Malaysia Berhad</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How can I contact the insurance provider company?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Howden Insurance Brokers Support<br>
+                            Hotline: <a href="tel:0379890386">03-7989 0386</a><br>
+                            Email: <a href="mailto:howdenhelpdesk@my.howdengroup.com">howdenhelpdesk@my.howdengroup.com</a> <br>
+                            For more info, please click at <a href="https://howden-fomema.instapol.my/PremiumCalculation/storage/FAQ.pdf">Howden Insurance FAQ</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Where should I click to check medical result in our employer portal?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Login> Go to medical result > select your search type (worker code or passport number) > click “Search”
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How am I able to access the employer portal to check the medical result as the registration for this foreign worker was done at FOMEMA branch?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You may need to refer to the medical examination form to obtain the employer code to login to the employer portal to check the medical result.<br>
+                            Fill in your employer code > leave the password blank > click on login > update your details for first time login > the reset password link will be sent to your email.
+                        </div>
+                    </div>
+                </div>
+
+                <!--BOLEH WALLET -->
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What is Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            FOMEMA is the sole merchant for Boleh Wallet. Boleh Wallet offers payment method such as FPX, Credit/ Debit Card and e-wallet.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I set up Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You need to download Boleh Wallet App through Apple App Store or Google Play Store.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How does Boleh Wallet Works?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Scan the QR code in FOMEMA online portal and select your payment method to pay.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Is Boleh Wallet Secure?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            All data shared with Boleh Wallet is secured and is end-to-end encrypted.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Is there any transaction limit per single transaction through Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Every transaction limited up to 25 foreign workers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. I have made payment via Boleh Wallet App, but why is the payment made to WorkerzDirect instead of FOMEMA Sdn Bhd?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Boleh Wallet is a product of WorkerzDirect Sdn Bhd (Collection Agent) which is a financial payment solution for FOMEMA Sdn Bhd. Kiple Pay is our payment gateway provider.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What type of bank is available for FPX payment?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            i. Affin Bank<br>
+                            ii. Agro Bank<br>
+                            iii. Alliance Bank<br>
+                            iv. AmBank<br>
+                            v. Bank Islam<br>
+                            vi. Bank Muamalat<br>
+                            vii. Bank Rakyat<br>
+                            viii. Bank Simpanan Nasional<br>
+                            ix. CIMB Bank<br>
+                            x. Hong Leong Bank<br>
+                            xi. HSBC Bank<br>
+                            xii. Kuwait Finance House<br>
+                            xiii. Maybank<br>
+                            xiv. OCBC Bank<br>
+                            xv. Public Bank<br>
+                            xvi. RHB Bank<br>
+                            xvii. Standard Chartered Bank<br>
+                            xviii. UOB Bank<br>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How much is the convenience fee imposed for using Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The convenience fee is RM 3.00 per transaction
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What type of debit/credit card is accepted through Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Two types of cards accepted:<br>
+                            i. MasterCard<br>
+                            ii. Visa
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How long is the Boleh Wallet QR code valid for?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The QR code is only valid <font color="red">for 10 minutes</font>. All payment has to be made within the validity of the QR code.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What shall I do if my QR code has expired?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            By going to “Register Worker” in FOMEMA online portal to make new payment.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Can I return to my payment list after the QR code has been generated?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Please avoid leaving the QR page once it has been generated. If you have accidentally closed the browser without copying down the QR payment URL, kindly wait for 10 minutes before reattempting to make a payment again in FOMEMA online portal.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I cancel my payment and get a refund if payment was made through Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Registration History” and click on refund button
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How do I check if payment is successful?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Payment” and refer to payment status
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What shall I do if I wrongly fill in my banking details?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Payment will be unsuccessful. The user will be redirected to FOMEMA online portal and go to “Register Worker” to make new payment.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What shall I do after payment is successful?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            You will be redirected to FOMEMA online portal to continue with clinic selection
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. What shall I do if I would like to cancel my pending authorization transaction for FPX B2B?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Please contact FOMEMA customer service from Monday to Friday, 9.00am to 5.00pm to cancel your pending authorization
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. How can I change my payment method after the QR code has been generated?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Wait for 10 minutes before reattempting to make a payment again in FOMEMA online portal
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Where should I click if I had chosen the wrong foreign worker and the QR code has been generated for this worker?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            After 10 minutes, go to “Register Worker” in FOMEMA online portal to select correct worker and make new payment.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. Where can I get an invoice for payment made through Boleh Wallet?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            Go to “Payment” in FOMEMA online portal and click invoice.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 20210127 - Remove insurance NF-2033 -->
+                <!--<div class="card">
+                    <div class="card-header" id="heading<%= qno = qno + 1 %>">
+                        <h5 class="mb-0">
+                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= qno %>" aria-expanded="false" aria-controls="collapse<%= qno %>">
+                                <%= qno %>. When I click the button for insurance, it's not directed to the insurance's page. What should I do and what are the insurance provider?
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapse<%= qno %>" class="collapse" aria-labelledby="heading<%= qno %>" data-parent="#accordionFomema">
+                        <div class="card-body">
+                            The insurance providers are QBE Insurance, Tune Protect and CHUBB Insurance. To purchase insurance, please navigate to Order > View Transaction >Select Insurance Provider and Foreign Worker and click Foreign Worker Online Insurance to proceed further.
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  </body>
+  <!-- Footer -->
+  <div class="footer-copyright text-center">
+        <div class="row justify-content-center">
+        </div>
+            <div class="mb-3"><img src="<%= image_path('logo.png') %>" class="img-responsive" style="max-height: 100px;"/></div>
+            <div class="text-bold text-white">Copyright &copy; <%= Date.current.year %> <%= @company_name %> All Rights Reserved.</div>
+      </div>
+        <!-- Footer -->
+</html>

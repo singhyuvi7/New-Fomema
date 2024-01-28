@@ -1,0 +1,114 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Bank Drafts</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_BANK_DRAFT') %>
+                    <%=raw index_table_new_button(new_internal_bank_draft_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Payer</th>
+            <th>Number</th>
+            <th>Bank</th>
+            <th>Creation Date</th>
+            <th>Issue Date</th>
+            <th>Place of Issue (Zone)</th>
+            <th>Amount (Allocated)</th>
+            <th>Branch</th>
+            <th>Holded</th>
+            <th>Bad</th>
+            <th>Posted</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @bank_drafts.blank? %>
+            <tr>
+                <td colspan="13" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @bank_drafts.each.with_index((@bank_drafts.current_page - 1) * get_per + 1) do |bank_draft, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= bank_draft.payerable ? "#{bank_draft.payerable&.name} (#{bank_draft.payerable&.code})" : raw("<i>N/A</i>") %></td>
+                    <td><%= bank_draft.number %></td>
+                    <td><%= bank_draft.bank&.name %></td>
+                    <td><%= bank_draft.created_at.strftime("%d/%m/%Y") %></td>
+                    <td><%= bank_draft.issue_date.strftime("%d/%m/%Y") if !bank_draft.issue_date.blank? %></td>
+                    <td><%= bank_draft.issue_place %> (<%= bank_draft.zone&.name %>)</td>
+                    <td><%= number_to_currency(bank_draft.amount || 0, unit: "") %> (<%= number_to_currency(bank_draft.amount_allocated || 0, unit: "") %>)</td>
+                    <td><%= bank_draft.organization&.name %></td>
+                    <td><%= bank_draft.holded ? "Yes" : "No" %></td>
+                    <td><%= bank_draft.bad ? "Yes" : "No" %></td>
+                    <td><%= bank_draft.sync_date.blank? ? "No" : "Yes" %></td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_bank_draft_path(bank_draft)) %>
+
+                        <% if !bank_draft.bad %>
+                            <% if has_permission?('EDIT_BANK_DRAFT') && bank_draft.sync_date.blank? %>
+                                <%=raw index_table_edit_button edit_internal_bank_draft_path(bank_draft) %>
+                            <% end %>
+                            <% if has_permission?('DELETE_BANK_DRAFT') && bank_draft.sync_date.blank? %>
+                                <%=raw index_table_delete_button(internal_bank_draft_path(bank_draft)) %>
+                            <% end %>
+
+                            <% if bank_draft.holded and has_permission?("UNHOLD_BANK_DRAFT") && bank_draft.sync_date.blank? %>
+                                <%=raw index_table_primary_button(unhold_internal_bank_draft_path(bank_draft), title: "Unhold", label: '<i class="fa fa-toggle-off"></i>', classes: 'btn btn-sm btn-success') %>
+                            <% elsif !bank_draft.holded and has_permission?("HOLD_BANK_DRAFT") && bank_draft.sync_date.blank? %>
+                                <%=raw index_table_warning_button(hold_internal_bank_draft_path(bank_draft), title: "Hold", label: '<i class="fa fa-toggle-on"></i>') %>
+                            <% end %>
+                        <% end %>
+
+
+                        <% if bank_draft.bad %>
+                            <%
+=begin%>
+ <% if has_permission?("UNSET_BAD_BANK_DRAFT") %>
+                                <%=raw index_table_confirm_button(unbad_internal_bank_draft_path(bank_draft), question: "Confirm remove bad tag?", title: "Confirm remove bad tag?", label: '<i class="fa fa-unlock"></i>', classes: 'btn btn-sm btn-success') %>
+                            <% end %>
+<%
+=end%>
+                            <% if has_permission?("REPLACE_BANK_DRAFT") && !bank_draft.replacement_id? && !bank_draft.from_migration %>
+                                <%=raw index_table_primary_button(replace_internal_bank_draft_path(bank_draft), title: "Replace bad bank draft", label: '<i class="fa fa-adjust"></i>') %>
+                            <% end %>
+                        <% elsif !bank_draft.bad and has_permission?("SET_BAD_BANK_DRAFT") %>
+                            <%=raw index_table_confirm_button(bad_internal_bank_draft_path(bank_draft), question: "Once bank draft is set to bad, it can never be unset. Confirm tag as bad bank draft?", title: "Confirm tag as bad bank draft?", label: '<i class="fa fa-unlock"></i>', classes: 'btn btn-sm btn-danger') %>
+                        <% end %>
+
+                        <% if has_permission?("REFUND_BANK_DRAFT") and bank_draft.can_new_refund? %>
+                            <%=raw index_table_warning_button(new_internal_bank_draft_bd_refund_path(bank_draft), label: '<i class="fa fa-undo"></i>', title: 'Refund', classes: "btn btn-sm btn-warning") %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @bank_drafts if !@bank_drafts.nil? %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

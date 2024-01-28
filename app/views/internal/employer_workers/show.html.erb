@@ -1,0 +1,308 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Foreign Workers</strong> - Foreign Worker Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_code">Code</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.code %></div>
+            </div>
+            <label class="col-md-2 col-form-label" for="employer_name">Employer</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @foreign_worker.employer.name %> (<%= @foreign_worker.employer.code %>)
+                    <% if @foreign_worker.employer_supplement_id? %>
+                        <p class="form-control-plaintext">
+                            <strong><i><%= @foreign_worker.employer_supplement&.name %> (Supplement User)</i></strong>
+                        </p>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_name">Name</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label" for="foreign_worker_passport_number">Passport Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.passport_number %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_gender">Gender</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= ForeignWorker::GENDERS[@foreign_worker.gender] %>
+                    <%= "(Last amended on #{@foreign_worker.gender_amended_at.strftime(get_standard_date_format)})" if !@foreign_worker.gender_amended_at.blank? %>
+                </div>
+            </div>
+            <label class="col-md-2 col-form-label" for="foreign_worker_date_of_birth">Date Of Birth</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.date_of_birth.strftime(get_standard_date_format) %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_country_id">Country</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.country&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label" for="foreign_worker_arrival_date">Arrival Date</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.arrival_date&.strftime(get_standard_date_format) || '-' %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="job_type_id">Job Type</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.job_type&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label" for="maid_online">Programme</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.programme_indicator %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="pati">PATI / Rehiring Programme</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.pati? ? "Yes" : "No" %></div>
+            </div>
+            <label class="col-md-2 col-form-label" for="plks_number">PLKS Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @foreign_worker.plks_number %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_is_reg_medical_blocked">Block Purchase Medical Form</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @foreign_worker.is_reg_medical_blocked? ? "Yes" : "No" %>
+                    <% if !@foreign_worker.is_reg_medical_blocked_comment.blank? %>
+                        <p class="form-control-plaintext">
+                            Comment: <%= @foreign_worker.is_reg_medical_blocked_comment %>
+                        </p>
+                    <% end %>
+                </div>
+            </div>
+            <label class="col-md-2 col-form-label" for="foreign_worker_is_sp_transmit_blocked">Block SP Result Transmit</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @foreign_worker.is_sp_transmit_blocked? ? "Yes" : "No" %>
+                    <% if !@foreign_worker.is_sp_transmit_blocked_comment.blank? %>
+                        <p class="form-control-plaintext">
+                            Comment: <%= @foreign_worker.is_sp_transmit_blocked_comment %>
+                        </p>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="foreign_worker_is_imm_blocked">Block Send to JIM</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @foreign_worker.is_imm_blocked? ? "Yes" : "No" %>
+                    <% if !@foreign_worker.is_imm_blocked_comment.blank? %>
+                        <p class="form-control-plaintext">
+                            Comment: <%= @foreign_worker.is_imm_blocked_comment %>
+                        </p>
+                    <% end %>
+                </div>
+            </div>
+            <label class="col-md-2 col-form-label" for="foreign_worker_blocked">Blocked</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext">
+                    <%= @foreign_worker.blocked? ? "Yes" : "No" %>
+                    <% if @foreign_worker.blocked? %>
+                        <p class="form-control-plaintext">
+                            Reason: <%= @foreign_worker.block_reason&.description %>
+                        </p>
+                        <% if !@foreign_worker.block_comment.blank? %>
+                            <p class="form-control-plaintext">
+                                Comment: <pre><%= @foreign_worker.block_comment %></pre>
+                            </p>
+                        <% end %>
+                        <p class="form-control-plaintext">
+                            By: <%= @foreign_worker.blocker&.name %>
+                        </p>
+                        <p class="form-control-plaintext">
+                            At: <%= @foreign_worker.blocked_at&.strftime(get_standard_date_format) %>
+                        </p>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <%=render "fw_block_logs" %>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label" for="jim_verified">Under Monitoring</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= ForeignWorker::MONITORINGS[@foreign_worker.monitoring] %></div>
+            </div>
+        </div>
+
+        <%=render "fw_monitor_logs" %>
+
+        <!-- uploaded documents -->
+        <div class="row">
+            <div class="col">
+                <label for="employer_uploads">Uploaded Documents</label><br>
+                <label for="employer_uploads">(Passport & Worker Permit)</label>
+
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th width="20%">Category</th>
+                        <th>Documents</th>
+                        <th width="15%">Date Uploaded</th>
+                        <th width="25%">Uploaded By</th>
+                    </tr>
+
+                    <% @foreign_worker.uploads.where(deleted_at: nil, category: ["PASSPORT","WORKINGPERMIT"]).order(created_at: :desc).each do |upload| %>
+                        <tr>
+                            <td class="filenames"><%= upload.category %></td>
+                            <td class="filenames">
+                                <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                <% end %>
+                            </td>
+                            <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                            <td class="filenames"><%= "#{upload.creator&.name} (#{upload.creator&.code})" %></td>
+                        </tr>
+                    <% end %>
+
+                    <% if @foreign_worker.uploads.where(deleted_at: nil, category: ["PASSPORT","WORKINGPERMIT"]).blank? %>
+                        <tr><td colspan="4">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label>(Suspicious Image)</label>
+                <table class="table table-bordered table-striped ">
+                    <tr>
+                        <th width="20%">Category</th>
+                        <th>Documents</th>
+                        <th width="15%">Date Uploaded</th>
+                        <th width="25%">Uploaded By</th>
+                    </tr>
+
+                    <% @foreign_worker.uploads.where(deleted_at: nil, category: ["SUSPICIOUS_IMAGE"]).order(created_at: :desc).each do |upload| %>
+                        <tr>
+                            <td class="filenames"><%= upload.category%></td>
+                            <td class="filenames" >
+                                <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                <% end %>
+                            </td>
+                            <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                            <td class="filenames"><%= "#{upload.creator&.name} (#{upload.creator&.code})" %></td>
+                        </tr>
+                    <% end %>
+
+                    <% if @foreign_worker.uploads.where(deleted_at: nil, category: ["SUSPICIOUS_IMAGE"]).blank? %>
+                        <tr><td colspan="4">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label>(Verified Image)</label>
+                <table class="table table-bordered table-striped ">
+                    <tr>
+                        <th width="20%">Category</th>
+                        <th>Documents</th>
+                        <th width="15%">Date Uploaded</th>
+                        <th width="25%">Uploaded By</th>
+                    </tr>
+
+                    <% @foreign_worker.uploads.where(deleted_at: nil, category: ["FOREIGN_WORKER_IMAGE"]).order(created_at: :desc).each do |upload| %>
+                        <tr>
+                            <td class="filenames"><%= upload.category%></td>
+                            <td class="filenames" >
+                                <% upload.documents.each do |document| %>
+                                    <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                <% end %>
+                            </td>
+                            <td class="filenames"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                            <td class="filenames"><%= "#{upload.creator&.name} (#{upload.creator&.code})" %></td>
+                        </tr>
+                    <% end %>
+
+                    <% if @foreign_worker.uploads.where(deleted_at: nil, category: ["FOREIGN_WORKER_IMAGE"]).blank? %>
+                        <tr><td colspan="4">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+        <!-- /uploaded documents -->
+
+        <div class="row">
+            <div class="col">
+                <label for="amendment_history">Amendment History</label>
+                <%=render "fw_amendment_logs", { show_partial: true } %>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer text-right">
+        <%=raw show_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+        <% if has_permission?('EDIT_FOREIGN_WORKER') and can_request_update?(@foreign_worker) && @foreign_worker.status == 'ACTIVE' %>
+            <%=raw show_edit_button(edit_internal_employer_employer_worker_path(@foreign_worker.employer_id, @foreign_worker)) %>
+        <% end %>
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if @foreign_worker.status == 'ACTIVE' && has_permission?("DEACTIVATE_FOREIGN_WORKER") %>
+                <li class="list-group-item">
+                    <%= link_to "Deactivate", deactivate_internal_employer_employer_worker_path(@employer, @foreign_worker) %>
+                </li>
+            <% elsif @foreign_worker.status == 'INACTIVE' && has_permission?("ACTIVATE_FOREIGN_WORKER") %>
+                <li class="list-group-item">
+                    <%= link_to "Activate", activate_internal_employer_employer_worker_path(@employer, @foreign_worker) %>
+                </li>
+            <% end %>
+
+            <% if has_permission?("VIEW_FW_CHANGE_EMPLOYER") %>
+                <li class="list-group-item">
+                    <%= link_to "Change Employer History", internal_fw_change_employers_path(worker_code: @foreign_worker.code) %>
+                </li>
+            <% end %>
+
+            <li class="list-group-item">
+                <%= link_to "Document(s) History", internal_fw_documents_history_path(@foreign_worker) %>
+            </li>
+
+            <li class="list-group-item">
+                <%= link_to "Amendment History", show_amendment_history_internal_employer_employer_worker_path %>
+            </li>
+
+            <% if has_permission?("VIEW_AUDIT_FOREIGN_WORKER") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_employer_employer_worker_audits_path(@employer, @foreign_worker) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

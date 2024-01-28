@@ -1,0 +1,152 @@
+<div class="card">
+    <div class="card-header">
+        <strong>PCR Review Cases</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "internal/pcr_reviews/filter" %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsivex">
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers"><label>#</label></th>
+            <th>Transaction ID</th>
+            <th>X-Ray Code</th>
+            <th>Worker Code</th>
+            <th>Worker Name</th>
+            <th>Date Pickup</th>
+            <th>X-Ray Taken Date</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Result</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% @pcr_reviews.each.with_index((@pcr_reviews.current_page - 1) * get_per + 1) do |pcr_review, index| %>
+            <%
+                if pcr_review.medical_appeal_id?
+                    trans_object    = pcr_review.medical_appeal
+                    retake          = pcr_review&.poolable&.xray_retake
+                    xray_taken_date = retake&.xray_examination&.xray_taken_date? ? retake.xray_examination.xray_taken_date.strftime(get_standard_date_format) : "N/A"
+                    xray_status     = retake&.status
+                else
+                    trans_object    = pcr_review.transactionz
+                    xray_taken_date = trans_object&.xray_examination&.xray_taken_date? ? trans_object.xray_examination.xray_taken_date.strftime(get_standard_date_format) : "N/A"
+                    xray_status     = Transaction::XRAY_STATUSES[trans_object.xray_status]
+                end
+            %>
+
+            <tr>
+                <td class="module-row-numbers"><label><%= index %></label></td>
+
+                <td>
+                    <% if pcr_review.can_request_retake? %>
+                        <a href="<%= xray_retake_request_internal_transaction_path(trans_object, pcr_review.id) %>"><%= trans_object&.code %></a>
+                    <% elsif pcr_review.status == "TRANSMITTED" %>
+                        <%= link_to pcr_review.medical_appeal_id? ? retake.code : trans_object&.code, internal_pcr_review_path(pcr_review.id) %>
+                    <% else %>
+                        <%= link_to pcr_review.medical_appeal_id? ? retake.code : trans_object&.code, edit_internal_pcr_review_path(pcr_review.id) %>
+                    <% end %>
+                </td>
+
+                <td><%= pcr_review.medical_appeal_id? ? retake&.xray_facility&.code : trans_object&.xray_facility&.code %></td>
+                <td><%= trans_object.try(:foreign_worker).try(:id).blank? ? raw('<i>N/A</i>') : "#{trans_object.foreign_worker&.code}"  %></td>
+                <td><%= trans_object.try(:foreign_worker).try(:id).blank? ? raw('<i>N/A</i>') : "#{trans_object.foreign_worker&.name}"  %></td>
+                <td><%= pcr_review.created_at.strftime(get_standard_date_format) %></td>
+                <td><%= xray_taken_date %></td>
+
+                <td>
+                    <% if pcr_review.medical_appeal_id? %>
+                        APPEAL
+                    <% else %>
+                        <%= PcrReview::CASE_TYPES[pcr_review.case_type] %> <% if pcr_review.is_retake? %> - RETAKE<% end %>
+                    <% end %>
+                </td>
+
+                <td><%= pcr_review.case_review_status %></td>
+                <td><%= pcr_review.result %></td>
+
+                <td>
+                    <% if pcr_review.status == "PCR_REVIEW" && pcr_review.pcr_id.eql?(current_user.id) && has_permission?("EDIT_PCR_REVIEW") %>
+                        <%=raw index_table_edit_button edit_internal_pcr_review_path(pcr_review.id) %>
+                    <% elsif has_permission?("VIEW_PCR_REVIEW") %>
+                        <%=raw index_table_show_button internal_pcr_review_path(pcr_review.id) %>
+                    <% end %>
+                </td>
+            </tr>
+        <% end %>
+
+        <% if @pcr_reviews.blank? %>
+            <tr>
+                <td colspan="12" class="text-danger">No active PCR Review cases.</td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @pcr_reviews %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .scrollable-menu-box {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        z-index: 1;
+        border: none;
+        opacity: 0.9;
+        padding: 0;
+        background-color: #f3f3f3;
+    }
+</style>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        tableHeight = $('.table-responsive').height() - 10;
+        setMaxHeight = Math.min(tableHeight, 320);
+        dropdownMenus = $('.dropdown-menu.in-table-dropdown').css('max-height', setMaxHeight);
+
+        $('.dropdown-menu.in-table-dropdown').map(function() {
+            menuHeight = $(this).height();
+            contentHeight = $(this).find('')
+        });
+
+        if (setMaxHeight < 320) {
+            $('.dropdown-menu.in-table-dropdown').scroll(function() {
+                if (this.scrollTop > 0) {
+                    $(this).find('.scrollable-menu-box').hide();
+                } else {
+                    $(this).find('.scrollable-menu-box').show();
+                }
+            });
+        }
+
+        $('.table-dropdown-trigger').click(function() {
+            trigger = this;
+
+            setTimeout(function() {
+                dropdown = $(trigger).closest('.dropdown').find('.in-table-dropdown');
+                noScroll = dropdown[0].scrollHeight <= dropdown.height() + 1;
+
+                if (noScroll) {
+                    dropdown.find('.scrollable-menu-box').hide();
+                }
+            }, 10);
+        });
+    </script>
+<% end %>

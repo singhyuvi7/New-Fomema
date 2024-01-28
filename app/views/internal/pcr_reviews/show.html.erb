@@ -1,0 +1,157 @@
+<% initialize_numbering_and_subnumbering %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>PCR Review</strong>
+    </div>
+
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+        <%=render 'shared/all_validation_flash', { model_obj: @pcr_review} %>
+        <%=render 'internal/pcr_reviews/shared/pcr_xqcc_indicator', { pcr_review: @pcr_review } %>
+
+        <div class="row">
+            <div class="col-md-8">
+                <%=render 'internal/xqccs/shared/transaction_worker_info', { transaction_model: @transaction } %>
+            </div>
+
+            <div class="col-md-4">
+                <%=render 'internal/xqccs/shared/perform_by_info', {
+                    name: @pcr_review.pcr_user.name,
+                    code: @pcr_review.pcr_user.code,
+                    label: 'PCR'
+                } %>
+            </div>
+        </div>
+
+        <!-- tab menu -->
+        <ul class="nav nav-tabs" role="tablist">
+            <% @transaction.xray_examinations.order(:created_at).each.with_index(1) do |xray_examination, index| %>
+                <% @examination_hashmap["#{ xray_examination.sourceable_type }__#{ xray_examination.sourceable_id }"] = index %>
+
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_examination.id %>-content">
+                        <% if xray_examination.sourceable_type == "XrayRetake"
+                            retake_tag = xray_examination.sourceable.requestable_type == "MedicalAppeal" ? "Appeal" : "XQCC Retake"
+                        end %>
+
+                        <%= "#{ index }. X-Ray Report" %>
+                        <%= xqcc_result_badge("#{ xray_examination.result }#{ " - #{ retake_tag.upcase }" if retake_tag.present? }") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% if @transaction.xray_pending_review_id? && @transaction.xray_pending_review&.is_audit_comparison == "YES" %>
+                <% @transaction.xray_pending_review.xray_pending_review_compares.each.with_index(1) do |xray_pending_review_compare| %>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" role="tab" href="#xray_examination-<%= xray_pending_review_compare.transactionz.xray_examination.id %>-content">
+                            Comparison X-Ray Report
+                            <%= xqcc_result_badge("#{xray_pending_review_compare.transactionz.xray_examination.result}") %>
+                        </a>
+                    </li>
+                <% end %>
+            <% end %>
+
+            <% if @transaction.xray_review_id? %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#xray_review-<%= @transaction.xray_review_id %>-content">
+                        XQCC Review
+                        <%= xqcc_result_badge("#{@transaction.xray_review.result}") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% @transaction.pcr_reviews.where(pcr_id: @pcr_review.pcr_id, medical_appeal_id: nil).where.not(id: @pcr_review.id).each.with_index(1) do |pcr_review, index| %>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">
+                        <%= generate_sub_numbering(pcr_review) %>.
+                        PCR Review
+                        <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button><% end %>
+                        <%#= xqcc_result_badge("#{pcr_review.result}#{" - #{pcr_review.xray_retake.approval_decision}" if pcr_review.xray_retake and !pcr_review.xray_retake.approval_decision.blank?}#{" - #{pcr_review.xray_retake.status}" if pcr_review.xray_retake}") %>
+                        <%= xqcc_result_badge("#{pcr_review.result}") %>
+                    </a>
+                </li>
+            <% end %>
+
+            <% if @pcr_review.medical_appeal_id? %>
+                <% @pcr_review.medical_appeal.pcr_reviews.where.not(id: @pcr_review.id, medical_appeal_id: nil).each.with_index(1) do |pcr_review, index| %>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" role="tab" href="#pcr_review-<%= pcr_review.id %>-content">
+                            <%= generate_sub_numbering(pcr_review) %>.
+                            PCR Review
+                            <% if pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button><% end %>
+                            <%#= xqcc_result_badge("#{pcr_review.result}#{" - #{pcr_review.xray_retake.approval_decision}" if pcr_review.xray_retake and !pcr_review.xray_retake.approval_decision.blank?}#{" - #{pcr_review.xray_retake.status}" if pcr_review.xray_retake}") %>
+                            <%= xqcc_result_badge("#{pcr_review.result}") %>
+                        </a>
+                    </li>
+                <% end %>
+            <% end %>
+
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#pcr_review-<%= @pcr_review.id %>-content">
+                    <%= generate_sub_numbering(@pcr_review) %>.
+                    PCR Review
+                    <% if @pcr_review.case_type === 'XQCC_REVIEW_IQA' %> <button type="button" class="btn btn-warning btn-sm py-0">IQA</button><% end %>
+                    <%= xqcc_result_badge("#{@pcr_review.result}") %>
+                </a>
+            </li>
+        </ul>
+        <!-- /tab menu -->
+
+        <!-- tab content -->
+        <div class="tab-content">
+            <% @transaction.xray_examinations.each.with_index(1) do |xray_examination, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_examination.id %>-content">
+                    <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_examination } %>
+                </div>
+            <% end %>
+
+            <% if @transaction.xray_pending_review_id? && @transaction.xray_pending_review&.is_audit_comparison == "YES" %>
+                <% @transaction.xray_pending_review.xray_pending_review_compares.each.with_index(1) do |xray_pending_review_compare| %>
+                    <div class="tab-pane fade" role="tabpanel" id="xray_examination-<%= xray_pending_review_compare.transactionz.xray_examination.id %>-content">
+                        <%=render 'internal/xray_examinations/xray_examination', { xray_examination: xray_pending_review_compare.transactionz.xray_examination } %>
+                    </div>
+                <% end %>
+            <% end %>
+
+            <% if @transaction.xray_review_id? %>
+                <div class="tab-pane fade" role="tabpanel" id="xray_review-<%= @transaction.xray_review_id %>-content">
+                    <%=render 'internal/xray_reviews/xray_review', { xray_review: @transaction.xray_review } %>
+                </div>
+            <% end %>
+
+            <% @transaction.pcr_reviews.where(pcr_id: @pcr_review.pcr_id, medical_appeal_id: nil).where.not(id: @pcr_review.id).each.with_index(1) do |pcr_review, index| %>
+                <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                    <%=render 'internal/pcr_reviews/pcr_review', { pcr_review: pcr_review } %>
+                </div>
+            <% end %>
+
+            <% if @pcr_review.medical_appeal_id? %>
+                <% @pcr_review.medical_appeal.pcr_reviews.where.not(id: @pcr_review.id, medical_appeal_id: nil).each.with_index(1) do |pcr_review, index| %>
+                    <div class="tab-pane fade" role="tabpanel" id="pcr_review-<%= pcr_review.id %>-content">
+                        <%= render "internal/pcr_reviews/appeal_pcr_form", { pcr_review: pcr_review, readonly: true } %>
+                    </div>
+                <% end %>
+            <% end %>
+
+            <!-- pcr review form -->
+            <div class="tab-pane fade show active" role="tabpanel" id="pcr_review-<%= @pcr_review.id %>-content">
+                <% if @pcr_review.medical_appeal_id? %>
+                    <%= render "internal/pcr_reviews/appeal_pcr_form", { pcr_review: @pcr_review, readonly: true } %>
+                <% else %>
+                    <%= render "internal/pcr_reviews/pcr_review", {
+                        pcr_review: @pcr_review
+                    } %>
+                <% end %>
+            </div>
+            <!-- /pcr review form -->
+        </div>
+        <!-- /tab content -->
+
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(internal_pcr_reviews_path) %>
+    </div>
+</div>

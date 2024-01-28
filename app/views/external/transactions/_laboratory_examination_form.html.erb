@@ -1,0 +1,301 @@
+<%
+    laboratory_indexable    = 0
+    transaction_model       ||= @transaction
+    readonly                ||= false
+    doctor_examination      ||= nil
+    namespacing             ||= "le_attributes_#{ rand(1000) }"
+%>
+
+<% unless current_user.userable_type == "Laboratory" %>
+    <div class="p-4 border-bottom">
+        <h3><u>PART IV. INVESTIGATIONS Section A: Laboratory Results</u></h3>
+    </div>
+<% end %>
+
+<% if laboratory_examination.try(:web_service_indicator) %>
+   <div class="px-4 py-2 d-flex flex-wrap justify-content-end border-bottom">
+        <label class="mb-0 text-success">Results submitted via web service</label>
+    </div>
+<% end %>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="flex-grow-1 mb-0">Laboratory tests not done</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <% value = laboratory_examination.try(:laboratory_test_not_done) == "YES" %>
+        <% @examination_disabled = value %>
+        <%= hidden_field_tag "#{ namespacing }[laboratory_test_not_done]", value ? "YES" : "NO", class: "boolean-field" %>
+        <p class="mb-0 mr-2">(Check <b>YES</b> if laboratory examination was not done for this worker)</p>
+        <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: "YES", placeholder: "Yes") %>
+        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: "NO", placeholder: "No") %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom lab-specimen-date-parents">
+    <label class="flex-grow-1 mb-0">Date & time of specimen taken</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%
+            date_value  = laboratory_examination.try(:specimen_taken_date)
+            formatted   = date_value.present? ? readonly ? date_value.strftime("%d/%m/%Y %I:%M:%S %p") : date_value.strftime("%F %H:%M") : nil
+            specimen_taken_date = formatted
+        %>
+
+        <%= text_field_tag "#{ namespacing }[specimen_taken_date]", formatted, placeholder: "Select date & time", class: "w-em-16 form-control rounded-0 px-2 datetimepicker exam-done-toggle", min: transaction_model.medical_examination_date? ? transaction_model.medical_examination_date.strftime("%F %H:%M") : "", max: Time.zone.now.strftime("%F %H:%M"), autocomplete: "off", readonly: readonly, disabled: @examination_disabled %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom lab-specimen-date-parents">
+    <label class="flex-grow-1 mb-0">Date & time of specimen received</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%
+            date_value  = laboratory_examination.try(:specimen_received_date)
+            formatted   = date_value.present? ? readonly ? date_value.strftime("%d/%m/%Y %I:%M:%S %p") : date_value.strftime("%F %H:%M") : nil
+            min_date    = specimen_taken_date || transaction_model.medical_examination_date.strftime("%F %H:%M") rescue transaction_model.transaction_date.strftime("%F %H:%M")
+        %>
+
+        <%= text_field_tag "#{ namespacing }[specimen_received_date]", formatted, placeholder: "Select date & time", class: "w-em-16 form-control rounded-0 px-2 datetimepicker exam-done-toggle", min: min_date, max: Time.zone.now.strftime("%F %H:%M"), autocomplete: "off", readonly: readonly, disabled: @examination_disabled %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="flex-grow-1 mb-0">Barcode of blood specimen</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%= text_field_tag "#{ namespacing }[blood_specimen_barcode]", laboratory_examination.try(:blood_specimen_barcode), placeholder: "Barcode number", class: "w-em-16 form-control rounded-0 px-2 exam-done-toggle", readonly: readonly, disabled: @examination_disabled %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+    <label class="flex-grow-1 mb-0">Barcode of urine specimen</label>
+
+    <div class="d-flex flex-shrink-0 align-items-center">
+        <%= text_field_tag "#{ namespacing }[urine_specimen_barcode]", laboratory_examination.try(:urine_specimen_barcode), placeholder: "Barcode number", class: "w-em-16 form-control rounded-0 px-2 exam-done-toggle", readonly: readonly, disabled: @examination_disabled %>
+    </div>
+</div>
+
+<h6 class="px-4 py-3 border-bottom mb-0">Blood Tests</h6>
+
+<div id="report-fields">
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+        <label class="row-index"><%= laboratory_indexable += 1 %></label>
+        <label class="flex-grow-1 mb-0">Blood Group</label>
+        <%= hidden_field_tag "#{ namespacing }[blood_group]", laboratory_examination.try(:blood_group) %>
+        <%= hidden_field_tag "#{ namespacing }[blood_group_rhesus]", laboratory_examination.try(:blood_group_rhesus) %>
+        <%= hidden_field_tag "#{ namespacing }[previous_blood_group]", @transaction.previous_transaction.nil? ? '' : @transaction.previous_transaction.laboratory_examination.blood_group %>
+        <%= hidden_field_tag "#{ namespacing }[previous_blood_group_rhesus]", @transaction.previous_transaction.nil? ? '' : @transaction.previous_transaction.laboratory_examination.blood_group_rhesus %>
+        <%= hidden_field_tag "#{ namespacing }[is_blood_group_benchmark]", @transaction.is_blood_group_benchmark %>
+
+        <%
+            blood_type      = laboratory_examination.try(:blood_group)
+            blood_rhesus    = laboratory_examination.try(:blood_group_rhesus)
+            disabled_group  = blood_type != "OTHER"
+            disabled_rhesus = blood_rhesus != "OTHER"
+        %>
+
+        <div class="d-flex flex-shrink-0 align-items-center mr-4">
+            <p class="font-weight-bold mb-0 mr-2">Type</p>
+
+            <% LaboratoryExamination.blood_groups.each do |type| %>
+                <div class="btn <%= blood_type == type.upcase ? "btn-primary" : "btn-default" %> border rounded-circle d-flex align-items-center justify-content-center mx-1 select-blood-type" style="width: 3em; height: 3em;" data-type="<%= type.upcase %>">
+                    <span class="font-weight-bold <%= "font-size-4" if type == "Other" %>"><%= type %></span>
+                </div>
+            <% end %>
+        </div>
+
+        <%= text_field_tag "#{ namespacing }[blood_group_other]", laboratory_examination.try(:blood_group_other), placeholder: "Other type", class: "w-em-12 p-2 flex-shrink-0 mr-4 form-control rounded-0", disabled: disabled_group, readonly: readonly %>
+
+        <div class="d-flex flex-shrink-0 align-items-center mx-4">
+            <p class="font-weight-bold mb-0 mr-2">RH</p>
+
+            <% ["+ve", "-ve", "Other"].each do |type| %>
+                <div class="btn <%= blood_rhesus == type.upcase ? "btn-primary" : "btn-default" %> border rounded-circle d-flex align-items-center justify-content-center mx-1 select-rhesus-type" style="width: 3em; height: 3em;" data-type="<%= type.upcase %>">
+                    <span class="font-weight-bold <%= "font-size-4" if type == "Other" %>"><%= type %></span>
+                </div>
+            <% end %>
+        </div>
+
+        <%= text_field_tag "#{ namespacing }[blood_group_rhesus_other]", laboratory_examination.try(:blood_group_rhesus_other), placeholder: "Other type", class: "w-em-12 p-2 flex-shrink-0 form-control rounded-0", disabled: disabled_rhesus, readonly: readonly %>
+    </div>
+
+    <% LaboratoryExamination.blood_tests.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            positive_case       = [:malaria, :bfmp].include?(field_name) ? "POSITIVE" : "REACTIVE"
+            value               = laboratory_examination.try(field_name)
+
+            case field_name
+            when :tpha
+                disabled_field  = !laboratory_examination.try(:vdrl)
+                primary_name    = :vdrl
+            when :bfmp
+                disabled_field  = !laboratory_examination.try(:malaria)
+                primary_name    = :malaria
+            end
+
+            build_class = ""
+            build_class += " secondary-selection" if primary_name.present?
+            build_class += " primary-selection" if [:vdrl, :malaria].include?(field_name)
+            build_class += " hidden" if disabled_field
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"><%= laboratory_indexable += 1 if primary_name.blank? %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field check-abnormal-status" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: positive_case.titleize, name: "#{ primary_name || field_name }", classes: build_class) %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Negative", name: "#{ primary_name || field_name }", classes: build_class) %>
+
+                    <% if primary_name %>
+                        <%= raw secondary_field_button(value: "NA", placeholder: "N/A", name: primary_name, classes: "#{ "hidden" if !disabled_field } #{ "secondary-selection" if primary_name }") %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <h5 class="px-4 py-3 border-bottom mb-0">Urine Tests</h5>
+
+    <% LaboratoryExamination.urine_test.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            value               = laboratory_examination.try(field_name)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"><%= laboratory_indexable += 1 %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field check-abnormal-status" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Positive", classes: "additional-value-input") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Negative", classes: "additional-value-input") %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% if transaction_model.fw_gender == "F" %>
+        <%
+            value       = laboratory_examination.try(:pregnancy)
+            value_hcg   = laboratory_examination.try(:pregnancy_serum_beta_hcg)
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"><%= laboratory_indexable += 1 %></label>
+            <label class="flex-grow-1 mb-0">Urine Pregnancy Test</label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[pregnancy]", value, class: "boolean-field check-abnormal-status" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Positive", name: "pregnancy", classes: "primary-selection") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Negative", name: "pregnancy", classes: "primary-selection") %>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Serum Beta-HCG</label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[pregnancy_serum_beta_hcg]", value_hcg, class: "boolean-field check-abnormal-status" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value_hcg, readonly: readonly, value: true, placeholder: "Positive", name: "pregnancy", classes: "secondary-selection #{ "hidden" if !value }") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value_hcg, readonly: readonly, value: false, placeholder: "Negative", name: "pregnancy", classes: "secondary-selection #{ "hidden" if !value }") %>
+                    <%= raw secondary_field_button(value: "NA", placeholder: "N/A", name: "pregnancy", classes: "secondary-selection #{ "hidden" if value }") %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <% LaboratoryExamination.sugar_and_albumin.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            value               = laboratory_examination.try(field_name)
+        %>
+
+        <div class="sugar_albumin_parent">
+            <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+                <label class="row-index"><%= laboratory_indexable += 1 %></label>
+                <label class="flex-grow-1 mb-0"><%= label %></label>
+
+                <div class="d-flex flex-shrink-0">
+                    <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field number-input-bool-field check-abnormal-status lab-exam-sugar-albumin-wipe" %>
+
+                    <div>
+                        <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Present", classes: "additional-value-input") %>
+                        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "Absent", classes: "additional-value-input") %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center <%= "bg-secondary" if @examination_disabled %>">
+                <label class="row-index"></label>
+                <label class="flex-grow-1 mb-0"><%= label %> Value</label>
+
+                <div class="d-flex flex-shrink-0 align-items-center">
+                    <p class="mb-0 mr-2"><%= ["millimoles per litre", "grams per litre"][index] %></p>
+                    <%= number_field_tag "#{ namespacing }[#{ field_name }_value]", laboratory_examination.try("#{ field_name }_value"), placeholder: "measurement", class: "w-em-16 form-control rounded-0 px-2 number-input-field measurement-range-check-lab", data: {type: "#{field_name}_value"}, disabled: @examination_disabled || !value, step: index == 0 ? 0.001 : 0.01, readonly: readonly %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 border-bottom boolean-field-parent except-this">
+        <div>
+            <label class="mr-4 w-em-3"></label>
+            <label>Reason if abnormal</label>
+        </div>
+
+        <%= text_area_tag "#{ namespacing }[abnormal_reason]", laboratory_examination.try(:abnormal_reason), rows: 5, placeholder: "Reason if abnormal", class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;", readonly: readonly %>
+    </div>
+
+    <% if readonly %>
+        <div class="border-bottom pt-3 pb-2">
+            <div class="px-4 pb-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center">
+                <label class="row-index"></label>
+                <label class="flex-grow-1 mb-0">Date of laboratory report: <%= laboratory_examination.transmitted_at? ? laboratory_examination.transmitted_at.strftime("%d/%m/%Y") : nil %></label>
+            </div>
+        </div>
+    <% end %>
+
+    <%
+        if @skip_visited.present?
+            nil
+        elsif doctor_examination.present?
+    %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Yes, I have visited laboratory results for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.visited_laboratory_result %>
+                <%= hidden_field_tag "de_attributes[visited_laboratory_result]", value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% else %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom except-this">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">I confirm the laboratory findings for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = laboratory_examination.transmitted_at? %>
+                <%= hidden_field_tag :visited_laboratory, value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: false, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: false, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    <% end %>
+</div>

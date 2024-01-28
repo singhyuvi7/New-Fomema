@@ -1,0 +1,9 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Radiologists') do |sheet|
+  sheet.add_row @captions
+  @radiologists.each do |radiologist|
+    @cols.then do |attributes|
+      sheet.add_row(attributes.map { |attribute| radiologist.try(attribute) })
+    end
+  end
+end

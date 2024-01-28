@@ -1,0 +1,42 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Pending Radiographer Report</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+            <% if @excel.present? %>
+                <%= link_to "Download as excel", "#{ request.path }.xlsx#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% elsif @csv.present? %>
+                <%= link_to "Download CSV", "#{ request.path }.csv#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% end %>
+
+            <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+
+            <div class="d-flex align-items-center mb-2">
+            	<label class="mb-0 mr-3 w-em-10">Date</label>
+            	<%= text_field_tag "date", params[:date].present? ? params[:date] : '', placeholder: "Select Date", class: "w-em-34 form-control datepicker" %>
+            </div>
+
+            <div class="d-flex align-items-center mb-2">
+            	<label class="mb-0 mr-3 w-em-10">Radiographer Name</label>
+            	<%= select_tag "uid", options_for_select(@radiographers.pluck(:name, :id), params[:uid].present? ? params[:uid] : ''), include_blank: "", class: "w-em-34 form-control" %>
+            </div>
+        <% end %>
+    </div>
+
+    <%= render '/internal/reports/xqcc/xqcc_pending_radiographer_report/xqcc_pending_radiographer_table' %>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

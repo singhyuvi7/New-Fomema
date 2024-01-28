@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Transactions</strong> - New Transaction
+    </div>
+    <%= form_for @transaction, url: internal_transactions_path, html: {class: "#{params[:action]}_doctor doctor-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

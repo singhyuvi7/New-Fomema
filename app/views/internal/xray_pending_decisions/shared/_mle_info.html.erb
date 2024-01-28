@@ -1,0 +1,28 @@
+<div class="card">
+    <div class="card-header">
+        MLE Info
+    </div>
+
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <th>Reviewed By</th>
+                <td><%= xray_pending_decision.reviewer&.name %></td>
+            </tr>
+            <tr>
+                <th>Reviewed At</th>
+                <td><%= xray_pending_decision.reviewed_at&.strftime(get_standard_datetime_format) %></td>
+            </tr>
+            <% if xray_pending_decision.status == "TRANSMITTED" %>
+                <tr>
+                    <th>Approval By</th>
+                    <td><%= xray_pending_decision.approval_user&.name %></td>
+                </tr>
+                <tr>
+                    <th>Approval At</th>
+                    <td><%= xray_pending_decision.transmitted_at&.strftime(get_standard_datetime_format) %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

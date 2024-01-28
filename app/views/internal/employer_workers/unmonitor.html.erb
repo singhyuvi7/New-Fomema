@@ -1,0 +1,52 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Remove Monitor Foreign Worker</div>
+        <%= form_for @foreign_worker, {url: unmonitor_internal_employer_employer_worker_path(@employer, @foreign_worker), html: {multipart: true}} do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <div class="card">
+                    <div class="card-body">
+                        <%= render 'foreign_worker' %>
+                    </div>
+                </div>
+
+                <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= label_tag :unmonitor_comment, "Removal Comment", id: "label_unmonitor_comment", class: "required" %>
+                            <textarea name="unmonitor_comment" id="unmonitor_comment" class="form-control" required><%= params[:unmonitor_comment] %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /card-body -->
+
+            <div class="card-footer">
+
+                <div class="text-right">
+                    <%=raw edit_back_button(internal_employer_employer_workers_path) %>
+                    <%=raw edit_save_button() %>
+                </div>
+            
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+function monitor_reason_changed(sel)
+{
+    if ($('#monitor_reason_id > option:selected').attr('data-code') == '9') {
+        $('#monitor_comment').prop('required', true);
+        $('#label_monitor_comment').addClass('required');
+    } else {
+        $('#monitor_comment').removeAttr('required');
+        $('#label_monitor_comment').removeClass('required');
+    }
+}
+</script>
+<% end %>

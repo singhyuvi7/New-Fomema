@@ -1,0 +1,133 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Visit Report Laboratory</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%= render "/internal/visit_reports/shared/filter", {
+            form_action: internal_visit_reports_laboratories_path,
+            filter_type: false,
+            filter_status: VisitPlan::STATUSES,
+            filter_facility_status: Laboratory::STATUSES,
+            sp_type: Laboratory.to_s
+        } %>
+
+        <%= render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Report ID</th>
+                                <th>Laboratory Name</th>
+                                <th>Laboratory Code</th>
+                                <th>Facility Type</th>
+                                <th>Visit Date</th>
+                                <th>Status</th>
+                                <th>Draft By</th>
+                                <th>1st Approved By</th>
+                                <th>2nd Approved By</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @visit_reports.blank? %>
+                                <tr>
+                                    <td colspan="11" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                            <% @visit_reports.each.with_index((@visit_reports.current_page - 1) * get_per + 1) do
+                                |visit_report, index| %>
+                                <tr>
+                                    <td class="module-row-numbers"><%= index %></td>
+                                    <td>
+                                        <%= visit_report.code %>
+                                    </td>
+                                    <td>
+                                        <a class="" href="<%= edit_internal_laboratory_path(visit_report.visitable_id) %>"><%= visit_report&.visit_report_laboratory&.laboratory_name %></a>
+                                    </td>
+                                    <td><%= visit_report&.visitable&.code %></td>
+                                    <td><%= LaboratoryType::LABORATORY_TYPES[visit_report&.laboratory_type&.id] %></td>
+                                    <td>
+                                        <%= visit_report.visit_date.try(:strftime, '%d/%m/%Y') %>
+                                    </td>
+                                    <td>
+                                        <%= VisitPlan::STATUSES[visit_report.status] %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.draft_by.username %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.level1_approval_user.nil? ? "" : visit_report.level1_approval_user.username %>
+                                    </td>
+                                    <td>
+                                        <%= visit_report.level2_approval_user.nil? ? "" : visit_report.level2_approval_user.username %>
+                                    </td>
+
+                                    <td class="module-row-actions">
+
+                                        <a class="btn btn-sm btn-secondary" title="View Visit Plan" data-toggle="tooltip" href="<%= internal_visit_plan_laboratory_edit_path(visit_report.visit_plan_id) %>"><i class="fa fa-file"></i></a>
+
+                                        <% if has_permission?('VIEW_LABORATORY_VISIT_REPORT') && visit_report.status != 'DRAFT' && visit_report.status != 'REJECTED' %>
+                                            <%= raw index_table_show_button internal_visit_report_laboratory_show_path(visit_report) %>
+                                        <% end %>
+
+                                        <!-- edit -->
+                                        <% if has_permission?('EDIT_LABORATORY_VISIT_REPORT') && (visit_report.status === 'DRAFT' || visit_report.status === 'REJECTED') %>
+                                            <%= raw index_table_edit_button internal_visit_report_laboratory_edit_path(visit_report) %>
+                                        <% end %>
+
+                                        <% if !visit_report.visit_report_laboratory_summary.blank? %>
+                                            <a class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Visit Summary" data-original-title="Visit Summary" href="<%= internal_visit_report_laboratory_visit_summary_path(visit_report) %>"><i class="fa fa-book"></i></a>
+                                        <% end %>
+
+                                        <!-- delete -->
+                                        <% if has_permission?('DELETE_LABORATORY_VISIT_REPORT') && (visit_report.status === 'DRAFT' || visit_report.status === 'REJECTED') %>
+                                            <%= raw index_table_delete_button(internal_visit_report_laboratory_delete_path(visit_report)) %>
+                                        <% end %>
+
+                                        <!-- 1st approval -->
+                                        <% if has_permission?('APPROVAL_LEVEL_1_LABORATORY_VISIT_REPORT') && visit_report.status === 'LEVEL_1_APPROVAL' && current_user[:id] != visit_report.created_by %>
+                                            <%= raw index_table_approval_lvl1_button internal_visit_report_laboratory_approval_path(visit_report) %>
+                                        <% end %>
+
+                                        <!-- 2nd approval -->
+                                        <% if has_permission?('APPROVAL_LEVEL_2_LABORATORY_VISIT_REPORT') && visit_report.status === 'LEVEL_1_APPROVED' && current_user[:id] != visit_report.level_1_approval_by %>
+                                        <%= raw index_table_approval_lvl2_button internal_visit_report_laboratory_approval_path(visit_report) %>
+                                        <% end %>
+
+                                    </td>
+                                </tr>
+
+                            <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @visit_reports %>
+        </div>
+
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<% end %>

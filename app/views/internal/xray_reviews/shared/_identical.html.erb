@@ -1,0 +1,27 @@
+<div class="card">
+
+    <div class="card-header">Identical Case</div>
+
+    <table class="table table-bordered table-card">
+        <tbody>
+            <tr>
+                <td>#</td>
+                <td>Transaction ID</td>
+                <td>X-Ray Examination Result</td>
+                <td>X-Ray Code</td>
+                <td>Decision</td>
+            </tr>
+
+            <% xray_review.xqcc_review_identicals.each.with_index(1) do |review_identical, index| %>
+                <tr>
+                    <td><%= index %></td>
+                    <td><a href="<%= internal_xray_review_path(review_identical.identical_xray_review_id) %>"><%= review_identical.identical_xray_review.transactionz.code %></a></td>
+                    <td><%= review_identical.identical_xray_review.transactionz.xray_examination.result %></td>
+                    <td><%= review_identical.identical_xray_review.transactionz.xray_facility.code %></td>
+                    <td><%= review_identical.identical_xray_review.result %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+
+</div>

@@ -1,0 +1,7 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns:updateUploadStatusResponse xmlns:ns="http://dbixelabs.com/xsd">
+      <ns:return><%= @response[:status] %></ns:return>
+    </ns:updateUploadStatusResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

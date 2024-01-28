@@ -1,0 +1,28 @@
+.card
+  .card-header
+    %strong Filter
+  = form_with(url: path, method: :get, local: true) do |form|
+    .card-body
+      .row
+        .col-md-6
+          .row.form-group
+            = form.label :film_type, class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = form.select :film_type, options_for_select([:digital, :analog], params[:film_type]), { prompt: true }, { class: 'form-control select2', required: true }
+        .col-md-6
+          .row.form-group
+            = form.label :year, class: 'col-sm-3 col-form-label'
+            .col-sm-9
+              = form.select :year, options_for_select((5.years.ago.year..DateTime.current.year).step(1).to_a.reverse, params[:year].presence || DateTime.current.year ), {}, { class: 'form-control select2', required: true }
+    .card-footer
+      - if has_permission?("VIEW_QUALITY_SUMMARY_REPORTS")
+        .text-right
+          = link_to path, class: 'btn btn-sm btn-danger' do
+            %i.icon-trash
+            Clear
+          = link_to merts_quality_summary_external_quality_summary_reports_path(format: :pdf, params: params.permit!), target: "_blank", class: 'btn btn-sm btn-secondary mx-1' do
+            %i.fa.fa-download
+            Download
+          = form.button :filter, class: 'btn btn-primary btn-sm' do
+            %i.icon-magnifier
+            View Report

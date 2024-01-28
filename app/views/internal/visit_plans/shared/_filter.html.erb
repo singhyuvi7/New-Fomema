@@ -1,0 +1,117 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag form_action, method: 'get' do |form| %>
+        <div class="card-body">
+
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="plan_id" class="col-sm-3 col-form-label">Visit Plan ID</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="plan_id" class="col-sm-3 col-form-label">State</label>
+                        <div class="col-sm-9">
+                            <select class="col-md-12 form-control select2" name="state" id="state">
+                                <option value="">Select option</option>
+                                <% State.all.each do |state, index| %>
+                                    <option value="<%= state.id %>" <% if params[:state] == state.id.to_s %> selected <% end %> ><%= state.name %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <% if filter_type %>
+
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="visitable_type" class="col-sm-3 col-form-label">Type</label>
+                        <div class="col-sm-9">
+                            <select class="col-md-12 form-control document-type-selector" name="visitable_type">
+                                <option value="">Select option</option>
+                                <% VisitPlan::VISITABLE_TYPES.each do |visitable_type, index| %>
+                                    <option value="<%= visitable_type %>" <% if params[:visitable_type] === visitable_type  %> selected <% end %> ><%= index %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <% end %>
+                
+
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="visitable_category" class="col-sm-3 col-form-label">Visit Type</label>
+                        <div class="col-sm-9">
+                            <select class="col-md-12 form-control document-type-selector select2" name="visitable_category">
+                                <option value="">Select option</option>
+                                <% VisitPlan::CATEGORIES.each do |category, index| %>
+                                    <option value="<%= category %>" <% if params[:visitable_category] === category  %> selected <% end %> ><%= index %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="inspect_from" class="col-sm-3 col-form-label">Inspect From</label>
+                        <div class="col-sm-12 col-md-4">
+                            <input type="date" class="form-control" name="inspect_from" id="inspect_from" value="<%= params[:inspect_from] %>">
+                        </div>
+                        <label for="inspect_to" class="col-sm-3 col-md-1 col-form-label">Inspect To</label>
+                        <div class="col-sm-12 col-md-4">
+                            <input type="date" class="form-control" name="inspect_to" id="inspect_to" value="<%= params[:inspect_to] %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          <div class="row">
+
+
+            <div class="col">
+              <div class="form-group row">
+                <label for="status" class="col-sm-3 col-form-label">Status</label>
+                <div class="col-sm-9">
+                  <select class="col-md-12 form-control document-type-selector select2" name="status">
+                    <option value="">Select option</option>
+                    <% filter_status.each do |status, index| %>
+                        <option value="<%= status %>" <% if params[:status] === status  %> selected <% end %> ><%= index %></option>
+                    <% end %>
+                </select>
+                </div>
+              </div>
+            </div>
+
+
+            <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+          </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%= raw filter_clear_button form_action %>
+                <%= raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

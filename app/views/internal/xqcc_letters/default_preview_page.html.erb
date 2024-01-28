@@ -1,0 +1,101 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= action_name.titleize.gsub(" Index", "").gsub("Xqcc", "XQCC") %></strong>
+    </div>
+
+    <div class="card-body">
+        <%
+            list = [
+                { title: "X-ray Code",          field: "xray_code",     type: "text",   placeholder: "Code" },
+                { title: "X-ray Name",          field: "xray_name",     type: "text",   placeholder: "Name" },
+                { title: "Transaction Code",    field: "trans_code",    type: "text",   placeholder: "Transaction Code" },
+                { title: "Worker Code",         field: "worker_code",   type: "text",   placeholder: "Worker Code" }
+            ]
+        %>
+
+        <%= render partial: "/shared/dropdown_filter_bar", locals: { dropdown_name: "internal-appeals-index", filter_link: request.path, list: list } %>
+        <%= render "/shared/all_flash" %>
+
+        <div class="d-flex align-items-center justify-content-end mb-4">
+            <% if has_permission? "CREATE_XQCC_LETTERS" %>
+                <%= link_to "New Letter", request.path.gsub("_index", "_new"), class: "btn btn-primary font-weight-bold" %>
+            <% end %>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+
+                                <% @headers.each do |header| %>
+                                    <th><%=
+                                        case header
+                                        when :letter_xray_and_employer_ref_number
+                                            "Xray/Employer Reference Numbers"
+                                        when :letter_xray_ref_number
+                                            "Xray Reference Numbers"
+                                        when :approver_name_and_designation
+                                            "Approver Name & Designation"
+                                        when :xray_code_and_name
+                                            "Xray Code/Name"
+                                        when :worker_code_name_and_passport
+                                            "Worker Code/Name/Passport"
+                                        when :created_by_user
+                                            "Created By"
+                                        when :letter_date
+                                            "Issued Date"
+                                        when :panel_year
+                                            "Issued Year"
+                                        else
+                                            header.to_s.titleize
+                                        end
+                                    %></th>
+                                <% end %>
+
+                                <th>Edit</th>
+                                <th>Preview</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @letters.each.with_index((@letters.current_page - 1) * get_per + 1) do |letter, index| %>
+                                <tr>
+                                    <td><%= index %></td>
+
+                                    <% @headers.each do |key| %>
+                                        <td><%= simple_format letter.try(key).to_s, class: "mb-0" %></td>
+                                    <% end %>
+
+                                    <td>
+                                        <%= link_to request.path.gsub("_index", "_edit?id=#{ letter.id }") do %>
+                                            <i class="fa fa-edit font-size-11 text-dark"></i>
+                                        <% end %>
+                                    </td>
+
+                                    <td>
+                                        <% @previews.each do |key, path| %>
+                                            <%= link_to key, path.gsub(":id_placeholder", letter.id.to_s), target: :_blank, class: "btn btn-primary m-1 font-weight-bold font-size-6" %>
+                                        <% end %>
+                                    </td>
+                                </tr>
+                            <% end %>
+
+                            <% if @letters.blank? %>
+                                <tr>
+                                    <td colspan="<%= @headers.size + 3 %>" class="text-danger">No letters.</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @letters %>
+        </div>
+    </div>
+</div>

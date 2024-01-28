@@ -1,0 +1,298 @@
+
+
+<visitplanapprovalform
+    inline-template
+    :visit_plan="<%= @visit_plan.to_json(:include => { :visit_plan_categories => {}, :level1_approval_user => {}, :level2_approval_user => {}, :visit_plan_states => { :include => :state }, :visit_plan_towns => { :include => :town }, :visit_plan_items => { :include => { :visitable => { :include => [:state, :town] } } } }) %>"
+>
+
+<div>
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="alert alert-info" role="alert">
+                LATEST STATUS: <b>{{ this.visit_plan.status }}</b>
+            </div>
+
+            <div v-if="!canEdit" class="alert alert-warning" role="alert">
+                FORM UPDATE IS DISABLE FOR STATUS: <b>{{ this.visit_plan.status }}</b>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Visit Plan Type</label>
+                        <input readonly="readonly" type="text" v-model="visit_plan.visitable_type" name="visit_plan[visitable_type]"
+                            class="form-control" id="">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Category</label>
+                        <input readonly="readonly" type="text" :value="category_list"
+                            name="visit_plan[visitable_category]" class="form-control" id="">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Inspect From</label>
+                        <input readonly="readonly" type="date" v-model="visit_plan.inspect_from" name="visit_plan[inspect_from]"
+                            class="form-control" id="">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Inspect To</label>
+                        <input readonly="readonly" type="date" v-model="visit_plan.inspect_to" name="visit_plan[inspect_to]"
+                            class="form-control" id="">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Comments</label>
+                        <textarea readonly="readonly" class="form-control" v-model="visit_plan.comment" name="visit_plan[comment]"
+                            id="" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">States</label>
+                        <textarea readonly="readonly" class="form-control" :value="state_list" name="state_list"
+                            id="" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Towns</label>
+                        <textarea readonly="readonly" class="form-control" :value="town_list" name="town_list"
+                            id="" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="">Visit List</label>
+            
+                        <table class="table table-sm table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="module-row-numbers">#</th>
+            
+                                    <template v-if="visit_plan.visitable_type === 'Doctor'">
+                                        <th>Doc. Code</th>
+                                        <th>Doc. Name</th>
+                                        <th>Clinic Name</th>
+                                        <th>Address</th>
+                                        <th>Town</th>
+                                        <th>Phone</th>
+                                        <th>SOP Compliance</th>
+                                        <th>Last Visit Date</th>
+                                    </template>
+            
+                                    <template v-if="visit_plan.visitable_type === 'XrayFacility'">
+                                        <th>X-Ray Code</th>
+                                        <th>X-Ray Name</th>
+                                        <th>X-Ray Licence Holder Name</th>
+                                        <th>Address</th>
+                                        <th>Town</th>
+                                        <th>Phone</th>
+                                        <th>SOP Compliance</th>
+                                        <th>Last Visit Date</th>
+                                    </template>
+
+                                    <template v-if="visit_plan.visitable_type === 'Laboratory'">
+                                        <th>Laboratory Code</th>
+                                        <th>Laboratory Name</th>
+                                        <th>Address</th>
+                                        <th>Town</th>
+                                        <th>Phone</th>
+                                        <th>SOP Compliance</th>
+                                        <th>Last Visit Date</th>
+                                    </template>
+            
+
+                                </tr>
+                            </thead>
+                            <tbody>
+            
+                                <tr v-for="(visit_plan_item, index) in visit_plan_items">
+                                    <td class="module-row-numbers">
+                                        {{ index + 1 }}
+                                    </td>
+            
+                                    <template v-if="visit_plan.visitable_type === 'Doctor'">
+                                        <td>{{ visit_plan_item.visitable.code }}</td>
+                                        <td>{{ visit_plan_item.visitable.name }}</td>
+                                        <td>{{ visit_plan_item.visitable.clinic_name }}</td>
+                                        <td>
+                                            {{ visit_plan_item.visitable.address1 }}<br>
+                                            {{ visit_plan_item.visitable.address2 }}<br>
+                                            {{ visit_plan_item.visitable.address3 }}<br>
+                                            {{ visit_plan_item.visitable.address4 }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.town, 'name') }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.state, 'name') }}
+                                        </td>
+                                        <td>{{ safeAccess(visit_plan_item.visitable.town, 'name') }}</td>
+                                        <td>{{ visit_plan_item.visitable.phone }}</td>
+                                        <td></td>
+                                        <td></td>
+            
+                                    </template>
+            
+                                    <template v-if="visit_plan.visitable_type === 'XrayFacility'">
+                                        <td>{{ visit_plan_item.visitable.code }}</td>
+                                        <td>{{ visit_plan_item.visitable.name }}</td>
+                                        <td>{{ visit_plan_item.visitable.licence_holder_name }}</td>
+                                        <td>
+                                            {{ visit_plan_item.visitable.address1 }}<br>
+                                            {{ visit_plan_item.visitable.address2 }}<br>
+                                            {{ visit_plan_item.visitable.address3 }}<br>
+                                            {{ visit_plan_item.visitable.address4 }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.town, 'name') }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.state, 'name') }}
+                                        </td>
+                                        <td>{{ safeAccess(visit_plan_item.visitable.town, 'name') }}</td>
+                                        <td>{{ visit_plan_item.visitable.phone }}</td>
+                                        <td></td>
+                                        <td></td>
+            
+                                    </template>
+
+                                    <template v-if="visit_plan.visitable_type === 'Laboratory'">
+                                        <td>{{ visit_plan_item.visitable.code }}</td>
+                                        <td>{{ visit_plan_item.visitable.name }}</td>
+                                        <td>
+                                            {{ visit_plan_item.visitable.address1 }}<br>
+                                            {{ visit_plan_item.visitable.address2 }}<br>
+                                            {{ visit_plan_item.visitable.address3 }}<br>
+                                            {{ visit_plan_item.visitable.address4 }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.town, 'name') }}<br>
+                                            {{ safeAccess(visit_plan_item.visitable.state, 'name') }}
+                                        </td>
+                                        <td>{{ safeAccess(visit_plan_item.visitable.town, 'name') }}</td>
+                                        <td>{{ visit_plan_item.visitable.phone }}</td>
+                                        <td></td>
+                                        <td></td>
+            
+                                    </template>
+            
+                                </tr>
+            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Approval Section</div>
+        <div class="card-body">
+
+        <div v-if="haveApproval">
+
+                <h6>Approval History</h6>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Decision</th>
+                            <th>Comment</th>
+                            <th>Decision By</th>
+                            <th>Decision At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-bind:class="{ 'table-success': isApproveLevel1, 'table-warning': isRejectLevel1 }">
+                            <td>Level 1</td>
+                            <td>{{ visit_plan.level_1_approval_decision }}</td>
+                            <td>{{ visit_plan.level_1_approval_comment }}</td>
+                            <td>{{ visit_plan.level1_approval_user.username }}</td>
+                            <td>{{ myDateTime(visit_plan.level_1_approval_at) }}</td>
+                        </tr>
+                        <tr v-if="visit_plan.level_2_approval_by" v-bind:class="{ 'table-success': isApproveLevel2, 'table-warning': isRejectLevel2 }">
+                            <td>Level 2</td>
+                            <td>{{ visit_plan.level_2_approval_decision }}</td>
+                            <td>{{ visit_plan.level_2_approval_comment }}</td>
+                            <td>{{ visit_plan.level2_approval_user.username }}</td>
+                            <td>{{ myDateTime(visit_plan.level_2_approval_at) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <form v-if="canEdit" ref="visit_plan_form" method="POST" action="<%= form_action %>">
+            
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            
+                <% if form_method.downcase !='post' %>
+                <input type="hidden" name="_method" value="<%= form_method %>">
+                <% end %>
+            
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label required">
+                        Decision
+                    </label>
+                    <div class="col-md-8">
+                        <div class="form-check form-check-inline mr-5" :class="{ 'is-invalid': errors.has('visit_plan_approval[decision]') }">
+                            <input v-validate="'required'" data-vv-as="Decision" v-model="visit_plan_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_plan_approval[decision]') }" id="decision_approve" type="radio" value="APPROVE" name="visit_plan_approval[decision]" required>
+                            <label class="form-check-label" for="decision_approve">APPROVE</label>
+                            
+                        </div>
+                        <div class="form-check form-check-inline mr-5">
+                            <input v-model="visit_plan_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_plan_approval[decision]') }" id="decision_reject" type="radio" value="REJECT" name="visit_plan_approval[decision]" required>
+                            <label class="form-check-label" for="decision_reject">REJECT</label>
+                            <div class="invalid-feedback">{{ errors.first('visit_plan_approval[decision]') }}</div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="required" for="">Comments</label>
+                            <textarea v-validate="commentValidationRule" data-vv-as="Comments" v-model="visit_plan_approval.comment" name="visit_plan_approval[comment]" class="form-control" :class="{ 'is-invalid': errors.has('visit_plan_approval[comment]') }" id="" rows="2"></textarea>
+                            <div class="invalid-feedback">{{ errors.first('visit_plan_approval[comment]') }}</div>
+                        </div>
+                    </div>
+                </div>
+            
+            </form>
+
+            
+
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+            
+                <%=raw edit_back_button(index_path) %>
+            
+                <button v-if="canEdit" @click="submit" type="button" class="btn btn-primary btn-sm"><i class="icon-pencil"></i>
+                    Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</visitplanapprovalform>
+

@@ -1,0 +1,62 @@
+<form>
+    <div class="card border-primary">
+    
+        <div class="card-header">
+            Pending Review Decision
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Audit & Comparison</label>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" type="radio" value="NO" <% if xray_pending_review.is_audit_comparison == 'NO' || xray_pending_review.is_audit_comparison.nil? %> checked <% else %> disabled <% end %>>
+                            No
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" type="radio" value="YES" <% if xray_pending_review.is_audit_comparison == 'YES' %> checked <% else %> disabled <% end %>>
+                            Yes
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <%= render "internal/xray_pending_reviews/shared/compare", {xray_pending_review: xray_pending_review} %>
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Decision</label>
+                    <div class="form-check">
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" type="radio" value="RADIOGRAPHER_REVIEW" <% if xray_pending_review.decision == 'RADIOGRAPHER_REVIEW' %> checked <% else %> disabled <% end %> data-parsley-errors-container="#xray_pending_review_decision_errors" data-parsley-error-message="Decision is required" required>
+                            Radiographer Review
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" type="radio" value="PCR_AUDIT" <% if xray_pending_review.decision == 'PCR_AUDIT' %> checked <% else %> disabled <% end %>>
+                            PCR Audit
+                        </label>
+                        <label class="form-check-label form-check-inline mr-5">
+                            <input class="form-check-input" type="radio" value="MANUAL_AUDIT" <% if xray_pending_review.decision == 'MANUAL_AUDIT' %> checked <% else %> disabled <% end %><%= " disabled" unless xray_pending_review.transactionz&.previous_transaction&.xray_film_type == 'ANALOG' %>>
+                            Manual Audit
+                        </label>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col">
+                    <label for="" class="required">Comment</label>
+                    <pre class="form-control text-break"><%= xray_pending_review.comment %></pre>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+    
+    </div>
+    <!-- /.card -->
+</form>
+<!-- /form -->

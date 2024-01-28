@@ -1,0 +1,32 @@
+<div class="card-body">
+
+    <%%= render 'shared/all_validation_flash', { model_obj: @<%= singular_table_name %> } %>
+
+<% attributes.each do |attribute| -%>
+    
+    <div class="row">
+        <div class="form-group col-md-6">
+            <%%= form.label :<%= attribute.column_name %>, class: 'required' %>
+            <%%= form.<%= attribute.field_type %> :<%= attribute.column_name %>, class: 'form-control', required: true %>
+        </div>
+    </div>
+
+<% end -%>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%%=raw edit_back_button(internal_<%= plural_route_name %>_path) %>
+        <%%=raw edit_save_button() %>
+    </div>
+
+</div>
+
+<%% content_for :page_end_scripts do %>
+<script>
+
+
+</script>
+<%% end %>

@@ -1,0 +1,13 @@
+<% code = "RADIOLOGIST_AUTORELEASE_ABNORMAL" %>
+<label class="col-md-4 col-form-label">
+    <% if has_permission?("VIEW_AUDIT_SYSTEM_CONFIGURATION") %>
+        <a href="<%= internal_system_configuration_audits_path(@system_configurations[code]) %>"><i class="fa fa-history"></i></a> 
+    <% end %>
+    <%= @system_configurations[code].name %>
+</label>
+<div class="col-md-8">
+    <p class="form-control-plaintext"><%= @system_configurations[code].value.eql?("1") ? "Yes" : "No" %></p>
+    <% if @system_configurations[code].comment.present? %>
+        <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+    <% end %>
+</div>

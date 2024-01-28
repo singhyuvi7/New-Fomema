@@ -1,0 +1,40 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Unblock Foreign Worker</div>
+        <%= form_for @foreign_worker, {url: unblock_internal_foreign_workers_path(@foreign_worker), html: {multipart: true}} do |form| %>
+            <!-- card-body -->
+            <div class="card-body">
+
+                <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :unblock_reason, class: 'required' %>
+                            <%= form.select :unblock_reason_id, options_from_collection_for_select(BlockReason.search_category('UNBLOCK').order(:name).all, 'id', 'name', form.object.unblock_reason_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2' %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :unblock_comment, "Comment", class: 'required' %>
+                            <%= form.text_area :unblock_comment, class: 'form-control', required: true %>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /card-body -->
+
+            <div class="card-footer">
+
+                <div class="text-right">
+                    <%=raw edit_back_button(internal_foreign_workers_path) %>
+                    <%=raw edit_save_button() %>
+                </div>
+            
+            </div>
+        <% end %>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<%= stylesheet_link_tag "inspectorate/lqcc" %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Explanation Letter</strong> - Approval
+    </div>
+    <%= form_for @letter, url: approval_internal_lqcc_letter_path(@letter), method: :patch, html: {class: "#{params[:action]}_lqcc lqcc-form"} do |form| %>
+
+        <div class="card-body">
+            <%= render "/shared/all_flash" %>
+
+            <%= render "default_info", { form: form } %>
+            <%= render "#{@letter.explanation_type.downcase}_form", { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: false %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_lqcc_letters_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <%= render "form_script" %>
+<% end %>

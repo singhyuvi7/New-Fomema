@@ -1,0 +1,29 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name"> Method</td>
+    <td colspan="3"></td>
+</tr>
+<tr>
+    <td class="table-index"></td>
+    <td class="checkbox-field">
+        <% options.each do |option| %>
+            <div class="option">
+                <%= finding[:method].include?(option.code) ? @checkbox_checked : @checkbox_unchecked %>
+                <div><%= option.name %></div>
+            </div>
+        <% end %>
+    </td>
+    <td colspan="3"></td>
+</tr>
+<% if !finding.method_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Others :</span>
+                <span class="unbold"><%= finding.method_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

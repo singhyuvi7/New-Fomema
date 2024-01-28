@@ -1,0 +1,12 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Doctors</strong> - Edit drafted doctor
+    </div>
+
+    <%= form_for @doctor, url: internal_doctor_path(@doctor), html: {class: "#{params[:action]}_doctor doctor-form with-parsley disable-enter-keypress"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+    
+	<%= render "xray_pairing_modal" %>
+	<%= render "laboratory_pairing_modal" %>
+</div>

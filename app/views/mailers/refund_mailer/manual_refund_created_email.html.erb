@@ -1,0 +1,33 @@
+<p>
+    <b>Dear <%= @customer&.name %></b>, <br>
+    <b><i>Tuan /Puan <%= @customer&.name %></i></b>,
+</p>
+
+<p>
+    Please be informed that your refund already being created and being process for our next action. <br>
+    <i>Dimaklumkan bahawa proses permohonan Bayaran Balik anda telah dibuat.</i>
+</p>
+
+<div>
+    Refund Information:<br>
+    <i>Informasi Bayaran Balik</i> <br>
+
+    Payment Date : <%= @refund.payment_date.try(:strftime,'%d/%m/%Y') || '-' %><br>
+    <i>Tarikh Bayaran</i> <br>
+
+    Reference No : <%= @refund.reference || '-' %><br>
+    <i>Nombor Rujukan</i> <br>
+
+    Amount : RM<%= @refund.amount %> <br>
+    <i>Jumlah</i>
+</div>
+
+<p>
+    Thank you.<br>
+    <i>Terimah Kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

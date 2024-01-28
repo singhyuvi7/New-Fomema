@@ -1,0 +1,29 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Radiologists</strong> - Approval
+    </div>
+    <%= form_for @radiologist, url: approval_update_internal_radiologists_path(@radiologist), html: {class: "#{params[:action]}_radiologist radiologist-form"} do |form| %>
+
+        <div class="card-body">
+            <%= render 'form_readonly', { form: form } %>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <%=render "shared/approval_comments", { comments: @radiologist.approval_request.comments } if @radiologist.approval_request %>
+
+                    <%= render 'internal/shared/approval_comment_decision', form: form, can_revert: true %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_radiologists_path) %>
+                <%=raw approval_submit_decision_button %>
+            </div>
+        
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,75 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong>Change Employers</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-responsive-sm table_circle">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">No.</th>
+                                <th>Requested Date</th>
+                                <th>Worker Name</th>
+                                <th>Passport Number</th>
+                                <th>Country</th>
+                                <th>Gender</th>
+                                <th>Date of Birth</th>
+                                <th>Status</th>
+                                <th class="module-row-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @fw_change_employers.blank? %>
+                                <tr>
+                                    <td colspan="9" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @fw_change_employers.each.with_index((@fw_change_employers.current_page - 1) * get_per + 1) do |fw_change_employer, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= fw_change_employer.requested_at.try(:strftime, get_standard_date_format) %></td>
+                                        <td><%= fw_change_employer.fw_name %></td>
+                                        <td><%= fw_change_employer.fw_passport_number %></td>
+                                        <td><%= fw_change_employer.fw_country.name %></td>
+                                        <td><%= fw_change_employer.fw_gender_name %></td>
+                                        <td><%= fw_change_employer.fw_date_of_birth&.strftime(get_standard_date_format) %></td>
+                                        <td><%= FwChangeEmployer::STATUSES[fw_change_employer.status] %></td>
+                                        <td class="module-row-actions">
+                                            <a href="<%= external_fw_change_employer_path fw_change_employer %>" class="btn btn-blue-portal">Show</a>
+                                            <% if has_permission?("EDIT_FOREIGN_WORKER") %>
+                                                <% if ["REVERTED"].include?(fw_change_employer.status) && fw_change_employer.foreign_worker.latest_fw_change_employer&.status == "REVERTED" %>
+                                                    <%
+                                                        revert_link = change_employer_revert_external_worker_list_path fw_change_employer.foreign_worker if current_user.userable_type == 'Employer'
+                                                        revert_link = change_employer_revert_external_worker_list_path fw_change_employer.foreign_worker if current_user.userable_type == 'Agency'
+                                                    %>
+                                                    <a href="<%= revert_link %>" class="btn btn-blue-portal">Request Reverted</a>
+                                                <% end %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row external-pagination-container">
+            <%= paginate @fw_change_employers if !@fw_change_employers.nil? %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

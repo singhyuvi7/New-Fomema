@@ -1,0 +1,63 @@
+/*
+	- Font sizes -
+	Font sizes from 1 through 11 starts at 0.5em and increases at 0.1em intervals.
+	Example:
+		font-size-1 => 0.5em
+		font-size-2 => 0.6em
+		font-size-3 => 0.7em
+		font-size-4 => 0.8em
+		font-size-5 => 0.9em
+		font-size-6 => 1.0em
+		font-size-7 => 1.1em
+		font-size-8 => 1.2em
+		font-size-9 => 1.3em
+		font-size-10 => 1.4em
+		font-size-11 => 1.5em
+
+	Font sizes from 12 through 14 starts at 2.0em and increases at 0.5em intervals.
+	Example:
+		font-size-12 => 2.0em
+		font-size-13 => 2.5em
+		font-size-14 => 3.0em
+
+	- Screen sizes -
+	To include font-size properties to small (below 1024px) and large (above 1024px) screen sizes, append sm or lg like so:
+		.font-size-lg-5
+		.font-size-sm-3
+
+	- Letter spacing -
+	Letter spacing between each letter can be set with values of 0 to 5px.
+		.letter-spacing-4 => 2px
+*/
+
+@mixin font_sizes($screen) {
+	@for $i from 1 through 11 {
+		$x: 0.4 + (0.1 * $i);
+
+		.font-size#{$screen}-#{$i} {
+			font-size: #{$x}em !important;
+		}
+	}
+
+	@for $i from 1 through 3 {
+		$y: 11 + $i;
+		$x: 1.5 + (0.5 * $i);
+
+		.font-size#{$screen}-#{$y} {
+			font-size: #{$x}em !important;
+		}
+	}
+}
+
+
+@include font_sizes(null);
+
+/* Large screen sizes - 1024px and above */
+@media screen and (min-width: 1024px) {
+	@include font_sizes(-lg);
+}
+
+/* Small screen sizes - 1023px and below */
+@media screen and (max-width: 1023px) {
+	@include font_sizes(-sm);
+}

@@ -1,0 +1,162 @@
+.invoice {
+	font-family: Helvetica, serif;
+	color: #010101;
+	font-size: 14px;
+	margin: 2rem;
+    padding: 4rem 2rem;
+
+    .invoice-title {
+        font-size: 16px;
+        margin-bottom: 2rem;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .row {
+        display: flex;
+        width: 100%;
+    }
+
+    .col-1 {
+        width: 8.333333333333333%;
+        max-width: 8.333333333333333%;
+    }
+
+    .col-2 {
+        width: 16.666666666666667%;
+        max-width: 16.666666666666667%;
+    }
+
+    .col-3 {
+        width: 25%;
+        max-width: 25%;
+    }
+
+    .col-4 {
+        width: 33.333333333333333%;
+        max-width: 33.333333333333333%;
+    }
+
+    .col-5 {
+        width: 41.666666666666667%;
+        max-width: 41.666666666666667%;
+    }
+
+    .col-6 {
+        width: 50%;
+        max-width: 50%;
+    }
+
+    .col-7 {
+        width: 58.333333333333333%;
+        max-width: 58.333333333333333%;
+    }
+
+    .col-8 {
+        width: 66.666666666666667%;
+        max-width: 66.666666666666667%;
+    }
+
+    .col-9 {
+        width: 75%;
+        max-width: 75%;
+    }
+
+    .col-10 {
+        width: 83.333333333333333%;
+        max-width: 83.333333333333333%;
+    }
+
+    .col-11 {
+        width: 91.666666666666667%;
+        max-width: 91.666666666666667%;
+    }
+
+    .col-12 {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .employer-box {
+        border: 2px solid black;
+        padding: 0 0.8rem;
+    }
+
+    .invoice-table {
+        width: 100%;
+        color: #23282c;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        border-collapse: collapse;
+        border: 2px solid black;
+        font-size: 16px;
+    }
+
+    .invoice-table thead {
+        display: table-header-group;
+        vertical-align: middle;
+        border-color: inherit;
+    }
+
+    .invoice-table tbody {
+        display: table-row-group;
+        vertical-align: middle;
+        border-color: inherit;
+
+        .row-details {
+            font-size: 13px;
+            padding-top: 5px;
+        }
+    }
+
+    .invoice-table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid black;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+        padding-left: 10px;
+        padding-right: 10px;
+        width: 1%;
+        white-space: nowrap;
+        padding: 8px 5px;
+    }
+
+    .invoice-table thead th,
+    .invoice-table thead td {
+        border-bottom-width: 2px;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+        border: 2px solid black;
+    }
+
+    .payment-table {
+        margin-top: 4rem;
+    }
+
+    .insurance-row {
+        .disclaimer {
+            padding-top: 7px;
+        }
+    }
+    a {
+        text-decoration:none;
+    }
+}  

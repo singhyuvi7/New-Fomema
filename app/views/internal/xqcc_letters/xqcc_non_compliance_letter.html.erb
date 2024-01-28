@@ -1,0 +1,146 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        Referring to the above matter, it has come to our attention that your X-ray facility performance has not complied with our Standard Operating Procedures in regards to chest X-ray quality. Kindly refer to the tables below.<br><br>
+    </p>
+
+    <p style="margin: 0;">Quality Performance Review</p>
+
+    <table class="w-100 no-spacing" style="font-size: 0.9em;">
+        <tr>
+            <% ["Month", "Total Images", "Compliant Images", "Non-Compliant Images"].each do |header| %>
+                <th class="table-border header-background text-center"><%= header %></th>
+            <% end %>
+        </tr>
+
+        <% @images.each do |image| %>
+            <tr>
+                <td class="table-border text-center"><%= image.try(:month) %></td>
+                <td class="table-border text-center"><%= image.try(:total_images) %></td>
+                <td class="table-border text-center"><%= image.try(:sop_compliant) %> (<%= image.try(:total_percentage_sop_compliant) %>%)</td>
+                <td class="table-border text-center"><%= image.try(:non_sop_compliant) %> (<%= image.try(:total_percentage_non_compliant) %>%)</td>
+            </tr>
+        <% end %>
+    </table>
+
+    <br><br>
+    <p style="margin: 0;">Details of Non-Compliance</p>
+
+    <table class="w-100 no-spacing" style="font-size: 0.9em; margin: auto;">
+        <tr>
+            <% ["Non-compliance", "Total"].each do |header| %>
+                <th class="table-border header-background text-center"><%= header %></th>
+            <% end %>
+        </tr>
+
+        <% @items.each do |item| %>
+            <tr>
+                <td class="table-border"><%= XqccLetterNonCompliances::NON_COMPLIANCE_ISSUE[item.try(:name)] %></td>
+                <td class="table-border text-center"><%= item.total %></td>
+            </tr>
+        <% end %>
+
+        <tr>
+            <th class="table-border header-background">Grand Total</th>
+            <th class="table-border header-background text-center"><%= @items.map(&:total).sum %></th>
+        </tr>
+    </table>
+
+    <p style="font-size: 0.8em;">* A single image may contribute to more than one non-compliance.</p>
+
+    <br>
+
+    <p class="text-justify">
+        <%  follow_letter_date = @letter.follow_up_date
+            ordinalize  = follow_letter_date.day.ordinalize.insert(-3,'<sup>').insert(-1,'</sup>')
+            follow_letter_date = follow_letter_date.strftime("#{ ordinalize } %B %Y") %>
+
+        Our radiographer has spoken to <%= @letter.follow_up_with %> on <b><%= follow_letter_date.html_safe %></b> and has advised accordingly in regards to the quality of the chest X-rays.
+    </p>
+
+    <p class="text-justify">
+        Therefore, please undertake the necessary corrective measures immediately to rectify the above non-compliance/s. As such, please provide <b>a written explanation</b> of the corrective measures taken <b> within five (5) working days </b>from the date of this letter.
+    </p>
+
+    <p class="text-justify">
+        As we view this matter seriously, XQCC will continue to monitor the quality of chest X-ray examination taken at your facility. Further to that, if the non-compliance/s issue still persist, we may have to take the necessary action upon your facility as FOMEMA panel.
+    </p>
+
+    <p class="text-justify">
+        Your understanding and cooperation in this matter is much appreciated.<br><br><br>Thank you.
+    </p>
+
+    <!-- This is the only way to keep this entire block together. For some reason, page-break-inside: avoid; does not work -->
+    <table style="margin-left: -2px;">
+        <tr>
+            <td style="padding: 0;">
+                <p style="margin: 0;">
+                    Yours sincerely,<br><br><br><br><br>
+                    <b><%= @letter.issuer_name %></b><br>
+                    <%= @letter.issuer_title %>
+                </p>
+            </td>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .table-border {
+        border: 1px solid black;
+        padding: 5px;
+        padding: 0.5em;
+    }
+
+    .no-spacing {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .header-background {
+        background-color: #d3d3d3;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

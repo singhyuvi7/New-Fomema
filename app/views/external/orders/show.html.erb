@@ -1,0 +1,192 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+        <!-- card-header -->
+        <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+            <div class="card-header border-0 bg-transparent text-dark">
+                <strong> Payment </strong>- <%= @order.code %>
+            </div>
+        <% else %>
+            <div class="card-header">
+                <strong> Order </strong>- <%= @order.code %>
+            </div>
+        <% end %>
+        <!-- /card-header -->
+
+        <!-- card-body -->
+        <div class="card-body">
+
+            <!-- card for order detail -->
+            <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Payment Code</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.code %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Date Created</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.date&.strftime("%d/%m/%Y") %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Payment Date</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.paid_at.try(:strftime,"%d/%m/%Y") %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Customer</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.customerable&.name %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Amount (RM) </label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= number_to_currency(@order.amount, unit: "") %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Category</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= Order::CATEGORIES[@order.category] %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Payment Status</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= Order::STATUSES[@order.status] %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% else %>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Order Code</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.code %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Order Date</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.date&.strftime("%d/%m/%Y") %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Customer</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= @order.customerable&.name %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Amount (RM) </label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= number_to_currency(@order.amount, unit: "") %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Category</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= Order::CATEGORIES[@order.category] %></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Status</label>
+                            <div class="col-md-9">
+                                <div class="form-control-plaintext"><%= Order::STATUSES[@order.status] %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+            <!-- /card for order detail -->
+
+            <!-- insurance payment success -->
+            <% if ['INSURANCE_PURCHASE'].include?(@order.category) && @order.status == 'PAID' %>
+                <table class="table" id="etr-table">
+                    <thead>
+                        <tr>
+                            <th>Foreign Worker</th>
+                            <th>Passport Number</th>
+                            <th>Gender</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% @order.order_items.exclude_insurance_fee.sort_convenient_fee_as_last.each do |order_item| %>
+                            <% if order_item.fee.is_convenient_fee? %>
+                                <tr>
+                                    <td colspan="3"><%= order_item.fee.name %></td>
+                                    <td><%= number_to_currency(order_item.amount, unit: "") %></td>
+                                </tr>
+                            <% else %>
+                                <tr>
+                                    <td><%= order_item.order_itemable.name %></td>
+                                    <td>-</td>
+                                    <td><%= ForeignWorker::GENDERS[order_item&.gender] %></td>
+                                    <td><%= number_to_currency(order_item.amount, unit: "") %></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                        <% insurance_items = @order.order_items.get_insurance_fee %>
+                        <% if !insurance_items.blank? %>
+                            <% @order.order_items.get_insurance_gross_premium.each do |order_item| %>
+                                <tr>
+                                    <td>INSURANCE/TAKAFUL (<%= order_item&.insurance_purchase&.fw_name %>)</td>
+                                    <td><%= order_item&.insurance_purchase&.fw_passport_number %></td>
+                                    <td><%= ForeignWorker::GENDERS[order_item&.insurance_purchase&.fw_gender] %></td>
+                                    <td><%= number_to_currency(order_item&.insurance_purchase&.total_premium, unit: "") %></td>
+                                </tr>
+                            <% end %>
+                        <% end %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">&nbsp;</th>
+                            <th>
+                                <div class="etr-amount-total"><%= number_to_currency(@order.order_items.sum(:amount), unit: "") %></div>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            <% end %>
+            <!-- end insurance -->
+
+            <div class="text-right">
+                <%= form_for @order, url: external_order_path(@order) do |form| %>
+                    <% if ["Employer", "Agency"].include?(current_user.userable_type) %>
+                        <a class="btn btn-blue-portal" href="<%= external_orders_path %>">Back</a>
+                    <% else %>
+                        <a class="btn btn-primary" href="<%= external_orders_path %>">Back</a>
+                    <% end %>
+                    <% if @order&.organization&.code == 'PT' %>
+                        <% if ["NEW", "PENDING_PAYMENT"].include?(@order.status) && !["AGENCY_REGISTRATION", "AGENCY_RENEWAL"].include?(@order.category) %>
+                            <button class="btn btn-red-portal" type="submit" name="submit" value="cancel">Cancel payment</button>
+                        <% end %>
+                        <% if ["NEW"].include?(@order.status) %>
+                            <a class="btn btn-blue-portal" href="<%= edit_external_order_path @order %>">Edit payment</a>
+                        <% end %>
+                        <% if ["PENDING_PAYMENT"].include?(@order.status) %>
+                            <% if @order.category != "SPECIAL_RENEWAL_TRANSACTION_REGISTRATION" %>
+                                <button class="btn btn-blue-portal" type="submit" name="submit" value="proceed_to_payment">Proceed to payment</button>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+                <% end %>
+            </div>
+        </div>
+        <!-- /card-body -->
+
+    </div>
+
+    <% content_for :page_end_scripts do %>
+    <script>
+    </script>
+    <% end %>

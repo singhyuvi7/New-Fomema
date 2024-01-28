@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Fees</strong> - Edit Association
+    </div>
+    <%= form_for @association, url: internal_association_path(@association), html: {class: "#{params[:action]}_association association-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

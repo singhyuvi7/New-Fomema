@@ -1,0 +1,2 @@
+module External::XrayLicensePurposesHelper
+end

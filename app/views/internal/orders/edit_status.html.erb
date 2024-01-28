@@ -1,0 +1,61 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent">
+        <b>Edit Status</b> - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+    <div class="card-body">
+        <%= form_for @order, url: edit_status_update_internal_order_path(@order) do |form| %>
+            <div class="card">
+                <div class="card-body">
+                    <%= render 'shared/all_validation_flash', { model_obj: @order } %>
+                    <div class="row">
+                        <label class="col-md-6 col-form-label">Pay with <img src="<%= image_path('logo/fpx-logo.png')%>" class="img-responsive" style="max-height: 30px"></label>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Payment Code</label>
+                        <div class="form-control-plaintext col-md-9"><%= @order.code %></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Amount (RM)</label>
+                        <div class="form-control-plaintext col-md-9"><%= number_to_currency(@order.amount, unit: "") %></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Payment of</label>
+                        <div class="form-control-plaintext col-md-9"><%= @order.category %></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Payment Method</label>
+                        <div class="form-control-plaintext col-md-9"><%= @order.payment_method.name %></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Order Status</label>
+                        <div class="form-control-plaintext col-md-9"><%= Order::STATUSES[@order.status] %></div>
+                    </div>
+                    <% if !["PAID", "FAILED", "CANCELLED", "NEW"].include?(@order.status) and @order.payment_method.code.start_with?('IPAY_FPX', 'SWIPE_', 'PAYNET', 'BOLEH') %>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p style="color:red"><b>Update order status to FAILED is irreversible. Please ensure payment is unsuccessful before saving.</b></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">New Order Status</label>
+                            <div class="form-control-plaintext col-md-9">
+                                <select class="col-md-12 form-control document-type-selector" name="order[status]" required>
+                                    <option value="">Select option</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+            <div class="text-right">
+                <%=raw edit_back_button(internal_orders_path) %>
+                <%=raw edit_save_button() %>
+            </div>
+        <% end %>
+    </div>
+</div>
+<% content_for :page_end_scripts do %>
+<% end %>

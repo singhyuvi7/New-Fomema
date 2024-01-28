@@ -1,0 +1,74 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Refund Batch</strong> - Batch Details
+    </div>
+
+    <div class="card-body">
+
+        <%= render "/shared/all_flash" %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="batch_code">Batch Code :  <%= "#{@refund_batch.code} ( #{@refund_batch.start_date&.strftime("%d/%m/%Y")} - #{@refund_batch.end_date&.strftime("%d/%m/%Y")})" %> </label>
+                    <p class="text-danger"><small><i><%= @error&.remark %></i></small></p>
+
+                    <table class="table table-responsive-sm table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Total (RM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                statuses = Refund::STATUSES
+                            %>
+
+                            <% if @refund_batch.refunds.empty? %>
+                                <tr>
+                                    <td colspan="5">No Records Found</td>
+                                </tr>
+                            <% end %>
+                            <% @refund_batch.refunds.each do |refund, index| %>
+                                <tr>
+                                    <td>
+                                        <%= refund.code %>
+                                    </td>
+                                    <td>
+                                        <%= "#{refund.customerable&.name} (#{!refund.customerable&.blank? ? refund.customerable&.code : '-'})" %>
+                                    </td>
+                                    <td><%= Refund::CATEGORIES[refund.category] %></td>
+                                    <td>
+                                        <div><%= statuses[refund.status] ? statuses[refund.status] : refund.status %></div>
+                                        <div><small><%= "(#{refund.fail_reason})" if (refund.status == 'PAYMENT_FAILED' && !refund.fail_reason.blank?) %></small></div>
+                                    </td>
+                                    <td><%= number_to_currency(refund.amount, unit: "", precision: 2) %></td>
+                                </tr>
+                            <% end %>
+                            <tr>
+                                <tr>
+                                    <td colspan="4"><div class="float-right font-weight-bold">Grand Total (RM)</div></td>
+                                    <td><%= number_to_currency(@refund_batch.refunds.sum(:amount), unit: "", precision: 2) %></td>
+                                </tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_refund_batches_path) %>
+            <% if has_permission?('PROCESS_REFUND_BATCH') && !(['PENDING_SEND','PROCESS_FAILED'] & @refund_batch.refunds.pluck('DISTINCT status')).empty? %>
+                <a href="<%= process_internal_refund_batch_path(@refund_batch) %>" class="btn btn-sm btn-warning process-payment-btn"><i class="fas fa-arrow-right"></i> Process Payment</a>
+            <% end %>
+            <a href="<%= download_internal_refund_batch_path %>.xlsx" class="btn btn-sm btn-primary"><i class="fas fa-download" target="_blank"></i> Download</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+<div class="modal" tabindex="-1" role="dialog" id="panel-radiologists-modal">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search X-Ray Facility</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+<div class="card">
+    <div class="card-header">Filter</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="code" class="col-sm-3 col-form-label">Code</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="code" id="panel_radiologist_filter_code" value="">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label for="name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="name" id="panel_radiologist_filter_name" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-right">
+        <button type="reset" class="btn btn-sm btn-danger" data-toggle="tooltip" data-html="true" title="Clear" data-original-title="Clear"><i class="icon-trash"></i> Clear</button>
+        <button type="button" id="panel-radiologists-filter-btn" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Filter" data-original-title="Filter"><i class="icon-magnifier"></i> Filter</button>
+    </div>
+</div>
+
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <!--<th class="module-row-numbers">#</th>-->
+            <th>Code</th>
+            <th>Name</th>
+            <th class="module-row-actions">&nbsp;</th>
+        </tr>
+    </thead>
+
+    <tbody id="panel-radiologists-filter-tbody">
+    </tbody>
+
+</table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#panel-radiologists-filter-btn').click(function () {
+    data = {
+        code: $('#panel_radiologist_filter_code').val(),
+        name: $('#panel_radiologist_filter_name').val()
+    }
+    $.ajax({
+        url: "<%= xray_facilities_filter_internal_radiologists_path %>",
+        method: "POST",
+        data: data,
+        success: function (response) {
+            $('#panel-radiologists-filter-tbody').html('');
+            response["results"].forEach(function (xray_facility, idx) {
+                $('#panel-radiologists-filter-tbody').append(
+                    '<tr>'
+                    + '<td>'+xray_facility["code"]+'</td>'
+                    + '<td>'+xray_facility["name"]+'</td>'
+                    + '<td><button type="button" onclick="add_panel_radiologist(this)" data-xray_facility="'+encodeURIComponent(JSON.stringify(xray_facility))
+
++'" class="btn btn-sm btn-primary">Add</button></td>'
+                    + '</tr>'
+                );
+            });
+        },
+    })
+});
+</script>
+<% end %>

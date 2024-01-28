@@ -1,0 +1,9 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: 'Doctors') do |sheet|
+  sheet.add_row @headers
+  @doctors&.each do |doctor|
+    %i[code name email clinic_name address1 address2 address3 address4 town_name postcode state_name xray_facility_code laboratory_code xray_facility_name xray_facility_email xray_facility_address1 xray_facility_address2 xray_facility_address3 xray_facility_address4 xray_facility_town_name xray_facility_postcode xray_facility_state_name xray_facility_phone xray_facility_fax laboratory_name laboratory_email laboratory_address1 laboratory_address2 laboratory_address3 laboratory_address4 laboratory_town_name laboratory_postcode laboratory_state_name laboratory_phone laboratory_fax].then do |attributes|
+      sheet.add_row(attributes.map { |attribute| doctor.try(attribute) }, types: Array.new(attributes.size) { :string })
+    end
+  end
+end

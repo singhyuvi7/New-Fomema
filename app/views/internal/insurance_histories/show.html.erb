@@ -1,0 +1,187 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header">
+        <strong>Insurance</strong> - Insurance Detail
+    </div>
+    <!-- /card-header -->
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_code">Worker Code</label>
+                    <p class="form-control-plaintext">
+                        <a href="<%= internal_employer_employer_worker_path(@insurance_purchase.foreign_worker.employer_id, @insurance_purchase.foreign_worker_id) if !@insurance_purchase.foreign_worker_id.blank? %>"><%= @insurance_purchase.fw_code %></a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_name">Worker Name</label>
+                    <p class="form-control-plaintext">
+                        <a href="<%= internal_employer_employer_worker_path(@insurance_purchase.foreign_worker.employer_id, @insurance_purchase.foreign_worker_id) if !@insurance_purchase.foreign_worker_id.blank? %>"><%= @insurance_purchase.fw_name %></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_gender">Worker Gender</label>
+                    <p class="form-control-plaintext">
+                        <%= ForeignWorker::GENDERS[@insurance_purchase.fw_gender] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_date_of_birth">Worker Date of Birth</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.fw_date_of_birth&.strftime(get_standard_date_format) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_passport_number">Worker Passport</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.fw_passport_number %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fw_country_id">Worker Country</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.fw_country&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employer_code">Employer Code</label>
+                    <p class="form-control-plaintext">
+                        <a href="<%= internal_employer_path(@insurance_purchase.employer_id) %>"><%= @insurance_purchase.employer&.code %></a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="employer_name">Employer Name</label>
+                    <p class="form-control-plaintext">
+                        <a href="<%= internal_employer_path(@insurance_purchase.employer_id) %>"><%= @insurance_purchase.employer&.name %></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="product_purchased">Product</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.product_purchased %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="insurance_provider">Provider</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.insurance_provider %> <%= "(#{@insurance_purchase.insurance_service_provider.display_name})" if !@insurance_purchase.insurance_service_provider.blank? %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="order_status">Order Code</label>
+                    <p class="form-control-plaintext">
+                        <% if has_permission?("VIEW_EMPLOYER_ORDER") %>
+                            <a href="<%= internal_order_path(@insurance_purchase.order) if !@insurance_purchase.order_id.blank? %>">
+                        <% end %>
+                        <%= @insurance_purchase.order.try(:code) %>
+                        <% if has_permission?("VIEW_EMPLOYER_ORDER") %>
+                            </a>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="order_status">Order Status</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.order.try(:status) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="product_purchased">Paid Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.order&.paid_at.try(:strftime,"%d/%m/%Y") %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="insurance_provider">Branch</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_purchase.order&.organization.name %> - <%= @insurance_purchase.order&.creator.try(:username) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                Products
+            </div>
+            <!-- /.card-header -->
+
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <th>Policy Start Date</th>
+                        <th>Policy End Date</th>
+                        <th>Status</th>
+                    </tr>
+                    <% @insurance_purchase.insurance_purchase_items.each.with_index(1) do |insurance_purchase_item| %>
+                        <tr>
+                            <td><%= insurance_purchase_item.product_name %></td>
+                            <td><%= insurance_purchase_item.start_date.try(:strftime, get_standard_date_format) %></td>
+                            <td><%= insurance_purchase_item.end_date.try(:strftime, get_standard_date_format) %></td>
+                            <td><%= insurance_purchase_item.policy_status %></td>
+                        </tr>
+                    <% end %>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw show_back_button(internal_insurance_histories_path) %>
+    </div>
+
+</div>
+<!-- /card -->

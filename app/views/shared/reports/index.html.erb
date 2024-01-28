@@ -1,0 +1,17 @@
+<%= render "/shared/all_flash" %>
+
+<% @reports.each do |hash| %>
+    <div class="card">
+        <div class="card-header">
+            <strong><%= hash[:title] %></strong>
+        </div>
+
+        <div class="card-body">
+            <ol>
+                <% hash[:reports].each do |report| %>
+                    <li><%= link_to report[:title], report[:path], class: "font-weight-bold" %></li>
+                <% end %>
+            </ol>
+        </div>
+    </div>
+<% end %>

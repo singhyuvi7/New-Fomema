@@ -1,0 +1,86 @@
+<%
+    transaction_model   ||= @transaction
+    namespacing         ||= "de_attributes_#{ rand(1000) }"
+    readonly            ||= false
+    @condition_index    = 0
+%>
+
+<div class="p-4 border-bottom">
+    <h3><u>PART V. CERTIFICATION BY DOCTOR</u></h3>
+</div>
+
+<% DoctorExamination.certification_conditions.each_with_index do |array, index| %>
+    <%
+        field_name, label   = array
+        value               = doctor_examination.try(field_name)
+    %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+        <label class="row-index"><%= @condition_index += 1 %></label>
+        <label class="flex-grow-1 mb-0"><%= label %></label>
+
+        <div class="d-flex flex-shrink-0">
+            <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field condition-check" %>
+
+            <div>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+    <label class="row-index"><%= @condition_index += 1 %></label>
+    <label class="flex-grow-1 mb-0">Other</label>
+
+    <div class="d-flex flex-shrink-0">
+        <% value = doctor_examination.try(:condition_other) %>
+        <%= hidden_field_tag "#{ namespacing }[condition_other]", value, class: "boolean-field condition-check" %>
+
+        <div>
+            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+            <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+        </div>
+    </div>
+</div>
+
+<h5 class="px-4 py-3 border-bottom mb-0">I also find that</h5>
+
+<% DoctorExamination.certification_condition_part_2.each_with_index do |array, index| %>
+    <%
+        field_name, label   = array
+        next if transaction_model.fw_gender == "M" && field_name == :condition_urine_for_pregnant
+        value               = doctor_examination.try(field_name)
+    %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+        <label class="row-index"><%= @condition_index += 1 %></label>
+        <label class="flex-grow-1 mb-0"><%= label %></label>
+
+        <div class="d-flex flex-shrink-0">
+            <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field condition-check" %>
+
+            <div>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+            </div>
+        </div>
+    </div>
+<% end %>
+
+<label class="px-4 py-3 border-bottom mb-0"><u>NOTE: IF A 'YES' IN ANY OF THE ABOVE COLUMNS, THE WORKER IS UNSUITABLE FOR EMPLOYMENT IN MALAYSIA</u></label>
+
+<% unless readonly || @skip_visited.present? %>
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-between align-items-center border-bottom">
+        <label class="row-index"></label>
+        <label class="flex-grow-1 mb-0">Yes, I have visited conditions for this foreign worker</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% value = doctor_examination.visited_condition %>
+            <%= hidden_field_tag "#{ namespacing }[visited_condition]", value, class: "boolean-field visited-bool" %>
+            <%= raw boolean_field_button(active_color: "success", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+            <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+        </div>
+    </div>
+<% end %>

@@ -1,0 +1,22 @@
+<%= form_tag internal_payments_bulk_update_path, multipart: true, method: "post" do %>
+    <div class="card">
+        <div class="card-header">
+            <strong>Bulk Update</strong>
+        </div>
+        <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label required" for="file-input">CSV File</label>
+                    <div class="col-md-9">
+                        <%= file_field_tag :file , :accept => 'text/csv', required: true %>
+                    </div>
+                </div>
+                <input type="hidden" name="service_provider" value="<%= params[:service_provider].present? ? params[:service_provider] : '' %>" />
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+            <a href="<%= internal_payments_bulk_update_template_path %>" target="_blank" class="btn btn-sm btn-secondary">Download Template</a>
+                <button type="submit" class="btn btn-sm btn-warning" title="Upload"><i class="fas fa-upload"></i> Import</button>
+            </div>
+        </div>
+    </div>
+<% end %>

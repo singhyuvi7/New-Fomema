@@ -1,0 +1,234 @@
+<form>
+<%= render 'internal/xray_examinations/shared/merts_examiner_info', { xray_examination: xray_examination } %>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col">
+                X-Ray Report
+            </div>
+
+            <div class="col">
+                <div class="text-right">
+                    <button type="button" class="btn btn-sm btn-dark mr-2"><%= xray_examination.xray_ref_number %></button>
+                    <button type="button" class="btn btn-sm btn-warning mr-2"><%= xray_examination.sourceable&.xray_film_type || "DIGITAL" %></button>
+
+
+
+
+                    <% if xray_examination.sourceable_type == 'MedicalAppeal' || xray_examination.transactionz&.xray_film_type&.downcase == 'digital' %>
+                        <a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: xray_examination&.id, user_id: current_user.id) %>">View Digital X-Ray Image <i class="fa fa-external-link-alt"></i></a>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<table class="table table-bordered table-card">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Report</th>
+            <th colspan="2" class="text-center">Status</th>
+            <th>Details of Abnormality</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Thoracic Cage</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="ABNORMAL" <% if xray_examination&.thoracic_cage %> checked <% else %> disabled <% end %>>
+                        Abnormal
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NORMAL" <% if !xray_examination&.thoracic_cage %> checked <% else %> disabled <% end %>>
+                        Normal
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.thoracic_cage_comment %></pre>
+            </td>
+        </tr>
+
+        <!-- heart_shape_and_size -->
+        <tr>
+            <td>2</td>
+            <td>Heart Shape & Size</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="ABNORMAL" <% if xray_examination&.heart_shape_and_size %> checked <% else %> disabled <% end %>>
+                        Abnormal
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NORMAL" <% if !xray_examination&.heart_shape_and_size %> checked <% else %> disabled <% end %>>
+                        Normal
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.heart_shape_and_size_comment %></pre>
+            </td>
+        </tr>
+        <!-- /heart_shape_and_size -->
+
+        <!-- lung_fields -->
+        <tr>
+            <td>3</td>
+            <td>Lung Fields</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="ABNORMAL" <% if xray_examination&.lung_fields %> checked <% else %> disabled <% end %>>
+                        Abnormal
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NORMAL" <% if !xray_examination&.lung_fields %> checked <% else %> disabled <% end %>>
+                        Normal
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.lung_fields_comment %></pre>
+            </td>
+        </tr>
+        <!-- /lung_fields -->
+
+        <!-- mediastinum_and_hila -->
+        <tr>
+            <td>5</td>
+            <td>Mediastinum & Hila</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="ABNORMAL" <% if xray_examination&.mediastinum_and_hila %> checked <% else %> disabled <% end %>>
+                        Abnormal
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NORMAL" <% if !xray_examination&.mediastinum_and_hila %> checked <% else %> disabled <% end %>>
+                        Normal
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.mediastinum_and_hila_comment %></pre>
+            </td>
+        </tr>
+        <!-- /mediastinum_and_hila -->
+
+        <!-- pleura_hemidiaphragms_costopherenic_angles -->
+        <tr>
+            <td>6</td>
+            <td>Pleura / Hemidiaphragms / Costopherenic Angles</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="ABNORMAL" <% if xray_examination&.pleura_hemidiaphragms_costopherenic_angles %> checked <% else %> disabled <% end %>>
+                        Abnormal
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NORMAL" <% if !xray_examination&.pleura_hemidiaphragms_costopherenic_angles %> checked <% else %> disabled <% end %>>
+                        Normal
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.pleura_hemidiaphragms_costopherenic_angles_comment %></pre>
+            </td>
+        </tr>
+        <!-- /pleura_hemidiaphragms_costopherenic_angles -->
+
+        <!-- focal_lesion -->
+        <tr>
+            <td>6</td>
+            <td>Focal Lesions</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="YES" <% if xray_examination&.focal_lesion %> checked <% else %> disabled <% end %>>
+                        Yes
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NO" <% if !xray_examination&.focal_lesion %> checked <% else %> disabled <% end %>>
+                        No
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.focal_lesion_comment %></pre>
+            </td>
+        </tr>
+        <!-- /focal_lesion -->
+
+        <!-- other_findings -->
+        <tr>
+            <td>7</td>
+            <td>Any other findings</td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="YES" <% if xray_examination&.other_findings %> checked <% else %> disabled <% end %>>
+                        Yes
+                    </label>
+                </div>
+            </td>
+            <td width="50" class="text-center">
+                <div class="form-check">
+                    <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" type="radio" value="NO" <% if !xray_examination&.other_findings %> checked <% else %> disabled <% end %>>
+                        No
+                    </label>
+                </div>
+            </td>
+            <td>
+                <pre class="form-control"><%= xray_examination&.other_findings_comment %></pre>
+            </td>
+        </tr>
+        <!-- /other_findings -->
+
+        <!-- impression -->
+        <tr>
+            <td>8</td>
+            <td>Impression</td>
+            <td colspan="3">
+                <pre class="form-control"><%= xray_examination&.impression %></pre>
+            </td>
+        </tr>
+        <!-- /impression -->
+
+    </tbody>
+</table>
+
+    <div class="card-footer">
+        <h5>Results of X-Ray Examination: <%= xray_examination&.result&.upcase %></h5>
+    </div>
+</div>
+</form>

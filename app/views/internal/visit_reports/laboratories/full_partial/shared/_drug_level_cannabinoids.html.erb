@@ -1,0 +1,11 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :drug_level_cannabinoids, 'Level of drug detection (Cannabinoids)' %>
+        <div class="drug-level" data-placeholder="(ng/ml)">
+            <%= form_shared.number_field :drug_level_cannabinoids, class: 'form-control', step: :any, min: 0 %>
+         </div>   
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

@@ -1,0 +1,204 @@
+<% indexing = 0 %>
+
+<div class="p-4 border-bottom">
+    <h3><u>Appeal Details</u></h3>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Officer In Charge</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal.officer_in_charge.try(:name) %>
+    </div>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label>Appeal reason(s)</label>
+    </div>
+
+    <div style="margin-left: 5em;">
+        <% if @appeal.doctor_reason? %>
+            <label>Recorded by <%= @appeal.registered_by_type %></label><br>
+            <%= raw @appeal.doctor_reason %><br><br>
+        <% end %>
+
+        <label>Recorded by PIC</label><br>
+        <%= raw @appeal.appeal_reason? ? @appeal.appeal_reason : "<i>N/A</i>" %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">MOH Appeal</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold">
+        <%= @appeal.is_moh ? "YES" : "NO" %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Is Specialist</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold">
+        <%= @appeal.is_specialist ? "YES" : "NO" %>
+    </div>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label>Comments</label>
+    </div>
+
+    <table class="table-borders" style="width: calc(100% - 5em); margin-left: 5em;">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">No.</th>
+                <th class="py-1 px-2">Date</th>
+                <th class="py-1 px-2">MLE Name</th>
+                <th class="py-1 px-2">Comments</th>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @appeal_comments.each_with_index do |comment, index| %>
+                <tr>
+                    <td class="py-1 px-2"><%= index + 1 %></td>
+                    <td class="py-1 px-2"><%= comment.created_at.strftime("%d/%m/%Y") %></td>
+                    <td class="py-1 px-2"><%= comment.user.name %></td>
+                    <td class="py-1 px-2"><%= comment.comment %></td>
+                </tr>
+            <% end %>
+
+            <% if @appeal_comments.blank? %>
+                <tr>
+                    <td colspan="5" class="text-center py-1 px-2">There are no comments</td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label>Appeal To Do List</label>
+    </div>
+
+    <table class="table-borders" style="width: calc(100% - 5em); margin-left: 5em;">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">To Do</th>
+                <th class="py-1 px-2">Doctor Remarks</th>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @appeal_todos.each_with_index do |to_do| %>
+                <tr>
+                    <td class="py-1 px-2"><%= to_do.appeal_todo.try(:description) %></td>
+
+                    <td class="py-1 px-2">
+                        <% if to_do.secondary_type == "Xray" %>
+                            <%= @xray_results %>
+                        <% else %>
+                            <%= simple_format to_do.comment %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label>Uploaded Document(s)</label>
+    </div>
+
+    <table class="table table-bordered table-striped" style="width: calc(100% - 5em); margin-left: 5em;">
+        <tr>
+            <th>Category</th>
+            <th>Documents</th>
+            <th>Date Uploaded</th>
+            <th>Uploaded By</th>
+        </tr>
+
+        <% @appeal.uploads.order(created_at: :asc).each do |upload| %>
+            <tr>
+                <td class="filenames" width="30%" name="uploadedfilecategory">
+                    <%
+                        category_description = upload.category
+                        MedicalAppeal::ALL_DOCUMENT_TYPES.each do |document_code, document_desc|
+                            if document_code == upload.category
+                                category_description =  document_desc
+                            end
+                        end
+                    %>
+                    <%= category_description %>
+                </td>
+                <td class="filenames" width="30%" name="uploadedfilename">
+                    <% upload.documents.each do |document| %>
+                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                    <% end %>
+                </td>
+                <td class="filenames" width="15%"><%= upload.updated_at&.strftime(get_standard_datetime_format) %></td>
+                <td class="filenames" width="25%"><%= "#{upload.creator.name} (#{upload.creator.code})" %></td>
+            </tr>
+        <% end %>
+
+        <% if @appeal.uploads.blank? %>
+            <tr><td colspan="4">There are no uploaded documents</td></tr>
+        <% end %>
+    </table>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Appeal Status</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal.displayed_status %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Appeal Decision</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal_approval&.medical_mle1_decision %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Appeal Decision Date</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal_approval&.medical_mle1_decision_at&.strftime("%d/%m/%Y") %>
+    </div>
+</div>
+
+<div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom">
+    <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+    <label class="flex-grow-1 mb-0">Appeal Decision By</label>
+
+    <div id="appeal-status-field" class="d-flex flex-shrink-0 font-weight-bold" data-status="<%= @appeal.status %>">
+        <%= @appeal_approval&.medical_mle1&.name %>
+    </div>
+</div>
+
+<div class="px-4 py-2 border-bottom">
+    <div>
+        <label class="mr-4 w-em-3"><%= indexing += 1 %></label>
+        <label>Appeal Remarks from MLE1</label>
+    </div>
+
+    <%= text_area_tag :medical_mle1_comment, @appeal_approval&.medical_mle1_comment, rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;", readonly: true %>
+</div>

@@ -1,0 +1,7 @@
+<body>
+    <% if current_user.userable_type == 'Employer' %>
+        <div>
+            <%= image_tag wicked_pdf_asset_base64("logo/fomema-logo.png"), style: "width: 200px; height: 60px;" %>
+        </div>
+    <% end %>
+</body>

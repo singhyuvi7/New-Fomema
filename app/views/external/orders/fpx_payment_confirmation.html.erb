@@ -1,0 +1,101 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent">
+        <b>Payment</b> - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_tag fpx_payment_confirmation_external_order_url, method: :get do |form| %>
+        <div class="card-body">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <label class="col-md-6 col-form-label">Pay with <img src="<%= image_path('logo/fpx-logo.png')%>" class="img-responsive" style="max-height: 30px"></label>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Payment Code</label>
+                        <div class="form-control-plaintext col-md-9"><%= @fpx_response.seller_order_no %></div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Amount (RM)</label>
+                        <div class="form-control-plaintext col-md-9"><%= number_to_currency(@fpx_response.txn_amount, unit: "") %></div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Transaction Date</label>
+                        <div class="form-control-plaintext col-md-9"><%= "#{@fpx_response.seller_txn_time[6..7]}/#{@fpx_response.seller_txn_time[4..5]}/#{@fpx_response.seller_txn_time[0..3]} #{@fpx_response.seller_txn_time[8..9]}:#{@fpx_response.seller_txn_time[10..11]}" %></div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">FPX Transaction ID</label>
+                        <div class="form-control-plaintext col-md-9"><%= @fpx_response.fpx_txn_id %></div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Buyer Bank Name</label>
+                        <div class="form-control-plaintext col-md-9"><%= FpxBank.find_by(code: @fpx_response.buyer_bank_id).display_name %></div>
+                    </div>
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">FPX Transaction Status</label>
+                        <div class="form-control-plaintext col-md-9"><%= @fpx_response.debit_auth_code == "00" ? "Payment Successful" : @fpx_response.debit_auth_code == "09" ? "Pending Transaction" : @fpx_response.debit_auth_code == "99" ? "Pending Authorization" : "Payment Unsuccessful" %></div>
+                    </div>
+
+                    <% if !["00", "09", "99"].include?(@fpx_response.debit_auth_code) %>
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">FPX Failed Reason</label>
+                            <%
+                                min_max_amount = case @fpx_response.debit_auth_code
+                                when '48'
+                                    @fpx_response.msg_token == '01' ? ENV['FPX_B2C_MAX_AMOUNT'] : ENV['FPX_B2B_MAX_AMOUNT']
+                                when '2A'
+                                    @fpx_response.msg_token == '01' ? ENV['FPX_B2C_MIN_AMOUNT'] : ENV['FPX_B2B_MIN_AMOUNT']
+                                else
+                                    ''
+                                end
+                            %>
+                            <div class="form-control-plaintext col-md-9"><%= "#{FpxResponseCode.find_by(code: @fpx_response.debit_auth_code).name} #{min_max_amount} (#{@fpx_response.debit_auth_code})" %></div>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col text-right">
+                    <% if ["00"].include?(@fpx_response.debit_auth_code) %>
+                        <% if ["TRANSACTION_REGISTRATION"].include?(@order.category) %>
+                            <% if ['Agency'].include?(@order.customerable_type) %>
+                                <a class="btn btn-blue-portal" href="<%= external_transactions_path(order_code: @fpx_response.seller_order_no) %>">Proceed To Select Clinic</a>
+                            <% else %>
+                                <a class="btn btn-blue-portal" href="<%= external_transactions_path(order_code: @fpx_response.seller_order_no) %>">Proceed To Select Clinic</a>
+                            <% end %>
+                        <% elsif ["SPECIAL_RENEWAL_TRANSACTION_REGISTRATION"].include?(@order.category) %>
+                            <a class="btn btn-blue-portal" href="<%= external_transactions_path(order_code: @fpx_response.seller_order_no) %>">Proceed to Upload Worker Document and Select Clinic</a>
+                        <% elsif ["AGENCY_REGISTRATION", "AGENCY_RENEWAL"].include?(@order.category) %>
+                            <a class="btn btn-blue-portal" href="<%= external_root_path %>">OK</a>
+                        <% else %>
+                            <a class="btn btn-blue-portal" href="<%= external_orders_path %>">OK</a>
+                        <% end %>
+                    <% elsif !["00", "09", "99"].include?(@fpx_response.debit_auth_code) %>
+                        <% if ["TRANSACTION_REGISTRATION"].include?(@order.category) %>
+                            <a class="btn btn-blue-portal" href="<%= external_worker_lists_path %>">Proceed To Register Worker</a>
+                        <% else %>
+                            <a class="btn btn-blue-portal" href="<%= external_orders_path %>">OK</a>
+                        <% end %>
+                    <% elsif ["09", "99"].include?(@fpx_response.debit_auth_code) %>
+                        <a class="btn btn-blue-portal" href="<%= external_orders_path %>">OK</a>
+                    <% end %>
+                </div>
+            </div>
+
+        </div>
+    <% end %>
+</div>
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

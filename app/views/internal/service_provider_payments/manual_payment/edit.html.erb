@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Manual Payment</strong>
+    </div>
+    <%= form_for @payment, url: internal_manual_payment_update_payment_path(@transaction), html: {class: "#{params[:action]}_payment payment_form with-parsley"} do |form| %>
+        <%= render 'internal/service_provider_payments/manual_payment/form', { form: form } %>
+    <% end %>
+</div>

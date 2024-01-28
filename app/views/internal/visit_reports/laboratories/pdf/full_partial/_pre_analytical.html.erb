@@ -1,0 +1,142 @@
+<%
+    findings = [
+        {
+            name: 'Appropriate Specimen Transportation',
+            sub: [
+                [:despatch_transportation, "Despatch Transportation"],
+                [:transport_to_test_lab, "Transportation to Testing Laboratory"]
+            ]
+        },
+        {
+            name: 'Appropriate Specimen Packaging',
+            sub: [
+                [:despatch_bag, "Despatch Bag"],
+                [:packaging_to_test_lab, "Packaging to Testing Laboratory"]
+            ]
+        },
+        {
+            name: 'Record of Specimen Traceability',
+            sub: [
+                [:clinic_to_despatch, "Clinic to Despatch"],
+                [:despatch_to, "Despatch to Laboratory"],
+                [:cc_partial_lab_to_test_lab, "CC/Partial lab to testing laboratory"]
+            ]
+        },
+        {
+            name: 'Pre-Analytical Procedure',
+            sub: [
+                [:registration_record, "Specimen Registration Record"],
+                [:rejection_register, "Specimen Rejection Register"],
+                [:rejection_criteria, "Specimen Rejection Criteria"]
+            ]
+        },
+        {
+            name: 'Others',
+            value: :others,
+            has_acc_option: false,
+            sub: []
+        }
+    ].map do |item|
+        if !item[:sub].blank?
+            item[:sub] = item[:sub].map do |key,value|
+                comment = visit_report_lab.try("#{ key }_comment")
+                items = visit_report_lab.try("#{ key }_items")
+
+                {
+                    number: "",
+                    name: value,
+                    key: key.to_s,
+                    yes: visit_report_lab.try(key) == 'YES',
+                    no: visit_report_lab.try(key) == 'NO',
+                    na: visit_report_lab.try(key) == 'NA',
+                    value: visit_report_lab.try("#{ key }_name"),
+                    has_acc_option: true,
+                    comment: comment,
+                    items: items
+                }
+            end
+        else
+            key = item[:value]
+            comment = visit_report_lab.try("#{ key }_comment")
+            items = visit_report_lab.try("#{ key }_items")
+
+            item = {
+                number: "",
+                name: item[:name],
+                key: key.to_s,
+                yes: visit_report_lab.try(key) == 'YES',
+                no: visit_report_lab.try(key) == 'NO',
+                na: visit_report_lab.try(key) == 'NA',
+                value: visit_report_lab.try("#{ key }"),
+                has_acc_option: item[:has_acc_option],
+                comment: comment,
+                items: items
+            }
+        end
+        item
+    end
+%>
+
+<% findings.each.with_index(1) do |finding, index| %>
+    <% if !finding[:sub].blank? %>
+        <tr>
+            <td class="table-index"><%= index %>.</td>
+            <td class="row-name" colspan="4">
+                <div class="row-wrap"><%= finding[:name] %></div>
+            </td>
+        </tr>
+        <% finding[:sub].each.with_index(1) do |sub_finding, index_2| %>
+            <tr>
+                <td class="table-sub-index"><%= "#{index}.#{index_2}" %></td>
+                <td class="row-sub-name">
+                    <div class="row-wrap"><%= sub_finding[:name] %></div>
+                </td>
+                <% if sub_finding[:has_acc_option] %>
+                    <td class="text-center"><%= sub_finding[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= sub_finding[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= sub_finding[:na] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <% else %>
+                    <td colspan="3"></td>
+                <% end %>
+            </tr>
+            <% if !sub_finding[:comment].blank? %>
+                <tr>
+                    <td class="table-index"></td>
+                    <td>
+                        <div class="finding-comment">
+                            <span class="bold">Comment :</span>
+                            <span class="unbold"><%= sub_finding[:comment] %></span>
+                        </div>
+                    </td>
+                    <td colspan="3"></td>
+                </tr>
+            <% end %>
+        <% end %>
+    <% else %>
+        <tr class="finding-row method-field">
+            <td class="table-index"><%= index %>.</td>
+            <td class="row-name">
+                <div class="row-wrap"><%= finding[:name] %></div>
+            </td>
+            <% if finding[:has_acc_option] %>
+                <td class="text-center"><%= finding[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= finding[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= finding[:na] ? @checkbox_checked : @checkbox_unchecked %></td>
+            <% else %>
+                <td colspan="3"></td>
+            <% end %>
+        </tr>
+        <% if !finding[:comment].blank? %>
+            <tr>
+                <td class="table-index"></td>
+                <td>
+                    <div class="finding-comment">
+                        <span class="bold">Comment :</span>
+                        <span class="unbold"><%= finding[:comment] %></span>
+                    </div>
+                </td>
+                <td colspan="3"></td>
+            </tr>
+        <% end %>
+    <% end %>
+<% end %>

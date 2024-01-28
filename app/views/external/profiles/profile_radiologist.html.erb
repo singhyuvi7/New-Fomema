@@ -1,0 +1,196 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if @radiologist.errors.any? %>
+    <p class="alert alert-danger">error : <%= @radiologist.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if flash[:error] %>
+    <p class="alert alert-danger"><%= flash[:error] %></p>
+<% end %>
+
+<%= form_for @user, url: external_profile_update_path, html: {method: :put, class: "with-parsley"} do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    <strong>Profile - <%= form.label :radiologist, @radiologist.code %></strong>
+                </div>
+                <div class="col-md-2">
+                    <strong>Registration Date: <%= form.label :activated_at, @radiologist&.activated_at&.strftime(get_standard_date_format) %></strong>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title" %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                    </div>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <%= form.label :name, 'Radiologist Name', class: 'col-form-label required' %>
+                        <%= text_field :radiologist, :name, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="required">Panel X-Ray Facility</label>
+                        <div class="form-check form-check-inline mr-5">
+                            <%= radio_button :radiologist, :is_panel_xray_facility, true, { class: "form-check-input", disabled: true } %>Yes
+                            &emsp;
+                            <%= radio_button :radiologist, :is_panel_xray_facility, false,{ class: "form-check-input", disabled: true } %>No
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <%= form.label :icno, 'IC No.', class: 'col-form-label required' %>
+                        <%= text_field :radiologist, :icno, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :nationality_id, 'Nationality', class: 'col-form-label required' %>
+                        <%= collection_select(:radiologist, :nationality_id, Country.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :race_id, 'Race/Ethnic', class: 'col-form-label required' %>
+                        <%= collection_select(:radiologist, :race_id, Race.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :gender, 'Gender', class: 'required col-form-label' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :radiologist, :gender, 'M', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="radiologist_gender_m">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :radiologist, :gender, 'F', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="radiologist_gender_f">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <%if false%><-- <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :xray_facility_id, 'Clinic Name', class: 'col-form-label' %>
+                        <%= collection_select(:radiologist, :xray_facility_id, XrayFacility.all, :id, :name,
+                        {include_blank: 'Select option'}, class: 'form-control select2', required: false, disabled: true) %>
+                    </div>
+                </div>
+            </div> --><%end%>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :address1, 'Address', class: 'col-form-label required' %>
+                        <%= text_field :radiologist, :address1, { class: 'form-control', required: true, disabled: true } %>
+                        <%= text_field :radiologist, :address2, { class: 'form-control', disabled: true } %>
+                        <%= text_field :radiologist, :address3, { class: 'form-control', disabled: true } %>
+                        <%= text_field :radiologist, :address4, { class: 'form-control', disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'external/shared/profile_form_state_postcode_town', {form: form} %>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :phone, 'Phone', class: 'col-form-label required' %>
+                        <%= telephone_field :radiologist, :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :mobile, 'Mobile', class: 'col-form-label required' %>
+                        <%= telephone_field :radiologist, :mobile, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :fax, 'Fax', class: 'col-form-label' %>
+                        <%= telephone_field :radiologist, :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }  %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :email, 'Email', class: 'col-form-label required' %>
+                        <%= email_field :radiologist, :email, { class: 'form-control', required: true} %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <% field_id = generate_field_id(form, :apc_year) %>
+                        <%= form.label :apc_year, 'APC Year', class: 'col-form-label required' %>
+                        <% yearArr = [Date.current.years_ago(1).strftime('%Y'), Date.current.year, Date.current.years_since(1).year, Date.current.years_since(2).year, Date.current.years_since(3).year] %>
+                        <%#= form.select :bank_id, options_from_collection_for_select(Bank.order(:name).all, 'id', 'name', form.object.bank_id), {include_blank: form_select_option_text}, class: 'form-control select2', required: true, data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                        <%= collection_select(:radiologist, :apc_year, yearArr, :to_s, :to_s, {include_blank: form_select_option_text}, class: 'form-control select2', required: true,  data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-radiologist_apc_year-container\"]", parsley_group: field_id }) %>
+                        <div id="select2_parsley_error__<%= field_id %>"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :apc_number, 'APC Number', class: 'col-form-label required' %>
+                        <%= number_field :radiologist, :apc_number, { class: 'form-control', required: true, min: 0, max: 9999999999 } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :district_health_office_id, 'Nearest District Health Office', class: 'col-form-label' %>
+                        <%= collection_select(:radiologist, :district_health_office_id, DistrictHealthOffice.all, :id, :name,
+                        {include_blank: 'Select option'}, class: 'form-control select2', required: false, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer text-right">
+            <a class="btn btn-primary" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit" name="submit" value="Save">Save</button>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

@@ -1,0 +1,50 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Other Payment</strong> - Hold
+    </div>
+    <%= form_for @order_payment_hold_log, url: hold_internal_order_payment_path(@order_payment), html: {class: "with-parsley"} do |form| %>
+        <div class="card-body">
+
+            <%=render 'shared/all_validation_flash', { model_obj: @order_payment_hold_log } %>
+            <%=render "/shared/all_flash" %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :reference, "Reference No." %>
+                        <%= text_field_tag :reference, @order_payment.reference, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= label_tag :holded_by, "Hold By" %>
+                        <%= text_field_tag :holded_by, form.object.holder&.name, class: 'form-control', readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :hold_comment, "Hold Reason", class: 'required' %>
+                        <%= form.text_area :hold_comment, class: 'form-control', required: true %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <div class="text-right">
+                <%=raw edit_back_button(internal_order_payments_path) %>
+                <%=raw edit_save_button() %>
+            </div>
+
+        </div>
+
+    <% end %>
+</div>

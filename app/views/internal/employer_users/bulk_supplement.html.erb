@@ -1,0 +1,36 @@
+<%=render partial: '/internal/employers/shared/employer' %>
+
+<form id="bulk-upload-form" method="post" action="<%= bulk_supplement_internal_employer_employer_users_path %>" enctype="multipart/form-data">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <input type="hidden" name="_method" value="PUT">
+
+    <input type="hidden" name="page_layout" value="internal/employer_users/bulk_supplement" />
+
+    <div class="card">
+        <div class="card-header">
+            <strong>Employer User</strong> - Bulk Upload New Employer Supplementary
+        </div>
+        <div class="card-body">
+            
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Upload employer supplementary bulk file</label>
+                    <div class="col-md-5">
+                        <input type="file" name="csv_file" id="csv_file" required>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <div class="btn-group">
+                            <a href="<%= bulk_supplement_template_internal_employer_employer_users_path %>" target="_blank" class="btn btn-secondary">Download template</a>
+                        </div>
+                    </div>
+                </div>
+            
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <a href="<%= internal_employer_employer_users_path %>" class="btn btn-primary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </div>
+    </div>
+
+</form>

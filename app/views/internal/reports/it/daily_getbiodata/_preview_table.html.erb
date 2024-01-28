@@ -1,0 +1,68 @@
+<div class="my-4">
+    <table class="table-borders w-100 text-center">
+        <thead class="text-center">
+        </thead>
+        <tbody>
+            <tr>
+                <th rowspan="2">Error_ID</th>
+                <th rowspan="2">DESC1</th>
+                <th rowspan="2">DESC2</th>
+                <th colspan="24">Hour</th>
+                <th rowspan="2">Total</th>
+            </tr>
+            <tr>
+                <% @column_hours.each do |hour| %>
+                    <% if !hour.blank? %>
+                        <th><%= hour %></th>
+                    <% end %>
+                <% end %>
+            </tr>
+            
+            <% column_sums = [] %>
+            <% if @new_responses.blank? %>
+                <tr><td colspan="28">No Result</td></tr>
+            <% end %>
+
+            <% @new_responses.each do |row| %>
+                <tr>
+                    <% 
+                        row.each.with_index(0) do |value, index| 
+                           if [0,1,2].include?(index) 
+                                column_sums[index] = ''
+                            else
+                                if column_sums[index]
+                                    column_sums[index] += value
+                                else
+                                    column_sums << value
+                                end
+                           end
+                    %>
+                    <td><%= value %></td>
+                    <% end %>
+                </tr>
+            <% end %>
+
+            <tr>
+                <% column_sums.each.with_index(0) do |sum, index| %>
+                    <% if index == 2 %>
+                        <td>Total</td>
+                    <% else %>
+                        <td><%= sum %></td>
+                    <% end %>
+                <% end %>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

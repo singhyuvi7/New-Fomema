@@ -1,0 +1,177 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Users</strong> - User Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_code">User ID</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_title_id">Title</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.title&.name || '-' %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_email">Email</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.email %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_username">Username</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.username %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_role_id">Role</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.role&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_userable_type">Userable Type</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.userable_type %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_userable_id">Userable</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.userable&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_session_limitable_disabled">Allow Multiple Logins</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.session_limitable_disabled ? "Yes" : "No" %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_status">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= User::STATUSES[@user.status] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="designation">Designation</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.designation || '-' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="comment">Remarks</label>
+                    <p class="form-control-plaintext">
+                        <%= @user.comment || '-' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_permissions">Permissions</label>
+                    <p class="form-control-plaintext">
+                        <% @permissions.each do |permission| %>
+                            <span class="badge badge-primary badge-pill"><%= permission %></span>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <% if has_permission?('EXPORT_USER_ROLE_PERMISSION') %>
+                <form id="user-export-form" method="post" action="<%= bulk_action_internal_user_setups_path %>">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+                    <input type="hidden" name="ids[]" value="<%= @user.id %>">
+                </form>
+                <%=raw index_table_bulk_submit_button(label: "<i class=\"fa fa-plus\"></i> Export", title: "Export", value: "export", form: "user-export-form", formtarget: "_blank") %>
+            <% end %>
+            <%=raw show_back_button(internal_user_setups_path) %>
+            <% if has_permission?('EDIT_USER') %>
+                <%=raw show_edit_button(edit_internal_user_setup_path(@user)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("RESEND_CONFIRMATION_INSTRUCTION_USER") && @user.pending_reconfirmation? %>
+                <li class="list-group-item">
+                    <%= link_to "Resend Confirmation Instruction", resend_confirmation_internal_user_setup_path(@user) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

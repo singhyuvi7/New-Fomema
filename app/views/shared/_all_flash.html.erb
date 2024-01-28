@@ -1,0 +1,72 @@
+<%#= render "/shared/all_flash" %>
+
+<% if flash[:alert] %>
+    <div class="alert alert-danger alert-dismissible font-size-8 fade show" role="alert">
+        <%= flash[:alert].html_safe %>
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+<% end %>
+
+<% if flash[:error] %>
+    <div class="alert alert-danger alert-dismissible font-size-8 fade show" role="alert">
+        <%= flash[:error].html_safe %>
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+<% end %>
+
+<% if flash[:errors] %>
+    <% flash[:errors].each do |error| %>
+        <div class="alert alert-danger alert-dismissible font-size-8 fade show" role="alert">
+            <%= error.html_safe %>
+            <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+    <% end %>
+<% end %>
+
+<% if flash[:warning] %>
+    <div class="alert alert-warning alert-dismissible font-size-8 fade show" role="alert">
+        <%= flash[:warning].html_safe %>
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+<% end %>
+
+<% if flash[:warnings] %>
+    <% flash[:warnings].each do |warning| %>
+        <div class="alert alert-warning alert-dismissible font-size-8 fade show" role="alert">
+            <%= warning.html_safe %>
+            <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+    <% end %>
+<% end %>
+
+<% if flash[:notice] %>
+    <div class="alert alert-primary alert-dismissible font-size-8 fade show" role="alert">
+        <%= flash[:notice].html_safe %>
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+<% end %>
+
+<% if flash[:notices] %>
+    <% flash[:notices].each do |notice| %>
+        <div class="alert alert-primary alert-dismissible font-size-8 fade show" role="alert">
+            <%= notice.html_safe %>
+            <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+    <% end %>
+<% end %>
+
+<% if flash[:info] %>
+    <div class="alert alert-primary alert-dismissible font-size-8 fade show" role="alert">
+        <%= flash[:info].html_safe %>
+        <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+<% end %>
+
+<% if flash[:infos] %>
+    <% flash[:infos].each do |notice| %>
+        <div class="alert alert-primary alert-dismissible font-size-8 fade show" role="alert">
+            <%= notice.html_safe %>
+            <button class="close" type="button" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+    <% end %>
+<% end %>

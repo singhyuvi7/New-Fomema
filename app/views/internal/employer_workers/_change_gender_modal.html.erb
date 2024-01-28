@@ -1,0 +1,30 @@
+
+<form action="<%= change_gender_internal_employer_employer_workers_path(@employer, @foreign_worker) %>" method="post" id="change_gender_form" class="with-parsley">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+
+    <input name='_method' type='hidden' value='patch' />
+    <input name='foreign_worker[gender]' type='hidden' value="<%= @foreign_worker.gender == 'M' ? 'F' : 'M' %>">
+    <div class="modal fade" id="genderChangeModal" tabindex="-1" role="dialog" aria-labelledby="genderChangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="genderChangeModalLabel">Change Gender</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        You are about to change the gender for this foreign worker.<br>
+                        Any unsaved data will be lost.<br>
+                       Click "<b>OK</b>" to continue else click "<b>Cancel</b>"
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <%= button_tag 'OK', type: 'submit', class: 'btn btn-primary', data: { disable_with: "Submiting..."} %>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

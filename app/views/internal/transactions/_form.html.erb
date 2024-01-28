@@ -1,0 +1,67 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, class: '' %>
+                <p class="form-control-plaintext">
+                    <%= @transaction.try(:code) %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :employer_id) %>
+                <%= form.label :employer, class: 'required' %>
+                <%= form.select :employer_id, options_from_collection_for_select(Employer.where(id: form.object.employer_id).order(:name).all, 'id', 'name', form.object.employer_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div> 
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :foreign_worker_id) %>
+                <%= form.label :foreign_worker, class: 'required' %>
+                <%= form.select :foreign_worker_id, options_from_collection_for_select(ForeignWorker.where(employer_id: form.object.employer_id).order(:name).all, 'id', 'name', form.object.foreign_worker_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <% field_id = generate_field_id(form, :doctor_id) %>
+                <%= form.label :doctor, class: 'required' %>
+                <%= form.select :doctor_id, options_from_collection_for_select(Doctor.order(:name).all, 'id', 'name', form.object.doctor_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2', data: { parsley_errors_container: "#select2_parsley_error__#{ field_id }", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-#{ field_id }-container\"]", parsley_group: field_id } %>
+                <div id="select2_parsley_error__<%= field_id %>"></div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :xray_film_type, "X-Ray Film Type" %>
+                <%= form.select :xray_film_type, options_for_select(Transaction::XRAY_FILM_TYPES.invert,form.object.xray_film_type), {include_blank: form_select_option_text}, class: 'form-control' %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_transactions_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>

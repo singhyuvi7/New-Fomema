@@ -1,0 +1,111 @@
+<pdfbody>
+    <table class="w-100 letter-header-underline" style="padding-bottom: 10px;">
+        <tr>
+            <td rowspan="5" valign="top" style="width: 120px;"><%= wicked_pdf_image_tag "logo/logojim1.png", style: "height: 70px;" %></td>
+
+            <td rowspan="5" valign="top">
+                JABATAN IMIGRESEN MALAYSIA<br>
+                (KEMENTERIAN DALAM NEGERI)<br>
+                NO 15, TINGKAT 1-7 (PODIUM)<br>
+                PERSIARAN PERDANA, PRESINT 2<br>
+                62550 PUTRAJAYA<br>
+                WILAYAH PERSEKUTUAN
+            </td>
+
+            <td colspan="2" style="text-align: center;"><%= wicked_pdf_image_tag "logo/logojim2.png", style: "height: 65px; padding-bottom: 5px;" %></td>
+        </tr>
+
+        <tr style="font-size: 0.9em;">
+            <td style="width: 5.4em;">Telefon</td>
+            <td style="width: 7.5em;">: 603-8000 8000</td>
+        </tr>
+
+        <tr style="font-size: 0.8em;">
+            <td></td>
+            <td>&nbsp;&nbsp;(1MOCC)</td>
+        </tr>
+
+        <tr style="font-size: 0.8em;">
+            <td>Faks</td>
+            <td>: 603-8880 1200</td>
+        </tr>
+
+        <tr style="font-size: 0.8em;">
+            <td>Portal Rasmi</td>
+            <td>: www.imi.gov.my</td>
+        </tr>
+    </table>
+
+    <p><b>"KEDAULATAN DAN KESELAMATAN NEGARA TANGGUNGJAWAB BERSAMA"</b></p>
+
+    <table class="w-100">
+        <tr>
+            <td style="width: 100%;"></td>
+            <td>Ruj kami:</td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>Tarikh:<%= @data[:slip_date] %></td>
+        </tr>
+
+        <% @data[:employer_address].each do |address| %>
+            <tr>
+                <td><%= address %></td>
+                <td></td>
+            </tr>
+        <% end %>
+    </table>
+
+    <p class="paragraph-spacing">Tuan/Puan,</p>
+    <p class="paragraph-spacing"><b style="border-bottom: 1px solid black;">NOTIS PENGHANTARAN PULANG KE NEGARA ASAL UNTUK PEKERJA ASING DIDAPATI TIDAK SESUAI SELEPAS PEMERIKSAAN KESIHATAN FOMEMA</b></p>
+    <p class="paragraph-spacing"><b><%= @data[:worker_name] %> / <%= @data[:worker_gender] %> / <%= @data[:worker_country] %> / PPT NO: <%= @data[:worker_passport] %></b></p>
+    <p class="paragraph-spacing text-justify">Dengan hormatnya saya merujuk kepada perkara di atas.</p>
+    <p class="paragraph-spacing text-justify">2. Dimaklumkan bahawa keputusan pemeriksaan kesihatan (FOMEMA) bagi pekerja asing tersebut didapati <b>"TIDAK SESUAI"</b> untuk bekerja di Malaysia. Sehubungan itu, pihak tuan/puan adalah diminta untuk membuat persiapan dengan kadar segera serta mengemukakan tiket kapal terbang/feri untuk tindakan pengeluaran Memo Periksa Keluar (COM) di mana-mana Pejabat Imigresen terdekat bagi tujuan penghantaran pulang secara teratur.</p>
+    <p class="paragraph-spacing text-justify">3. Kegagalan pihak tuan/puan melaksanakan tindakan ini merupakan satu kesalahan yang boleh didakwa di bawah Seksyen 56(1)(d) Akta Imigresen 1959/63, dan sekiranya sabit kesalahan boleh dikenakan denda tidak kurang RM10,000 <b>(SEPULUH RIBU RINGGIT)</b> dan tidak lebih RM50,000 <b>(LIMA PULUH RIBU RINGGIT)</b> bagi setiap seorang yang diambil bekerja.</p>
+    <p class="paragraph-spacing text-justify">4. Kerjasama dan keprihatinan pihak tuan/puan dalam perkara ini amat dihargai.</p>
+    <p class="paragraph-spacing text-justify">Sekian, terima kasih.</p><br>
+    <p style="font-size: 1.1em;"><b>"BERKHIDMAT UNTUK NEGARA"<br>"INTEGRITI PROFESIONAL MESRA"</b></p>
+
+    <p class="paragraph-spacing">Saya yang menjalankan amanah,</p>
+
+    <p class="paragraph-spacing">
+        Ketua Pengarah Imigresen<br>
+        Jabatan Imigresen Malaysia<br>
+        Putrajaya.
+    </p>
+
+    <p class="paragraph-spacing">
+        s.k.:<br>
+        Pengarah Bahagian Operasi, Siasatan Dan Pendakwaan<br>
+        Jabatan Imigresen Malaysia
+    </p>
+
+    <p class="paragraph-double-spacing" style="font-size: 1.1em; text-align: center;"><b>***This letter is computer generated. No signature is required.***</b></p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 14px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

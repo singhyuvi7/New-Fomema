@@ -1,0 +1,71 @@
+ <% if current_user.userable_type == "Employer" %>  
+<div class="form-group row">
+    <label class="col-md-2 col-form-label">State</label>
+
+    <div class="col-md-4">
+        <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, 'id', 'name'), include_blank: form_select_option_text, class: "form-control  ajax-input" %>
+    </div>
+
+    <label class="col-md-2 col-form-label">Town</label>
+
+    <div class="col-md-4">
+        <%= select_tag :town_id, options_from_collection_for_select(Town.order(:name).all, 'id', 'name'), include_blank: form_select_option_text, class: "form-control  ajax-input" %>
+    </div>
+
+</div>
+
+<% else %>
+
+<div class="form-group row">
+    <label class="col-md-2 col-form-label">State</label>
+
+    <div class="col-md-4">
+        <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, 'id', 'name'), include_blank: form_select_option_text, class: "form-control select2 ajax-input" %>
+    </div>
+
+    <label class="col-md-2 col-form-label">Town</label>
+
+    <div class="col-md-4">
+        <%= select_tag :town_id, options_from_collection_for_select(Town.order(:name).all, 'id', 'name'), include_blank: form_select_option_text, class: "form-control select2 ajax-input" %>
+    </div>
+
+</div>
+
+<div class="form-group row">
+    <label class="col-md-2 col-form-label">Postcode</label>
+
+    <div class="col-md-4">
+        <%= text_field_tag :postcode, "", placeholder: "Postcode", class: "form-control ajax-input" %>
+    </div>
+</div>
+
+<% end %>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    // when change state, ajax fetch towns
+
+    $('#state_id').change(function () {
+        
+        // empty town and postcode
+
+        $('#town_id').html('<option value><%= form_select_option_text %></option>');
+        $('#postcode').val('');
+
+        if (this.value) {
+            
+            $.ajax({
+                url: '/states/' + this.value + '/towns.json',
+                method: "GET",
+            }).done(function (data) {
+                $.each(data, function (idx, town) {
+                    $('#town_id').append('<option value="' + town.id + '" data-postcode_id="' + town.postcode_id + '" data-postcode_code="' + town.postcode_code + '">' + town.name + '</option>');
+                });
+            });
+        }
+        
+    });
+
+</script>
+<% end %>

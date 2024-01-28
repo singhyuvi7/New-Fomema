@@ -1,0 +1,32 @@
+<%= notice %>
+<% item = @draft.items.first %>
+<div class="card">
+  <div class="card-body">
+    <div class="row margin-top-10">
+    <% item.params.each do |key, value| %>
+        <div class="col-3">
+          <strong><%= key %></strong>
+        </div>
+        <div class="col-9"><%= value %></div>
+    <% end %>
+    <div class="col-3">
+      <strong>Documents:</strong>
+    </div>
+    <% item.documents.each do |document| %>
+      <%= link_to document.url, target: "_blank" do %>
+        <%= document.file.filename %>
+      <% end %>
+    <% end %>
+    </div>
+  </div>
+
+  <div class="card-footer">
+
+    <div class="text-right">
+      <%= link_to 'Submit', internal_draft_submit_for_approval_path(@draft), class: 'btn btn-sm btn-primary' %>
+      <%= link_to 'Back', internal_drafts_path, class: 'btn btn-sm btn-secondary' %>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,92 @@
+<div class="card">
+    <div class="card-header"><%= current_user.userable_type.titleize %> Reported Cases</div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+
+        <%= form_tag view_external_reported_cases_path, method: :get, target: :_blank, class: "disable-enter-keypress" do %>
+            <div class="form-group row">
+                <label for="list_of_facilities" class="col-sm-2 col-form-label text-right"><%= current_user.userable_type == "Radiologist" ? "X-Ray Facility" : "Radiologist" %></label>
+
+                <div class="col-sm-10">
+                    <%= select_tag :list_of_facilities, options_for_select(@dropdown_list, params[:list_of_facilities]), include_blank: form_select_option_text, class: 'form-control w-em-40' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-right">Report Type</label>
+                <%= hidden_field_tag :report_type, params[:report_type] %>
+
+                <div class="col-sm-10">
+                    <div class="d-flex">
+                        <% ["summary", "detailed"].each do |option| %>
+                            <div class="report-type-selectable btn font-weight-bold w-em-12 rounded-0 <%= option == params[:report_type] ? "btn-primary" : "border-secondary" %>" data-value="<%= option %>"><%= option.titleize %></div>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-right">Period</label>
+                <%= hidden_field_tag :selectable_period, params[:selectable_period] %>
+
+                <div class="col-sm-10">
+                    <div class="d-flex">
+                        <% ["previous day", "previous months"].each do |option| %>
+                            <div class="period-selectable btn font-weight-bold w-em-12 rounded-0 <%= option == params[:selectable_period] ? "btn-primary" : "border-secondary" %>" data-value="<%= option %>"><%= option.titleize %></div>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row" id="toggleable-months-row" style="<%= "display: none;" if params[:selectable_period] != "previous months" %>">
+                <label class="col-sm-2 col-form-label text-right">Month</label>
+                <%= hidden_field_tag :selectable_month, params[:selectable_month] %>
+
+                <div class="col-sm-10">
+                    <%= select_tag :selectable_month, options_for_select(@month_list, params[:list_of_facilities]), include_blank: form_select_option_text, class: 'form-control w-em-20' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10 offset-sm-2">
+                    <%= submit_tag "View Report", class: "btn btn-success font-weight-bold" %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.period-selectable').click(function(event) {
+            $('.period-selectable').removeClass('btn-primary').addClass('border-secondary');
+            $(this).addClass('btn-primary').removeClass('border-secondary');
+            var value = $(this).attr('data-value');
+            $('#selectable_period').val(value);
+
+            if (value == 'previous months') {
+                $('#toggleable-months-row').show();
+            } else {
+                $('#toggleable-months-row').hide();
+            }
+        });
+
+        $('.report-type-selectable').click(function(event) {
+            $('.report-type-selectable').removeClass('btn-primary').addClass('border-secondary');
+            $(this).addClass('btn-primary').removeClass('border-secondary');
+            var value = $(this).attr('data-value');
+            $('#report_type').val(value);
+        });
+
+        $('input[type="submit"]').click(function() {
+            var button = $(this);
+
+            setTimeout(function() {
+                button.removeAttr('disabled');
+                console.log('wowow');
+            }, 2000);
+        });
+    </script>
+<% end %>

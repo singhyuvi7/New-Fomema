@@ -1,0 +1,28 @@
+.card
+  .card-header
+    %strong Search
+  = form_tag filter_link, method: 'get' do
+    .card-body
+      .row
+        .col-md-6
+          .form-group.row
+            %label.col-sm-3.col-form-label{:for => "register_date"} Register Date
+            .col-sm-9
+              .d-flex.align-items-center
+                = text_field_tag "register_date_start", params["register_date_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'register_date' }, max: Date.today.strftime("%F")
+                %span.mx-3 to
+                = text_field_tag "register_date_end", params["register_date_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'register_date' }, max: Date.today.strftime("%F")
+        .col-md-6
+          .form-group.row
+            = label_tag :status, nil, class: ['col-sm-3', 'col-form-label']
+            .col-sm-9
+              = select_tag :status, options_for_select(Laboratory::STATUS_LIST.transform_keys { |key| key.to_s.humanize }, params[:status]), include_blank: 'All',  class: 'form-control'
+    .card-footer
+      .text-right
+        = raw filter_clear_button filter_link
+        = link_to '<i class="fa fa-download" aria-hidden="true"></i> Download'.html_safe, filter_link, class: "btn btn-sm btn-secondary with-pdf-format", :target => "_blank"
+- content_for :page_end_scripts do
+  :javascript
+    $('.with-pdf-format').click(function(e) {
+        $(this).attr("href", this.href + ".pdf?" + $(this).closest('form').serialize());
+    });

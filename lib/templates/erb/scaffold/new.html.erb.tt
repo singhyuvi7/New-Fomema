@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong><%= plural_table_name.titleize %></strong> - New <%= singular_table_name.titleize %>
+    </div>
+    <%%= form_for @<%= singular_table_name %>, url: internal_<%= plural_route_name %>_path do |form| %>
+        <%%= render 'form', { form: form } %>
+    <%% end %>
+</div>

@@ -1,0 +1,91 @@
+    function validateFiles(inputFile) {
+        var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+        var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+        var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+        var extName;
+        var maxFileSize = <%= 10.megabytes %>;
+        var sizeExceeded = false;
+        var extError = false;
+
+        var total_uploaded_size = getTotalUploadedSize();
+
+        var file = inputFile.files[0];
+
+        var file_size = file.size;
+
+        // check if single file exceed max file size
+
+        if (file_size && maxFileSize && file_size > parseInt(maxFileSize)) {
+            sizeExceeded = true;
+        };
+
+        // check if combine with previous file will exceed max file size
+
+        var combine_size = (file_size + total_uploaded_size) - file_size;
+
+        if (combine_size > parseInt(maxFileSize)) {
+            sizeExceeded = true;
+        };
+
+        extName = file.name.split('.').pop().toLowerCase();
+
+        if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+
+        if (sizeExceeded) {
+            window.alert(maxExceededMessage);
+            $(inputFile).val('');
+        }
+
+        if (extError) {
+            window.alert(extErrorMessage);
+            $(inputFile).val('');
+        }
+
+        // set inline size
+
+        var file_size_label = getUploadSizeLabel(file_size);
+
+        $(inputFile).closest('div').next().find('.inline-file-size').val(file_size_label);
+
+        // set label
+
+        setTotalUploadLabel();
+    }
+
+    function getTotalUploadedSize() {
+
+        var total_uploaded_size = 0;
+
+        $('.custom-file-input').each(function (index, obj) {
+
+            if (obj.files.length > 0) {
+                total_uploaded_size = total_uploaded_size + parseFloat(obj.files[0].size);
+            }
+
+        });
+
+        return total_uploaded_size;
+    }
+
+    function setTotalUploadLabel() {
+
+        var total_uploaded_size = getTotalUploadedSize();
+
+        var total_uploaded_label = getUploadSizeLabel(total_uploaded_size);
+
+        $("#total_uploaded_label").text(total_uploaded_label);
+    }
+
+    function getUploadSizeLabel(upload_size) {
+
+        var total_mb = upload_size / 1000000;
+
+        total_mb = total_mb.toFixed(2);
+
+        var upload_size_label = total_mb + ' MB';
+
+        return upload_size_label;
+    }
+
+    

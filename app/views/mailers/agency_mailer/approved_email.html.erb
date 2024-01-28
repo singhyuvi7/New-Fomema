@@ -1,0 +1,32 @@
+<p>
+    <b>Dear <%= @name %></b>, <br>
+    <b><i>Tuan/ Puan <%= @name %></i></b>,
+</p>
+<p>Thank you for registering with FOMEMA Sdn. Bhd.</p>
+<p>Your registration has been approved and your agency code is <%= @agency.code %>. To activate your account,
+<br>please click on the link below or copy and paste the link into your web browser. 
+<br>Once your account is activated, please proceed to make payment.</p>
+<p>Kindly sign the attached ‘Agreement Letter’ and post to the following address. A copy 
+<br>of the stamped agreement letter will be posted to you.</p>
+<p>The stamping agreement process will be taken place once your registration payment is successful.</p>
+<p><i>Terima kasih kerana mendaftar dengan FOMEMA Sdn. Bhd.</i></p> 
+<p><i>Permohonan anda telah berjaya dan Kod Agensi adalah <%= @agency.code %>. Untuk membuat pembayaran, 
+<br>sila klik pautan di bawah atau salin dan tampal semula paparan ke dalam pelayar web anda.
+<br> Setelah akaun anda diaktifkan, sila melakukan pembayaran.</i></p>
+<p><i>Sila tandatangani ‘Surat Perjanjian’ yang telah dilampirkan dan hantarkan ke alamat yang berikut.
+<br>Salinan surat perjanjian yang disahkan akan dihantarkan semula melalui pos kepada anda.</i></p>
+<p><i>Proses pengesahan perjanjian akan dilakukan setelah pembayaran pendaftaran anda berjaya.</i>
+<p>FOMEMA SDN BHD<br>Support Service Department<br>Lot 49 & 51,<br>Jalan Kampung Pandan<br>55100 Kuala Lumpur</p>
+<p>
+    <%= @activation_link %>
+</p>
+
+<p>
+    Thank you.<br> 
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

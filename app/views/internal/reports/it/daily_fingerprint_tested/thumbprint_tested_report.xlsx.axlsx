@@ -1,0 +1,25 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+    title_style = s.add_style :alignment => { :horizontal=> :center, :vertical=> :center}, :border=>Axlsx::STYLE_THIN_BORDER, :bg_color => "63c2de"
+    data_style = s.add_style :border=>Axlsx::STYLE_THIN_BORDER, :alignment => { :horizontal=> :center, :vertical=> :center}
+    wb.add_worksheet(:name => "Custom Styles") do |sheet|
+
+        sheet.add_row [@sp,"","","","","","","","",""]
+        sheet.add_row ["DATE","SUCCESS","%","BELOW THRESHOLD","%","NOT MATCHING","%","OTHERS","%","TOTAL"], :style => title_style
+
+       @response_by_dates.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+
+        sheet.add_row []
+
+        sheet.add_row ["Based on state","","","","","","","","",""]
+        sheet.add_row ["STATE","SUCCESS","%","BELOW THRESHOLD","%","NOT MATCHING","%","OTHERS","%","TOTAL"], :style => title_style
+
+       @response_by_states.each do |response|
+            sheet.add_row response, :style => data_style
+        end
+
+    end
+end

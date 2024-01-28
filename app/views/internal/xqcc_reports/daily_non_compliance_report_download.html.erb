@@ -1,0 +1,124 @@
+<pdfbody>
+    <h4 style="font-size: 1.4em; margin-bottom: 0.5em;">Daily Non Compliance Report for the month <%= @start_date.strftime("%m-%Y") %></h4>
+
+    <table id="table-info" class="w-100">
+        <tr>
+            <th valign="top" style="width: 7em;">X-Ray Code</th>
+            <td valign="top" style="width: 1em;">:</td>
+            <td valign="top"><%= @user.code %></td>
+            <th valign="top" style="width: 7em;">X-Ray Name</th>
+            <td valign="top" style="width: 1em;">:</td>
+            <td valign="top"><%= @user.name %></td>
+            <th valign="top" style="width: 11em;">License Holder Name</th>
+            <td valign="top" style="width: 1em;">:</td>
+            <td valign="top"><%= @user.license_holder_name %></td>
+        </tr>
+
+        <tr>
+            <th valign="top" style="width: 7em;">Address</th>
+            <td valign="top" style="width: 1em;">:</td>
+            <td valign="top" colspan="5"><%= @user.displayed_address %></td>
+        </tr>
+    </table><br>
+
+    <table id="data-table" class="w-100">
+        <tr>
+            <th>Date</th>
+
+            <% @date_range.each do |day| %>
+                <th style="text-align: center;"><%= day %></th>
+            <% end %>
+
+            <th style="text-align: center;">Total</th>
+        </tr>
+
+        <% @data.each do |row| %>
+            <tr>
+                <% row.each_with_index do |datum, index| %>
+                    <td style="text-align: <%= index > 0 ? "center" : "left" %>;"><%= datum %></td>
+                <% end %>
+            </tr>
+        <% end %>
+    </table><br><br>
+
+    <table class="w-100 total-count-table" style="text-align: center; page-break-inside: avoid;">
+        <tr>
+            <% ["SOP Compliant Films", "Non SOP Compliant Films", "Total Reviews", "X-Ray Submissions"].each do |header| %>
+                <th><%= header %></th>
+            <% end %>
+        </tr>
+
+        <tr>
+            <% [:compliant, :non_compliant, :total_reviews, :submissions].each do |key| %>
+                <td><%= @totals[key] %></td>
+            <% end %>
+        </tr>
+    </table><br><br>
+
+    <table class="w-100 total-count-table" style="text-align: center; page-break-inside: avoid;">
+        <tr>
+            <% ["Taken by GP", "Taken by CR", "Reported by GP", "Reported by CR"].each do |header| %>
+                <th><%= header %></th>
+            <% end %>
+        </tr>
+
+        <tr>
+            <% ["taken_by_gp", "taken_by_cr", "reported_by_gp", "reported_by_cr"].each do |key| %>
+                <td><%= @taken_reported_by[key] || 0 %></td>
+            <% end %>
+        </tr>
+    </table><br><br>
+
+    <table class="w-100 total-count-table" style="text-align: center; page-break-inside: avoid;">
+        <tr>
+            <% @total_categories.each do |header| %>
+                <th><%= header %></th>
+            <% end %>
+        </tr>
+
+        <tr>
+            <% @total_categories.each do |header| %>
+                <td><%= @totals[header] %></td>
+            <% end %>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 13px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    #table-info {
+        text-align: left;
+    }
+
+    #table-info td,
+    #table-info th {
+        padding-bottom: 0.5em;
+    }
+
+    #data-table,
+    .total-count-table {
+        text-align: left;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    #data-table th,
+    #data-table td,
+    .total-count-table th,
+    .total-count-table td {
+        border: 1px solid black;
+        padding: 0.5em;
+    }
+
+    #data-table th:nth-child(5n + 1),
+    #data-table td:nth-child(5n + 1) {
+        border-right: 2px solid black;
+    }
+</style>

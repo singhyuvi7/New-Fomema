@@ -1,0 +1,38 @@
+<%=render partial: '/internal/employers/shared/employer' %>
+
+<form id="bulk-upload-form" method="post" action="<%= bulk_upload_preview_internal_employer_employer_workers_path %>" enctype="multipart/form-data">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+    <input type="hidden" name="page_layout" value="internal/employer_workers/bulk_upload" />
+
+    <div class="card">
+        <div class="card-header">
+            <strong>Employer Worker</strong> - Bulk Upload New Worker
+        </div>
+        <div class="card-body">
+            
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Upload foreign worker bulk file</label>
+                    <div class="col-md-5">
+                        <input type="file" name="csv_file" id="csv_file" required>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <div class="btn-group">
+                            <a href="<%= bulk_upload_template_internal_employer_employer_workers_path %>" target="_blank" class="btn btn-secondary">Download template</a>
+                            <a href="<%= bulk_upload_specification_internal_employer_employer_workers_path %>" target="_blank" class="btn btn-primary">Batch Upload Specification</a>
+                        </div>
+                    </div>
+                </div>
+            
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <a href="<%= internal_employer_employer_workers_path %>" class="btn btn-primary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Preview</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<%= render '/external/worker_lists/worker_upload_preview', { form_action_path: bulk_upload_internal_employer_employer_workers_path, redirect_path: internal_employer_employer_workers_path, cancel_path: internal_employer_employer_workers_path} %>

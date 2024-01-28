@@ -1,0 +1,150 @@
+<div class="modal fade" id="bank-draft-modal" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bank Draft</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bank-draft-form">
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label required">Number</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="number" id="number">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label required">Bank</label>
+                        <div class="col-md-8">
+                            <select class="form-control" name="bank_id" id="bank_id">
+                                <option value=""><%= form_select_option_text %></option>
+                            <%= options_from_collection_for_select(Bank.select("id, name || ' (' || code || ')' as label").all, 'id', 'label') %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label required">Issue Date</label>
+                        <div class="col-md-8">
+                            <input type="date" class="form-control" name="issue_date" id="issue_date" value="<%= DateTime.now.strftime("%F") %>">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label required">Issue Place</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="issue_place" id="issue_place">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 col-form-label required">Amount</label>
+                        <div class="col-md-8">
+                            <input type="number" class="form-control" name="amount" id="amount" step="0.01">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-secondary" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-sm btn-primary add-bank-draft" type="button">Add</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+
+$('.add-bank-draft').click(function () {
+    var hidtype = 'hidden';
+    var tr = document.createElement('tr');
+
+    if (!$('#number').val().length) {
+        alert("Number is required");
+        return;
+    }
+    var td = document.createElement('td');
+    td.innerHTML = $('#number').val();
+    var hid = document.createElement('input');
+    hid.setAttribute('type', hidtype);
+    hid.setAttribute('name', 'bank_draft[][number]');
+    hid.setAttribute('value', $('#number').val());
+    td.appendChild(hid);
+    tr.appendChild(td);
+
+    if (!$('#bank_id').val().length) {
+        alert("Bank is required");
+        return;
+    }
+    var td = document.createElement('td');
+    td.innerHTML = $('#bank_id>option:selected').html();
+    var hid = document.createElement('input');
+    hid.setAttribute('type', hidtype);
+    hid.setAttribute('name', 'bank_draft[][bank_id]');
+    hid.setAttribute('value', $('#bank_id').val());
+    td.appendChild(hid);
+    tr.appendChild(td);
+
+    if (!$('#issue_date').val().length) {
+        alert("Issue date is required");
+        return;
+    }
+    var td = document.createElement('td');
+    td.innerHTML = $('#issue_date').val();
+    var hid = document.createElement('input');
+    hid.setAttribute('type', hidtype);
+    hid.setAttribute('name', 'bank_draft[][issue_date]');
+    hid.setAttribute('value', $('#issue_date').val());
+    td.appendChild(hid);
+    tr.appendChild(td);
+
+    if (!$('#issue_place').val().length) {
+        alert("Issue place is required");
+        return;
+    }
+    var td = document.createElement('td');
+    td.innerHTML = $('#issue_place').val();
+    var hid = document.createElement('input');
+    hid.setAttribute('type', hidtype);
+    hid.setAttribute('name', 'bank_draft[][issue_place]');
+    hid.setAttribute('value', $('#issue_place').val());
+    td.appendChild(hid);
+    tr.appendChild(td);
+
+    if (!$('#amount').val().length) {
+        alert("Amount is required");
+        return;
+    }
+    var td = document.createElement('td');
+    td.innerHTML = $('#amount').val();
+    var hid = document.createElement('input');
+    hid.setAttribute('type', hidtype);
+    hid.setAttribute('name', 'bank_draft[][amount]');
+    hid.setAttribute('value', $('#amount').val());
+    td.appendChild(hid);
+    tr.appendChild(td);
+
+    var td = document.createElement('td');
+    td.innerHTML = '<button class="btn btn-sm btn-danger" onclick="remove_bank_draft(this)" type="button">Remove</button></td>';
+    tr.appendChild(td);
+
+    // $('#bank_id>option:selected')[0]
+
+    /* var html = '<tr><td><input type="text" name="bank_draft[][number]" class="form-control" required></td>'
+    + '<td><select name="bank_draft[][bank_id]" class="form-control"></select></td>'
+    + '<td><input name="bank_draft[][issue_date]" type="date" value="<%= DateTime.now.strftime('%Y-%m-%d') %>" class="form-control" required></input></td>'
+    + '<td><input name="bank_draft[][issue_place]" type="text" value="" class="form-control" required></input></td>'
+    + '<td><input name="bank_draft[][amount]" type="number" value="" step="0.01" class="form-control" required></input></td>'
+    + '<td>'
+    + '</tr>'; */
+    $('tbody.bank-draft-container').append(tr);
+    $('#bank-draft-form').trigger('reset');
+
+    sum_bank_draft();
+
+    $('#bank-draft-modal').modal('toggle');
+});
+</script>
+<% end %>

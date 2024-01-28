@@ -1,0 +1,154 @@
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent text-dark">
+     <strong>Change Employer</strong> - Details
+    </div>
+    <!-- /card-header -->
+
+    <!-- card-body -->
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Requested Date</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.requested_at.try(:strftime, get_standard_date_format) %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Worker Name</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.fw_name %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Passport Number</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.fw_passport_number %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Country</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.fw_country.name %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Date of Birth</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.fw_date_of_birth&.strftime(get_standard_date_format) %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Gender</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.fw_gender_name %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">New Employer Code</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.new_employer.code %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">New Employer Name</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.new_employer.name %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Approval Status</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= FwChangeEmployer::STATUSES[@fw_change_employer.status] %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Approval Comment</label>
+                    <div class="col-sm-9">
+                        <div class="form-control-plaintext"><%= @fw_change_employer.approval_comment %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="employer_uploads">Uploaded Documents</label>
+
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Category</th>
+                        <th>Documents</th>
+                        <th>Date Uploaded</th>
+                        <th>Uploaded By</th>
+                    </tr>
+
+                    <% @fw_change_employer.foreign_worker.uploads.each do |upload| %>
+                        <% if upload.created_by == current_user.id %>
+                            <tr>
+                                <td class="filenames"><%= ForeignWorker::DOCUMENT_TYPES_CHANGE_EMPLOYER[upload.category] %></td>
+                                <td class="filenames">
+                                    <% upload.documents.each do |document| %>
+                                        <div><%= link_to document.filename, rails_blob_url(document), target: "_blank" %></div>
+                                    <% end %>
+                                </td>
+                                <td class="filenames"><%= upload.updated_at.try(:strftime, get_standard_datetime_format) %></td>
+                                <td class="filenames" width="25%"><%= "#{upload.creator&.name } (#{upload.creator&.code})" if !upload.creator.blank? %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+
+                    <% if @fw_change_employer.foreign_worker.uploads.blank? %>
+                        <tr><td colspan="4">There are no uploaded documents</td></tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="text-right">
+
+                <a class="btn btn-blue-portal" href="<%= external_fw_change_employers_path %>">Back</a>
+
+        </div>
+    </div>
+    <!-- /card-body -->
+
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

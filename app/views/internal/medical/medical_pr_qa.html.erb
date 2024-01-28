@@ -1,0 +1,219 @@
+<div class="card">
+    <div class="card-header"><strong>Transactions #<%= @transaction.code %></strong> - Medical Review</div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                medical: "Medical History",
+                physical: "Physical Examination",
+                system: "System Exam",
+                laboratory: "Laboratory",
+                xray: "X-ray",
+                certification: "Certification"
+            }
+
+            category_parent_tabs.merge!(xqcc_pcr: "XQCC") if @pcr_comments.present? || @xray_pending_decisions.present?
+            category_parent_tabs.merge!(review_decision: "Medical PR")
+            category_parent_tabs.merge!(medical_pr_qa_status: "Medical PR QA")
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",        parent: "information",      title: "Worker Information"},
+                {type: "category_1",    parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",    parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",      parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",      parent: "system",           title: "System Exam 1"},
+                {type: "system_2",      parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",    parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",          parent: "xray",             title: "X-ray"},
+                {type: "condition",     parent: "certification",    title: "Condition"},
+                {type: "certification", parent: "certification",    title: "Certification"},
+                {type: "follow_up",     parent: "certification",    title: "Follow Up"},
+                {type: "decision",      parent: "review_decision",  title: "Review Decision"},
+                {type: "medical_pr_qa", parent: "medical_pr_qa_status",  title: "Review QA Decision"}
+            ]
+
+            category_tabs += [{type: "unsuitable_reasons",  parent: "certification",    title: "Unsuitable Reasons"}]   if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS")
+            category_tabs += [{type: "pcr_comments",        parent: "xqcc_pcr",         title: "PCR Comments"}]         if @pcr_comments.present?
+            category_tabs += [{type: "xqcc_p_decision",     parent: "xqcc_pcr",         title: "Pending Decision"}]     if @xray_pending_decisions.present?
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 0}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= nested_form_for @transaction, url: @qa_review ? medical_mle_qa_status_internal_medical_path(@transaction) : medical_mle_qa_status_internal_medical_path(@transaction), method: :post, html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <% doctor_examination = @transaction.medical_examination %>
+        <%= render partial: "internal/medical/worker_information", locals: { transaction: @transaction } %>
+        <%= render "/shared/transactions_tab_params" %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+
+        <div class="category-switchable hidden" data-type="laboratory">
+            <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="condition">
+            <%= render partial: "external/transactions/doctor_examinations/certification_condition_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination, readonly: @readonly } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="certification">
+            <%= render partial: "external/transactions/doctor_examinations/certification_certification_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination, readonly: true, comment_exception: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="follow_up">
+            <%= render partial: "external/transactions/doctor_examinations/certification_follow_up_form", locals: { namespacing: "de_attributes", doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="decision">
+            <%= form.fields_for :latest_medical_review do |review_form| %>
+                <%= render partial: "review_decision_approval", locals: {form: review_form, doctor_examination: doctor_examination, readonly: true } %>
+            <% end %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="medical_pr_qa">
+            <%= form.fields_for :latest_medical_review do |review_form| %>
+                <% if @qa_review %>
+                    <%= render partial: "pending_review_qa", locals: {form: review_form, doctor_examination: doctor_examination} %>
+                    <div class="text-right py-2 px-4">
+                        <div id="transaction-history-list-btn" class="btn btn-success btn-sm">History</div>
+                        <%= form.submit "Transmit", class: "btn btn-primary btn-sm", value: "Transmit", id: "save-and-transmit-submit" %>
+                    </div>
+                <% else %>
+                    <%= render partial: "review_qa", locals: {form: review_form, doctor_examination: doctor_examination} %>
+                <% end %>
+            <% end %>
+        </div>
+
+        <% if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS") %>
+            <div class="category-switchable hidden" data-type="unsuitable_reasons">
+                <%= render partial: "internal/transactions/shared/unsuitable_reasons_tab", locals: { readonly: !has_permission?("EDIT_UNSUITABLE_REASONS_FOR_TRANSACTION") , hide_save_button: true } %>
+            </div>
+        <% end %>
+
+        <% if @pcr_comments.present? %>
+            <div class="category-switchable hidden" data-type="pcr_comments">
+                <%= render partial: "internal/transactions/pcr_comments" %>
+            </div>
+        <% end %>
+
+        <% if @xray_pending_decisions.present? %>
+            <div class="category-switchable hidden" data-type="xqcc_p_decision">
+                <%= render partial: "internal/transactions/pending_decision" %>
+            </div>
+        <% end %>
+
+        <div class="card-footer text-right">
+            <%= raw show_back_button(internal_transactions_path(review_status: "pending_pr_qa")) %>
+        </div>
+    <% end %>
+</div>
+
+<div id="dialog-review-decision-fill" class="hidden" title="Review decision needed">
+    <p>Please specify your review decision.</p>
+</div>
+
+<div id="dialog-justification-fill" class="hidden" title="Justification needed">
+    <p>Please include the justification for your review decision.</p>
+</div>
+
+<div id="dialog-unsuitable-conditions" class="hidden" title="Please select a condition">
+    <p>You will need to select at least one condition if the review decision is <b>Unsuitable</b>.</p>
+</div>
+
+
+<%= render partial: "/internal/medical/transaction_history_list_modal", locals: { transactions: @transactions_list } %>
+
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            initializeToggleableFields('doctor examination');
+            loadParentCategoryTabSelection();
+            loadCategoryTabSelection();
+
+            $('#save-and-transmit-submit').click(function(e) {
+                qa_status      = $('#transaction_latest_medical_review_attributes_qa_status').val();
+                qa_comment_box    = $('#transaction_latest_medical_review_attributes_qa_comment');
+                decision      = $('#transaction_latest_medical_review_attributes_qa_decision').val();
+
+                conditionsCheck     = $('.condition-check').map(function() {
+                    return $(this).val();
+                 }).get().includes('true');
+
+                if (!qa_status) {
+                    openDialogAndPreventSubmit('#dialog-review-decision-fill', e);
+                    statusField = $('#transaction_latest_medical_review_attributes_qa_status').closest('.boolean-field-parent');
+
+                    $('#dialog-review-decision-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="medical_pr_qa"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(statusField, 500);
+                        highlightElement(statusField, '#facf7f', 'slow');
+                        delayedHighlightField(statusField, '#fff', 'slow', 5000);
+                    });
+
+                }else if (qa_status === 'INACCURATE' && !decision) {
+                    openDialogAndPreventSubmit('#dialog-review-decision-fill', e);
+                    decisionField = $('#transaction_latest_medical_review_attributes_qa_decision').closest('.boolean-field-parent');
+
+                    $('#dialog-review-decision-fill').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="medical_pr_qa"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                        scrollToElement(decisionField, 500);
+                        highlightElement(decisionField, '#facf7f', 'slow');
+                        delayedHighlightField(decisionField, '#fff', 'slow', 5000);
+                    });
+
+                } else if (decision === 'UNSUITABLE' && !conditionsCheck) {
+                    openDialogAndPreventSubmit('#dialog-unsuitable-conditions', e);
+
+                    $('#dialog-unsuitable-conditions').on('dialogclose', function(event, ui) {
+                        tab = $('.category-tab[data-type="condition"]');
+                        $(`.category-parent-tab[data-type="${tab.attr('data-parent')}"]`).click();
+                        tab.click();
+                    });
+                } else if (!qa_comment_box.val().trim()) {
+                    field = qa_comment_box.closest('.boolean-field-parent');
+                    openDialogAndPreventSubmit('#dialog-justification-fill', e);
+
+                    $('#dialog-justification-fill').on('dialogclose', function(event, ui) {
+                        $(`.category-parent-tab[data-type="medical_pr_qa"]`).click();
+                        scrollToElement(field, 500);
+                        highlightElement(field, '#facf7f', 'slow');
+                        delayedHighlightField(field, '#fff', 'slow', 5000);
+                    });
+                }
+            });
+
+            $('.qa-bool-check').click(function() {
+                if ($(this).attr('data-type') === 'INACCURATE') {
+                    $('#inaccurate-checklist-container').show();
+                } else {
+                    $('#inaccurate-checklist-container').hide();
+                }
+            });
+
+        </script>
+    <% end %>
+
+
+<%= render "/shared/transactions_javascript_trigger" %>

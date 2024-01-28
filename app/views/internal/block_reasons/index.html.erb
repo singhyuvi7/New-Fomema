@@ -1,0 +1,70 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Block Reasons</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_BLOCK_REASON') %>
+                    <%=raw index_table_new_button(new_internal_block_reason_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Type</th>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @block_reasons.blank? %>
+                                <tr>
+                                    <td colspan="5" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                                <% @block_reasons.each.with_index((@block_reasons.current_page - 1) * get_per + 1) do |block_reason, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= block_reason.category %></td>
+                                        <td><%= block_reason.code %></td>
+                                        <td><%= block_reason.description %></td>
+                                        <td class="module-row-actions">
+                                            <%=raw index_table_show_button(internal_block_reason_path(block_reason)) %>
+                                            <% if has_permission?('EDIT_BLOCK_REASON') %>
+                                                <%=raw index_table_edit_button edit_internal_block_reason_path(block_reason) %>
+                                            <% end %>
+                                            <% if has_permission?('DELETE_BLOCK_REASON') %>
+                                                <%=raw index_table_delete_button(internal_block_reason_path(block_reason)) %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @block_reasons %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

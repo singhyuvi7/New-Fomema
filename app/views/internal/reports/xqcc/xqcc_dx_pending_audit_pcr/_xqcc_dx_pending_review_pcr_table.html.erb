@@ -1,0 +1,24 @@
+<div class="card-body">
+	<div class="w-100 pb-3" style="overflow-x: auto;">
+
+		<table id="preview-csv-table" class="table-borders w-100">
+			<thead>
+				<% @to_review_headers.each do |header| %>
+					<th><%= header %></th>
+				<% end %>
+			</thead>
+
+			<% if @pending_review_data.present? %>
+				<tbody>
+					<% @pending_review_data.each do |date, count| %>
+						<tr>
+							<td><%= date.strftime("%d-%^b-%y") %></td>
+							<td><%= count %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			<% end %>
+		</table>
+		
+	</div>
+</div>

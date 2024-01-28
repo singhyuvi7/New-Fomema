@@ -1,0 +1,33 @@
+<tr class="finding-row method-field">
+    <td class="table-index"></td>
+    <td class="row-name"></td>
+    <td colspan="3">
+        <div class="yes-no-checkbox">
+            <div class="acceptable">Yes</div>
+            <div class="not-acceptable">No</div>
+        </div>
+    </td>
+</tr>
+
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">In-house</td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:in_house] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:in_house] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>
+<% if finding[:in_house] == 'NO' %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Referred Laboratory Name :</span>
+                <span class="unbold"><%= finding.in_house_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

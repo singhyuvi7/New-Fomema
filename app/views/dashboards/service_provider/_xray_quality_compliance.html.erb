@@ -1,0 +1,68 @@
+<% if has_permission?('DASHBOARD_SP_XRAY_FACILITY') %>
+  <div id="xray-quality-compliance" style="width: 100%; height: 218px;">
+    Loading...
+  </div>
+
+
+  <script type="text/javascript">
+      // Declare a global variable for the container
+      var chartContainer;
+
+      function updateXrayCompliance(data) {
+          google.charts.load("current", {packages: ["corechart"]});
+          google.charts.setOnLoadCallback(function () {
+              createXrayCompliance(data);
+          });
+      }
+
+      function createXrayCompliance(data) {
+          var xrayQualityComplianceData = data.xray_compliance;
+          console.log('xrayQualityComplianceData',xrayQualityComplianceData)
+
+
+          if (xrayQualityComplianceData > 0) {
+
+              var data = google.visualization.arrayToDataTable([
+                  ['Task', 'Hours per Day'],
+                  [' ', xrayQualityComplianceData],
+                  ['', 0]
+              ]);
+
+              var options = {
+                  title: 'X-ray Facility Achieve Quality Compliance',
+                  pieHole: 0.4,
+                  legend: 'none',
+                  colors: ['#0e7dc1', '#99bed6'],
+              };
+
+              var chart = new google.visualization.PieChart(document.getElementById('xray-quality-compliance'));
+              chart.draw(data, options);
+          } else {
+              document.getElementById('xray-quality-compliance').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+          }
+      }
+
+
+
+      // Call the function on initial page load
+      document.addEventListener("DOMContentLoaded", function () {
+          // Set the global variable with the container
+          chartContainer = $('#xray-quality-compliance');
+
+          $.ajax({
+              url: '/dashboards/service_provider/xray_compliance',
+              method: 'GET',
+              dataType: 'json',
+              success: function (data) {
+                  // Once data is loaded, update the chart
+                  updateXrayCompliance(data);
+              },
+              error: function () {
+                  // Handle errors here
+                  console.error('Failed to fetch certification data.');
+              }
+          });
+      });
+  </script>
+
+<% end %>

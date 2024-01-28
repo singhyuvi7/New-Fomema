@@ -1,0 +1,83 @@
+<%
+    category_1_number   = '1.'
+
+    category_1_diseases = [
+        [:history_hiv, "HIV"],
+        [:history_tuberculosis, "TUBERCULOSIS"],
+        [:history_leprosy, "LEPROSY"],
+        [:history_viral_hepatitis, "VIRAL HEPATITIS B"],
+        [:history_psychiatric_illness, "PSYCHIATRIC ILLNESS"],
+        [:history_epilepsy, "EPILEPSY"],
+        [:history_cancer, "CANCER(e.g. Breast lump or mass on the body)"],
+        [:history_std, "SEXUALLY TRANSMITTED DISEASES"],
+        [:history_malaria, "MALARIA"]
+    ].map do |key, value|
+        date = @doctor_exam.try("#{ key }_date")
+
+        {
+            number: "",
+            name:   value,
+            yes:    @doctor_exam.try(key),
+            no:     !@doctor_exam.try(key),
+            date:   date.present? ? date.strftime("%d/%m/%Y") : "",
+        }
+    end
+%>
+
+<div class="medical-results-content medical-history">
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART II. MEDICAL HISTORY</b>
+    </div>
+
+    <table>
+        <thead>
+            <tr class="with-date">
+                <th class="text-left bold head-index"><%= category_1_number %></th>
+                <th class="text-left bold head-title underline">CATEGORY 1 DISEASES</th>
+                <th class="head-checkbox"></th>
+                <th class="head-checkbox"></th>
+                <th class="head-date"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="text-center bold">YES</td>
+                <td class="text-center bold">NO</td>
+                <td class="text-center bold">DATE (DD/MM/YYYY)</td>
+            </tr>
+
+            <% category_1_diseases.each.with_index(1) do |disease, index| %>
+                <tr>
+                    <td><%= disease[:number].present? ? disease[:number] : "#{ category_1_number + index.to_s }" %></td>
+                    <td><%= disease[:name] %></td>
+                    <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+                    <td class="text-center"><%= disease[:date] %></td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+
+    <table class="note-table bold">
+        <thead>
+            <tr>
+                <th class="text-left head-index"></th>
+                <th class="text-left head-note">Note:</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td>
+                    <ul class="note-list">
+                        <li>Foreign worker with a medical history of the above diseases/conditions is deemed to be unsuitable<br>for employment in Malaysia</li>
+                        <li>However, foreign worker who gives a medical history of HIV, Hepatitis B, Sexually Transmitted Diseases<br>or Malaria but does not show any clinical evidence of the above and the blood test results are negative,<br>the foreign worker is deemed to be suitable for employment in Malaysia.</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

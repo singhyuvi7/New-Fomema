@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "MERTS_TRANSMISSION_EXPIRY_DAYS" %>"><%= raw @system_configurations["MERTS_TRANSMISSION_EXPIRY_DAYS"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "MERTS_TRANSMISSION_EXPIRY_DAYS", @system_configurations["MERTS_TRANSMISSION_EXPIRY_DAYS"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["MERTS_TRANSMISSION_EXPIRY_DAYS"].value %></p>
+</div>

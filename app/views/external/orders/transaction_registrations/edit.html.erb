@@ -1,0 +1,154 @@
+<%= render '/shared/all_flash' %>
+
+<div class="card">
+    <!-- card-header -->
+    <div class="card-header border-0 bg-transparent">
+        <b>Payment</b> - <%= @order.code %>
+    </div>
+    <!-- /card-header -->
+
+    <%= form_for @order, url: external_order_path(@order) do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render "external/orders/shared/order_detail", {order: @order, form: form} %>
+
+            <p class="plks-optional-message">
+                Please review your worker list before submission. Workers highlighted in blue indicates that medical examination is optional for upcoming period. Your may choose to go ahead and register these workers for a medical or remove the workers.
+            </p>
+            <% if ! @insurance_need_recalculate && has_permission?("CREATE_INSURANCE_PURCHASE")%>
+                <p class="insurance-text">
+                  To purchase medical examination form with insurance, please click "Add-on Insurance" button.
+                </p>
+            <% end %>
+            <% if InsuranceService.order_has_insurance?(order: @order) %>
+                <p class="order-warning-text">
+                    Changes related to insurance premium require re-calculation. Kindly click on Calculate Insurance Premium button for re-calculation.
+                </p>
+            <% end %>
+
+            <%= render "swipe_reminder.html.erb" %>
+            <%= render "boleh_reminder.html.erb" if @order.payment_method&.code == "BOLEH" %>
+
+            <table class="table" id="etr-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="bulk-toggle" data-target="#etr-table input.bulk"></th>
+                        <th>Worker Name</th>
+                        <th>Gender</th>
+                        <th class="currency">Amount (RM) </th>
+                        <th class="text-right" style = "width:10px;"><!--<button type="button" class="btn btn-sm btn-secondary etr-add">+</button>--></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @order.order_items.joins("join fees on order_items.fee_id = fees.id
+                    left join foreign_workers on order_items.order_itemable_id = foreign_workers.id and order_items.order_itemable_type = 'ForeignWorker'")
+                    .select("order_items.*, case when order_items.order_itemable_type = 'ForeignWorker' then 1
+                    when fees.code in ('IPAY_FPX_B2B', 'IPAY_FPX_B2C', 'SWIPE_FPX_B2B', 'SWIPE_FPX_B2C', 'PAYNET_FPX_B2B', 'PAYNET_FPX_B2C', 'BOLEH', 'BOLEH_WEB') then 3
+                    else 2 end as sort1, foreign_workers.name as sort2, case when fees.code in ('TRANSACTION_MALE', 'TRANSACTION_FEMALE') then 1
+                    else 2 end as sort3")
+                    .where.not("fees.code" => ["INSURANCE_SST", "INSURANCE_STAMP_DUTY", "INSURANCE_ADMINFEES", "INSURANCE_ADMINFEES_SST"])
+                    .order("sort1 asc, sort2 asc, sort3 asc").includes(:fee, :order_itemable, :insurance_purchase).each do |order_item| %>
+                        <%=render "external/orders/transaction_registrations/#{order_item.fee.code.downcase}", {order_item: order_item} %>
+                    <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">&nbsp;</th>
+                        <th class="currency">
+                            <div class="etr-amount-total"><%= number_to_currency(@order.amount, unit: "") %></div>
+                        </th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label><input type="checkbox" id="chk-validity-form">
+                            I hereby understand that the validity of the FOMEMA Medical Examination Form is <%= SystemConfiguration.get("TRANSACTION_EXPIRY_DAYS").to_i %> days from the date of payment. Kindly select the clinic and complete the Medical
+                            Examination for your foreign worker once payment has been made. Failure to do so will result in the expiry of the Form and may have to be re-purchase.
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label> <%= form.check_box :personal_data_consent,  id: 'chk-add-consent-box-form', required: true %>
+                        I hereby declare that I have obtained the necessary and voluntary consent from the said
+                        foreign worker. I also accept my obligations to protect all Personal Data regarding the
+                        said foreign worker and adhere to all the principles of data protection in accordance
+                        with the Personal Data Protection 2010.
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="card conditional-renewal-disclaimer">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label><input type="checkbox" id="chk-conditional-renewal"> I hereby confirm that no medical examination has been carried out for the following worker(s):</label>
+                            <% index_c = 1 %>
+                            <% @order.order_items.joins(:fee).where("fees.code" => ["TRANSACTION_MALE", "TRANSACTION_FEMALE"]).each do |order_item| %>
+                                <% @has_conditional_renewal = if order_item.order_itemable.conditional_renewal? %>
+                                    <%=render "external/orders/shared/conditional_renewal", {order_item: order_item, index: index_c} %>
+                                    <% index_c += 1 %>
+                                <% end %>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-right">
+                    <% if has_permission?("CREATE_INSURANCE_PURCHASE") %>
+                        <button class="btn btn-blue-portal" type="submit" name="submit" value="addon_insurance" id="btn-addon_insurance" formnovalidate>Add-on Insurance</button>
+                    <% end %>
+                    <% #if @insurance_need_recalculate %>
+                        <%= render partial: "/external/shared/calculate_insurance_menu", locals: {order: @order, button_class: "btn btn-blue-portal dropdown-toggle"} %>
+                    <% #end %>
+                    <button class="btn btn-blue-portal" type="submit" name="submit" value="save" id="btn-save">Save</button>
+                    <button class="btn btn-blue-portal" type="submit" name="submit" value="save_and_proceed_to_payment" id="btn-save_and_proceed_to_payment"<% if @insurance_need_recalculate %> disabled <% end %>>Pay now</button>
+                    <a class="btn btn-blue-portal" href="<%= external_orders_path %>">Back</a>
+                    <button class="btn btn-red-portal" type="submit" name="submit" value="cancel" id="btn-cancel" formnovalidate>Cancel payment</button>
+                </div>
+            </div>
+        </div>
+        <!-- /card-body -->
+    <% end %>
+</div>
+
+<style>
+.plks-optional-message {
+    display: <%= @has_plks_optional ? "block" : "none" %>;
+}
+.conditional-renewal-disclaimer {
+    display: <%= @has_conditional_renewal ? "block" : "none" %>;
+}
+
+</style>
+<%=render 'etr_search_worker' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.etr-add').click(function () {
+    $('#search-worker-modal').modal();
+});
+
+<% if @has_conditional_renewal %>
+    $('#chk-conditional-renewal').attr('required', true);
+<% end %>
+
+$('#chk-validity-form').attr('required', true);
+
+function etr_remove(btn)
+{
+    $(btn).closest('tr').remove();
+    $('#order_payment_method_id').attr('required', false);
+    $('#chk-conditional-renewal').attr('required', false);
+    $('#chk-validity-form').attr('required', false);
+    $('#chk-add-consent-box-form').attr('required', false);
+    $('#btn-save').trigger('click');
+    $('.btn').prop('disabled',true);
+}
+</script>
+<% end %>

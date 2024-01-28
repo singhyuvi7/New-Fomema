@@ -1,0 +1,16 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :urine_sugar_level, "Level of Urine Sugar detected as 'Present'" %>
+        <div class="row">
+            <div class="drug-level col-6 urine-col" data-placeholder="(mmol/L)">
+                <%= form_shared.number_field :urine_sugar_level, class: 'form-control', step: :any, min: 0 %>
+            </div>  
+            <div class="drug-level col-6 urine-col" data-placeholder="(qualitative)">
+                <%= form_shared.text_field :urine_sugar_qualitative, class: 'form-control' %>
+            </div> 
+         </div>
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

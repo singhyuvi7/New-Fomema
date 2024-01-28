@@ -1,0 +1,24 @@
+<div class="card">
+  <div class="card-header">
+    <strong>Clinic Visit Plans</strong> - New Clinic Visit Plan
+  </div>
+
+    <%= form_for @visit_plan, url: internal_visit_plans_clinics_create_path, html: {multipart: true, class: "with-parsley"} do |form| %>
+      <div class="card-body">
+        <%= render 'internal/visit_plans/clinics/form', { form: form } %>
+
+        <%= render "/internal/visit_plans/clinics/provider_filter" %>
+        
+
+        <%= render "/internal/visit_plans/clinics/selected_service_providers" %>
+      </div>
+      <div class="card-footer">
+          <div class="text-right">
+              <%=raw edit_back_button(internal_visit_plans_clinics_path) %>
+              <%=raw edit_save_draft_button() %>
+              <%=raw edit_submit_for_approval_button() %>
+          </div>
+      </div>
+    <% end %>
+
+</div>

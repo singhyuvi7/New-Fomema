@@ -1,0 +1,71 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Xray Storages</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_XRAY_STORAGE') %>
+                    <%=raw index_table_new_button(new_internal_xray_storage_path) %>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                  <table class="<%= index_table_class %>">
+                    <thead>
+                    <tr>
+                      <th class="module-row-numbers">#</th>
+                      <th>Batch Number</th>
+                      <th>Location</th>
+                      <th>Status</th>
+                      <th>Disposed Date</th>
+                      <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% if @xray_storages.blank? %>
+                      <tr>
+                        <td colspan="6" class="text-danger">No records found.</td>
+                      </tr>
+                    <% else %>
+
+                      <% @xray_storages.each.with_index((@xray_storages.current_page - 1) * get_per + 1) do |xray_storage, index| %>
+                        <tr>
+                          <td class="module-row-numbers"><%= index %></td>
+                          <td><%= xray_storage.code %></td>
+                          <td><%= xray_storage.organization.name %></td>
+                          <td><%= xray_storage.status %></td>
+                          <td><%= xray_storage.disposal_date %></td>
+                          <td class="module-row-actions">
+                            <%=raw index_table_show_button(internal_xray_storage_path(xray_storage)) %>
+                            <% if has_permission?('EDIT_XRAY_STORAGE') %>
+                              <%=raw index_table_edit_button edit_internal_xray_storage_path(xray_storage) %>
+                            <% end %>
+                            <% if has_permission?('DELETE_XRAY_STORAGE') %>
+                              <%=raw index_table_delete_button(internal_xray_storage_path(xray_storage)) %>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+
+                    <% end %>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @xray_storages %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

@@ -1,0 +1,22 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">Instrument Maintenance Record</td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:instrument_maintenance_record] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:instrument_maintenance_record] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>
+<% if !finding.instrument_maintenance_record_comment.blank? %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Comment :</span>
+                <span class="unbold"><%= finding.instrument_maintenance_record_comment %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

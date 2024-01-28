@@ -1,0 +1,87 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <%#= @employer.name %>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <label class="col-md-2 col-form-label">Employer Code</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.code %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Employer Name</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer.name %></div>
+            </div>
+        </div>
+        <% if @employer.is_individual? %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">NRIC / Passport Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.ic_passport_number %></div>
+                </div>
+            </div>
+        <% else %>
+            <div class="row">
+                <label class="col-md-2 col-form-label">Business Registration Number</label>
+                <div class="col-md-10">
+                    <div class="form-control-plaintext"><%= @employer.business_registration_number %></div>
+                </div>
+            </div>
+        <% end %>
+
+        <!-- address -->
+        <div class="row">
+            <label class="col-md-2 col-form-label">Address</label>
+            <div class="col-md-10">
+                <div class="form-control-plaintext">
+                    <%= @employer.address1 %>
+                    <%=raw "<br>#{@employer.address2}" if @employer.address2 %>
+                    <%=raw "<br>#{@employer.address3}" if @employer.address3 %>
+                    <%=raw "<br>#{@employer.address4}" if @employer.address4 %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">State</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.state&.name %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Town</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.town&.name %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Postcode</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.postcode %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Email Address</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.email %></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 col-form-label">Telephone Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.phone %></div>
+            </div>
+            <label class="col-md-2 col-form-label">Fax Number</label>
+            <div class="col-md-4">
+                <div class="form-control-plaintext"><%= @employer&.fax %></div>
+            </div>
+        </div>
+        <!-- /address -->
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer border-0 bg-transparent text-dark">
+        <div class="text-right">
+            <a href="<%= external_agency_employers_path %>" class="btn btn-blue-portal">Back</a>
+        </div>
+    </div>
+
+    <!-- /.card-footer -->
+</div>

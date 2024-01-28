@@ -1,0 +1,44 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>11, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 11, bg_color: 'fdf971', border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+  data_style = s.add_style(sz: 11, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  wb.add_worksheet(name: 'certifications') do |sheet|
+    sheet.add_row ["#{@company_name.to_s.upcase} - #{@date}"], style: title_style
+    sheet.add_row ["SUMMARY WORKER CERTIFICATION REPORT FROM #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} TO #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')} FOR #{!@branch_id.blank? ? Organization.find(@branch_id).try(:name) : 'ALL STATE'}"], style: title_style
+    sheet.add_row
+
+    if @certifications.present?
+      @certifications.each.with_index do |(branch, collection), index|
+        sheet.add_row [branch]
+        sheet.add_row @headers, style: header_style
+        total_male_count = 0
+        total_female_count = 0
+        total_count = 0
+        collection&.each do |certification|
+          _, _, gender, count, gender_code, organization_id = certification
+          certification.delete_at(1)
+          certification.delete_at(3)
+          certification.delete_at(3)
+          case gender
+          when 'Male'
+            total_male_count += count
+          when 'Female'
+            total_female_count += count
+          end
+          total_count += count
+          sheet.add_row(certification, style: data_style) unless count.zero?
+        end
+        sheet.add_row(['Total', "Female: #{total_female_count} \rMale: #{total_male_count}", total_count]) unless total_count.zero?
+        2.times { sheet.add_row } if index != (@certifications.size - 1)
+      end
+    end
+
+    if @grand_total.present?
+      sheet.add_row []
+      total_male_count, total_female_count, total_count = @grand_total
+      sheet.add_row(['Grand Total', "Female: #{total_female_count} \rMale: #{total_male_count}", total_count]) unless total_count.zero?
+    end
+  end
+end

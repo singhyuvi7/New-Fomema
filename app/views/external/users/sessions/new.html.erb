@@ -1,0 +1,152 @@
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="row">
+            <div class="column2 left">
+            </div>
+            <div class="column2 right">
+                <ul class="nav" style="display: flex; justify-content: flex-end;font-size: 20px;">
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="btn padding-top-manual text-size text-white" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                USER MANUAL
+                            </button>
+                            <div class="dropdown-menu" align="center" aria-labelledby="dropdownMenuButton2">
+                                <%= link_to "Employer", asset_path("/files/Register_employer_user_manual.pdf"), class: 'nav-link dropdown-item', target:'_blank' %>
+                                <button class="btn dropdown-item" type="button" id="dropdownMenuButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Agency
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
+                                    <%= link_to "> Manual", asset_path("/files/Agency_User_manual.pdf"), class: 'nav-link dropdown-item', target:'_blank' %>
+                                    <%= link_to "> Video Tutorial", "https://fomema2u.com.my/video_tutorial/Video_Tutorial_for_Sign_Up.mp4", class: 'nav-link dropdown-item', target:'_blank' %>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <%= link_to "FAQ", external_faq_path, class: 'nav-link text-white text-size'%>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white text-size" href="https://www.fomema2u.com.my/locate-us/">CONTACT US</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="btn btn-fomema1 li-portal border-white padding-right-portal text-bold text-size text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                SIGN UP <i class="fa fa-user" style="margin-right:10px;" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu" align="center" aria-labelledby="dropdownMenuButton">
+                                <%= link_to "Employer Registration", sign_up_external_employers_path, class: 'dropdown-item'%>
+                                <%= link_to "Agency Registration", sign_up_external_agencies_path, class: 'dropdown-item'%>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container container-transparent form-control-file" style="padding-top: 20px;">
+        <img src="<%= image_path('external_bg_logo.png')%>" style="max-height: 180px">
+
+        <% if flash[:notice] %>
+            <div class="alert alert-info text-black" role="alert" style="margin-left: 130px; margin-right:40px;">
+                <%= flash[:notice] %>
+            </div>
+        <% end %>
+
+        <% if flash[:error] %>
+            <div class="alert alert-danger text-black" role="alert" style="margin-left: 130px; margin-right:40px;">
+                <%= flash[:error] %>
+            </div>
+        <% end %>
+
+        <% if cookies[:error] %>
+            <div id="error" class="alert alert-danger"><%= cookies[:error] %></div>
+            <% cookies.delete(:error) %>
+        <% end %>
+
+        <%= form_for(resource, as: resource_name, url: new_external_user_session_path()) do |f|  %>
+            <input type="hidden" name="login_user" value="employer">
+            <input type="hidden" name="external_user[login_from]" value="ext_employer_login">
+            <div class="" style="">
+                <% if !flash[:alert].blank? %>
+                    <div id="alert" class="alert alert-danger text-danger" role="alert" style="margin-left: 130px; margin-right:40px;">
+                        <%= flash[:alert] %>
+                    </div>
+                <% end %>
+
+                <% if PaymentMethod.where("code ilike 'BOLEH%' and category = 'IN' and active = true").count > 0 %>
+                   <% if cookies[:boleh] != "prompted" %>
+                        <% #cookies[:boleh] = "prompted" %>
+                        <div id="dialog-pending-appeals" class="hidden" title="">
+                            <div align="center">
+                                <img src="<%= image_path('boleh-payment-step.png') %>" style="width: 100%">
+                            </div>
+                        </div>
+
+                        <% content_for :page_end_scripts do %>
+                            <script>
+                                openDialog({target: '#dialog-pending-appeals', type: 'white'});
+                            </script>
+                        <% end %>
+                    <% end %>
+                <% end %>
+
+                <div class="d-flex align-items-center my-2 text-portal text-white">
+                    <%= label_tag :login_user_type, "User type", class: "mb-0", style: "width: 120px;" %>
+                    <%= f.select :login_user_type, options_for_select(["Employer", "Agency"], cookies[:login_user_type]), {}, class: "form-control form-field" %>
+                </div>
+
+                <div class="d-flex align-items-center my-2 text-portal text-white">
+                    <%= f.label :login_type, class: "mb-0", style: "width: 120px;" %>
+                    <%= f.select :login_type, options_for_select(["Code", "Email"], cookies[:login_type]), {}, class: "form-control form-field" %>
+                </div>
+
+                <div class="d-flex align-items-center my-2 text-portal text-white">
+                    <%= f.label :username,'Code / Email', class: "mb-0", style: "width: 120px;" %>
+                    <%= f.text_field :login, class: 'form-control form-field no-uppercase username-field', placeholder: "Code/Email", autofocus: true, autocomplete: false %>
+                </div>
+
+                <div class="d-flex align-items-center my-2 text-portal text-white">
+                    <%= f.label :password, class: "mb-0", style: "width: 120px;" %>
+                    <%= f.password_field :password, class: 'form-control form-field', placeholder: "Password", autocomplete: false %>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <%= submit_tag("Clear", { :name => 'reset', :id => 'reset', :type => 'reset', :class => 'btn btn-fomema  margin-right-10 border-white text-portal'}) %>
+                <%= f.submit "Login",class: 'btn btn-fomema btn-blue-portal margin-left-10 text-portal' %>
+            </div>
+        <% end %>
+
+        <p class="forgot-password text-center" style="padding-top:10px; padding-bottom:20px;">
+            <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+                <%= link_to "FORGOT YOUR PASSWORD", new_password_path(resource_name), class: "forgot-password text-bold text-white" %><br />
+            <% end -%>
+        </p>
+        <% if flash[:notice] %>
+            <p class="text-center"><%= flash[:notice] %></p>
+        <% end %>
+        <% if flash[:error] %>
+            <p class="text-center text-danger"><%= flash[:error] %></p>
+        <% end %>
+    </div>
+
+<% content_for :page_end_scripts do %>
+<script>
+set_login();
+
+$('#external_user_login_user_type').change(function (e) {
+    var login_from;
+    set_login();
+});
+
+function set_login() {
+    if($('#external_user_login_user_type').val() == 'Employer') {
+        login_from = "ext_employer_login"
+    } else if ($('#external_user_login_user_type').val() == 'Agency') {
+        login_from = "ext_agency_login"
+    }
+    $('[name="login_user"]').val( $('#external_user_login_user_type').val().toLowerCase() );
+    $('[name="external_user[login_from]"]').val(login_from);
+}
+</script>
+<% end %>

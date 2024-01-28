@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Retake Reasons</strong> - Edit Retake Reason
+    </div>
+    <%= form_for @retake_reason, url: internal_retake_reason_path(@retake_reason), html: {class: "#{params[:action]}_retake_reason retake_reason-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

@@ -1,0 +1,130 @@
+<div class="container text-center" style="padding-top:50px">
+    <img src="<%= image_path('external_bg_logo.png')%>" class="img-responsive" style="max-height: 180px">
+</div>
+
+<div class="container">
+
+    <div class="container margin-top-30">
+        <h2 class="text-center text-white">
+
+        </h2>
+    </div>
+
+    <div class="row justify-content-center margin-top-30">
+        <hr class="navbar-sep-1">
+        <hr class="navbar-sep-2">
+    </div>
+
+    <div class="container-blue-portal margin-top-30" style="margin-top:20px;">
+        <h2 class="text-center">Forgot your password?</h2>
+
+        <% if flash[:notice] %>
+            <div class="alert alert-info" role="alert">
+                <%= flash[:notice] %>
+            </div>
+        <% end %>
+
+        <% if flash[:error] %>
+            <div class="alert alert-danger" role="alert">
+                <%= flash[:error] %>
+            </div>
+        <% end %>
+
+        <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+            <% if params[:username] %>
+                <input type="hidden" name="username" id="username" value="<%= params[:username] %>">
+            <% end %>
+
+            <div style="width: 400px;margin: auto;" class="">
+                <%= devise_forgot_password_error_messages! %>
+            </div>
+
+            <div class="field text-center">
+                <% if params[:username] %>
+                    <%= f.label :email %><br/>
+                    <input type="hidden" name="external_user[email]" id="external_user_email" value="<%= @user.email %>">
+                    <input type="email" name="email_r" id="email_r" value="<%= @user.obfuscated_email %>" class="form-control offset-md-4" readonly>
+                <% else %>
+                    <% if on_merts? %>
+                        <%= f.label :code %><br/>
+                        <%= f.text_field :code, autofocus: true, class: "form-control col-md-4 offset-md-4" %>
+                    <% else %>
+                        <div class="form-group row">
+                            <div style="width:400px;margin: auto;">
+                                <%= f.label :email %><br/>
+                                <%= f.email_field :email, autofocus: true, class: "form-control" %>
+                            </div>
+                        </div>
+                    <% end %>
+                <% end %>
+            </div>
+
+            <div class="text-center mt-4">
+                <%= recaptcha_tags %>
+            </div>
+
+            <div class="text-center text-danger mt-4">
+                <%= flash[:recaptcha_error] %>
+            </div>
+
+            <div class="actions text-center submit-request-btn">
+                <%= f.submit "Reset my password", class: "btn btn-blue-portal btn-fomema col-md-6" %>
+            </div>
+        <% end %>
+    </div>
+
+</div>
+
+<% if flash[:not_found].present? %>
+    <div id="dialog-not-found" class="hidden" title="Not Found">
+        <p>The password reset link appears to be invalid.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+        openDialog({target: '#dialog-not-found', type: 'danger'});
+        </script>
+    <% end %>
+<% end %>
+
+<% if flash[:expired].present? %>
+    <div id="dialog-expired" class="hidden" title="Message [ID: 41]">
+        <p>Password reset request has expired.</p>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+        openDialog({target: '#dialog-expired', type: 'danger'});
+        </script>
+    <% end %>
+<% end %>
+
+<style>
+    .submit-request-btn {
+        margin-top: 25px;
+    }
+    .card {
+        padding: 20px;
+        margin-top: 20px;
+    }
+    #error_explanation {
+        color: #813838;
+        background-color: #fee2e1;
+        border-color: #fdd6d6;
+        position: relative;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+    .btn-fomema {
+        width: auto !important;
+    }
+    label {
+        margin-top: 30px;
+    }
+
+    .g-recaptcha {
+        display: inline-block;
+    }
+</style>

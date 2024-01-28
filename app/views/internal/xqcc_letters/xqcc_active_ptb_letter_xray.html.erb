@@ -1,0 +1,103 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        This is with reference to the foreign workers below who had been certified as SUITABLE for
+        employment in Malaysia based on the chest X-ray findings reported by you as NORMAL. However,
+        after the subsequent auditing of the worker&apos;s chest X-ray by our consultant radiologist, they were found to be <b>Active PTB</b>.
+    </p>
+    <p class="text-justify">
+        Foreign worker&apos;s particulars are as follows:
+    </p>
+
+    <table class="w-100" border="1px" style="border-collapse: collapse; text-align: center;">
+        <tr>
+            <td valign="top" style="width: 8em; background-color: #D3D3D3;"><b>WORKER CODE</b></td>
+            <td valign="top" style="width: 8em; background-color: #D3D3D3;"><b>NAME</b></td>
+            <td valign="top" style="width: 8em; background-color: #D3D3D3;"><b>PASSPORT NUMBER</b></td>
+
+        </tr>
+        <tr>
+            <td><%= @letter.worker_code %></td>
+            <td><%= @letter.worker_name %></td>
+            <td><%= @letter.worker_passport %></td>
+        </tr>
+    </table>
+
+    <p class="text-justify">
+       Please refer to the attached copy of the audit report by our consultant radiologist for further details.
+    </p>
+    <p class="text-justify">
+        In accordance with our Standard Operating Procedure (SOP) Clause (10.1.1), we would like to emphasize that
+        the radiologist/doctor reporting the chest X-ray is responsible for the quality of the radiograph and the
+        accuracy of the reporting.
+    </p>
+    <p style="page-break-after: always; text-align: justify">
+        For your information, punitive actions for the Active PTB case reported as normal is the discontinuation
+        of service for a period of 1 to 3 months. Based on your previous records, we have decided to allow you
+        to improve your performance by attending any X-ray related training provided by FOMEMA. If you are unable to make time for the nearest upcoming X-ray training, we would advise you to attend another X-ray training, which will be scheduled throughout this year by FOMEMA.
+    </p>
+    <p class="text-justify">
+        Should you have further inquiries about our X-ray seminar, you may email us at face@fomema.com.my, reach us via WhatsApp at 011-54108007 or visit our FOMEMA shop at https://shop.fomema.my/
+    </p>
+    <p class="text-justify">
+        As this worker was found to be an <b>Active PTB</b> and falls under notifiable diseases, please notify through the Infectious Disease Information System (Sistem eNotifikasi) at http://enotifikasi.moh.gov.my or manually notify this case to the nearest District Health Office.
+    </p>
+    <p class="text-justify">
+        Your cooperation and understanding are highly appreciated.
+    </p>
+
+    <!-- This is the only way to keep this entire block together. For some reason, page-break-inside: avoid; does not work -->
+    <table style="margin-left: -2px;">
+        <tr>
+            <td style="padding: 0;">
+                <p style="margin: 0;">
+                    Yours sincerely,<br><br><br><br><br>
+                    <b><%= @letter.issuer_name %></b><br>
+                    <%= @letter.issuer_title %>
+                </p>
+            </td>
+        </tr>
+    </table><br>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline-block;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

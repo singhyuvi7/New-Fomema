@@ -1,0 +1,20 @@
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name"><%= ['blood_grouping'].include?(report_category) ? 'Control Cell Name & Manufacturer' : 'Control Name & Manufacturer' %></td>
+    <td colspan="3"></td>
+</tr>
+<tr>
+    <td class="table-index"></td>
+    <td class="listing">
+        <ul>
+            <% if finding.control_cell_name.reject(&:empty?).blank? %>
+                <li><i>NONE</i></li>
+            <% else %>
+                <% finding.control_cell_name.reject(&:empty?).each do |reagent| %>
+                    <li><%= JSON.parse(reagent)['name'] %></li>
+                <% end %>
+            <% end %>
+        </ul>
+    </td>
+    <td colspan="3"></td>
+</tr>

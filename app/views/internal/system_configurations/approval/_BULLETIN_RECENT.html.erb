@@ -1,0 +1,9 @@
+<% code = "BULLETIN_RECENT" %>
+<label class="col-md-4 col-form-label" for="<%= code %>"><%= @system_configurations[code].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag code, @system_configurations[code].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations[code].value %></p>
+    <% if !@system_configurations[code].comment.blank? %>
+        <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+    <% end %>
+</div>

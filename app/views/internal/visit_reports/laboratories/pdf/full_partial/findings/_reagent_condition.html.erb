@@ -1,0 +1,33 @@
+<tr class="finding-row method-field">
+    <td class="table-index"></td>
+    <td class="row-name"></td>
+    <td colspan="3">
+        <div class="acceptable-checkbox">
+            <div class="acceptable">Acceptable</div>
+            <div class="not-acceptable">Not Acceptable</div>
+        </div>
+    </td>
+</tr>
+
+<tr class="finding-row method-field">
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="row-name">Reagent Condition</td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:reagent_condition] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:reagent_condition] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>
+<% if finding.reagent_condition == 'NO' %>
+    <tr>
+        <td class="table-index"></td>
+        <td>
+            <div class="finding-comment">
+                <span class="bold">Expiry Date :</span>
+                <span class="unbold"><%= finding.reagent_condition_expiry_date %></span>
+            </div>
+        </td>
+        <td colspan="3"></td>
+    </tr>
+<% end %>

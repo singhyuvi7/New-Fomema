@@ -1,0 +1,2 @@
+class FpxResponseCode < ApplicationRecord
+end

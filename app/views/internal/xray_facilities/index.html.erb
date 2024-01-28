@@ -1,0 +1,130 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Facilities</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class='col'>
+                <% if has_permission?("MSPD_REPORTS") %>
+                    <%= link_to(internal_xray_facilities_path(format: :xlsx, params: params.permit!), class: 'btn btn-sm btn-primary') do %>
+                        <i class='fa fa-download'></i>
+                        Export
+                    <% end %>
+                <% end %>
+            </div>
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_DRAFT_XRAY_FACILITY') %>
+                    <%=raw index_table_new_button(new_internal_xray_facility_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+<table class="<%= index_table_class %>">
+    <thead>
+        <tr>
+            <th class="module-row-numbers">#</th>
+            <th>Code</th>
+            <th>License Holder Name</th>
+            <th>Facility Name</th>
+            <th>Address</th>
+            <th>State</th>
+            <th>Postcode</th>
+            <th>Town</th>
+            <th>Active Clinic Allocated</th>
+            <th>Activated</th>
+            <th>Status</th>
+            <th class="module-row-actions">Action(s)</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% if @xray_facilities.blank? %>
+            <tr>
+                <td colspan="12" class="text-danger">No records found.</td>
+            </tr>
+        <% else %>
+
+            <% @xray_facilities.each.with_index((@xray_facilities.current_page - 1) * get_per + 1) do |xray_facility, index| %>
+                <tr>
+                    <td class="module-row-numbers"><%= index %></td>
+                    <td><%= xray_facility.code or raw '<i>N/A</i>' %></td>
+                    <td><%= xray_facility.license_holder_name %></td>
+                    <td><%= xray_facility.name %></td>
+                    <td><%= xray_facility.xray_facility_address %></td>
+                    <td><%= xray_facility.try(:state).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= xray_facility.postcode or raw '<i>N/A</i>' %></td>
+                    <td><%= xray_facility.try(:town).try(:name) or raw '<i>N/A</i>' %></td>
+                    <td><%= xray_facility.doctors_count(active: true) %></td>
+                    <td><%= xray_facility.activated_at.nil? ? (raw '<i>N/A</i>') : xray_facility.activated_at.strftime(get_standard_date_format) %></td>
+                    <td>
+                        <div><%= XrayFacility::STATUSES[xray_facility.status] %></div>
+                        <div class="font-italic"><small><%= xray_facility.status_display %></small></div>
+                    </td>
+                    <td class="module-row-actions">
+                        <%=raw index_table_show_button(internal_xray_facility_path(xray_facility)) %>
+
+                        <% if can_request_update?(xray_facility) and has_any_permission?('EDIT_NON_FINANCE_INFO_XRAY_FACILITY', 'EDIT_FINANCE_INFO_XRAY_FACILITY') %>
+                            <%=raw index_table_edit_button edit_internal_xray_facility_path(xray_facility) %>
+                        <% end %>
+
+                        <% if can_continue_draft?(xray_facility, any_user: true) %>
+                            <% if has_permission?("EDIT_NON_FINANCE_INFO_XRAY_FACILITY") %>
+                                <%=raw index_table_draft_button(draft_internal_xray_facility_path(xray_facility)) %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if can_cancel_approval?(xray_facility) %>
+                            <%=raw index_table_cancel_button(cancel_internal_xray_facilities_path(xray_facility)) %>
+                        <% end %>
+
+                        <% if can_do_approval?(xray_facility) %>
+                            <% if has_permission?("APPROVAL_XRAY_FACILITY") %>
+                                <%=raw index_table_approval_button(approval_internal_xray_facilities_path(xray_facility)) %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if can_do_approval2?(xray_facility) %>
+                            <% if has_permission?("CONCUR_XRAY_FACILITY") %>
+                                <%=raw index_table_approval_button(concur_internal_xray_facilities_path(xray_facility), title: "Concur") %>
+                            <% else %>
+                                <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Approval request ongoing"><i class="fa fa-info"></i></span>
+                            <% end %>
+                        <% end %>
+
+                        <% if has_permission?('DELETE_XRAY_FACILITY') %>
+                            <%=raw index_table_delete_button(internal_xray_facility_path(xray_facility)) %>
+                        <% end %>
+
+                        <% if has_permission?("CREATE_ORDER") && xray_facility.biometric_device_paid? && !xray_facility.paid_biometric_device %>
+                            <%=raw index_table_primary_button buy_biometric_device_internal_xray_facility_path(xray_facility), title: "Create Biometric Device Order", label: "<i class=\"fas fa-cart-plus\"></i>" %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+
+        <% end %>
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <%= paginate @xray_facilities %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

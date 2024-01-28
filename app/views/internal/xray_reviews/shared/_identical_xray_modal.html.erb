@@ -1,0 +1,143 @@
+<!-- Modal -->
+<div class="modal fade" id="identicalModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="identicalModalLabel">Select Identical XQCC Review</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <%= form_tag filter_identicals_internal_xray_reviews_path, method: :post, remote: true, class: "filter-identicals-form", data: { } do %>
+                    <div class="card">
+                        <div class="card-header">
+                            Search For XQCC Review
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Transaction ID</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :transaction_code, "", placeholder: "Code", class: "form-control ajax-input" %>
+                                </div>
+                                <label class="col-md-2 col-form-label">Batch</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control ajax-input" name="batch" id="batch" value="<%= params[:batch] %>">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Decision</label>
+                                <div class="col-md-4">
+                                    <select name="result" id="result" class="form-control select2 ajax-input">
+                                        <option value="">SELECT DECISION</option>
+                                        <option value="NORMAL">NORMAL</option>
+                                        <option value="SUSPICIOUS">SUSPICIOUS</option>
+                                        <option value="IDENTICAL">IDENTICAL</option>
+                                        <option value="WRONGLY_TRANSMITTED">WRONGLY TRANSMITTED</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <div class="btn btn-secondary clear-filters" data-type="doctor">Clear filters</div>
+                            <%= submit_tag "Search", class: "btn btn-primary filter-facilities-search", data: {type: "doctor"} %>
+                        </div>
+                    </div>
+                <% end %>
+
+                <!-- Developer note: -->
+                <!-- Ajax response: /internal/xqccs/shared/filter_xray_examinations -->
+                <table class="table table-bordered search-facilities-table">
+                    <thead>
+                        <th><%= check_box_tag "toggle_all_checkboxes", "", false %></th>
+                        <th>Transaction ID</th>
+                        <th>X-Ray Code</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Date Pickup</th>
+                        <th>X-Ray Taken Date</th>
+                        <th>Decision</th>
+                        <th>Batch</th>
+                    </thead>
+                    <tbody id="search-results">
+                        <tr>
+                            <td colspan="9">Search XQCC Review</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="identical-add-button">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end of modal -->
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.clear-filters').click(function() {
+    $(`.filter-identicals-form .ajax-input`).val('');
+});
+
+$('.filter-facilities-search').click(function() {
+    form = $(this).closest('form');
+    data = $(`.filter-identicals-form`).find('input.ajax-input, select.ajax-input').map(function() {
+        return {
+            key: $(this).attr('name'),
+            val: $(this).val()
+        };
+    }).get().reduce(function(map, obj) {
+        map[obj.key] = obj.val;
+        return map;
+    }, {});
+
+    data.current_xray_review_id = '<%= @xray_review.id %>';
+    data.selected_identical_ids = $("#xray_review_identical_xqcc_review_ids").val();
+
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: data,
+    }).done(function(response) {
+        $(`.search-facilities-table tbody#search-results`).html(response);
+        $(`.filter-facilities-search`).removeAttr('disabled');
+    });
+});
+
+$('#toggle_all_checkboxes').change(function() {
+    checked = $(this).prop('checked');
+    $('input[name*="xray_review_ids["]').prop('checked', checked);
+});
+
+$('#identical-add-button').click(function(e) {
+    identical_xray_reviews = $('input[name*="xray_review_ids["]:checked').map(function() {
+        return $(this).val();
+    }).get();
+
+    if (identical_xray_reviews.length > 0) {
+        $('input[name*="xray_review_ids["]:checked').each(function(index) {
+            var transaction_id = $(this).val();
+            var current_row = $(this).closest('tr');
+            clone_row = current_row.clone(true);
+            clone_row.find("td:first-child").remove();
+            clone_row.append("<td><button type='button' class='btn btn-sm btn-danger delete_identical' data-transaction_id='" + transaction_id + "'><i class='fa fa-trash'></i></button></td>");
+            $("#identical_table tbody").append(clone_row);
+            current_row.remove();
+        });
+
+        // side effect at main form
+        refresh_identical_ids();
+
+        // hide modal
+        $('#identicalModal').modal('hide');
+    } else {
+        alert('Please select at least 1 case');
+    }
+});
+</script>
+<% end %>

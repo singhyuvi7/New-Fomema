@@ -1,0 +1,29 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style sz: 14
+  header_style = style.add_style border: Axlsx::STYLE_THIN_BORDER,
+                                 bg_color: 'b7b7b7'
+  data_style = style.add_style border: Axlsx::STYLE_THIN_BORDER
+
+  # worksheet data
+  wb.add_worksheet(name: 'monthly') do |sheet|
+    sheet.add_row ["Monthly Registration Report by Jobtype #{@month} #{@year}"],
+                  style: title_style
+    sheet.add_row ['BRANCH', *@job_types.map(&:last), 'BLANK', 'TOTAL'],
+                  style: header_style
+    @branches.each do |branch_data|
+      branch_id, branch_name = branch_data
+      @job_types
+        .map(&:first)
+        .tap { |ids| ids << nil }
+        .map { |job_type_id| @data.dig([branch_id, job_type_id]) }
+        .then do |result|
+          sheet.add_row [branch_name, result, @total.dig(branch_id)].flatten,
+                        style: data_style
+        end
+      sheet.column_widths 22, nil, nil, nil
+    end
+  end
+end

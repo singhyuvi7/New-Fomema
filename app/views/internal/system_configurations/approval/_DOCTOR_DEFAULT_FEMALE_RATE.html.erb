@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "DOCTOR_DEFAULT_FEMALE_RATE" %>"><%= @system_configurations["DOCTOR_DEFAULT_FEMALE_RATE"].name %></label>
+<div class="col-md-8">
+    <%= text_field_tag "DOCTOR_DEFAULT_FEMALE_RATE", @system_configurations["DOCTOR_DEFAULT_FEMALE_RATE"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["DOCTOR_DEFAULT_FEMALE_RATE"].value %></p>
+</div>

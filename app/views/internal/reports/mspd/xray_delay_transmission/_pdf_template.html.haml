@@ -1,0 +1,53 @@
+.w-100.pb-3.text-uppercase{:style => "margin-top: 2rem;"}
+  %table.w-100.text-center.export-table
+    %thead
+      %tr
+        %th{ colspan: 10 }
+          Delay Transmission Xray
+      %tr
+        %th Doctor
+        %th Xray Facility
+        %th Year
+        %th{ width: 100 } <=48H
+        %th{ width: 100 } >48H (DELAY)
+        %th{ width: 100 } Total
+    %tbody
+      = render partial: 'internal/reports/mspd/xray_delay_transmission/doctor', collection: @doctors
+= render 'internal/reports/mspd/xray_delay_transmission/notes'
+
+:css
+  thead { display: table-row-group;}
+  tfoot { display: table-row-group }
+  tr { page-break-inside: avoid }
+
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid black;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid black;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid black;
+  }
+
+  .bold {
+      font-weight: bold;
+  }
+
+  .text-center {
+      text-align: center;
+  }

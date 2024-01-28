@@ -1,0 +1,58 @@
+<div class="card-body">
+    <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker} %>
+    <%= render "pure_form", { form: form, is_change_employer: @is_change_employer } %>
+</div>
+
+<div class="card-footer border-0 bg-transparent text-dark">
+    <div class="text-right">
+        <a href="<%= external_agency_workers_path employer_id: @employer.id %>" class="btn btn-red-portal">Cancel</a>
+        <% if !is_change_employer %>
+            <button type="submit" class="btn btn-blue-portal" name="submit" value="save">Save</button>
+        <% else %>
+            <button type="submit" class="btn btn-blue-portal" name="submit" value="change_employer">Change Employer</button>
+        <% end %>
+    </div>
+</div>
+
+<% #if params[:action] == "edit" %>
+    <% content_for :page_end_scripts do %>
+        <script>
+         // var address  = '<%= AmendmentReason.find_by(code: "ADDRESS")&.id %>';
+
+            $('#foreign_worker_amendment_reasons').change(function() {
+                var hasOther = $('#foreign_worker_amendment_reasons').find('option:selected').map(function() {
+                    return $(this).text()
+                }).get().includes('Other');
+                var id= (this.value);
+                 /*   if(id==address){
+                        $('#foreign_worker_upl').prop('disabled', true);
+                    }else{
+                        $('#foreign_worker_upl').prop('disabled', false);
+                    }*/
+
+                $('#foreign_worker_amendment_reason_comment').prop('disabled', !hasOther);
+            });
+
+            var foreignWorkerCode   = '<%= @foreign_worker[:code] %>'.length > 0;
+            var employerAmmendedAt  = '<%= @foreign_worker.employer_amended_at %>'.length > 0;
+
+            if (foreignWorkerCode) {
+                $('.critical-field').on('change keyup paste', function(){
+                    // $('.critical-field').not($(this)).prop('disabled',true);
+                    if (($(this).prop('name') == '' && $(this).hasClass("critical-field")) || $(this).prop('name') == 'foreign_worker[date_of_birth]') {
+                        $('.critical-field').not($('.critical-date')).prop('disabled',true);
+                    } else {
+                        $('.critical-field').not($(this)).prop('disabled',true);
+                    }
+                    $(`#foreign_worker_amendment_reasons option[value='${address}']`).prop('disabled', true);
+
+                if (employerAmmendedAt) {
+                        // $('#foreign_worker_amendment_reasons').prop('disabled', true);   //Requested by Letchumy to override this checking - SR20220150
+                        $('#foreign_worker_amendment_reason_comment').prop('readonly', true);
+                    }
+                });
+            }
+
+        </script>
+    <% end %>
+<% #end %>

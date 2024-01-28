@@ -1,0 +1,54 @@
+<div class="w-100 py-3" style="overflow-x: auto;">
+    <table id="preview-csv-table" class="table-borders w-100">
+        <thead>
+            <tr>
+                <% @headers.each do |header| %>
+                <th><%= header %></th>
+                <% end %>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <% if @bank_drafts.present? %>
+                <% @bank_drafts.each do |bank_draft| %>
+                    <tr>
+                        <td>Bank Draft</td>
+                        <td>-</td>
+                        <td><%= bank_draft.total_count %></td>
+                        <td><%= bank_draft.total_amount || 0 %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+            <% if @order_payments.present? %>
+                <% @order_payments.each do |order_payment| %>
+                    <tr>
+                        <td><%= order_payment.name %></td>
+                        <td>-</td>
+                        <td><%= order_payment.total_count %></td>
+                        <td><%= order_payment.total_amount %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+            
+            <tr class="font-weight-bold">
+                <td></td>
+                <td>Total</td>
+                <td><%= @grand_total_count %></td>
+                <td><%= @grand_total_amount %></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

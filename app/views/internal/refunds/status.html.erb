@@ -1,0 +1,44 @@
+<div class="card">
+
+    <div class="card-header">Amend Refund <%= @refund.code %> Status</div>
+
+    <%= form_for @refund, url: status_internal_refund_path(@refund), method: :patch, html: {class: "with-parsley"} do |form| %>
+
+        <div class="card-body">
+
+            <%= render "refund_info" %>
+
+            <%= render 'shared/all_validation_flash', { model_obj: @refund } %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :status, class: "required" %>
+                        <%= form.select :status, options_for_select({
+                            "PENDING_PAYMENT" => "Pending Payment",
+                            "CANCELLED" => "Cancelled",
+                            "PAYMENT_SUCCESS" => "Payment Success",
+                            "PAYMENT_FAILED" => "Payment Failed"
+                        }.invert, form.object.status), {include_blank: form_select_option_text}, class: 'form-control' %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :comment %>
+                        <%= form.text_area :comment, class: "form-control" %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(internal_refunds_path) %>
+            <%=raw edit_save_button() %>
+        </div>
+
+    <% end %>
+
+</div>

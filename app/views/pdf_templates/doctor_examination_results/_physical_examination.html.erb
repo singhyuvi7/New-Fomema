@@ -1,0 +1,480 @@
+<%
+    section_a_present_absent_number_start_with = 6
+    section_a_defective_normal_number_start_with = 12
+    section_a_abnormal_normal_number_start_with = 14
+    section_b_abnormal_normal_number_start_with = 1
+
+
+    section_a_present_absent = [
+        [:physical_chronic_skin_rash, "CHRONIC SKIN RASH"],
+        [:physical_anaesthetic_skin_patch, "ANAESTHETIC SKIN PATCH"],
+        [:physical_deformities_of_limbs, "DEFORMITIES OF LIMBS"],
+        [:physical_pallor, "PALLOR"],
+        [:physical_jaundice, "JAUNDICE"],
+        [:physical_lymph_node_enlargement, "LYMPH NODE ENLARGEMENT"]
+    ].map do |key, value|
+        date = @doctor_exam.try("#{ key }_date")
+
+        {
+            number: "",
+            name:   value,
+            yes:    @doctor_exam.try(key),
+            no:     !@doctor_exam.try(key),
+            date:   "",
+        }
+    end
+
+    section_a_defective_normal = [
+        {
+            number: '',
+            name: 'VISION TEST',
+            sub: [
+                {
+                    hide_name: false,
+                    name: 'Unaided',
+                    name_2: 'L',
+                    yes: @doctor_exam.try(:physical_vision_test_unaided_left),
+                    no: !@doctor_exam.try(:physical_vision_test_unaided_left)
+                },
+                {
+                    type: 'values',
+                    hide_name: true,
+                    name: 'Unaided',
+                    name_2: 'L',
+                    name_3: 'Acuity',
+                    display: @doctor_exam.try(:physical_vision_test_unaided_left),
+                    value: "#{@doctor_exam.try(:physical_vision_test_unaided_left_a_value)} / #{@doctor_exam.try(:physical_vision_test_unaided_left_b_value)}"
+                },
+                {
+                    hide_name: true,
+                    name: 'Unaided',
+                    name_2: 'R',
+                    yes: @doctor_exam.try(:physical_vision_test_unaided_right),
+                    no: !@doctor_exam.try(:physical_vision_test_unaided_right)
+                },
+                {
+                    type: 'values',
+                    hide_name: true,
+                    name: 'Unaided',
+                    name_2: 'R',
+                    name_3: 'Acuity',
+                    display: @doctor_exam.try(:physical_vision_test_unaided_right),
+                    value: "#{@doctor_exam.try(:physical_vision_test_unaided_right_a_value)} / #{@doctor_exam.try(:physical_vision_test_unaided_right_b_value)}"
+                },
+                {
+                    hide_name: false,
+                    name: 'Aided',
+                    name_2: 'L',
+                    yes: @doctor_exam.try(:physical_vision_test_aided_left),
+                    no: !@doctor_exam.try(:physical_vision_test_aided_left)
+                },
+                {
+                    type: 'values',
+                    hide_name: true,
+                    name: 'Aided',
+                    name_2: 'L',
+                    name_3: 'Acuity',
+                    display: @doctor_exam.try(:physical_vision_test_aided_left),
+                    display_left: @doctor_exam.try(:physical_vision_test_aided_right_a_value),
+                    value: "#{@doctor_exam.try(:physical_vision_test_aided_left_a_value)} / #{@doctor_exam.try(:physical_vision_test_aided_left_b_value)}"
+                },
+                {
+                    hide_name: true,
+                    name: 'Aided',
+                    name_2: 'R',
+                    yes: @doctor_exam.try(:physical_vision_test_aided_right),
+                    no: !@doctor_exam.try(:physical_vision_test_aided_right)
+                },
+                {
+                    type: 'values',
+                    hide_name: true,
+                    name: 'Aided',
+                    name_2: 'R',
+                    name_3: 'Acuity',
+                    display: @doctor_exam.try(:physical_vision_test_aided_right),
+                    display_right: @doctor_exam.try(:physical_vision_test_aided_right_a_value),
+                    value: "#{@doctor_exam.try(:physical_vision_test_aided_right_a_value)} / #{@doctor_exam.try(:physical_vision_test_aided_right_b_value)}"
+                },
+            ]
+        },
+        {
+            number: '',
+            name: 'HEARING ABILITY',
+            sub: [
+                {
+                    hide_name: true,
+                    name: 'HEARING ABILITY',
+                    name_2: 'L',
+                    yes: @doctor_exam.try(:physical_hearing_ability_left),
+                    no: !@doctor_exam.try(:physical_hearing_ability_left)
+                },
+                {
+                    hide_name: true,
+                    name: 'HEARING ABILITY',
+                    name_2: 'R',
+                    yes: @doctor_exam.try(:physical_hearing_ability_right),
+                    no: !@doctor_exam.try(:physical_hearing_ability_right)
+                }
+            ]
+        }
+    ]
+
+    section_a_abnormal_normal = [
+        {
+            number: '',
+            name: 'OTHERS (if abnormal, please specify under Comments-item 15 below)',
+            yes: @doctor_exam.try(:physical_other),
+            no: !@doctor_exam.try(:physical_other),
+            date: ''
+        },
+        {
+            type: 'text',
+            name: 'Comments (refer to Part III, Section A: 1-14)',
+            value: @doctor_exam.try(:physical_comment)
+        }
+    ]
+
+    section_b_abnormal_normal = [
+        {
+            number: '',
+            name: 'CARDIOVASCULAR SYSTEM',
+            sub: [
+                {
+                    hide_name: false,
+                    name: 'Heart Size',
+                    name_2: '',
+                    yes: @doctor_exam.try(:system_cardiovascular_heart_size),
+                    no: !@doctor_exam.try(:system_cardiovascular_heart_size)
+                },
+                {
+                    hide_name: false,
+                    name: 'Heart Sounds',
+                    name_2: '',
+                    yes: @doctor_exam.try(:system_cardiovascular_heart_sounds),
+                    no: !@doctor_exam.try(:system_cardiovascular_heart_sounds)
+                },
+                {
+                    hide_name: false,
+                    name: 'Other Findings (Please specify under Comments-Item 7)',
+                    name_2: '',
+                    yes: @doctor_exam.try(:system_cardiovascular_other_findings),
+                    no: !@doctor_exam.try(:system_cardiovascular_other_findings)
+                }
+            ]
+        },{
+            number: '',
+            name: 'RESPIRATORY SYSTEM',
+            sub: [
+                {
+                    hide_name: false,
+                    name: 'Breath Sounds',
+                    name_2: '',
+                    yes: @doctor_exam.try(:system_respiratory_breath_sounds),
+                    no: !@doctor_exam.try(:system_respiratory_breath_sounds)
+                },
+                {
+                    hide_name: false,
+                    name: 'Other Findings (Please specify under Comments-Item 7)',
+                    name_2: '',
+                    yes: @doctor_exam.try(:system_respiratory_other_findings),
+                    no: !@doctor_exam.try(:system_respiratory_other_findings)
+                }
+            ]
+        },{
+            number: '',
+            name: 'GASTROINTESTINAL SYSTEM',
+            sub: [
+                {
+                    hide_name: false,
+                    name: 'Liver',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_liver),
+                    no: !@doctor_exam.try(:gastrointestinal_liver)
+                },
+                {
+                    hide_name: false,
+                    name: 'Spleen',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_spleen),
+                    no: !@doctor_exam.try(:gastrointestinal_spleen)
+                },
+                {
+                    hide_name: false,
+                    name: 'Swelling (If abnormal, please specify under Comments-Item 7) - e.g. Hernia',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_swelling),
+                    no: !@doctor_exam.try(:gastrointestinal_swelling)
+                },
+                {
+                    hide_name: false,
+                    name: 'Lymph Nodes',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_lymph_nodes),
+                    no: !@doctor_exam.try(:gastrointestinal_lymph_nodes)
+                },
+                {
+                    hide_name: false,
+                    name: 'Rectal Examination (if indicated)',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_rectal_examination),
+                    no: !@doctor_exam.try(:gastrointestinal_rectal_examination)
+                },
+                {
+                    hide_name: false,
+                    name: 'Other findings (Please specify under Comments-Item 7)',
+                    name_2: '',
+                    yes: @doctor_exam.try(:gastrointestinal_other),
+                    no: !@doctor_exam.try(:gastrointestinal_other)
+                }
+            ]
+        },{
+            number: '',
+            name: 'NERVOUS SYSTEM AND MENTAL STATUS',
+            sub: [
+                {
+                    hide_name: false,
+                    name: 'General Mental Status (Refer to Mental Status Examination Guide)*',
+                    yes: @doctor_exam.try(:system_nervous_general_mental_status),
+                    no: !@doctor_exam.try(:system_nervous_general_mental_status)
+                },{
+                    type: 'label',
+                    name: '',
+                    yes: 'UNTIDY',
+                    no: 'NEAT&TIDY'
+                },{
+                    type: 'label',
+                    name: 'Mental Health Assessment By General Practitioner:',
+                    yes: '',
+                    no: '',
+                    sub: [
+                        {
+                            name: 'General Appearance',
+                            yes: @doctor_exam.try(:system_nervous_general_appearance),
+                            no: !@doctor_exam.try(:system_nervous_general_appearance)
+                        }
+                    ]
+                },
+            ]
+        }
+    ]
+%>
+
+<div class="medical-results-content">
+    <div class="sub-title text-center subtitle-top-margin">
+        <b>PART III. PHYSICAL EXAMINATION</b>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left bold head-index" colspan="5">SECTION A: GENERAL EXAMINATION</th>
+            </tr>
+        </thead>
+
+        <tbody class="without-date">
+            <tr>
+                <td class="head-index">1.</td>
+                <td class="head-title width-100" colspan="4"><div class="general-non-checkbox-title d-inline label">HEIGHT</div>: <b><span class="value"><%= @doctor_exam.try(:physical_height) %></span> cm</b></td>
+            </tr>
+
+            <tr>
+                <td class="head-index">2.</td>
+                <td class="head-title width-100" colspan="4"><div class="general-non-checkbox-title d-inline label">WEIGHT</div>: <b><span class="value"><%= @doctor_exam.try(:physical_weight) %></span> kg.</b></td>
+            </tr>
+            <tr>
+                <td class="head-index">3.</td>
+                <td class="head-title width-100" colspan="4"><div class="general-non-checkbox-title d-inline label">PULSE</div>: <b><span class="value"><%= @doctor_exam.try(:physical_pulse) %></span> per minute</b></td>
+            </tr>
+            <tr>
+                <td class="head-index" valign="top">4.</td>
+                <td class="head-title width-100" colspan="4">BLOOD PRESSURE :<br>
+                    <div><div class="general-non-checkbox-title d-inline label">a) Systolic</div>: <b><%= @doctor_exam.try(:physical_blood_pressure_systolic) %> mm. Hg.</b></div>
+                    <div><div class="general-non-checkbox-title d-inline label">b) Diastolic</div>: <b><%= @doctor_exam.try(:physical_blood_pressure_diastolic) %> mm. Hg.</b></div>
+                </td>
+            </tr>
+            <tr>
+                <td class="head-index">5.</td>
+                <td class="head-title width-100" colspan="4">LAST MENSTRUAL PERIOD DATE : <b><span class="value"><%= @doctor_exam.try(:physical_last_menstrual_period_date).present? ? @doctor_exam.try(:physical_last_menstrual_period_date).strftime("%d/%m/%Y") : "N/A" %></span></b>
+                </td>
+            </tr>
+            <tr>
+                <td class="head-index"></td>
+                <td class="head-title" colspan="2"></td>
+                <td class="head-checkbox text-center bold">PRESENT</td>
+                <td class="head-checkbox text-center bold">ABSENT</td>
+            </tr>
+
+            <% section_a_present_absent.each.with_index(section_a_present_absent_number_start_with) do |disease, index| %>
+                <tr>
+                    <td><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                    <td colspan="2"><%= disease[:name] %></td>
+                    <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td class="head-index"></td>
+                <td class="head-title" colspan="2"></td>
+                <td class="head-checkbox text-center bold">DEFECTIVE</td>
+                <td class="head-checkbox text-center bold">NORMAL</td>
+            </tr>
+
+            <% section_a_defective_normal.each.with_index(section_a_defective_normal_number_start_with) do |disease, index| %>
+                <% if disease[:sub].present? %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td colspan="4"><%= disease[:name] %></td>
+                    </tr>
+
+                    <% disease[:sub].each do |sub_disease| %>
+                        <% if sub_disease[:type] == 'values' %>
+                            <% if sub_disease[:display] %>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td>
+                                        <%= sub_disease[:name_3] + " : " + sub_disease[:value] %>
+                                    </td>
+                                </tr>
+                            <% elsif sub_disease[:display_left] ||  sub_disease[:display_right]  %>
+                                <tr>
+                                    <td colspan="4"></td>
+                                    <td>
+                                        <%= sub_disease[:name_3] + " : " + sub_disease[:value] %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        <% else %>
+                            <tr>
+                                <td></td>
+                                <td class="sub-disease name"><%= sub_disease[:name] if !sub_disease[:hide_name] %></td>
+                                <td class="text-center sub-disease sub-name"><%= sub_disease[:name_2] %></td>
+                                <td class="text-center"><%= sub_disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                                <td class="text-center"><%= sub_disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                            </tr>
+                        <% end %>
+
+                    <% end %>
+                <% else %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td><%= disease[:name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+            <tr>
+                <td class="head-index"></td>
+                <td class="head-title" colspan="2"></td>
+                <td class="head-checkbox text-center bold">ABNORMAL</td>
+                <td class="head-checkbox text-center bold">NORMAL</td>
+            </tr>
+
+            <% section_a_abnormal_normal.each.with_index(section_a_abnormal_normal_number_start_with) do |disease, index| %>
+                <% if disease[:type].present? && disease[:type] == 'text' %>
+                    <tr>
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td colspan="5">
+                            <div class="label"><%= disease[:name] %><div>
+                            <div class="value"><%= disease[:value].present? ? simple_format(disease[:value]) : "-" %></>
+                        </td>
+                    </tr>
+                <% else %>
+                    <tr>
+                        <td valign="top"><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td colspan="2"><%= disease[:name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%= disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+        </tbody>
+    </table>
+
+    <!-- SECTION B SYSTEM EXAMINATION -->
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-left bold head-index" colspan="4">SECTION B: SYSTEM EXAMINATION</th>
+            </tr>
+        </thead>
+        <tbody class="without-date">
+            <tr>
+                <td class="head-index"></td>
+                <td class="head-title"></td>
+                <td class="head-checkbox text-center bold">ABNORMAL</td>
+                <td class="head-checkbox text-center bold">NORMAL</td>
+            </tr>
+
+            <% section_b_abnormal_normal.each.with_index(section_b_abnormal_normal_number_start_with) do |disease, index| %>
+                <% if disease[:sub].present? %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td colspan="4"><%= disease[:name] %></td>
+                    </tr>
+                    <% sub_index = 0 %>
+                    <% disease[:sub].each do |sub_disease| %>
+                        <% if sub_disease[:number].blank? && sub_disease[:type].blank?
+                                sub_index += 1
+                            end
+                        %>
+
+                        <% if sub_disease[:type].present? && sub_disease[:type] == 'label' %>
+                            <tr>
+                                <td></td>
+                                <td><%= sub_disease[:name] %></td>
+                                <td class="text-center bold"><%= sub_disease[:yes] %></td>
+                                <td class="text-center bold"><%= sub_disease[:no] %></td>
+                            </tr>
+                            <% if sub_disease[:sub].present? %>
+                                <% sub_index_2 = 0 %>
+                                <% sub_disease[:sub].each do |sub_disease_2| %>
+                                    <% if sub_disease_2[:type].present? and sub_disease_2[:type] == 'label' %>
+                                        <tr>
+                                            <td></td>
+                                            <td><%= sub_disease_2[:name] %></td>
+                                            <td class="text-center bold"><%= sub_disease_2[:yes] %></td>
+                                            <td class="text-center bold"><%= sub_disease_2[:no] %></td>
+                                        </tr>
+                                    <% else %>
+
+                                        <% if sub_disease_2[:number].blank? && sub_disease_2[:type].blank?
+                                                sub_index_2 += 1
+                                            end
+                                        %>
+
+                                        <tr>
+                                            <td></td>
+                                            <td><%= sub_disease_2[:number].present? ? sub_disease_2[:number] : "#{index.to_s}.#{sub_index}.#{sub_index_2}" %> <%= sub_disease_2[:name] if !sub_disease_2[:hide_name] %></td>
+                                            <td class="text-center"><%= sub_disease_2[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                                            <td class="text-center"><%= sub_disease_2[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                                        </tr>
+                                    <% end %>
+                                <% end %>
+                            <% end %>
+                        <% else %>
+                            <tr>
+                                <td><%= sub_disease[:number].present? ? sub_disease[:number] : "#{index.to_s}.#{sub_index}" %></td>
+                                <td><%= sub_disease[:name] if !sub_disease[:hide_name] %></td>
+                                <td class="text-center"><%= sub_disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                                <td class="text-center"><%= sub_disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                <% else %>
+                    <tr>
+                        <td><%= disease[:number].present? ? disease[:number] : "#{index.to_s}." %></td>
+                        <td><%= disease[:name] %></td>
+                        <td class="text-center"><%= disease[:yes] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                        <td class="text-center"><%=disease[:no] ? @checkbox_checked : @checkbox_unchecked  %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+        </tbody>
+    </table>
+</div>

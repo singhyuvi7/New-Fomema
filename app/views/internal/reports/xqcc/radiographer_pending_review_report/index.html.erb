@@ -1,0 +1,27 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Radiographer Pending Review Report</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress" do %>
+            <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+            
+            <div class="d-flex align-items-center mb-2">
+                <label class="mb-0 mr-3 w-em-10">Date Range</label>
+                <%= text_field_tag "start_date", params[:start_date], class: "w-em-16 form-control datepicker datepicker-range-filter", placeholder: "Start Date" %>
+
+                <span class="w-em-2 text-center">to</span>
+
+                <%= text_field_tag "end_date", params[:end_date], class: "w-em-16 form-control datepicker datepicker-range-filter", placeholder: "End Date" %>
+
+                <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.7em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="Example: Querying data from 01/01/2020 to 07/01/2020 will query 01/01/2020 at 00:00:00 to 07/01/2020 at 23:59:59. If both start and end dates are the same, it will query 00:00:00 to 23:59:59 of the same day."></i>
+            </div>
+        <% end %>
+    </div>
+
+    <%= render '/internal/reports/xqcc/radiographer_pending_review_report/radiographer_pending_review_table' %>
+
+</div>

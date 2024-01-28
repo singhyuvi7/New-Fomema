@@ -1,0 +1,155 @@
+<div class="card">
+    <div class="card-header"><strong>Transaction #<%= @transaction.code %></strong> - TCUPI Review Approval</div>
+    <%= render "/shared/all_flash" %>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_parent_tabs = {
+                information: "Information",
+                medical: "Medical History",
+                physical: "Physical Examination",
+                system: "System Exam",
+                laboratory: "Laboratory",
+                xray: "X-ray",
+                certification: "Certification",
+                review_decision: "FOMEMA Result Review & TCUPI",
+            }
+        %>
+
+        <% category_parent_tabs.each_with_index do |tab, index| %>
+            <div class="category-parent-tab btn btn-<%= index > 0 ? "default" : "primary" %>" data-type="<%= tab[0] %>"><%= tab[1] %></div>
+        <% end %>
+    </div>
+
+    <div class="border-bottom d-flex flex-wrap">
+        <%
+            category_tabs = [
+                {type: "worker",        parent: "information",      title: "Worker Information"},
+                {type: "category_1",    parent: "medical",          title: "Medical History - Category 1"},
+                {type: "category_2",    parent: "medical",          title: "Medical History - Category 2"},
+                {type: "physical",      parent: "physical",         title: "Physical Examination"},
+                {type: "system_1",      parent: "system",           title: "System Exam 1"},
+                {type: "system_2",      parent: "system",           title: "System Exam 2"},
+                {type: "laboratory",    parent: "laboratory",       title: "Laboratory"},
+                {type: "xray",          parent: "xray",             title: "X-ray"},
+                {type: "condition",     parent: "certification",    title: "Condition"},
+                {type: "certification", parent: "certification",    title: "Certification"},
+                {type: "follow_up",     parent: "certification",    title: "Follow Up"},
+                {type: "decision",      parent: "review_decision",  title: "Medical PR"},
+                {type: "approval",      parent: "review_decision",  title: "TCUPI Decision"}
+            ]
+
+            category_tabs += [{type: "unsuitable_reasons",  parent: "certification",    title: "Unsuitable Reasons"}] if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS")
+        %>
+
+        <% category_tabs.each_with_index do |hash, index| %>
+            <div class="category-tab btn btn-<%= "#{index > 0 ? "default" : "primary"}#{" hidden" if index > 0}" %>" data-parent="<%= hash[:parent] %>" data-type="<%= hash[:type] %>"><%= hash[:title] %></div>
+        <% end %>
+    </div>
+
+    <%= nested_form_for @transaction, url: tcupi_review_2_internal_medical_path(@transaction), method: :post, html: {class: "#{params[:action]}_transaction transaction-form disable-enter-keypress"} do |form| %>
+        <% doctor_examination = @transaction.medical_examination %>
+        <%= render partial: "internal/medical/worker_information", locals: { transaction: @transaction } %>
+        <%= render "/shared/transactions_tab_params" %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_category_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_physical", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_1", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        <%= render partial: "external/transactions/doctor_examinations/doctor_exam_system_2", locals: { doctor_examination: doctor_examination, readonly: true } %>
+
+        <div class="category-switchable hidden" data-type="laboratory">
+            <%= render partial: "external/transactions/laboratory_examination_form", locals: { laboratory_examination: @transaction.laboratory_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="xray">
+            <%= render partial: "external/transactions/xray_examinations/xray_examination_form", locals: { xray_examination: @transaction.xray_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="condition">
+            <%= render partial: "external/transactions/doctor_examinations/certification_condition_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="certification">
+            <%= render partial: "external/transactions/doctor_examinations/certification_certification_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="follow_up">
+            <%= render partial: "external/transactions/doctor_examinations/certification_follow_up_form", locals: { doctor_examination: doctor_examination, readonly: true } %>
+        </div>
+
+        <div class="category-switchable hidden" data-type="decision">
+            <%= form.fields_for :latest_medical_review do |review_form| %>
+                <%= render partial: "internal/medical/review_decision_approval", locals: {form: review_form, doctor_examination: doctor_examination, readonly: true } %>
+            <% end %>
+        </div>
+
+        <% if has_permission?("VIEW_UNSUITABLE_REASONS_DATA_TRANSACTIONS") && on_nios? %>
+            <div class="category-switchable hidden" data-type="unsuitable_reasons">
+                <%= render partial: "internal/transactions/shared/unsuitable_reasons_tab", locals: { readonly: !has_permission?("EDIT_UNSUITABLE_REASONS_FOR_TRANSACTION"), hide_save_button: true } %>
+            </div>
+        <% end %>
+
+        <div class="category-switchable hidden" data-type="approval">
+            <%= form.fields_for :latest_tcupi_review do |tcupi_review_approval_form| %>
+                <%= render partial: "tcupi_review_approval", locals: {form: form, tcupi_review_approval_form: tcupi_review_approval_form} %>
+
+                <div class="text-right py-2 px-4">
+                    <div id="transaction-history-list-btn" class="btn btn-success btn-sm">History</div>
+
+                    <% if @can_review %>
+                        <%= form.submit "Transmit", class: "btn btn-sm btn-primary", value: "Transmit", id: "save-and-transmit-submit" %>
+                    <% end %>
+                </div>
+            <% end %>
+        </div>
+
+        <div class="card-footer text-right">
+            <%= raw show_back_button(internal_transactions_path(review_status: "tcupi_approval", field_set: "tcupi")) %>
+        </div>
+    <% end %>
+</div>
+
+<div id="dialog-approval-fill" class="hidden" title="Please select approval decision">
+    <p>Please make your decision whether to <b>APPROVE</b> or <b>REJECT</b> this review decision.</p>
+</div>
+
+<div id="dialog-approval_remark-fill" class="hidden" title="Please include your justification for this decision">
+    <p>Please include your approval remark based on your decision.</p>
+</div>
+
+<%= render partial: "/internal/medical/transaction_history_list_modal", locals: { transactions: @transactions_list } %>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        loadParentCategoryTabSelection();
+        loadCategoryTabSelection();
+        initializeToggleableFields('mle 2 approval');
+
+        $('#save-and-transmit-submit').click(function(e) {
+            reviewDecision  = $('[name="transaction[tcupi_review_approval_attributes][medical_mle2_decision]"]:checked');
+            justification   = $('#transaction_tcupi_review_approval_attributes_medical_mle2_comment').val().trim();
+
+            if (reviewDecision.length === 0) {
+                approvalContainer = $('#review-approval-container');
+                openDialogAndPreventSubmit('#dialog-approval-fill', e);
+
+                $('#dialog-approval-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(approvalContainer, 500);
+                    highlightElement(approvalContainer, '#facf7f', 'slow');
+                    delayedHighlightField(approvalContainer, '#fff', 'slow', 5000);
+                });
+            } else if (justification.length === 0) {
+                remarkContainer = $('#review-remark-container');
+                openDialogAndPreventSubmit('#dialog-approval_remark-fill', e);
+
+                $('#dialog-approval_remark-fill').on('dialogclose', function(event, ui) {
+                    scrollToElement(remarkContainer, 500);
+                    highlightElement(remarkContainer, '#facf7f', 'slow');
+                    delayedHighlightField(remarkContainer, '#fff', 'slow', 5000);
+                });
+            }
+        });
+    </script>
+<% end %>
+
+<%= render "/shared/transactions_javascript_trigger" %>

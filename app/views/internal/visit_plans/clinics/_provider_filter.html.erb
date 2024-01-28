@@ -1,0 +1,55 @@
+<div class="card mt-4">
+
+    <form @submit.prevent="handleFilterSubmit">
+        <div class="card-body">
+
+            <div class="row">
+                
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-4 col-form-label">Code</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="code" v-model="search_data.code" class="form-control" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group row">
+                        <label for="status" class="col-sm-4 col-form-label">Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="provider_name" v-model="search_data.provider_name" class="form-control" value="">
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+            
+            <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">State</label>
+                <div class="col-sm-10">
+                    <multiselect v-model="selected_states" :options="states" :multiple="true" placeholder="Select State"
+                        label="name" track-by="id" @input="updateStateSelection" @select="selectNewState">
+                    </multiselect>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="status" class="col-sm-2 col-form-label">Town</label>
+                <div class="col-sm-10">
+                    <multiselect v-model="selected_towns" :options="town_options" :multiple="true" placeholder="Select Town"
+                        label="name" track-by="id" group-values="towns" group-label="state" :group-select="true"
+                        @input="updateTownSelection" @select="selectNewTown">
+                    </multiselect>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="button" class="btn btn-sm btn-danger" @click="reset()"><i class="icon-trash"></i> Clear</button>
+                <%= raw filter_button %>
+            </div>
+
+        </div>
+    </form>
+</div>

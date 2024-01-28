@@ -1,0 +1,239 @@
+<% last_year = Date.current.years_ago(1).strftime('%Y') %>
+<% current_year = Date.current.year %>
+
+<div v-if="canEdit" class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="<%= index_table_class %> table-sm" v-if="visit_plan.visitable_type == 'Doctor'">
+                <thead>
+                    <tr class="text-center">
+                        <th class="module-row-numbers"><input type="checkbox" v-model="selectAll" @click="select"> #
+                        </th>
+                        <th>Doc. Code</th>
+                        <th class="min-width-120">Doc. Name</th>
+                        <th class="min-width-120">Clinic Name</th>
+                        <th class="min-width-120">Address</th>
+                        <th class="text-nowrap">Own X&#8209;ray</th> <!-- use non-breaking hyphen request by user -->
+                        <th>Phone</th>
+                        <th>SOP Compliance</th>
+                        <th>Last Visit Date</th>
+                        <th style="width: 5%">Allocation (<%= last_year %>/<%= current_year %>)</th>
+                        <th style="width: 5%">Examined (<%= last_year %>/<%= current_year %>)</th>
+                        <th style="width: 5%">Certified (<%= last_year %>/<%= current_year %>)</th>
+                        <th>Status</th>
+                        <th>Category</th>
+                        <th>Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr v-if="!providers.length">
+                        <td colspan="16" class="text-danger">No records found.</td>
+                    </tr>
+
+                    <tr v-if="is_loading">
+                        <td colspan="16" class="text-info">Fetching records ...</td>
+                    </tr>
+
+                    <tr v-for="(provider, index) in providers">
+                        <td class="module-row-numbers">
+                            <input type="checkbox" :value="provider" v-model="selected_providers"
+                                v-on:change="selectProviderUpdate($event)">
+                            {{ index + 1 }}
+                        </td>
+                        <td>
+                            <% if has_permission?('VIEW_DOCTOR') %>
+                                <a target="_blank" :href="'/doctors/'+provider.id">{{ provider.code }}</a>
+                            <% else %>
+                                {{ provider.code }}
+                            <% end %>
+                        </td>
+                        <td>{{ provider.name }}</td>
+                        <td>{{ provider.clinic_name }}</td>
+                        <td>
+                            {{ provider.address1 }}<br v-if="provider.address1">
+                            {{ provider.address2 }}<br v-if="provider.address2">
+                            {{ provider.address3 }}<br v-if="provider.address3">
+                            {{ provider.address4 }}<br v-if="provider.address4">
+                            {{ safeAccess(provider, 'town.name') }}<br>
+                            {{ provider.postcode }}<br>
+                            {{ safeAccess(provider, 'state.name') }}
+                        </td>
+                        <td class="text-center">{{ provider.xray_facility_id ? 'Yes' : 'No' }}</td>
+                        <td>{{ provider.phone }}</td>
+                        <td>{{ provider.sop_compliance }}</td>
+                        <td>{{ provider.last_visit_report_date }}</td>
+                        <td class="text-center">{{ provider.allocations_last_year+'/'+provider.allocations_current_year }}</td>
+                        <td class="text-center">{{ provider.examined_last_year+'/'+provider.examined_current_year }}</td>
+                        <td class="text-center">{{ provider.certification_last_year+'/'+provider.certification_current_year }}</td>
+                        <td>{{ provider.status }}</td>
+                        <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                        <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                        <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+                        
+                        <td>
+                            <% if has_permission?('VIEW_OPERATION_HOUR_DOCTOR') %>
+                            <a class="btn btn-sm btn-secondary" data-toggle="tooltip" data-html="true"
+                                title="View Operation Hours" data-original-title="View Operation Hours"
+                                :href="'/doctors/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <table class="<%= index_table_class %> table-sm" v-if="visit_plan.visitable_type == 'Laboratory'">
+                <thead>
+                    <tr class="text-center">
+                        <th class="module-row-numbers"><input type="checkbox" v-model="selectAll" @click="select"> #
+                        </th>
+                        <th>Laboratory Code</th>
+                        <th class="min-width-120">Laboratory Name</th>
+                        <th>Facility Type</th>
+                        <th class="min-width-120">Address</th>
+                        <th>Total Associated Clinic</th>
+                        <th>Phone</th>
+                        <th>Last Visit Date</th>
+                        <th>Status</th>
+                        <th>Category</th>
+                        <th>Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr v-if="!providers.length">
+                        <td colspan="12" class="text-danger">No records found.</td>
+                    </tr>
+
+                    <tr v-if="is_loading">
+                        <td colspan="12" class="text-info">Fetching records ...</td>
+                    </tr>
+
+                    <tr v-for="(provider, index) in providers">
+                        <td class="module-row-numbers">
+                            <input type="checkbox" :value="provider" v-model="selected_providers"
+                                v-on:change="selectProviderUpdate($event)">
+                            {{ index + 1 }}
+                        </td>
+                        <td>
+                            <% if has_permission?('VIEW_LABORATORY') %>
+                                <a target="_blank" :href="'/laboratories/'+provider.id">{{ provider.code }}</a>
+                            <% else %>
+                                {{ provider.code }}
+                            <% end %>
+                        </td>
+                        <td>{{ provider.name }}</td>
+                        <td v-if="provider.laboratory_type_id == 1 || provider.laboratory_type_id == 2">Full/Partial</th>
+                        <td v-if="provider.laboratory_type_id == 3">Collection</th>
+                        <td>
+                            {{ provider.address1 }}<br v-if="provider.address1">
+                            {{ provider.address2 }}<br v-if="provider.address2">
+                            {{ provider.address3 }}<br v-if="provider.address3">
+                            {{ provider.address4 }}<br v-if="provider.address4">
+                            {{ safeAccess(provider, 'town.name') }}<br>
+                            {{ provider.postcode }}<br>
+                            {{ safeAccess(provider, 'state.name') }}
+                        </td>
+                        <td><a :href="'<%= internal_doctors_path%>'+'?laboratory_code='+provider.code" target="_blank">{{ provider.doctors | associated_clinic }}</a></td>
+                        <td>{{ provider.phone }}</td>
+                        <td>{{ provider.last_visit_report_date }}</td>
+                        <td>{{ provider.status }}</td>
+                        <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                        <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                        <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+
+                        <td>
+                            <% if has_permission?('VIEW_OPERATION_HOUR_LABORATORY') %>
+                            <a class="btn btn-sm btn-secondary" data-toggle="tooltip" data-html="true"
+                                title="View Operation Hours" data-original-title="View Operation Hours"
+                                :href="'/laboratories/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <table class="<%= index_table_class %> table-sm" v-if="visit_plan.visitable_type == 'XrayFacility'">
+                <thead>
+                    <tr class="text-center">
+                        <th class="module-row-numbers"><input type="checkbox" v-model="selectAll" @click="select"> #
+                        </th>
+                        <th>X-Ray Code</th>
+                        <th class="text-nowrap">X-Ray Name</th>
+                        <th class="min-width-120">License Holder Name</th>
+                        <th class="min-width-120">Address</th>
+                        <th style="width: 5%">Total Associated Clinic</th>
+                        <th>Phone</th>
+                        <th>SOP Compliance</th>
+                        <th>Last Visit Date</th>
+                        <th style="width: 5%">Allocation (<%= last_year %>/<%= current_year %>)</th>
+                        <th style="width: 5%">Examined (<%= last_year %>/<%= current_year %>)</th>
+                        <th>Status</th>
+                        <th>Category</th>
+                        <th>Action(s)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr v-if="!providers.length">
+                        <td colspan="15" class="text-danger">No records found.</td>
+                    </tr>
+
+                    <tr v-if="is_loading">
+                        <td colspan="15" class="text-info">Fetching records ...</td>
+                    </tr>
+
+                    <tr v-for="(provider, index) in providers">
+                        <td class="module-row-numbers">
+                            <input type="checkbox" :value="provider" v-model="selected_providers"
+                                v-on:change="selectProviderUpdate($event)">
+                            {{ index + 1 }}
+                        </td>
+                        <td>
+                            <% if has_permission?('VIEW_XRAY_FACILITY') %>
+                                <a target="_blank" :href="'/xray_facilities/'+provider.id">{{ provider.code }}</a>
+                            <% else %>
+                                {{ provider.code }}
+                            <% end %>
+                        </td>
+                        <td>{{ provider.name }}</td>
+                        <td>{{ provider.license_holder_name }}</td>
+                        <td>
+                            {{ provider.address1 }}<br v-if="provider.address1">
+                            {{ provider.address2 }}<br v-if="provider.address2">
+                            {{ provider.address3 }}<br v-if="provider.address3">
+                            {{ provider.address4 }}<br v-if="provider.address4">
+                            {{ safeAccess(provider, 'town.name') }}<br>
+                            {{ provider.postcode }}<br>
+                            {{ safeAccess(provider, 'state.name') }}
+                        </td>
+                        <td class="text-center"><a :href="'<%= internal_doctors_path %>'+'?xray_facility_code='+provider.code" target="_blank">{{ provider.doctors | associated_clinic }}</a></td>
+                        <td>{{ provider.phone }}</td>
+                        <td>{{ provider.sop_compliance }}</td>
+                        <td>{{ provider.last_visit_report_date }}</td>
+                        <td class="text-center">{{ provider.allocations_last_year+'/'+provider.allocations_current_year }}</td>
+                        <td class="text-center">{{ provider.examined_last_year+'/'+provider.examined_current_year }}</td>
+                        <td>{{ provider.status }}</td>
+                        <td v-if="!provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-danger"><b class="text-white">Red</b></td>
+                        <td v-if="provider.is_previous_year_exist && !provider.is_current_year_exist" class="bg-warning"><b class="text-white">Yellow</b></td>
+                        <td v-if="provider.is_current_year_exist" class="bg-success"><b class="text-white">Green</b></td>
+
+                        <td>
+                            <% if has_permission?('VIEW_OPERATION_HOUR_XRAY_FACILITY') %>
+                            <a class="btn btn-sm btn-secondary" data-toggle="tooltip" data-html="true"
+                                title="View Operation Hours" data-original-title="View Operation Hours"
+                                :href="'/xray_facilities/'+provider.id+'/operation_hours'" target="_blank">View Operation Hours</a>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

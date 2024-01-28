@@ -1,0 +1,5 @@
+<label class="col-md-4 col-form-label" for="<%= "REFUND_PAYMENT_FAILED_REMINDER_DAYS" %>"><%= @system_configurations["REFUND_PAYMENT_FAILED_REMINDER_DAYS"].name %></label>
+<div class="col-md-8">
+    <%= number_field_tag "REFUND_PAYMENT_FAILED_REMINDER_DAYS", @system_configurations["REFUND_PAYMENT_FAILED_REMINDER_DAYS"].new_value, class: "form-control", required: true, readonly: true %>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["REFUND_PAYMENT_FAILED_REMINDER_DAYS"].value %></p>
+</div>

@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :explanation_non_compliances, 'Non-Compliances', class: 'required' %>
+            <div class="input-group">
+                <%= form.text_area :explanation_non_compliances, class: 'letter-wysiwyg form-control', required: true, value: @letter.explanation_non_compliances.try(:html_safe), data: { parsley_errors_container: "#select2_parsley_error__wysiwyg_box", parsley_class_handler: ".note-editor.note-frame" } %>
+                <div id="select2_parsley_error__wysiwyg_box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <%= form.label :explanation_clauses, 'Clauses', class: 'required' %>
+            <div class="input-group">
+                <%= form.text_area :explanation_clauses, class: 'letter-wysiwyg form-control', required: true, value: @letter.explanation_clauses.try(:html_safe), data: { parsley_errors_container: "#select2_parsley_error__wysiwyg_box_2", parsley_class_handler: ".note-editor.note-frame" } %>
+                <div id="select2_parsley_error__wysiwyg_box_2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%=render 'explanation_signature_modal', {form: form} %>
+<%=render 'summernote_liststyle_script' %>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.letter-wysiwyg').summernote({
+    height: 100,
+    width: 550,
+    toolbar: [
+        [ 'font', [ 'bold', 'italic', 'underline', 'strikethrough'] ],
+        ['para', ['ul', 'ol', 'listStyles', 'indent', 'outdent']],
+        [ 'view', [ 'codeview' ] ]
+    ]
+});
+</script>
+<% end %>

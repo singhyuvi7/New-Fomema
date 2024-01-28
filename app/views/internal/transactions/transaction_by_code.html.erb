@@ -1,0 +1,18 @@
+<%= nested_form_for @xray_dispatch, url: "" do |form| %>
+    <table data-transmit-date="<%= @transaction.xray_transmit_date.to_s %>">
+        <%= form.fields_for :xray_dispatch_items do |dispatch_items_form| %>
+            <tr class="dispatch-items-row">
+                <td><%= @transaction.code %></td>
+                <td><%= @transaction.foreign_worker.code %></td>
+                <td><%= @transaction.xray_transmit_date&.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                <td><%= @transaction.doctor_examination&.suitability %></td>
+
+                <td>
+                    <%= dispatch_items_form.hidden_field :xray_dispatch_id, value: params[:xray_dispatch_id] %>
+                    <%= dispatch_items_form.hidden_field :transaction_id, value: @transaction.id %>
+                    <%= dispatch_items_form.link_to_remove "Remove",  id: "remove_item", class: "btn btn-danger btn-sm remove-row" %>
+                </td>
+            </tr>
+        <% end %>
+    </table>
+<% end %>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>FOMEMA</title>
+        <%= csrf_meta_tags %>
+        <%= csp_meta_tag %>
+
+        <%= stylesheet_link_tag    'internal/application', media: 'all' %>
+        <%= javascript_include_tag 'internal/application' %>
+    </head>
+
+    <body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+        <%= render "internal/shared/header" %>
+        <%= render "internal/shared/aside" %>
+        <div class="app-body">
+            <%= render "internal/shared/sidebar" %>
+            <main class="main">
+
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item text-blue">  <%= params[:controller].titleize %>/<%= params[:action].capitalize %></li>
+            </ol>
+
+            <div class="container-fluid margin-top-10">
+                <%= render "internal/shared/menu" %>
+                <%= yield %>
+            </div>
+
+            </main>
+
+            <%= render "internal/shared/aside" %>
+        </div>
+        <%= render "internal/shared/footer" %>
+    </body>
+</html>

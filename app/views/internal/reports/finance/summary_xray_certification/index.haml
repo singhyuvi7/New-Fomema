@@ -1,0 +1,33 @@
+.card
+  .card-header
+    %strong Finance - Certification - Xray Facility Summary
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      .card
+        .card-header
+          %strong Search
+        = form_with(url: summary_xray_certification_internal_finance_reports_path(format: :xlsx), method: :get, local: true) do |form|
+          .card-body
+            .row
+              .col-md-6
+                .row.form-group
+                  = form.label :certification_date_from, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :certification_date_from, class: 'form-control datepicker datepicker-range-filter', data: { type: "start", target: "from"}, required: true, max: Date.today.strftime("%F")
+              .col-md-6
+                .row.form-group
+                  = form.label :certification_date_to, class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.text_field :certification_date_to, class: 'form-control datepicker datepicker-range-filter', data: { type: "end", target: "from"}, required: true, max: Date.today.strftime("%F")
+              .col-md-6
+                .row.form-group
+                  = form.label :group , class: 'col-sm-3 col-form-label'
+                  .col-sm-9
+                    = form.select :group, options_for_select([['ALL(GRP AND NON-GRP)', :all], ['NON-GROUP', :non_group], ['Group-Giro', :group_giro]].concat(@service_provider_groups), params[:group]), { prompt: true }, { class: 'form-control', required: true }
+          .card-footer
+            .text-right
+              - if has_permission? 'FINANCE_REPORTS'
+                = form.button :export, class: 'btn btn-primary btn-sm' do
+                  %i.fa.fa-download
+                  Download

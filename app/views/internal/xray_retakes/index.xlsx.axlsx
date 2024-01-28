@@ -1,0 +1,95 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+  wrap = style.add_style alignment: {wrap_text: true}
+
+    wb.add_worksheet(name: 'Retakes') do |sheet|
+        sheet.merge_cells "A1:A1"
+        sheet.merge_cells "A2:A2"
+        # sheet.add_row([@company_name], style: [title_style])
+        # sheet.add_row([""])
+        sheet.add_row([
+            "Transaction ID",
+            "X-Ray Code",
+            "Worker Code",
+            "Worker Name",
+            "X-Ray Taken Date",
+            "Retake Request",
+            "Retake Reason",
+            "Retake X-Ray Facility",
+            (@retake_review_type == "XrayReview") ? "Radiographer Name" : "PCR Name",
+            "Retake Request Date",
+            "Retake Approval Date",
+            "Retake Request Status",
+            "Duration"
+        ],
+        style: [
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style
+            ]
+        )
+
+        my_types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string
+        ]
+
+        my_styles = [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil
+        ]
+        @xray_retakes.find_each do |xray_retake|
+
+            sheet.add_row([
+                xray_retake.transactionz.code,
+                xray_retake.transactionz.xray_facility&.code,
+                xray_retake.transactionz&.foreign_worker&.code,
+                xray_retake.transactionz&.foreign_worker&.name,
+                xray_retake.transactionz&.xray_examination&.xray_taken_date.nil? ? "N/A" : xray_retake.transactionz&.xray_examination.xray_taken_date.strftime(get_standard_date_format),
+                xray_retake.retake_review_type,
+                xray_retake.retake_reason&.name,
+                "#{xray_retake.xray_facility&.name} (#{xray_retake.xray_facility&.code})",
+                xray_retake.creator.name,
+                xray_retake.created_at.nil? ? "N/A" : xray_retake.created_at.strftime(get_standard_date_format),
+                xray_retake.approved_at.nil? ? "N/A" : xray_retake.approved_at.strftime(get_standard_date_format),
+                xray_retake.approval_status,
+                xray_retake.retake_duration,
+            ], types: my_types, style: my_styles)
+        end
+    end
+end

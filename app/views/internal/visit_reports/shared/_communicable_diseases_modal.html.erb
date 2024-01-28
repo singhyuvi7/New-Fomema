@@ -1,0 +1,51 @@
+<!-- Modal -->
+<div class="modal fade" id="communicableDiseaseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Communicable Disease List</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="communicable-diseases-form">
+            <table id="communicable-disease-table" class="table">
+                <thead>
+                    <tr>
+                        <th class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Certification Date</th>
+                        <th>Disease</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if @transactions.blank? %>
+                        <tr>
+                            <td colspan="9" class="text-danger">No records found.</td>
+                        </tr>
+                    <% else %>
+                        <% @transactions.each do |transaction| %>
+                            <tr>
+                                <td><input type="checkbox" class="child-checkbox" name="ids[]" value="<%= transaction.id %>" data-transaction-id="<%= transaction.id %>"></td>
+                                <td><%= transaction.fw_code %></td>
+                                <td><%= transaction.fw_name %></td>
+                                <td><%= transaction.certification_date.try(:strftime,'%d/%m/%Y') %></td>
+                                <td><%= simple_format transaction.display_communicable_diseases_list, class: "mb-0" %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                </tbody>
+            </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a href="<%= internal_visit_report_explanation_letter_path(@visit_report&.id) %>" target="_blank" class="btn btn-primary" id="explanationLetterBtn" v-on:click="generateExplanationLetter">
+            Generate Explanation Letter
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

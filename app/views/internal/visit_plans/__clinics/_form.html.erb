@@ -1,0 +1,37 @@
+
+<%= render "/shared/all_flash" %>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :visit_type, class: 'required' %>
+            <%= form.select :visit_type, options_for_select(VisitPlan::INSPECTORATE_CATEGORIES.invert, form.object.try(:visit_type)), {include_blank: 'Select Option'}, { class: 'form-control'}%>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="inspect_from" class="col-form-label">Inspect From</label>
+            <%= form.date_field :inspect_from, class: 'form-control', required: true %>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="inspect_to" class="col-form-label">Inspect To</label>
+            <%= form.date_field :inspect_to, class: 'form-control', required: true %>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <%= form.label :comment, "Comment", class: 'col-form-label' %>
+            <%= form.text_area :comment, class: "form-control" %>
+        </div>
+    </div>
+</div>
+
+        

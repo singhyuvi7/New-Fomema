@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header bg-transparent border-0 ">
+    <Strong>  Medical Result </strong> <!--Foreign Worker Medical Result-->
+    </div>
+
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <% if @results.present? %>
+            <%= render "search_results", foreign_workers: @results %>
+        <% elsif params[:code].present? || params[:passport_number].present? %>
+            <div class="card">
+                <div class="card-body">
+                    No results found
+                </div>
+            <div>
+        <% end %>
+    </div>
+</div>

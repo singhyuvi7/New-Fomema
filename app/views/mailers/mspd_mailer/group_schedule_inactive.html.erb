@@ -1,0 +1,13 @@
+<p>
+    Dear MSPD,
+</p>
+
+<p>
+    Attached, list of inactive SP in service provider group payment/company from <% inactive_date=DateTime.now.beginning_of_day - SystemConfiguration.find_by(code: "MSPD_INACTIVE_GROUP_IN_X_DAYS").value.to_i.days %> <%= inactive_date.strftime('%d/%m/%Y') %> as at <%= @today.strftime('%d/%m/%Y') %>  for your kind attention.
+</p>
+    Thanks.
+</p>
+
+<p>
+    ***This is an auto generated email. Do not reply to this email.***
+</p>

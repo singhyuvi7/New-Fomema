@@ -1,0 +1,35 @@
+<div class="card">
+    <div class="card-header">
+        Filter
+    </div>
+    <%= form_tag daily_balance_quota_internal_mspd_reports_path, method: 'get' do |form| %>
+        <div class="card-body">
+        <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label for="state_id" class="col-sm-3 col-form-label">State</label>
+                <div class="col-sm-9">
+                    <%= select_tag :state_id, options_from_collection_for_select(State.order(:name).all, :id, :name, params[:state_id]), include_blank: form_select_option_text, class: 'form-control' do %>
+                        State
+                    <% end %>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label for="activated" class="col-sm-3 col-form-label">Town</label>
+                <div class="col-sm-9">
+                    <%= select_tag :town_id, options_from_collection_for_select(Town.where(state_id: params[:state_id]).order(:name).all, 'id', 'name',  params[:town_id]), include_blank: form_select_option_text, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button daily_balance_quota_internal_mspd_reports_path %>
+            <button type="submit" class="btn btn-sm btn-warning" formaction="<%= daily_balance_quota_internal_mspd_reports_path(format: :xlsx) %>"><i class="fa fa-file-excel"> Export</i></button>
+            <%=raw filter_button %>
+        </div>
+    <% end %>
+</div>
+<%=render '/shared/state_towns_js' %>

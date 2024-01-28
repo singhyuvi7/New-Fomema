@@ -1,0 +1,99 @@
+<div class="modal fade" id="search-agency-modal" tabindex="-1" role="dialog" aria-labelledby="search-agency" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Search agency</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-agency-form">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="search_agency_code" id="search_agency_code">
+                                </div>
+                                <label class="col-md-2 col-form-label">Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="search_agency_name" id="search_agency_name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button type="button" id="search-agency-search-button" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table id="search-agency-table" class="<%= index_table_class %>">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>State</th>
+                            <th>Town</th>
+                            <th>Postcode</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7">Search agency</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content-->
+    </div>
+    <!-- /.modal-dialog-->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#search-agency-search-button').click(function () {
+    var data = {
+        code: $('#search_agency_code').val(),
+        name: $('#search_agency_name').val(),
+    };
+    if ($('#search_agency_code').val().length < 1 && $('#search_agency_name').val().length < 1) {
+        alert('Please key in code or name');
+        return;
+    }
+    $.ajax({
+        url: '<%= internal_agencies_path %>.json',
+        method: 'GET',
+        data: data,
+        success: function (response) {
+            $('#search-agency-table tbody').html('');
+            for (var i=0, j = response.length; i < j; i ++){
+                $('#search-agency-table tbody').append('<tr><td>' + response[i].code + '</td>' + 
+                '<td>' + response[i].name + '</td>' + 
+                '<td>' + [response[i].address1, response[i].address2, response[i].address3, response[i].address4].filter(function (el) {
+                    return el;
+                }).join('<br>') + '</td>' + 
+                '<td>' + (response[i]['state'] ? response[i].state.name : '') + '</td>' + 
+                '<td>' + (response[i]['town'] ? response[i].town.name : '') + '</td>' + 
+                '<td>' + response[i].postcode + '</td>' + 
+                '<td class="text-right"><button type="button" class="btn btn-primary" data-agency="' + encodeURIComponent(JSON.stringify(response[i])) + '" onclick="select_agency(this)">Select</button></td></tr>');
+            }
+        },
+    });
+});
+
+function select_agency(btn)
+{
+    var agency = JSON.parse(decodeURIComponent($(btn).attr('data-agency')));
+    $('#agency_id').val(agency.id);
+    $('#agency_display').html(agency.name + " (" + agency.code + ")");
+    $('#search-agency-modal').modal('toggle');
+}
+</script>
+<% end %>

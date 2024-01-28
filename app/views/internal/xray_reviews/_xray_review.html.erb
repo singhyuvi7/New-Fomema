@@ -1,0 +1,22 @@
+<%=render 'internal/xqccs/shared/perform_by_info', { 
+    name: xray_review.radiographer&.name,
+    code: xray_review.radiographer&.name,
+    label: 'Radiographer' 
+} if xray_review&.radiographer&.present?
+%>
+<form>
+<%=render 'internal/xray_reviews/shared/checklist', { xray_review: xray_review } %>
+
+<% if xray_review.transactionz.xray_film_type&.downcase === 'analog' %>
+    <%=render 'internal/xray_reviews/shared/perform_by', { xray_review: xray_review } %>
+<% end %>
+
+<%=render 'internal/xray_reviews/shared/conclusion', { xray_review: xray_review } %>
+
+<% if xray_review.xqcc_review_identicals.present? %>
+    <%=render 'internal/xray_reviews/shared/identical', { xray_review: xray_review } %>
+<% end %>
+
+<%=render 'internal/xray_reviews/shared/comments', { xray_review: xray_review } %>
+
+</form>

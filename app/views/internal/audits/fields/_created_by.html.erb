@@ -1,0 +1,2 @@
+<th>Created By</th>
+<td><%= value %> - <%= User.find(value)&.name.try(:titleize) if !value.blank? %></td>

@@ -1,0 +1,82 @@
+<%= wicked_pdf_stylesheet_link_tag 'pdf/fontawesome/fontawesome.min.css' %>
+<%= wicked_pdf_stylesheet_link_tag "pdf/lqcc_visit_summary" %>
+<%
+    @checkbox_unchecked = image_tag wicked_pdf_asset_base64 "icons/checkbox_unchecked.png"
+    @checkbox_checked   = image_tag wicked_pdf_asset_base64 "icons/checkbox_checked.png"
+    
+    action = params[:action]
+    not_summary = ['download'].include?(action)
+    visit_report_lab = not_summary ? @visit_report.visit_report_laboratory : @visit_report.visit_report_laboratory_summary
+    officers = @visit_report.visit_report_visitors
+
+    report_categories = VisitReportLaboratory::REPORT_CATEGORIES
+    inverted_referred_tabs = {
+        malaria_bfmp: 'malaria_screening',
+        hbsag_verification: 'hbsag_screening',
+        hiv_verification: 'hiv_screening',
+        tpha_tppa: 'vdrl_rpr',
+        urine_drugs_verification: 'urine_drugs_screening',
+        serum_assay: 'upt'
+    }
+%>
+
+<div class="visit-summary page-container">
+<%=render 'internal/visit_reports/laboratories/pdf/visit_details', {visit_report_lab: visit_report_lab, officers: officers} %>
+<hr>
+
+    <div class="visit-findings medical-results-content medical-history">
+        <h3>Part 2: Visit Findings</h3>
+
+        <% @tabs.each_with_index do |(key, value), index| %>
+            <% 
+                is_in_house = !inverted_referred_tabs.as_json[key.to_s].blank? ? visit_report_lab.try(inverted_referred_tabs.as_json[key.to_s])&.in_house : nil 
+            %>
+            <% if is_in_house.blank? || is_in_house == 'YES' %>
+                <div class="finding-section">
+                    <table>
+                        <tbody>
+                            <hr>
+                            <tr>
+                                <td class="table-name" colspan="2"><%= value %></td>
+                                <% if !report_categories.include?(key.to_s) %>
+                                    <td class="text-center bold">YES</td>
+                                    <td class="text-center bold">NO</td>
+                                    <td class="text-center bold">N/A</td>
+                                <% else %>
+                                    <td colspan="3"></td>
+                                <% end %>
+                            </tr>
+
+                            <% if report_categories.include?(key.to_s) %>
+                                <%=render "internal/visit_reports/laboratories/pdf/full_partial/#{key}", { finding: visit_report_lab.try(key), report_category: key.to_s, shared_path: 'internal/visit_reports/laboratories/pdf/full_partial/findings' } %>
+                            <% else %>
+                                <%=render "internal/visit_reports/laboratories/pdf/full_partial/#{key}", {report_category: key.to_s, visit_report_lab: visit_report_lab } rescue nil %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            <% end %>
+        <% end %>
+
+    </div>
+    <!-- signature -->
+    <% if !not_summary %>
+        <div class="signature">
+            <div class="d-flex">
+                <div class="signature-box-1">
+                    <div>Laboratory's Personnel Acknowledgement</div>
+                    <%= image_tag visit_report_lab.lab_personnel_signature, class: "signature-img" if !visit_report_lab.lab_personnel_signature.blank? %>
+                    <div>(<%= visit_report_lab.lab_personnel_name %>)</div>
+                    <div><%= visit_report_lab.lab_personnel_designation %></div>
+                </div>
+
+                <div class="signature-box-2">
+                    <div>Fomema's Officer</div>
+                    <%= image_tag visit_report_lab.fomema_officer_signature, class: "signature-img" if !visit_report_lab.fomema_officer_signature.blank? %>
+                    <div>(<%= visit_report_lab.fomema_officer_name %>)</div>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    <!-- end signature -->
+</div>

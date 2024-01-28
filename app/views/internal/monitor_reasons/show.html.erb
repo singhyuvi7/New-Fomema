@@ -1,0 +1,70 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Monitor Reasons</strong> - Monitor Reason Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="monitor_reason_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @monitor_reason.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="monitor_reason_code">Description</label>
+                    <p class="form-control-plaintext">
+                        <%= @monitor_reason.description %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="monitor_reason_code">Short Description</label>
+                    <p class="form-control-plaintext">
+                        <%= @monitor_reason.short_description %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_monitor_reasons_path) %>
+            <% if has_permission?('EDIT_MONITOR_REASON') %>
+                <%=raw show_edit_button(edit_internal_monitor_reason_path(@monitor_reason)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_MONITOR_REASON") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_monitor_reason_audits_path(@monitor_reason) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

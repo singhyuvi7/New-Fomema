@@ -1,0 +1,101 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Status Schedules</strong> - Status Schedule Detail
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">Type</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.status_scheduleable_type %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">Service Provider</label>
+                    <p class="form-control-plaintext">
+                        <%= "#{ @status_schedule.status_scheduleable&.name} (#{@status_schedule.status_scheduleable&.code})" %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <% if @status_schedule.status_scheduleable_type.eql? 'Doctor' %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">Clinic Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.status_scheduleable.clinic_name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <% end %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">From</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.from.strftime("%d/%m/%Y") %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">To</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.to&.strftime("%d/%m/%Y") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">Status</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.status_scheduleable.class.name.constantize::STATUSES[@status_schedule.status] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_code">Status Reason</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.status_scheduleable.class.name.constantize::STATUS_REASONS[@status_schedule.status][@status_schedule.status_reason] if @status_schedule.status_scheduleable.class.name.constantize::STATUS_REASONS[@status_schedule.status] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="user_code">Comment</label>
+                    <p class="form-control-plaintext">
+                        <%= @status_schedule.comment %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+        <style>
+            form.button_to {
+                display: inline;
+            }
+        </style>
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_status_schedules_path) %>
+            <%=raw show_edit_button edit_internal_status_schedule_path(@status_schedule) if (has_permission?('EDIT_STATUS_SCHEDULE') and !@status_schedule.to.blank? and @status_schedule.to > Date.today) %>
+        </div>
+
+    </div>
+
+</div>

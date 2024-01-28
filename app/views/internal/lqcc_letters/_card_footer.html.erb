@@ -1,0 +1,28 @@
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_lqcc_letters_path) %>
+
+       <!-- <% if has_any_permission?("CREATE_LQCC_LETTER","EDIT_LQCC_LETTER") && !['APPROVAL','APPROVED'].include?(@letter.explanation_status) && params[:action] != 'show' %>
+            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#signatureModal">E-Signature</button>
+            <button id="draft_submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Save draft" data-original-title="Save draft" type="submit" name="submit" value="Save draft" data-disable-with="Save" formnovalidate><i class="icon-pencil"></i> Save draft</button>
+            
+            <% if !@letter.explanation_signature_name.blank? && !@letter.explanation_signature_designation.blank? && !@letter.explanation_signature.blank? %>
+                <%=raw edit_submit_for_approval_button() %>
+            <% end %>
+        <% end %> -->
+
+        <% if has_any_permission?("CREATE_LQCC_LETTER","EDIT_LQCC_LETTER") && !['APPROVAL','APPROVED'].include?(@letter.explanation_status) %>
+            <%= link_to "Preview", preview_explanation_letter_internal_lqcc_letter_path(@letter), target: "_blank", class: "btn btn-success btn-sm" if ['edit'].include?(params[:action]) %>
+
+            <% if params[:action] != 'show' %>
+                <button id="draft_submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Save draft" data-original-title="Save draft" type="submit" name="submit" value="Save draft" data-disable-with="Save" formnovalidate><i class="icon-pencil"></i> Save draft</button>
+                
+                <%=raw edit_submit_for_approval_button() %>
+            <% end %>
+        <% end %>
+
+        <% if has_any_permission?("CREATE_LQCC_LETTER") && ['APPROVED'].include?(@letter.explanation_status) && @letter.warning_status.blank? %>
+            <%= link_to "Create Warning Letter", edit_warning_letter_internal_lqcc_letter_path(@letter), class: "btn btn-sm btn-primary" %>
+        <% end %>
+    </div>
+</div>

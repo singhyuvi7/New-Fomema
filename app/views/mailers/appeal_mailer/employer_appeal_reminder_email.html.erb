@@ -1,0 +1,44 @@
+<p>
+    <b>Dear Valued Customer,</b><br>
+</p>
+
+<p>
+    We are delightful to inform that your appeal registration for the following foreign worker has been successful:<br>
+</p>
+
+<p>
+    <% if ["Employer", "User"].include?(@appeal.registered_by_type) %>
+        Name of Employer: <b><%= @appeal.transactionz.employer.name %></b><br>
+    <% elsif @appeal.registered_by_type == "Agency" %>
+        Name of Agency: <b><%= @appeal.transactionz.agency.name %></b><br>
+    <% end %>
+    Name of Foreign Worker: <b><%= @appeal.transactionz.fw_name %></b><br>
+    Worker Code: <b><%= @appeal.transactionz.fw_code %></b><br>
+</p>
+
+<p>
+    <%= @appeal.registered_by_type == "Agency" ? "Agency" : "Employer" %> is advised to immediately contact/make appointment with the original doctor/clinic as below for the next appeal process:<br>
+</p>
+
+<p>
+    Name of Doctor: <b><%= @doctor.name %></b><br>
+    Name of Clinic: <b><%= @doctor.clinic_name %></b><br>
+    Address of Clinic: <b><%= @doctor.address1 %>,<%= @doctor.address2 %>,<%= @doctor.address3 %>,<%= @doctor.address4 %>,<%= @doctor&.town&.name %>,<%= @doctor.postcode %>,<%= @doctor&.state&.name %></b><br>
+</p>
+
+<p>
+    Thank you for your kind attention, cooperation and continuous support.<br>
+</p>
+
+<p>
+    Regards,<br>
+</p>
+
+<p>
+    <b>Medical Review and Appeal Department</b><br>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email.*** <br>
+    <i>***Email dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

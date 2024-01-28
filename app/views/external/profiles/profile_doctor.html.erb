@@ -1,0 +1,259 @@
+<% if flash[:notice] %>
+    <p class="alert alert-success"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @user.errors.any? %>
+    <p class="alert alert-danger">error : <%= @user.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if @doctor.errors.any? %>
+    <p class="alert alert-danger">error : <%= @doctor.errors.full_messages.join(', ') %></p>
+<% end %>
+
+<% if flash[:error] %>
+    <p class="alert alert-danger"><%= flash[:error] %></p>
+<% end %>
+
+<%= form_for @user, url: external_profile_update_path, method: :PUT ,html: {id: "profile_form", class: "with-parsley"} do |form| %>
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-10">
+                    <strong>Profile - <%= form.label :doctor, @doctor.code %></strong>
+                </div>
+                <div class="col-md-2">
+                    <strong>Registration Date: <%= form.label :activated_at, @doctor&.activated_at&.strftime(get_standard_date_format) %></strong>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <%= form.label :title_id, "Title" %>
+                        <%= form.select :title_id, options_from_collection_for_select(Title.order(:name).all, 'id', 'name', form.object.title_id), {include_blank: form_select_option_text}, class: 'form-control select2' %>
+                        <input type="hidden" name="user[title_id]" id="hidden_title_id" value=""/>
+                    </div>
+                </div>
+
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <%= form.label :name, 'Doctor Name', class: 'col-form-label required' %>
+                        <%= text_field :doctor, :name, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :icno, 'IC No.', class: 'col-form-label required' %>
+                        <%= text_field :doctor, :icno, class: 'form-control', required: true, disabled: true %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :clinic_name, 'Clinic Name', class: 'col-form-label required' %>
+                        <%= text_field :doctor, :clinic_name, { class: 'form-control', required: true, disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :nationality_id, 'Nationality', class: 'col-form-label required' %>
+                        <%= collection_select(:doctor, :nationality_id, Country.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :race_id, 'Race/Ethnic', class: 'col-form-label required' %>
+                        <%= collection_select(:doctor, :race_id, Race.order(:name).all, :id, :name, {include_blank: 'Select option'}, class: 'form-control', required: true, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :gender, 'Gender', class: 'required col-form-label' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :doctor, :gender, 'M', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="doctor_gender_m">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :doctor, :gender, 'F', class: "form-check-input", required: true %>
+                                <label class="form-check-label" for="doctor_gender_f">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :address1, 'Address', class: 'col-form-label required' %>
+                        <%= text_field :doctor, :address1, { class: 'form-control', required: true, disabled: true } %>
+                        <%= text_field :doctor, :address2, { class: 'form-control', disabled: true } %>
+                        <%= text_field :doctor, :address3, { class: 'form-control', disabled: true } %>
+                        <%= text_field :doctor, :address4, { class: 'form-control', disabled: true } %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'external/shared/profile_form_state_postcode_town', {form: form} %>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :phone, 'Phone', class: 'col-form-label required' %>
+                        <%= telephone_field :doctor, :phone, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :mobile, 'Mobile', class: 'col-form-label required' %>
+                        <%= telephone_field :doctor, :mobile, class: 'form-control', required: true, maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" } %>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <%= form.label :fax, 'Fax', class: 'col-form-label' %>
+                        <%= telephone_field :doctor, :fax, class: 'form-control', maxlength: '12', data: { parsley_maxlength: "12", parsley_maxlength_message: "Maximum length of 12 numbers", parsley_pattern: "[0-9]*", parsley_pattern_message: "Only numbers are allowed" }  %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email, 'Email', class: 'col-form-label required' %>
+                        <%= email_field :doctor, :email, { class: 'form-control', required: true} %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :email_payment, 'Email (Payment)', class: 'col-form-label' %>
+                        <%= email_field :doctor, :email_payment, { class: 'form-control' } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :apc_year, 'APC Year', class: 'col-form-label required' %>
+                        <% yearArr = [Date.current.years_ago(1).strftime('%Y'), Date.current.year, Date.current.years_since(1).year, Date.current.years_since(2).year, Date.current.years_since(3).year] %>
+                        <%= collection_select(:doctor, :apc_year, yearArr, :to_s, :to_s, {include_blank: form_select_option_text}, class: 'form-control select2', required: true) %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :apc_number, 'APC Number', class: 'col-form-label required' %>
+                        <%= number_field :doctor, :apc_number, { class: 'form-control', required: true, min: 0, max: 9999999999 } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= form.label :doctor_association, "I Am Member Of Doctor’s Association", class: 'col-form-label required' %>
+                        <div class="col-form-label">
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :doctor, :has_doctor_association, true, class: "has_doctor_association form-check-input", required:true %>
+                                <label class="form-check-label" for="doctor_has_doctor_association_true">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-3">
+                                <%= radio_button :doctor, :has_doctor_association, false, class: "has_doctor_association form-check-input" %>
+                                <label class="form-check-label" for="doctor_has_doctor_association_false">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6" id="doctor_association">
+                    <div class="form-group">
+                        <% field_id = generate_field_id(form, :associations) %>
+                        <%= form.label :associations, "Name Of Association", class: 'name_of_association' %>
+                        <span class="btn btn-sm btn-info" data-toggle="tooltip" data-html="true" title="Add Selection"><i class="fa fa-info"></i></span>
+                        <select name="doctor[associations][]" id="doctor_associations" class="form-control select2" multiple data-parsley-multiple="doctor[associations][]" data-select2-id="doctor_associations" data-parsley-errors-container="#select2_parsley_error__<%= field_id %>" data-parsley-class-handler='.select2-selection--multiple' data-parsley-group="doctor_associations">
+                            <%
+                                arrAssociation=[]
+                                if !@doctor.associations.nil?
+                                    @doctor.associations["association"].each do |association_id|
+                                        if !association_id.blank?
+                                            arrAssociation << association_id
+                                        end
+                                    end
+                                end
+                            %>
+                            <% Association.order(name: :asc).all().each do |ar| %>
+                                <option value="<%= ar.id %>" data-code="<%= ar.code %>"<%= " selected" if (arrAssociation || []).include?(ar.id.to_s) %>><%= ar.name %></option>
+                            <% end %>
+                        </select>
+                        <div id="select2_parsley_error__<%= field_id %>"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :district_health_office_id, 'Nearest District Health Office', class: 'col-form-label' %>
+                        <%= collection_select(:doctor, :district_health_office_id, DistrictHealthOffice.all, :id, :name,
+                        {include_blank: 'Select option'}, class: 'form-control select2', required: false, disabled: false) %>
+                    </div>
+                </div>
+            </div>
+
+            <%= render 'operating_hour' %>
+        </div>
+
+        <div class="card-footer text-right">
+            <a class="btn btn-primary" href="#">Cancel</a>
+            <button class="btn btn-primary" type="submit" name="save" id="save" value="Save" >Save</button>
+        </div>
+    </div>
+<% end %>
+
+<% content_for :page_end_scripts do %>
+    <%= render 'external/shared/profiles_script' %>
+    <script>
+
+            var i = $("input[type=radio][name='doctor[has_doctor_association]']:checked").val();
+            if (i == "true"){
+                $('.name_of_association').addClass("required");
+                $('#doctor_associations').removeAttr('disabled');
+                $('#doctor_associations').prop('required',true);
+            } else if (i == "false"){
+                $('.name_of_association').removeClass("required");
+                $('#doctor_associations').removeClass("required");
+                $('#doctor_associations').attr('disabled','disabled');
+                $('#doctor_associations').prop('required',false);
+            }
+
+        $(".has_doctor_association").change(function () {
+            var has_doctor_association = $(this).val();
+            if (has_doctor_association == "true") {
+                $('.name_of_association').addClass("required");
+                $('#doctor_associations').removeAttr('disabled');
+                $('#doctor_associations').prop('required',true);
+            } else if (has_doctor_association == "false") {
+                $('.name_of_association').removeClass("required");
+                $('#doctor_associations').removeClass("required");
+                $('#doctor_associations').attr('disabled','disabled');
+                $('#doctor_associations').val(false).trigger( "change" );
+                $('#doctor_associations').prop('required',false);
+            }
+        });
+    </script>
+<% end %>

@@ -1,0 +1,7 @@
+<a href="<%= internal_user_setup_path(activity.owner_id) %>"><%= activity.owner.name %></a>  perform XQCC Review on
+
+<% if activity.trackable %>
+    <a href="<%= internal_xray_review_path(activity.trackable.id) %>"><%= activity.trackable.transactionz&.code %></a>
+<% else %>
+    which has since been removed
+<% end %>

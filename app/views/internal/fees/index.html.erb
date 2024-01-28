@@ -1,0 +1,70 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Fees</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_FEE') %>
+                    <%=raw index_table_new_button(new_internal_fee_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                    <thead>
+                    <tr>
+                      <th class="module-row-numbers">#</th>
+                      <th>Code</th>
+                      <th>Name</th>
+                      <th>Amount (RM)</th>
+                      <th class="module-row-actions">Action(s)</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% if @fees.blank? %>
+                      <tr>
+                        <td colspan="5" class="text-danger">No records found.</td>
+                      </tr>
+                    <% else %>
+
+                      <% @fees.each.with_index((@fees.current_page - 1) * get_per + 1) do |fee, index| %>
+                        <tr>
+                          <td class="module-row-numbers"><%= index %></td>
+                          <td><%= fee.code %></td>
+                          <td><%= fee.name %></td>
+                          <td><%= fee.amount %></td>
+                          <td class="module-row-actions">
+                            <%=raw index_table_show_button(internal_fee_path(fee)) %>
+                            <% if has_permission?('EDIT_FEE') %>
+                              <%=raw index_table_edit_button edit_internal_fee_path(fee) %>
+                            <% end %>
+                            <% if has_permission?('DELETE_FEE') %>
+                              <%=raw index_table_delete_button(internal_fee_path(fee)) %>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+
+                    <% end %>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @fees %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

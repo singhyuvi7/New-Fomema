@@ -1,0 +1,9 @@
+<tr class="finding-row mso-iso-status">
+    <td class="row-name" colspan="2">Same Method & Reagent as Screening</td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:same_as_screening] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:same_as_screening] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>

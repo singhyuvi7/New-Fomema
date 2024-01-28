@@ -1,0 +1,147 @@
+/*
+body{
+  background-color:#f8f8f8;
+}
+.app-header.navbar{ background-color:#FFFFFF; }
+.logo-container{ height: 100%; 
+  .logo{ height:65%; margin-top:8px; }
+}
+#notice{
+  color:#04dbac;
+}
+#alert{
+  color:#d00410;
+}
+.form-group{
+  margin-bottom:5px;
+}
+.navbar-brand-full{
+  margin:0px 15px 0px 15px;
+}
+.app-header.navbar .dropdown-menu {
+    padding-bottom: 0;
+    line-height: 1.5;
+    margin-top: 16px;
+}
+.card-header .btn {
+  margin-top: 0;
+}
+.card-body, .card-block{
+  padding: 20px;
+}
+.btn-width-50{
+  width:50px;
+}
+.clickable-row {
+  cursor: pointer;
+}
+.btn-fomema{
+  color:#ffffff;
+  border-radius: 20px;
+}
+.btn-blue, .btn-blue:hover {
+  background-color: #337ab7;
+}
+.btn-white, .btn-white:hover {
+  background-color: #ffffff;
+  color:#337ab7;
+}
+.btn-green, .btn-green:hover {
+  background-color: #04dbac;
+}
+.btn-red, .btn-red:hover {
+  background-color: #d00410;
+  border:none; 
+}
+.form-inline{
+  padding: 5px 0px 5px 0px;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 5px;
+}
+.forgot-password{
+  color:#337ab7;
+  padding: 15px 10px 20px 10px;
+  font-size: small;
+}
+.text-blue{
+  color:#337ab7;
+}
+.text-bold{
+  font-weight: bold;
+}
+.margin-top-30{
+  margin-top: 30px;
+}
+.margin-top-10{
+  margin-top: 10px;
+}
+.margin-left-10{
+  margin-left:10px;
+}
+.margin-right-10{
+  margin-right:10px;
+}
+.margin-bottom-10{
+  margin-bottom:10px;
+}
+.padding-left-30{
+  padding-left:30px;
+}
+.padding-right-30{
+  padding-right:30px;
+}
+.width-100{
+  width:100%;
+}
+.footer{
+  margin-top: 120px;
+}
+*/
+
+.btn, .form-control {
+  border-radius: 0.2rem;
+}
+
+.module-actions {
+  margin-bottom: 6px;
+}
+
+ul.pagination {
+  margin-bottom: 0;
+}
+
+table th.module-row-numbers, table td.module-row-numbers {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 1%;
+  white-space: nowrap;
+}
+
+table th.module-row-actions, table td.module-row-actions {
+  width: 1%;
+  white-space: nowrap;
+}
+
+label.required:before {
+  content: "* ";
+  color: #f86c6b;
+}
+
+.approval-previous-value {
+  color: #f86c6b;
+}
+.approval-previous-value:before {
+  content: "Previous: ";
+  color: #f86c6b;
+}
+
+.condition-code {
+  display: none;
+}
+.condition-code::after {
+  content: " - ";
+}

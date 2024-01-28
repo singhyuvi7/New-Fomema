@@ -1,0 +1,32 @@
+<% @filter_options.each do |hash| %>
+    <div class="d-flex align-items-center mb-2">
+        <label class="mb-0 mr-3 w-em-10"><%= hash[:label] %></label>
+
+        <% case hash[:type] %>
+        <% when "date" %>
+            <% param = hash[:field_name] || :query_date %>
+            <%= text_field_tag param, params[param], placeholder: "Select Date", class: "w-em-34 form-control datepicker" %>
+        <% when "date range" %>
+            <% param        = hash[:field_name] || :filter_date %>
+            <% start_param  = "#{ param }_start" %>
+            <% end_param    = "#{ param }_end" %>
+
+            <%= text_field_tag start_param, params[start_param], class: "w-em-16 form-control datepicker datepicker-range-filter", placeholder: "Start Date", data: { type: "start", target: param }, min: hash[:min], max: hash[:max] %>
+
+            <span class="w-em-2 text-center">to</span>
+
+            <%= text_field_tag end_param, params[end_param], class: "w-em-16 form-control datepicker datepicker-range-filter", placeholder: "End Date", data: { type: "end", target: param }, min: hash[:min], max: hash[:max] %>
+
+            <i class="far fa-question-circle ml-2 clickable" style="font-size: 1.7em; color: #777;" aria-hidden="true" data-toggle="tooltip" title="Example: Querying data from 01/01/2020 to 07/01/2020 will query 01/01/2020 at 00:00:00 to 07/01/2020 at 23:59:59. If both start and end dates are the same, it will query 00:00:00 to 23:59:59 of the same day."></i>
+        <% when "month select" %>
+            <% param = hash[:field_name] || :query_month %>
+            <%= text_field_tag param, params[param], placeholder: "Select Month", class: "w-em-34 form-control datepicker-month" %>
+        <% when "select list" %>
+            <% param = hash[:field_name] || :selected_option %>
+            <%= select_tag param, options_for_select(hash[:list], params[param]), include_blank: hash[:placeholder] || form_select_option_text, class: "form-control w-em-34" %>
+        <% when "text field" %>
+            <% param = hash[:field_name] || :text_field %>
+            <%= text_field_tag param, params[param], placeholder: hash[:placeholder] || "Type here", class: "w-em-34 form-control" %>
+        <% end %>
+    </div>
+<% end %>

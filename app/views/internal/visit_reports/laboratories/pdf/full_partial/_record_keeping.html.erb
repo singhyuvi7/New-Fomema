@@ -1,0 +1,47 @@
+<%
+    findings = [
+        [:checked_before_transcription, "Reports been checked before transcription/issue"],
+        [:precaution_taken, "Precaution taken to avoid manipulation of results (Level of IT security)"],
+        [:records_kept_reg_lab, "Records of specimens and results are kept at the registered laboratory for at the last two(2) years"],
+        [:records_kept_at_least, "Records of specimens and results are kept for at least seven(7) years"]
+    ].map do |key, value|
+        comment = visit_report_lab.try("#{ key }_comment")
+        items = visit_report_lab.try("#{ key }_items")
+        {
+            number: "",
+            name: value,
+            key: key.to_s,
+            yes: visit_report_lab.try(key) == 'YES',
+            no: visit_report_lab.try(key) == 'NO',
+            na: visit_report_lab.try(key) == 'NA',
+            value: visit_report_lab.try("#{ key }_name"),
+            has_acc_option: true,
+            comment: comment,
+            items: items
+        }
+    end
+%>
+
+<% findings.each.with_index(1) do |finding, index| %>
+    <tr class="finding-row method-field">
+        <td class="table-index"><%= index %>.</td>
+        <td class="row-name">
+            <div class="row-wrap"><%= finding[:name] %></div>
+        </td>
+        <td class="text-center"><%= finding[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+        <td class="text-center"><%= finding[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+        <td class="text-center"><%= finding[:na] ? @checkbox_checked : @checkbox_unchecked %></td>
+    </tr>
+    <% if !finding[:comment].blank? %>
+        <tr>
+            <td class="table-index"></td>
+            <td>
+                <div class="finding-comment">
+                    <span class="bold">Comment :</span>
+                    <span class="unbold"><%= finding[:comment] %></span>
+                </div>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+    <% end %>
+<% end %>

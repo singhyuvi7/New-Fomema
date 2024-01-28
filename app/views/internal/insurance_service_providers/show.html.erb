@@ -1,0 +1,85 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Insurance Service Providers</strong> - Insurance Service Provider Detail
+    </div>
+
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="insurance_service_provider_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_service_provider.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="insurance_service_provider_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_service_provider.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="insurance_service_provider_display_name">Display Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_service_provider.display_name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="insurance_service_provider_payment_to_code">Payment To Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_service_provider.payment_to_code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="insurance_service_provider_active">Active</label>
+                    <p class="form-control-plaintext">
+                        <%= @insurance_service_provider.active ? "Yes" : "No" %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw show_back_button(internal_insurance_service_providers_path) %>
+            <% if has_permission?('EDIT_INSURANCE_SERVICE_PROVIDER') %>
+                <%=raw show_edit_button(edit_internal_insurance_service_provider_path(@insurance_service_provider)) %>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_INSURANCE_SERVICE_PROVIDER") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_insurance_service_provider_audits_path(@insurance_service_provider) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

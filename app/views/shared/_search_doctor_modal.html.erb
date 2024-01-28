@@ -1,0 +1,136 @@
+<div class="modal fade select2-modals" data-type="doctor" id="change-doctor-modal" role="dialog" aria-labelledby="doctor-pairing" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Doctor</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <%= form_tag search_for_doctors_shared_index_path, method: :post, remote: true, class: "facilities-filter-form", data: { type: "doctors" } do %>
+                <div class="modal-body">
+                    <%= hidden_field_tag :per, "", class: "ajax-input" %>
+                    <%= hidden_field_tag :page, "", class: "ajax-input" %>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <label class="col-form-label mb-4">Enter Postcode/Area and Year (If both Postcode and Area are not empty, priority given to Postcode)</label>
+
+                            <div class="row mt-3 mb-0">
+                                <label class="col-md-2 col-form-label">Postcode</label>
+                                <div class="col-md-4"><%= text_field_tag :postcode, "", placeholder: "Postcode, eg: 43000", class: "form-control ajax-input" %></div>
+                                <label class="col-md-2 col-form-label">Area</label>
+                                <div class="col-md-4"><%= text_field_tag :area, "", placeholder: "Area, eg: Kajang", class: "form-control ajax-input" %></div>
+                            </div>
+
+                            <div class="row mt-3 mb-0">
+                                <label class="col-md-2 col-form-label">Previous Year</label>
+                                <div class="col-md-4"><%= select_tag :previous_year, options_for_select((1..5).map {|x| Date.today.year - x}, Date.today.year), class: "form-control ajax-input" %></div>
+                                <label class="col-md-2 col-form-label" for="exclude_previous_year">Exclude Previous Year</label>
+                                <div class="col-md-4"><%= check_box_tag :exclude_previous_year_placeholder, 'true', false, class: "form-control" %></div>
+                                <%= hidden_field_tag :exclude_previous_year, 'false', class: "ajax-input" %>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <div class="btn btn-secondary clear-filters" data-type="doctors">Clear filters</div>
+                            <%= submit_tag "Search", class: "btn btn-primary filter-facilities-search", data: { type: "doctors" } %>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-3">Search results</label>
+
+                            <table id="doctor-search-results" class="table shared-search-table-results" data-type="doctors">
+                                <tr><td>Search for doctors</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pagination-holder" class="modal-body"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            <% end %>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        $('.clear-filters[data-type="doctors"]').click(function() {
+            $(`.facilities-filter-form[data-type="doctors"] .ajax-input`).val('');
+        });
+
+        $('.filter-facilities-search[data-type="doctors"]').click(function(e) {
+            var form    = $(this).closest('form');
+            form.find('#doctor-search-results').html('<tr><td class="text-center"><i class="fas fa-spinner fa-spin text-primary font-size-14 text-center"></i></td></tr>')
+
+            var data    = $(`.facilities-filter-form[data-type="doctors"]`).find('input.ajax-input, select.ajax-input').map(function() {
+                return {key: $(this).attr('name'), val: $(this).val()};
+            }).get().reduce(function(map, obj) {
+                map[obj.key] = obj.val;
+                return map;
+            }, {});
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: data,
+            })
+            .done(function(response) {
+                var searchResults = $(`#doctor-search-results`);
+                searchResults.html(response);
+                form.find('#pagination-holder').html($(`<div>${ response }</div>`).find('#pagination-response'));
+                $(`.filter-facilities-search[data-type="doctors"]`).removeAttr('disabled');
+
+                searchResults.find('.select-doctor').click(function() {
+                    var id      = $(this).attr('data-id');
+                    var name    = $(this).attr('data-name');
+                    var code    = $(this).attr('data-code');
+                    $('#transaction_latest_medical_appeal_attributes_doctor_id, #medical_appeal_doctor_id').val(id);
+                    $('#selected-doctor-name-code').html(`${ name } (<b>${ code }</b>)`);
+                    $('#change-doctor-modal').modal('hide');
+                });
+
+                form.find('#pagination-response .dropdown-menu a.dropdown-item').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).attr('href').includes('per=')) {
+                        var perPage = $(this).attr('href').match(/per=(\d+)/)[1];
+                        form.find('#per').val(perPage);
+                    } else {
+                        form.find('#per').val('');
+                    }
+
+                    form.find('#page').val('');
+                    form.find('.filter-facilities-search').click();
+                });
+
+                form.find('#pagination-response .pagination a.page-link').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).attr('href') === undefined) {
+                        form.find('#page').val('');
+                    } else if ($(this).attr('href').includes('page=')) {
+                        var page = $(this).attr('href').match(/page=(\d+)/)[1];
+                        form.find('#page').val(page);
+                    } else {
+                        form.find('#page').val('');
+                    }
+
+                    form.find('.filter-facilities-search').click();
+                });
+            });
+        });
+
+        $('#exclude_previous_year_placeholder').change(function() {
+            $('#exclude_previous_year').val($(this).prop('checked'));
+        });
+    </script>
+<% end %>

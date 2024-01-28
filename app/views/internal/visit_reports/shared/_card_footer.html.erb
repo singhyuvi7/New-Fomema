@@ -1,0 +1,72 @@
+<div class="card-footer">
+            
+    <div class="text-right">
+
+        <%=raw edit_back_button(index_path) %>
+
+        <% if ['Doctor'].include? @visit_report.visitable_type %>
+            <%= link_to "Communicable Disease", internal_transactions_path(certification_status: "inspectorate_cases", field_set: "inspectorate_cases", certification_date_start: Date.today.beginning_of_year, certification_date_end: Date.today.end_of_year, doctor_code: @visit_report.visitable&.code), target: "_BLANK", class: 'btn btn-info btn-sm text-white' %>
+            
+           <% if ['LEVEL_2_APPROVED'].include?(@visit_report.status) && @visit_report&.visit_report_doctor&.satisfactory == false %>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#communicableDiseaseModal">
+                Explanation Letter
+            </button>
+            <% end %>
+        <% end %>
+
+        <% if ['XrayFacility'].include? @visit_report.visitable_type %>
+           <% if ['LEVEL_2_APPROVED'].include?(@visit_report.status) && @visit_report&.visit_report_xray_facility&.satisfactory == false %>
+                <a href="<%= internal_visit_report_explanation_letter_path(@visit_report&.id) %>" target="_blank" class="btn btn-sm btn-primary" id="explanationLetterBtn">Explanation Letter</a>
+            <% end %>
+        <% end %>
+
+        <button v-if="canEdit" @click="save" type="button" class="btn btn-primary btn-sm">
+            <i class="icon-pencil"></i> Save Draft
+        </button>
+
+        <div class="dropdown show d-inline">
+            <a class="btn btn-sm btn-success dropdown-toggle" href="#" role="button" id="signatureMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            E-Signature
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="signatureMenuLink">
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#labPersonnelModal">PIC</button>
+                <button type="button" class="dropdown-item" data-toggle="modal" data-target="#fomemaOfficerModal">Fomema's Officer</button>
+            </div>
+        </div>
+
+        <%
+            if @visit_report.visitable_type == 'Doctor'
+                _visit_report = @visit_report.visit_report_doctor
+            elsif @visit_report.visitable_type == 'XrayFacility'
+                _visit_report = @visit_report.visit_report_xray_facility
+            end
+            can_submit_for_approval = !_visit_report&.fomema_officer_signature.blank? && !_visit_report&.fomema_officer_name.blank? && !_visit_report&.personnel_signature.blank? && !_visit_report&.personnel_name.blank? && !_visit_report&.personnel_designation.blank?
+        %>
+
+        <% if can_submit_for_approval %>
+            <button v-if="canEdit" @click="submit" type="button" class="btn btn-warning btn-sm">
+                <i class="icon-flag"></i> Submit for Approval
+            </button>
+        <% end %>
+
+        <button v-if="onApprove" @click="submit" type="button" class="btn btn-warning btn-sm">
+            <i class="icon-flag"></i>Submit Decision
+        </button>
+
+        <% if ['LEVEL_2_APPROVED'].include?(@visit_report.status) %>
+            <% download_path = @visit_report.visitable_type == 'Doctor' ? internal_visit_report_clinic_download_path(@visit_report) : internal_visit_report_xray_facility_download_path(@visit_report) %>
+
+            <%= link_to '<i class="fa fa-download" aria-hidden="true"></i> Download'.html_safe, download_path, target: "_BLANK", class: 'btn btn-danger btn-sm' %>
+        <% end %>
+
+        <% if can_submit_for_approval && ['DRAFT'].include?(@visit_report.status) %>
+            <button type="button" class="btn btn-sm btn-dark text-white" data-toggle="modal" data-target="#emailModal">Submit to <%= @visit_report&.visitable_type == 'Doctor' ? 'Clinic' : 'Xray Facility' %></button>
+        <% end %>
+
+    </div>
+
+    <% if !can_submit_for_approval && !['show','approval'].include?(params[:action]) %>
+        <div class="text-right text-danger"><small><i>* Please complete signature(s) in order to submit for approval/send to service provider</i></small></div>
+    <% end %>
+</div>

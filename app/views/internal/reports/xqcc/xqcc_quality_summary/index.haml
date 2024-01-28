@@ -1,0 +1,8 @@
+.card
+  .card-header
+    %strong XQCC Quality Summary Report
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render 'internal/reports/xqcc/xqcc_quality_summary/filter', path: xqcc_quality_summary_internal_xqcc_reports_path
+    = render "/internal/reports/xqcc/xqcc_quality_summary/pdf_template"

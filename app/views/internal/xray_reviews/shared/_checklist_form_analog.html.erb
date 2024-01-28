@@ -1,0 +1,239 @@
+<!-- id_not_clear -->
+<tr>
+    <td><span class="condition-code">6102</span>Not Clear</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6102]" id="xray_review_detail_6102_y" value="Y" <% if xray_review.get_condition_detail("6102") == 'Y' %> checked <% end %> required >
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6102]" id="xray_review_detail_6102_n" value="N" <% if !xray_review.get_condition_detail("6102") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :id_not_clear_blur, code: "6152", label: "Blur"},
+            {field: :id_not_clear_fog, code: "6153", label: "Fog"},
+            {field: :id_not_clear_dark, code: "6154", label: "Dark"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6102") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6102") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of id_not_clear -->
+<!-- id_not_printed -->
+<tr>
+    <td><span class="condition-code">6103</span>Not Printed</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6103]" id="xray_review_detail_6103_y" value="Y" <% if xray_review.get_condition_detail("6103") == 'Y' %> checked <% end %> required >
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6103]" id="xray_review_detail_6103_n" value="N" <% if !xray_review.get_condition_detail("6103") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :id_not_printed_handwritten, code: "6155", label: "Handwritten"},
+            {field: :id_not_printed_sticker, code: "6156", label: "Sticker"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6103") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6103") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of id_not_printed -->
+<!-- proc_chemical_defect  -->
+<tr>
+    <td rowspan="4">Processing Procedure</td>
+    <td><span class="condition-code">6104</span>Chemical Defect</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6104]" id="xray_review_detail_6104_y" value="Y" <% if xray_review.get_condition_detail("6104") == 'Y' %> checked <% end %> required >
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6104]" id="xray_review_detail_6104_n" value="N" <% if !xray_review.get_condition_detail("6104") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :proc_chemical_defect_weak_chemical, code: "6157", label: "Weak Chemical"},
+            {field: :proc_chemical_defect_discoloration, code: "6158", label: "Discoloration"},
+            {field: :proc_chemical_defect_stain, code: "6159", label: "Stain"},
+            {field: :proc_chemical_defect_water_mark, code: "6160", label: "Water Mark"},
+            {field: :proc_chemical_defect_poor_agitation, code: "6105", label: "Poor Agitation"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail("6104") == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6104") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of proc_chemical_defect -->
+<!-- proc_marks_of_film  -->
+<tr>
+    <td><span class="condition-code">6106</span>Marks of Film</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6106]" id="xray_review_detail_6106_y" value="Y" <% if xray_review.get_condition_detail("6106") == 'Y' %> checked <% end %> required>
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6106]" id="xray_review_detail_6106_n" value="N" <% if !xray_review.get_condition_detail("6106") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :proc_marks_of_film_film_guide_mark, code: "6161", label: "Film Guide Mark"},
+            {field: :proc_marks_of_film_scratches, code: "6162", label: "Scratches"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail(item[:code]) == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6106") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of proc_marks_of_film -->
+<!-- proc_fog  -->
+<tr>
+    <td><span class="condition-code">6107</span>Fog</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6107]" id="xray_review_detail_6107_y" value="Y" <% if xray_review.get_condition_detail("6107") == 'Y' %> checked <% end %> required>
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6107]" id="xray_review_detail_6107_n" value="N" <% if !xray_review.get_condition_detail("6107") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :proc_fog_partial_fog, code: "6163", label: "Partial Fog"},
+            {field: :proc_fog_base_fog, code: "6164", label: "Base Fog"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail(item[:code]) == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6107") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of proc_fog -->
+<!-- proc_screen_defect  -->
+<tr>
+    <td><span class="condition-code">6108</span>Screen Defect</td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6108]" id="xray_review_detail_6108_y" value="Y" <% if xray_review.get_condition_detail("6108") == 'Y' %> checked <% end %> required>
+                Yes
+            </label>
+        </div>
+    </td>
+    <td width="50" class="findings text-center">
+        <div class="form-check">
+            <label class="form-check-label form-check-inline">
+            <input class="form-check-input" type="radio" name="xray_review_detail[6108]" id="xray_review_detail_6108_n" value="N" <% if !xray_review.get_condition_detail("6108") %> checked <% end %>>
+                No
+            </label>
+        </div>
+    </td>
+    <td class="items">
+        <%
+        items_checker = ''
+        [
+            {field: :proc_screen_defect_dirty_screen, code: "6165", label: "Dirty Screen"},
+            {field: :proc_screen_defect_spoilt_screen, code: "6166", label: "Spoilt Screen"},
+        ].each do |item| 
+            items_checker = '1' if xray_review.get_condition_detail(item[:code]) == 'Y'
+        %>
+            <div class="form-check">
+                <label class="form-check-label form-check-inline">
+                    <input class="form-check-input" name="xray_review_detail[<%= item[:code] %>]" type="checkbox" <%= " disabled" unless xray_review.get_condition_detail(item[:code]) == 'Y' %> value="Y" id="xray_review_detail_<%= item[:code] %>" <% if xray_review.get_condition_detail(item[:code]) == 'Y' %> checked <% end %>>
+                    <span class="condition-code"><%= item[:code] %></span><%= item[:label] %>
+                </label>
+            </div>
+        <% end %>
+        <input type="hidden" class="items_checker" value="<%= items_checker %>" <%= " disabled" unless xray_review.get_condition_detail("6108") == 'Y' %> required>
+    </td>
+</tr>
+<!-- end of proc_screen_defect -->

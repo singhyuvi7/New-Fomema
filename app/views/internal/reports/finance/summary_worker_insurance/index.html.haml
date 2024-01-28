@@ -1,0 +1,11 @@
+.card
+  .card-header
+    %strong Finance - Summary Worker Insurance
+  .card-body
+    = render '/shared/all_flash'
+    .row-fluid
+      = render "/internal/reports/finance/summary_worker_insurance/filter"
+      = render '/internal/reports/finance/summary_worker_insurance/pdf_template'
+- content_for :page_end_scripts do
+  :javascript
+

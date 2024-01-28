@@ -1,0 +1,580 @@
+<div class="modal fade select2-modals" data-type="doctor" id="change-doctor-modal" role="dialog" aria-labelledby="doctor-pairing" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select doctor</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <%= form_tag assign_doctors_internal_transactions_path, method: :post do %>
+                    <div>
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-6">Note: Please select the clinic separately for each worker under re-medical examination.</label>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <label class="col-form-label mx-3">Your workers</label>
+
+                            <table id="change-doctors-table" class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left"><%= check_box_tag "toggle_all_to_be_paired", "", false %></th>
+                                        <th class="text-left">Transaction Code</th>
+                                        <th class="text-left">Re-medical</th>
+                                        <th class="text-left">Re-medical (Others) </th>
+                                        <th class="text-left">Worker Code</th>
+                                        <th class="text-left">Worker Name</th>
+                                        <th class="text-left">Gender</th>
+                                        <th class="text-left edit-doctor-header">Current Doctor</th>
+                                        <th class="text-left edit-doctor-header">New Doctor</th>
+                                        <th class="text-left new-doctor-header">Assigned Doctor</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody></tbody>
+                            </table>
+
+                            <div id="change-doctor-reason-fields" class="px-3 pb-3">
+                                <%= hidden_field_tag :select_doctor_type %>
+                                <label class="col-form-label required">Reason for changing doctors</label>
+                                <select name="change_reason_id" id="change_reason_id" class="form-control mb-2">
+                                <% ChangeSpReason.select("id, code, description, case when code = 'OTHER' then null else description end sort ").order("sort asc nulls last").each do |change_sp_reason| %>
+                                    <option value="<%= change_sp_reason.id %>" data-code="<%= change_sp_reason.code %>"><%= change_sp_reason.description %></option>
+                                <% end %>
+                                </select>
+                                <%#= select_tag :change_reason_id, options_for_select(ChangeSpReason.all.pluck(:description, :id).sort), class: "form-control mb-2" %>
+                                <%= text_area_tag :change_reason, "", placeholder: "What is the reason for changing doctors?", rows: 5, style: "width: 100%;", class: "hidden p-2" %>
+                            </div>
+
+                            <div id="fee-fields" class="px-3 pb-3">
+                                <label class="col-form-label required">Fee</label>
+                                <%= select_tag :fee_id, options_for_select(Fee.where(code: ["FOC", "CHANGE_CLINIC"]).pluck(:name, :id).sort), include_blank: "Select Option", class: "form-control mb-2" %>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <%= submit_tag "Save", class: "btn btn-success", id: "save-doctor-selection-button" %>
+                        </div>
+                    </div>
+                <% end %>
+
+                <%= form_tag filter_doctors_internal_transactions_path, method: :post, remote: true, class: "facilities-filter-form", data: {type: "doctor"} do %>
+                    <div class="card">
+                        <div class="card-body">
+                            <label class="col-form-label mb-4">Search For Clinic</label>
+                            <%= hidden_field_tag :per, "", class: "ajax-input" %>
+                            <%= hidden_field_tag :page, "", class: "ajax-input" %>
+                            <%= hidden_field_tag :tid, "0", class: "ajax-input" %>
+                            <%= hidden_field_tag :reregister, "0", class: "ajax-input" %>
+
+                            <div>
+                                <label class="text-danger">You may fill in one or more search criteria</label>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Doctor Code</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :code, "", placeholder: "Doctor code", class: "form-control ajax-input" %>
+                                </div>
+
+                                <label class="col-md-2 col-form-label">Doctor Name</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :name, "", placeholder: "Doctor name", class: "form-control ajax-input" %>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Clinic name</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :clinic_name, "", placeholder: "Clinic name", class: "form-control ajax-input" %>
+                                </div>
+                            </div>
+
+                            <%= render 'internal/shared/filter_state_postcode_town' %>
+
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">One Stop Center</label>
+                                <div class="col-md-4">
+                                    <select name="has_xray" id="has_xray" class="form-control ajax-input">
+                                        <option value="">Select option</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <div class="btn btn-secondary clear-filters" data-type="doctor">Clear filters</div>
+                            <%= submit_tag "Search", class: "btn btn-primary filter-facilities-search", data: {type: "doctor"} %>
+                        </div>
+                    </div>
+                <% end %>
+
+                <div class="card">
+                    <div class="card-body p-0">
+                        <label class="col-form-label mx-3">Search results</label>
+
+                        <table class="table search-facilities-table" data-type="doctor">
+                            <thead>
+                                <tr>
+                                    <th>Doctor Code</th>
+                                    <th>Doctor Name</th>
+                                    <th>Clinic</th>
+                                    <th>X-Ray Clinic</th>
+                                    <th width="100px">Digital X-Ray Online Transmission</th>
+                                    <th>Quota Available</th>
+
+                                    <th>
+                                        <%# <button type="button" class="btn btn-primary btn-sm" id="toggle_row" data-toggle="tooltip" title="Toggle Row"><i class="fa fa-toggle-off"> Clinic Details</i></button> %>
+                                        <div class="custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="toggle_detail" data-toggle="tooltip">
+                                            <label class="custom-control-label" for="toggle_detail">Clinic Details</label>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="search-results">
+                                <tr>
+                                    <td colspan="8">Search doctors</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div id="pagination-holder" class="modal-body"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+    $('.clear-filters').click(function() {
+        type = $(this).attr('data-type');
+        $(`.facilities-filter-form[data-type="${type}"] .ajax-input`).val('');
+    });
+
+    $('.filter-facilities-search').click(function() {
+        var type    = $(this).attr('data-type');
+        var form    = $(this).closest('form');
+
+        data = $(`.facilities-filter-form[data-type="${type}"]`).find('input.ajax-input, select.ajax-input').map(function() {
+            return {key: $(this).attr('name'), val: $(this).val()};
+        }).get().reduce(function(map, obj) {
+            map[obj.key] = obj.val;
+            return map;
+        }, {});
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: data,
+        })
+        .done(function(response) {
+            var table   = $(`.search-facilities-table[data-type="${type}"]`);
+            table.find('tbody#search-results').html(response);
+            table.closest('.card-body').find('#pagination-holder').html($(`<div>${ response }</div>`).find('#pagination-response'));
+
+            $(`.filter-facilities-search[data-type="${type}"]`).removeAttr('disabled');
+            bindDoctorWorkersPairingTrigger();
+
+            $('#pagination-response .dropdown-menu a.dropdown-item').click(function(e) {
+                e.preventDefault();
+
+                if ($(this).attr('href').includes('per=')) {
+                    var perPage = $(this).attr('href').match(/per=(\d+)/)[1];
+                    $('.facilities-filter-form #per').val(perPage);
+                } else {
+                    $('.facilities-filter-form #per').val('');
+                }
+
+                var perPage = $(this).attr('href').match(/per=(\d+)/)[1];
+                $('.facilities-filter-form #per').val(perPage);
+                $('.filter-facilities-search').click();
+            });
+
+            $('#pagination-response .pagination a.page-link').click(function(e) {
+                e.preventDefault();
+
+                if ($(this).attr('href') === undefined) {
+                    $('.facilities-filter-form #page').val('');
+                } else if ($(this).attr('href').includes('page=')) {
+                    var page = $(this).attr('href').match(/page=(\d+)/)[1];
+                    $('.facilities-filter-form #page').val(page);
+                } else {
+                    $('.facilities-filter-form #page').val('');
+                }
+
+                $('.filter-facilities-search').click();
+            });
+        });
+    });
+
+    $('.pairing-modal-open').click(function() {
+        $('#change-doctors-table tbody').empty();
+        selectedWorkers = $('[name="ids[]"]:checked');
+        tableType       = $(this).attr('data-table');
+        ableToChangeDocArr = []
+        changedOnceArr = []
+        cancelArr = []
+        rejectedArr = []
+        newPendingApprovalArr = []
+        isBloodGroupBenchmarkArr = []
+        bloodGroupBenchmarkArr = []
+        isIgnoreRenewalRuleArr = []
+        ignoreRenewalRuleArr = []
+        isRemedicalArr = []
+
+        doctorIds = selectedWorkers.map(function() {
+            // Check medical examination date and expiry date
+            selectedRow = $(this).closest('tr')
+            examinationDate = selectedRow.attr('data-medical-examination_date')
+            expiredAt = moment(selectedRow.attr('data-expired-at'))
+            doctorChangedAt = selectedRow.attr('data-doctor-changed-at')
+            status = selectedRow.attr('data-status')
+            transactionCode = selectedRow.attr('data-transaction-code')
+            today = moment().startOf('day')
+            isBloodGroupBenchmark = selectedRow.attr('data-is-blood-group-benchmark')
+            ignoreRenewalRule = selectedRow.attr('data-ignore_renewal_rule')
+            isRemedical = selectedRow.attr('data-is-re-medical')
+
+            if(examinationDate || (expiredAt && today >= expiredAt)){
+                ableToChangeDocArr.push(false)
+            }else{
+                ableToChangeDocArr.push(true)
+            }
+
+            if(doctorChangedAt){
+                changedOnceArr.push(transactionCode)
+            }
+
+            if(status.toLowerCase() == 'cancelled'){
+                cancelArr.push(transactionCode)
+            }
+
+            if(status == 'REJECTED'){
+                rejectedArr.push(transactionCode)
+            }
+
+            if(status == 'NEW_PENDING_APPROVAL'){
+                newPendingApprovalArr.push(transactionCode)
+            }
+
+            isBloodGroupBenchmark = (isBloodGroupBenchmark === undefined || isBloodGroupBenchmark == null || isBloodGroupBenchmark.length <= 0) ? 'false' : isBloodGroupBenchmark
+            isBloodGroupBenchmarkArr.push(isBloodGroupBenchmark)
+            if(isBloodGroupBenchmark) {
+                bloodGroupBenchmarkArr.push(transactionCode)
+            }
+
+            ignoreRenewalRule = (ignoreRenewalRule === undefined || ignoreRenewalRule == null || ignoreRenewalRule.length <= 0) ? 'false' : ignoreRenewalRule
+            isIgnoreRenewalRuleArr.push(ignoreRenewalRule)
+            if(ignoreRenewalRule) {
+                ignoreRenewalRuleArr.push(transactionCode)
+            }
+
+            isRemedical = (isRemedical === undefined || isRemedical == null || isRemedical.length <= 0) ? 'false' : isRemedical
+            isRemedicalArr.push(isRemedical)
+            if(isRemedical) {
+                isRemedicalArr.push(transactionCode)
+            }
+            // End check
+
+            return $(this).attr('data-doctor').length > 0;
+        }).get();
+
+        if (selectedWorkers.length === 0) {
+            alert('Please select workers');
+            return false;
+        } else if (tableType === 'new' && doctorIds.includes(true)) {
+            alert('You can only select doctors for foreign workers without any paired doctor');
+            return false;
+        } else if (tableType === 'edit' && doctorIds.includes(false)) {
+            alert('You can only change doctors for foreign workers with a paired doctor');
+            return false;
+        }
+
+        if(ableToChangeDocArr.includes(false)){
+            alert('Unable to select/change doctor for foreign worker(s) that has already taken the medical examination or medical form that are expired');
+            return false;
+        }
+
+        if(changedOnceArr.length > 0){
+            alert('Transaction only allow changing doctor once. '+changedOnceArr.join(", ")+' has changed doctor before.');
+            return false;
+        }
+
+        if(cancelArr.length > 0){
+            alert('Transaction(s) that has been cancelled are not allow to select or update doctor.');
+            return false;
+        }
+
+        if(rejectedArr.length > 0){
+            alert('Transaction(s) that has been rejected are not allow to select or update doctor.');
+            return false;
+        }
+
+        if(newPendingApprovalArr.length > 0){
+            alert('Transaction(s) that are pending for approval are not allow to select or update doctor.');
+            return false;
+        }
+
+        i = 0;
+        tableRows = selectedWorkers.each(function() {
+
+            tableData = $(this).closest('tr').find('.select-doctor-table-data');
+            transactionId = $(this).val();
+
+            tds = tableData.map(function() {
+                text = $(this).attr('data-text');
+
+                if ($(this).attr('data-type') === 'doctor' && tableType === 'new') {
+                    return `<td class="selected-doctor-placeholder ${text ? 'text-primary' : 'text-danger'}">${text ? text : 'No doctor selected'}</td>`;
+                } else if ($(this).attr('data-type') === 'doctor' && tableType === 'edit') {
+                    return `<td>${text}</td><td class="selected-doctor-placeholder text-danger">No doctor selected</td>`;
+                } else {
+                    return `<td>${text}</td>`
+                }
+            }).get().join();
+
+            hiddenField = `<input type="hidden" name="edit_transaction[${transactionId}]" id="edit_transaction_${transactionId}" class="edit-transaction-hidden-field">`;
+            checkField  = `<td><input type="checkbox" name="to_be_paired[${transactionId}]" data-doctor="${ $(this).attr('data-doctor') }"></td>`;
+            hiddenTransactionIdField  = `<input type="hidden" name="transaction_id[${transactionId}]" id="transaction_id_${transactionId}" class="transaction-id-hidden-field" value="${transactionId}">`;
+            hiddenRemedicalField  = `<input type="hidden" name="remedical[${transactionId}]" id="remedical_${transactionId}" class="remedical-hidden-field" value="${isBloodGroupBenchmarkArr[i]}">`;
+            hiddenReregisterField  = `<input type="hidden" name="rereg[${transactionId}]" id="rereg${transactionId}" class="rereg-hidden-field" value="${isRemedicalArr[i]}">`;
+
+            $('#change-doctors-table tbody').append(`<tr>${hiddenField}${hiddenTransactionIdField}${hiddenRemedicalField}${hiddenReregisterField}${checkField}${tds}<td class="remove-pairing-placeholder"></td></tr>`);
+            i += 1;
+        });
+
+        type    = $(this).attr('data-type');
+        modal   = $(`.select2-modals[data-type="${type}"]`);
+
+        if (tableType === 'new') {
+            $('.new-doctor-header').show();
+            $('.edit-doctor-header').hide();
+            $('#select_doctor_type').val('assign');
+            $('#change-doctor-reason-fields').hide();
+            $('#fee-fields').hide();
+            $('#fee_id').prop('required', false);
+        } else {
+            $('.new-doctor-header').hide();
+            $('.edit-doctor-header').show();
+            $('#select_doctor_type').val('change');
+            $('#change-doctor-reason-fields').show();
+            $('#fee-fields').show();
+            $('#fee_id').prop('required', true);
+        }
+
+        bindToBePairedCheckboxes();
+
+        // Set listeners when opening modals, so that Select2 can be initialized when the modal is ready.
+        /* checkForModalShow = setInterval(function() {
+            if (modal.hasClass('show')) {
+                initializeSelect2Fields(type);
+                clearInterval(checkForModalShow);
+            }
+        }, 50); */
+    });
+
+    function bindDoctorWorkersPairingTrigger() {
+        $('.doctor-workers-pairing-trigger').click(function() {
+            if ($(this).hasClass('btn-secondary')) {
+                alert('There is no available quota left for this doctor. Please select another.');
+                return false;
+            }
+
+            doctorId            = $(this).attr('data-id');
+            doctorName          = $(this).attr('data-name');
+            selected_workers    = $('input[name*="to_be_paired["]:checked');
+
+            currentDoctors      = selectedWorkers.map(function() {
+                return $(this).attr('data-doctor');
+            }).get();
+
+            if (currentDoctors.includes(doctorId)) {
+                alert('Cannot select the same doctor as the Current Doctor. Please select a different doctor.');
+                return false;
+            }
+
+            if (selected_workers.length === 0) {
+                alert('Please select a worker to pair this doctor with');
+                return false;
+            }
+
+            selected_workers.each(function() {
+                placeholder = $(this).closest('tr').find('.selected-doctor-placeholder');
+                input       = $(this).closest('tr').find('.edit-transaction-hidden-field');
+                remover     = $(this).closest('tr').find('.remove-pairing-placeholder');
+                placeholder.removeClass('text-danger').addClass('text-primary').text(doctorName);
+                input.val(doctorId);
+                remover.html('<div class="btn btn-danger remove-doctor-pairing font-weight-bold clickable">Clear</div>');
+                bindRemovePairingBtn(remover.find('.remove-doctor-pairing'), input, placeholder);
+                $(this).prop('checked', false);
+                $('#toggle_all_to_be_paired').attr("disabled", false);
+                $('#toggle_all_to_be_paired').prop("checked", false);
+                $('input[name*="to_be_paired["]').attr("disabled", false);
+            });
+
+            scrollToElement($('#change-doctors-table'), 200);
+        });
+    }
+
+    $('.master-checkbox').change(function() {
+        checked = $(this).prop('checked');
+        $('input[name*="ids["]').prop('checked', checked);
+    });
+
+    function bindToBePairedCheckboxes() {
+        $('#toggle_all_to_be_paired').change(function() {
+            checked = $(this).prop('checked');
+            $('input[name*="to_be_paired["]').prop('checked', checked);
+
+            //select non re-medical transaction(s) only
+            selectedWorkers.each(function() {
+                tid = $(this).val();
+                if($('input[name="remedical['+tid+']"]').val() == 'true') {
+                    $('input[name="to_be_paired['+tid+']"]').attr("disabled", checked);
+                    $('input[name="to_be_paired['+tid+']"]').prop('checked', false);
+                }else if($('input[name="rereg['+tid+']"]').val() == 'true') {
+                    $('input[name="to_be_paired['+tid+']"]').attr("disabled", checked);
+                    $('input[name="to_be_paired['+tid+']"]').prop('checked', false);
+                } else {
+                    $('input[name="to_be_paired['+tid+']"]').prop('checked', checked);
+                    $('#tid').val('0');
+                }
+            });
+            $('#search-results').empty();
+        });
+
+        $('input[name*="to_be_paired["]').change(function() {
+            transid = ($(this).attr('name').replace('to_be_paired[','')).replace(']','');
+            remedical = $('input[name="remedical['+transid+']"]').val();
+            rereg = $('input[name="rereg['+transid+']"]').val();
+
+            if(remedical == 'true') {
+                if($(this).is(':checked')) {
+                    $('#toggle_all_to_be_paired').attr("disabled", true);
+                    $('input[name*="to_be_paired["]').attr("disabled", true);
+                    $('input[name="to_be_paired['+transid+']"]').removeAttr("disabled");
+                    $('#tid').val(transid);
+                    $('#reregister').val('0');
+                    // $('#search-results').empty();
+                } else {
+                    $('#toggle_all_to_be_paired').attr("disabled", false);
+                    $('input[name*="to_be_paired["]').attr("disabled", false);
+                    $('#tid').val('0');
+                    // $('#search-results').empty();
+                }
+            }else if(rereg == 'true') {
+                  if($(this).is(':checked')) {
+                    $('#toggle_all_to_be_paired').attr("disabled", true);
+                    $('input[name*="to_be_paired["]').attr("disabled", true);
+                    $('input[name="to_be_paired['+transid+']"]').removeAttr("disabled");
+                    $('#tid').val(transid);
+                    $('#reregister').val('1');
+                    // $('#search-results').empty();
+                } else {
+                    $('#toggle_all_to_be_paired').attr("disabled", false);
+                    $('input[name*="to_be_paired["]').attr("disabled", false);
+                    $('#tid').val('0');
+                    // $('#search-results').empty();
+                }
+            }else {
+                if($(this).is(':checked')) {
+                    selectedWorkers.each(function() {
+                        tid = $(this).val();
+                        if($('input[name="remedical['+tid+']"]').val() == 'true') {
+                            $('input[name="to_be_paired['+tid+']"]').attr("disabled", true);
+                        }else   if($('input[name="rereg['+tid+']"]').val() == 'true') {
+                            $('input[name="to_be_paired['+tid+']"]').attr("disabled", true);
+                        }
+                    });
+                    $('#tid').val('0');
+                } else {
+                    numberOfChecked = $('input[name*="to_be_paired["]:checked').length;
+                    if (numberOfChecked <= 0) {
+                        $('input[name*="to_be_paired["]').attr("disabled", false);
+                        $('#tid').val('0');
+                    }
+                }
+            }
+            $('#search-results').empty();
+        });
+    }
+
+    function bindRemovePairingBtn(button, input, placeholder) {
+        button.click(function() {
+            input.val('');
+            placeholder.addClass('text-danger').removeClass('text-primary').text('No doctor selected');
+            button.remove();
+        });
+    }
+
+    $('#change_reason_id').change(function() {
+        change_reason_code = $('#change_reason_id option:selected').attr('data-code');
+        if (change_reason_code === 'OTHER') {
+            $('#change_reason').show();
+        } else {
+            $('#change_reason').hide();
+        }
+    });
+
+    $('#save-doctor-selection-button').click(function(e) {
+        fields = $('.edit-transaction-hidden-field');
+
+        haveValues = fields.map(function() {
+            return $(this).val().length > 0
+        }).get();
+
+        change_reason_code = $('#change_reason_id option:selected').attr('data-code');
+        changeReason    = $('#change_reason').val().trim().length > 0;
+
+        if (haveValues.includes(false)) {
+            alert('All workers must have a doctor selected before you can save');
+            e.preventDefault();
+        } else if ($('#select_doctor_type').val() == 'change' && change_reason_code === 'OTHER' && !changeReason) {
+            alert('You have chosen "Others" as your reason for changing doctors. Please include a reason before saving');
+            e.preventDefault();
+        }
+    });
+
+    var expand_row = false;
+
+    // show / hide all row facility address
+    $('#toggle_row').click(function(e) {
+        if (expand_row) {
+            $('.collapse').collapse('hide');
+            expand_row = false;
+        } else {
+            $('.collapse').collapse('show');
+            expand_row = true;
+        }
+    });
+
+    $('#toggle_detail').change(function(e) {
+        if (this.checked) {
+            $('.collapse').collapse('show');
+        } else {
+            $('.collapse').collapse('hide');
+        }
+    });
+
+    $('#change-doctor-modal').on('hidden.bs.modal', function(e) {
+        $('#search-results').empty();   //clear search result when close the modal
+    });
+</script>
+<% end %>

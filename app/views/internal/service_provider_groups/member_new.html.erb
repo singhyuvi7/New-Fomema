@@ -1,0 +1,88 @@
+<div class="card">
+    <div class="card-header">
+        <strong>New members</strong> - New members
+    </div>
+
+        <div class="card-body">
+
+            <div class="card">
+                <%= form_tag members_new_internal_service_provider_group_path, method: 'get' do |form| %>
+                <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="code" class="col-sm-3 col-form-label"><%= ServiceProviderGroup::CATEGORIES[@service_provider_group.category] %> Code</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="name" class="col-sm-3 col-form-label"><%= ServiceProviderGroup::CATEGORIES[@service_provider_group.category] %> Name</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        <div class="text-right">
+                            <%=raw filter_clear_button members_new_internal_service_provider_group_path %>
+                            <%=raw filter_button %>
+                        </div>
+                    </div>
+                    <!-- /.card-footer -->
+                <% end %>
+            </div>
+            <!-- /.card -->
+
+            <%= form_tag members_internal_service_provider_group_path, method: "post" do |form| %>
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if @memberables.blank? %>
+                                <tr>
+                                    <td colspan="4" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+                                <% @memberables.each.with_index((@memberables.current_page - 1) * get_per + 1) do |member, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= member.code %></td>
+                                        <td><%= member.name %></td>
+                                        <td class="module-row-actions">
+                                            <button type="submit" class="btn btn-primary" name="member_ids[]" value="<%= member.id %>">Add</button>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <%= paginate @memberables %>
+                </div>
+            <% end %>
+
+        </div>
+        <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <%=raw edit_back_button(members_internal_service_provider_group_path) %>
+        </div>
+    </div>
+
+</div>

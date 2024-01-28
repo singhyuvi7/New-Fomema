@@ -1,0 +1,64 @@
+<% if has_permission?('DASHBOARD_SP_DOCTOR') %>
+  <div id="accuracy-result-transmission" style="width: 100%; height: 218px;">
+    Loading...
+  </div>
+
+  <script type="text/javascript">
+      // Declare a global variable for the container
+      var chartContainer;
+
+      function updateChartAccuracy(data) {
+          google.charts.load("current", {packages: ["corechart"]});
+          google.charts.setOnLoadCallback(function () {
+              createChartAccuracy(data);
+          });
+      }
+
+      function createChartAccuracy(data) {
+          var doctorTransmitAccuratelyData = data.accuracy_transmission;
+          console.log('accuracy', doctorTransmitAccuratelyData)
+
+
+          if (doctorTransmitAccuratelyData > 0) {
+
+              var data = google.visualization.arrayToDataTable([
+                  ['Task', 'Hours per Day'],
+                  [' ', doctorTransmitAccuratelyData],
+                  ['', 0]
+              ]);
+
+              var options = {
+                  title: 'Doctor Transmit Accurately',
+                  pieHole: 0.4,
+                  legend: 'none',
+                  colors: ['#0e7dc1', '#99bed6'],
+              };
+
+              var chart = new google.visualization.PieChart(document.getElementById('accuracy-result-transmission'));
+              chart.draw(data, options);
+          } else {
+              document.getElementById('accuracy-result-transmission').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+          }
+      }
+
+      // Call the function on initial page load
+      document.addEventListener("DOMContentLoaded", function () {
+          // Set the global variable with the container
+          chartContainer = $('#accuracy-result-transmission');
+
+          $.ajax({
+              url: '/dashboards/service_provider/accuracy_transmission',
+              method: 'GET',
+              dataType: 'json',
+              success: function (data) {
+                  // Once data is loaded, update the chart
+                  updateChartAccuracy(data);
+              },
+              error: function () {
+                  // Handle errors here
+                  console.error('Failed to fetch certification data.');
+              }
+          });
+      });
+  </script>
+<% end %>

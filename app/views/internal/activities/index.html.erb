@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header">
+        <strong>User Activities</strong>
+    </div>
+
+    <div class="card-body">
+
+        <%=render "filter" %>
+
+        <%=render "/shared/all_flash" %>
+
+        <div class="row">
+            <div class="col-md-12">
+
+              <table class="<%= index_table_class %>">
+                  <thead>
+                      <tr>
+                          <th>User</th>
+                          <th>Activity</th>
+                          <th>Date Time</th>
+                      </tr>
+                  </thead>
+
+                  <tbody>
+
+                  <% @activities.each do |activity| %>
+                      <tr>
+                          <td><%= activity.owner.name %></td>
+                          <td><%= render_activity(activity) %></td>
+                          <td><%= activity.created_at.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                      </tr>
+                  <% end %>
+
+                  </tbody>
+              </table>
+
+
+            </div>
+        </div>
+        <div class="row">
+          <%= paginate @activities %>
+        </div>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <div class="text-right">
+            <a class="btn btn-sm btn-secondary" href=""><i class="fa fa-history"></i> Back</a>
+        </div>
+    </div>
+</div>

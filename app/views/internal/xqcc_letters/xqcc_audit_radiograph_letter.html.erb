@@ -1,0 +1,69 @@
+<pdfbody>
+    <div style="height: 0.8cm;">
+        &nbsp;
+    </div><br>
+
+    <table class="w-100">
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Ref No</td>
+            <td>: <%= @data[:ref_number] %></td>
+        </tr>
+
+        <tr style="font-weight: bold;">
+            <td style="width: 3.5em;">Date</td>
+            <td>: <%= raw @data[:letter_date] %></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><%= simple_format @letter.xray_address %></td>
+        </tr>
+    </table>
+
+    <p>Dear Doctor,</p>
+
+    <p class="letter-header-underline"><b><%= @data[:letter_title] %></b></p>
+
+    <p class="text-justify">
+        This is to confirm that radiographs from your X-ray facility at the address above has been audited by
+        a panel of radiologist for the year <%= @letter.panel_year %> in accordance with FOMEMA's X-ray Quality Control
+        Programme.
+    </p>
+
+    <p class="text-justify">
+        The X-ray Quality Summary for the year <%= @letter.panel_year %> for your facility is satisfactory and has adhered to the
+        guidelines stipulated by the Ministry of Health, Malaysia.<br><br>
+        Thank you.<br><br>
+    </p>
+
+    <!-- This is the only way to keep this entire block together. For some reason, page-break-inside: avoid; does not work -->
+    <table style="margin-left: -2px;">
+        <tr>
+            <td style="padding: 0;">
+                <p style="margin: 0;">
+                    Yours sincerely,<br><br><br><br><br>
+                    <b><%= @letter.issuer_name %></b><br>
+                    <%= @letter.issuer_title %>
+                </p>
+            </td>
+        </tr>
+    </table>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 18px; /* Was originally 16px */
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .letter-header-underline {
+        display: inline;
+        border-bottom: 2px solid black;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>

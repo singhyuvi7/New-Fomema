@@ -1,0 +1,59 @@
+<div class="card">
+    <div class="card-header">
+        Digital X-Ray Image
+    </div>
+
+    <table class="table table-bordered table-card table-sm">
+        <tbody>
+            <% cnt = 0 %>
+
+            <% if transaction.xray_film_type == "DIGITAL" && transaction.xray_examination %>
+                <% cnt =+ 1 %>
+                <tr>
+                    <th>Current</th>
+                    <td><a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: transaction.xray_examination&.id, user_id: current_user.id) %>"><%= transaction.code %> <i class="fa fa-external-link-alt"></i></a></td>
+                </tr>
+            <% end %>
+
+            <% if transaction.previous_transaction && transaction.previous_transaction.xray_film_type == "DIGITAL" && transaction.xray_pending_review&.is_audit_comparison == "YES" %>
+                <% cnt =+ 1 %>
+                <tr>
+                    <th>Previous</th>
+                    <td><a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: transaction.previous_transaction.xray_examination&.id, user_id: current_user.id) %>"><%= transaction.previous_transaction.code %> <i class="fa fa-external-link-alt"></i></a></td>
+                </tr>
+            <% end %>
+
+            <% transaction.retake_xray_examinations.each do |xe| %>
+                <% cnt =+ 1 %>
+                <tr>
+                    <th>Retake</th>
+                    <td><a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: xe.id, user_id: current_user.id) %>"><%= xe.sourceable.code %> <i class="fa fa-external-link-alt"></i></a></td>
+                </tr>
+            <% end %>
+
+            <% transaction.identical_transactions.each do |t| %>
+                <% if t.xray_film_type == "DIGITAL" && t.xray_examination %>
+                    <% cnt =+ 1 %>
+                    <tr>
+                        <th>Identical</th>
+                        <td><a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: t.xray_examination&.id, user_id: current_user.id) %>"><%= t.code %> <i class="fa fa-external-link-alt"></i></a></td>
+                    </tr>
+                <% end %>
+
+                <!-- retake of identical transactions -->
+                <% t.retake_xray_examinations.each do |xe| %>
+                    <% cnt =+ 1 %>
+                    <tr>
+                        <th>Identical Retake</th>
+                        <td><a class="btn btn-sm btn-primary" target="_blank" href="<%= view_xray_image_shared_index_path(xray_exam_id: xe.id, user_id: current_user.id) %>"><%= xe.sourceable.code %> <i class="fa fa-external-link-alt"></i></a></td>
+                    </tr>
+                <% end %>
+                <!-- /retake of identical transactions -->
+            <% end %>
+
+            <% if cnt == 0 %>
+                <tr><td>None</td></tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

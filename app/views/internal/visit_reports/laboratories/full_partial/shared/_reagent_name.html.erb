@@ -1,0 +1,10 @@
+<tr>
+    <td class="table-index"><%= row_no %>.</td>
+    <td class="table-items">
+        <%= form_shared.label :reagent_name, 'Reagent Name & Manufacturer' %>
+        <%= form_shared.select 'reagent_name', options_for_select(options.collect{ |u| [u['name'], u.to_json] }), {}, {:multiple => true, :class => 'form-control custom-select'} %>  
+        <input type="hidden" id="<%= tab_name %>_reagentName" value="<%= @visit_report.visit_report_laboratory.try(tab_name).try(:reagent_name).to_json %>"/> 
+    </td>
+    <td class="text-right table-acceptable">
+    </td>
+</tr>

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Insurance Service Providers</strong> - Edit Insurance Service Provider
+    </div>
+    <%= form_for @insurance_service_provider, url: internal_insurance_service_provider_path(@insurance_service_provider), html: {class: "#{params[:action]}_insurance_service_provider insurance_service_provider-form with-parsley"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

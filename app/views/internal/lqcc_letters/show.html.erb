@@ -1,0 +1,21 @@
+<%= stylesheet_link_tag "inspectorate/lqcc" %>
+
+<div class="card">
+    <div class="card-header">
+        <strong>Letters</strong> - Explanation Letter (<%= LqccLetter::EXPLANATION_TYPES[@letter.explanation_type] %>)
+    </div>
+    <%= form_for @letter, url: internal_lqcc_letter_path(@letter), html: {multipart: true, class: "with-parsley lqcc-form"} do |form| %>
+        <div class="card-body">
+            <%= render 'shared/all_validation_flash', { model_obj: @letter } %>
+            <%= render "/shared/all_flash" %>
+
+            <%= render "default_info", { form: form } %>
+            <%= render "#{@letter.explanation_type.downcase}_form", { form: form } %>
+        </div>
+        <%=render 'card_footer' %>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <%= render "form_script" %>
+<% end %>

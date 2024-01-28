@@ -1,0 +1,11 @@
+<% @has_plks_optional = true if order_item.order_itemable.plks_optional? %>
+<tr class="<%= "plks-optional" if order_item.order_itemable.plks_optional? %>">
+    <td><input type="checkbox" class="bulk" name="addon_foreign_worker_ids[]" value="<%= order_item.order_itemable.id %>"></td>
+    <td><%= order_item.order_itemable.name %></td>
+    <td><%= ForeignWorker::GENDERS[order_item&.gender] %></td>
+    <td class="currency item-amount" data-amount="<%= order_item.amount %>"><%= number_to_currency(order_item.amount, unit: "") %></td>
+    <td class="text-right">
+        <input type="hidden" name="foreign_worker_ids[]" value="<%= order_item.order_itemable.id %>" class="etr-foreign_workers" data-amount="<%= order_item.amount %>">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="etr_remove(this)">X</button>
+    </td>
+</tr>

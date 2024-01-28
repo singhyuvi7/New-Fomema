@@ -1,0 +1,2 @@
+<%= label_tag :state_id %>
+<%= collection_select(params[:controller].singularize.to_sym, :state_id, @states, :id, :name, {include_blank: 'Select Option'}, { required: true, class: 'form-control'}) %>

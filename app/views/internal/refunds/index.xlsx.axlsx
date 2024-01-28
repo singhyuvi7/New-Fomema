@@ -1,0 +1,106 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  # worksheet styles
+  title_style = style.add_style b: true
+  wrap = style.add_style alignment: {wrap_text: true}
+
+    wb.add_worksheet(name: 'Refunds') do |sheet|
+        sheet.merge_cells "A1:A1"
+        sheet.merge_cells "A2:A2"
+        # sheet.add_row([@company_name], style: [title_style])
+        # sheet.add_row([""])
+        sheet.add_row([
+            "Refund Code",
+            "Refund Created Date",
+            "Category",
+            "Amount",
+            "Status",
+            "Failed Reason",
+            "Updated Date",
+            "Customer Code",
+            "Customer Name",
+            "Customer Contact",
+            "Customer Email",
+            "FW Code",
+            "FW Name",
+        ],
+        style: [
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            title_style,
+            ]
+        )
+
+        my_types = [
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+            :string,
+        ]
+
+        my_styles = [
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+            nil,
+        ]
+        @refunds.find_each do |refund|
+            fw_code= ""
+            fw_name= ""
+            refund.refund_items.where("refund_itemable_type in ('Transaction', 'ForeignWorker')").find_each do |refund_item|
+                if refund_item.refund_itemable_type == 'Transaction'
+                    fw_code = refund_item.refund_itemable.foreign_worker.code
+                    fw_name = refund_item.refund_itemable.foreign_worker.name
+                elsif refund_item.refund_itemable_type == 'ForeignWorker'
+                    fw_code = refund_item.refund_itemable.code
+                    fw_name = refund_item.refund_itemable.name
+                end
+            end
+
+            sheet.add_row([
+                refund.code,
+                refund.date&.strftime(get_standard_date_format),
+                Refund::CATEGORIES[refund.category],
+                number_to_currency(refund.amount, unit: ""),
+                Refund::STATUSES[refund.status],
+                "#{refund.fail_reason} - #{Refund::REASONS[refund.fail_reason]}",
+                refund.updated_at&.strftime(get_standard_date_format),
+                refund.customerable&.code,
+                refund.customerable&.name,
+                refund.customerable&.phone,
+                refund.customerable&.email,
+                fw_code,
+                fw_name,
+            ], types: my_types, style: my_styles)
+        end
+    end
+end

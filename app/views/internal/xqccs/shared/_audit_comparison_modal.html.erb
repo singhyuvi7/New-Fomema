@@ -1,0 +1,121 @@
+<!-- Modal -->
+<div class="modal fade" id="comparisonModal" tabindex="-1" role="dialog" aria-labelledby="identicalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="identicalModalLabel">Select Transaction Comparison</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <%= form_tag filter_xray_examination_comparisons_internal_transactions_path, method: :post, remote: true, class: "xray-examinations-filter-form", data: { } do %>
+
+                <div class="card">
+                    <div class="card-body">
+                        <label class="col-form-label mb-4">Search Transaction Comparison</label>
+
+                        <div class="form-group row">
+                            <label class="col-md-2 col-form-label">Transaction ID</label>
+                        
+                            <div class="col-md-4">
+                                <%= text_field_tag :transaction_code, "", placeholder: "Code", class: "form-control ajax-input" %>
+                            </div>
+                        
+                            
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer text-right">
+                        <div class="btn btn-secondary clear-filters" data-type="doctor">Clear filters</div>
+                        <%= submit_tag "Search", class: "btn btn-primary filter-facilities-search", data: {type: "doctor"} %>
+                    </div>
+                </div>
+
+                <% end %>
+
+                <!-- Developer note: -->
+                <!-- Ajax response: /internal/xqccs/shared/filter_xray_examination_comparisons -->
+                
+                <table class="table table-bordered search-facilities-table">
+                    <thead>
+                        <th>Transaction ID</th>
+                        <th>X-Ray Code</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>X-Ray Taken Date</th>
+                        <th>Result</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody id="search-results">
+                        <tr>
+                            <td colspan="9">Search Worker Transaction</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- end of modal -->
+
+<% content_for :page_end_scripts do %>
+<script>
+
+    var identical_transactions = [];
+
+    $('.clear-filters').click(function () {
+        
+        $(`.xray-examinations-filter-form .ajax-input`).val('');
+    });
+
+    $('.filter-facilities-search').click(function () {
+        
+        form = $(this).closest('form');
+        
+        selected = identical_transactions;
+
+        data = $(`.xray-examinations-filter-form`).find('input.ajax-input, select.ajax-input').map(function () {
+            return { key: $(this).attr('name'), val: $(this).val() };
+        }).get().reduce(function (map, obj) {
+            map[obj.key] = obj.val;
+            return map;
+        }, {});
+
+        data.selected = selected;
+
+        data.foreign_worker_id = '<%= foreign_worker_id %>';
+        data.current_transaction_id = '<%= current_transaction_id %>';
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: data,
+        })
+        .done(function (response) {
+            $(`.search-facilities-table tbody#search-results`).html(response);
+            $(`.filter-facilities-search`).removeAttr('disabled');
+            
+        });
+    });
+
+    $("#comparisonModal").on("click", ".select_transaction", function() {
+
+        var comparison_transaction_code = $(this).data('transaction_code');
+        
+        $('#comparisonModal').modal('hide');
+
+        $('#compare-transaction-id').val(comparison_transaction_code);
+
+        $('#compare-transaction-id').parsley().reset();
+    });
+
+</script>
+<% end %>

@@ -1,0 +1,68 @@
+<p>
+    <b>Dear <%= @customer.name %></b>,<br>
+    <b><i>Tuan/ Puan </i><%= @customer.name %></b>,
+</p>
+
+<p>
+    <% if @approval_decision.upcase == "APPROVED" %>
+        Please be informed that your request to change employer was approved. The details are as follows: <br>
+    <% elsif @approval_decision.upcase == "REJECTED" %>
+        Please be informed that your request to change employer was not approved due to <%= "#{@approval_comment}" %>. The details are as follows: <br>
+    <% elsif @approval_decision.upcase == "REVERTED" %>
+        Please be informed that your request to change employer was reverted due to <%= "#{@approval_comment}" %>. The details are as follows: <br>
+    <% else %>
+        Change employer details as follows: <br>
+    <% end %>
+
+    <% if @approval_decision.upcase == "APPROVED" %>
+        <i>Dimaklumkan permohonan Pindaan Maklumat Pekerja Asing anda telah berjaya. Maklumat adalah seperti berikut:</i>
+    <% elsif @approval_decision.upcase == "REJECTED" %>
+        <i>Dimaklumkan permohonan Pindaan Pekerja Asing anda tidak berjaya kerana <%= @approval_comment %>. Maklumat adalah seperti berikut:</i>
+    <% elsif @approval_decision.upcase == "REVERTED" %>
+        <i>Dimaklumkan permohonan Pindaan Pekerja Asing anda dikembalikan kerana <%= @approval_comment %>. Maklumat adalah seperti berikut:</i>
+    <% else %>
+        <i>Maklumat Pindaan Pekerja Asing adalah seperti berikut:</i>
+    <% end %>
+</p>
+
+<div>
+    Foreign Worker Information:<br>
+    <i>Maklumat Perkerja Asing</i><br>
+
+    Code : <%= @foreign_worker.code %><br>
+    <i>Kod</i><br>
+
+    Name : <%= @foreign_worker.name %><br>
+    <i>Nama</i><br>
+
+    Passport Number : <%= @foreign_worker.passport_number %><br>
+    <i>Nombor Pasport</i><br>
+
+    Country of Origin: <%= @foreign_worker.country.name %><br>
+    <i>Negara Asal</i><br>
+
+    Date of Birth : <%= @foreign_worker.date_of_birth.try(:strftime, '%d/%m/%Y') %><br>
+    <i>Tarikh Lahir</i><br>
+
+    Gender : <%= @foreign_worker.gender_name %><br>
+    <i>Jantina</i><br>
+
+    <% if @approval_decision.upcase == "APPROVED" %>
+        Employer Name : <%= "#{@employer.name} (#{@employer.code})" %><br>
+        <i>Nama Majikan</i><br>
+        <% if !@user.employer_supplement_id.blank? %>
+            Supplementary Employer Name : <%= "#{@user.name}" %><br>
+            <i>Nama Majikan Tambahan</i><br>
+        <% end %>
+    <% end %>
+</div>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih.</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

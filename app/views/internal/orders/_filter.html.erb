@@ -1,0 +1,90 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_orders_path, method: 'get' do |form| %>
+        <div class="card-body">
+
+            <div class="form-group row">
+                <label for="code" class="col-sm-2 col-form-label">Order Code</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                </div>
+                <label for="code" class="col-sm-2 col-form-label">Status</label>
+                <div class="col-sm-4">
+                    <%= select_tag :status, options_for_select(Order::STATUSES.invert, params[:status]), include_blank: "Select Option", class: 'form-control select2' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="start_date" class="col-sm-2 col-form-label">Order Date From</label>
+                <div class="col-sm-4">
+                    <input type="date" name="start_date" id="filter_start_date" value="<%= params[:start_date] %>" id="start_date" class="form-control">
+                </div>
+                <label for="end_date" class="col-sm-2 col-form-label">Order Date To</label>
+                <div class="col-sm-4">
+                    <input type="date" name="end_date" id="filter_end_date" value="<%= params[:end_date] %>" id="end_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="code" class="col-sm-2 col-form-label">Category</label>
+                <div class="col-sm-4">
+                    <select class="form-control select2" name="category">
+                        <option value="">Select option</option>
+                        <% Order::CATEGORIES.each do |order, index| %>
+                            <option value="<%= order %>" <% if params[:category] === order %>selected="selected"<% end %> ><%= index %></option>
+                        <% end %>
+                    </select>
+                </div>
+                <label for="code" class="col-sm-2 col-form-label">Payment Method</label>
+                <div class="col-sm-4">
+                    <%= select_tag :payment_method_id, options_from_collection_for_select(PaymentMethod.where("category = 'IN'").where(:active => true).or(PaymentMethod.where("code in ('IPAY_FPX_B2C','IPAY_FPX_B2B','PAYNET_FPX_B2C','PAYNET_FPX_B2B','SWIPE_FPX_B2C','SWIPE_FPX_B2B','SWIPE_CC','BOLEH','BOLEH_WEB')")).order(:name), :id, :name, params[:payment_method_id]), include_blank: "Select Option", class: 'form-control select2' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="customer_code" class="col-sm-2 col-form-label">Customer Code</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="customer_code" id="customer_code" value="<%= params[:customer_code] %>">
+                </div>
+                <label for="document_number" class="col-sm-2 col-form-label">Document Number</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="document_number" id="document_number" value="<%= params[:document_number] %>">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="payment_no" class="col-sm-2 col-form-label">Payment No</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" name="payment_no" id="payment_no" value="<%= params[:payment_no] %>">
+                </div>
+                <label for="organization_id" class="col-sm-2 col-form-label">Branch</label>
+                <div class="col-sm-4">
+                    <%= select_tag :organization_id, options_from_collection_for_select(@branches, :id, :name, params[:organization_id]), include_blank: "Select Option", class: 'form-control select2' %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="paid_start_date" class="col-sm-2 col-form-label">Paid Date From</label>
+                <div class="col-sm-4">
+                    <input type="date" name="paid_start_date" value="<%= params[:paid_start_date] %>" id="paid_start_date" class="form-control">
+                </div>
+                <label for="paid_end_date" class="col-sm-2 col-form-label">Paid Date To</label>
+                <div class="col-sm-4">
+                    <input type="date" name="paid_end_date" value="<%= params[:paid_end_date] %>" id="paid_end_date" class="form-control">
+                </div>
+            </div>
+
+            <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button internal_orders_path %>
+            <%=raw filter_button %>
+            <button class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Export" data-original-title="Filter" type="submit" formaction="<%= internal_orders_path(format: "xlsx") %>" formtarget="_BLANK"><i class="fa fa-file-excel"></i> Export</button>
+        </div>
+    <% end %>
+</div>

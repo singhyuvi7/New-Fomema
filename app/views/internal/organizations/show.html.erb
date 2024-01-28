@@ -1,0 +1,184 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Organizations</strong> - Organization Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_name">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="organization_address">Address</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.address1 %>
+                        <%=raw "<br>#{@organization.address2}" if !@organization.address2.blank? %>
+                        <%=raw "<br>#{@organization.address3}" if !@organization.address3.blank? %>
+                        <%=raw "<br>#{@organization.address4}" if !@organization.address4.blank? %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="organization_parent_id">Organization Parent</label>
+                    <p class="form-control-plaintext">
+                        <%= "#{@organization.parent&.name} (#{@organization.parent&.code})" if @organization.parent %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_state">State</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.state&.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_town">Town</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.town&.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_postcode">Postcode</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.postcode %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_phone">Telephone Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.phone %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_fax">Fax Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.fax %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="organization_email">Email</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.email %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="organization_org_type">Type</label>
+                    <p class="form-control-plaintext">
+                        <%= Organization::TYPES[@organization.org_type] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_bank_code">Bank Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.bank_code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_bank_co">Bank Co</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.bank_co %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_bank_acctno">Bank Account Number</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.bank_acctno %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="organization_zone_id">Bank Zone</label>
+                    <p class="form-control-plaintext">
+                        <%= @organization.zone&.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_organizations_path) %>
+            <% if has_permission?('EDIT_ORGANIZATION') %>
+                <%=raw show_edit_button(edit_internal_organization_path(@organization)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_ORGANIZATION") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_organization_audits_path(@organization) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

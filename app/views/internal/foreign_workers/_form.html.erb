@@ -1,0 +1,264 @@
+<div class="card-body">
+
+    <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :employer, class: 'required' %>
+                <div class="input-group">
+                    <input style="display: none" name="foreign_worker[employer_id]" id="foreign_worker_employer_id" value="<%= @foreign_worker.employer_id %>"></input>
+                    <div class="form-control" id="foreign_worker_employer_display">
+                        <% if !@foreign_worker.employer_id.nil? %>
+                            <%= "#{@foreign_worker.employer.name} - #{@foreign_worker.employer.code}" %>
+                        <% end %>
+                    </div>
+                    <span class="input-group-append">
+                        <button id="select-employer-button" type="button" class="btn btn-primary">Select employer</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :code, class: '' %>
+                <%= form.text_field :code, class: 'form-control', disabled: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :name, class: 'required' %>
+                <%= form.text_field :name, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :passport_number, class: 'required' %>
+                <%= form.text_field :passport_number, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="required">Gender</label>
+                <div>
+                    <div class="form-check form-check-inline mr-5">
+                        <%= form.radio_button(:gender, "M", class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_gender_m">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <%= form.radio_button(:gender, "F", class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_gender_f">Female</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% [:date_of_birth, :arrival_date].each do |field| %>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <%= form.label field, class: '' %>
+                    <%= form.date_field field, class: 'form-control', required: false %>
+                </div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :plks_number, "PLKS Number", class: 'required' %>
+                <%= form.text_field :plks_number, class: 'form-control', required: true %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="required">PATI / Rehiring programme</label>
+                <div>
+                    <div class="form-check form-check-inline mr-5">
+                        <%= form.radio_button(:pati, true, class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_pati_true">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline mr-5">
+                        <%= form.radio_button(:pati, false, class: "form-check-input", required: true) %>
+                        <label class="form-check-label" for="foreign_worker_pati_false">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :country_id, class: 'required' %>
+                <%= form.select :country_id, options_from_collection_for_select(Country.order(:name).all, 'id', 'name', form.object.country_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :job_type_id, class: 'required' %>
+                <%= form.select :job_type_id, options_from_collection_for_select(JobType.order(:name).all, 'id', 'name', form.object.job_type_id), {include_blank: form_select_option_text}, required: true, class: 'form-control select2' %>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="document-input-group" class="form-group">
+                <label for="foreign_worker_uploads">Upload documents</label>
+                <div class="input-group custom-input-group">
+                    <div class="document-type col-md-6">
+                        <select class="form-control document-type-selector" name="foreign_worker[uploads][][category]">
+                            <option value="">Select option</option>
+                            <% ForeignWorker::DOCUMENT_TYPES.each do |index, document_type| %>
+                                <option value="<%= index %>"><%= document_type %></option>
+                            <% end %>
+                        </select>
+                    </div>
+                    <div class="custom-file col-md-6">
+                        <input type="file" name="foreign_worker[uploads][][documents]" class="custom-file-input" onchange="validateFiles(this)" multiple disabled required>
+                        <label class="custom-file-label">Choose file</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <%= form.button 'Add more documents', id: 'add_more_documents', class: 'btn btn-success float-right', type: 'button' %>
+        </div>
+    </div>
+</div>
+
+<div class="card-footer">
+
+    <div class="text-right">
+        <%=raw edit_back_button(internal_foreign_workers_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+
+</div>
+
+<%=render 'search_employer' %>
+
+<style>
+    .custom-input-group {
+        border: 1px solid #e4e7ea;
+        border-radius: 5px;
+        padding: 0;
+    }
+    .document-type {
+        padding: 0;
+    }
+    .document-type > select {
+        border: 0px;
+    }
+    .buttons-wrapper {
+        padding: 0;
+    }
+    .top-margin {
+        margin-top: 10px;
+    }
+    #add_more_documents {
+        margin-bottom: 10px;
+    }
+</style>
+<script>
+    function validateFiles(inputFile) {
+        var maxExceededMessage = "This file exceeds the maximum allowed file size (10 MB)";
+        var extErrorMessage = "Only image file with extension: .jpg, .jpeg, .gif or .png is allowed";
+        var allowedExtension = ["jpg", "jpeg", "png", "pdf"];
+
+        var extName;
+        var maxFileSize = <%= 10.megabytes %>;
+        var sizeExceeded = false;
+        var extError = false;
+
+        $.each(inputFile.files, function () {
+            if (this.size && maxFileSize && this.size > parseInt(maxFileSize)) { sizeExceeded = true; };
+            extName = this.name.split('.').pop();
+            if ($.inArray(extName, allowedExtension) == -1) { extError = true; };
+        });
+        if (sizeExceeded) {
+            window.alert(maxExceededMessage);
+            $(inputFile).val('');
+        };
+
+        if (extError) {
+            window.alert(extErrorMessage);
+            $(inputFile).val('');
+        };
+    }
+</script>
+
+<% content_for :page_end_scripts do %>
+<script>
+    /**
+    * Function to duplicate document fields
+    **/
+    $('#add_more_documents').click(() => {
+        $('.custom-input-group:first')
+            .clone(true, true)
+            .appendTo("#document-input-group")
+            .addClass('top-margin col-md-12')
+            .find(".custom-file-input")
+            .val("")
+            .attr("disabled", "disabled")
+        $('.custom-input-group:last')
+            .find(".custom-file-label").html("Choose file")
+    });
+
+
+    /**
+    * Function to set file name
+    **/
+    $('.custom-file-input').change(function() {
+        let filePath = $(this).val().split("\\")
+        let fileName = filePath[filePath.length - 1]
+        if (fileName != "")
+            $(this).siblings('.custom-file-label').html(fileName)
+        else
+            $(this).siblings('.custom-file-label').html("Choose file")
+    });
+
+    /**
+    * Function to re-enable form input after selecting dom type
+    **/
+    $(".document-type-selector").change(function() {
+        let selectedValue = $("option:selected", this).val()
+
+        if (selectedValue.length > 0)
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").removeAttr("disabled")
+        else
+            $("option:selected", this).parent().parent().parent().find(".custom-file input").attr("disabled", "disabled")
+    });
+
+    /**
+    * select employer
+    */
+    $('#select-employer-button').click(function () {
+        $('#search-employer-modal').modal();
+    });
+</script>
+<% end %>

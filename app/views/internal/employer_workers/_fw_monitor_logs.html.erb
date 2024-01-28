@@ -1,0 +1,28 @@
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Monitor Reason</th>
+        <th>Monitor Comment</th>
+        <th>Monitor Request By</th>
+        <th>Monitor Request At</th>
+        <th>Remove Monitor Comment</th>
+        <th>Remove Monitor By</th>
+        <th>Remove Monitor At</th>
+    </tr>
+    <% if @monitor_logs.blank? %>
+        <tr>
+            <td colspan="7" class="text-danger">No records found.</td>
+        </tr>
+    <% else %>
+        <% @monitor_logs.each do |monitor_log| %>
+            <tr>
+                <td><%= monitor_log.monitor_reason.description %></td>
+                <td><%= monitor_log.monitor_comment %></td>
+                <td><%= monitor_log.monitor_requestor&.name %></td>
+                <td><%= monitor_log.monitor_request_at&.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+                <td><%= monitor_log.unmonitor_comment %></td>
+                <td><%= monitor_log.unmonitor_requestor&.name %></td>
+                <td><%= monitor_log.unmonitor_request_at&.strftime("%d/%m/%Y %l:%M:%S %p") %></td>
+            </tr>
+        <% end %>
+    <% end %>
+</table>

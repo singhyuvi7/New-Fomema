@@ -1,0 +1,80 @@
+<pdfbody>
+    <table class="w-100">
+        <tr>
+            <td style="width: 4em;">Our Ref</td>
+            <td>: <%= "#{ @data[:certification_date] } / #{ @data[:worker_code] }" %></td>
+            <td rowspan="2" valign="top" style="text-align: right;"><%= wicked_pdf_image_tag "logo/fomema-logo.png", style: "height: 50px;" %></td>
+        </tr>
+
+        <tr>
+            <td style="width: 4em;">Date</td>
+            <td>: <%= @data[:slip_date] %></td>
+        </tr>
+    </table>
+
+    <p class="paragraph-spacing">Dear Sir / Madam,</p>
+
+    <p class="paragraph-spacing letter-header-underline">
+        <b>FOREIGN WORKER'S MEDICAL EXAMINATION RESULT<br>
+        FOREIGN WORKER &ndash;</b>  <%= @data[:worker_name] %> (<%= @data[:worker_code] %>) (<%= @data[:worker_passport] %>)
+    </p>
+
+    <p>We refer to the above named foreign worker who was examined recently under FOMEMA's Health Screening Program, for the purpose of obtaining /renewal of work permit. We regret to inform you that the worker registered under your name has been certified as <b>UNSUITABLE</b> for employment in Malaysia based on the following reasons: </p>
+
+    <ul class="paragraph-spacing">
+        <% @data[:failed_reasons_en].each do |reason| %>
+            <li><%= reason %></li>
+        <% end %>
+    </ul>
+
+    <p class="paragraph-spacing" style="border-bottom: 1px solid black;">
+        In view of the above, please contact the Immigration Department for the necessary action you are required to take.
+    </p>
+
+    <p class="paragraph-spacing">Kami merujuk kepada pekerja asing seperti nama di atas yang telah diperiksa di bawah Program Saringan Kesihatan FOMEMA untuk tujuan mendapat/memperbaharui permit kerja. Dukacita dimaklumkan bahawa pekerja yang didaftarkan di bawah nama tuan/puan telah diperakukan sebagai <b>TIDAK SESUAI</b> untuk bekerja di Malaysia kerana sebab berikut: </p>
+
+    <ul class="paragraph-spacing">
+        <% @data[:failed_reasons_my].each do |reason| %>
+            <li><%= reason %></li>
+        <% end %>
+    </ul>
+
+    <p class="paragraph-spacing">
+        Sehubungan dengan itu, tuan/puan dipohon untuk menghubungi Jabatan Imigresen untuk tindakan selanjutnya.
+    </p>
+
+    <div style="border: 1px solid black; padding: 0.5em; font-size: 0.65em; position: absolute; width: 37%; right: 0; margin-top: 1em;">
+        <p class="letter-header-underline" style="margin: 0 0 0.5em 0; padding-bottom: 0.5em;">NOTICE: THE FOREIGN WORKER SHOULD BE REPATRIATED TO HIS/HER COUNTRY OF ORIGIN WHEN HE/SHE HAS BEEN CERTIFIED AS UNSUITABLE FOR EMPLOYMENT.</p>
+        <p style="margin: 0;">NOTIS: PEKERJA ASING HENDAKLAH DIHANTAR PULANG KE NEGARA ASAL JIKA TELAH DIPERAKUKAN SEBAGAI TIDAK SESUAI UNTUK BEKERJA.</p>
+    </div>
+
+    <p class="paragraph-double-spacing">
+        Yours sincerely,<br>
+        <b>FOMEMA SDN BHD</b><br>
+        cc. Pengarah, Bahagian Pekerja Asing Jabatan Imigresen Malaysia
+    </p>
+
+    <p class="paragraph-double-spacing" style="font-size: 0.85em;">This letter is computer generated and no signature is required.</p>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 17px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+</style>

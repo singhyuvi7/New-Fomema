@@ -1,0 +1,46 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Search</strong>
+    </div>
+    <!-- /.card-header -->
+
+    <form method="GET" action="<%= filter_link %>.pdf" target="_blank">
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label required" for="register_date_start">Register Date</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="date" class="form-control" name="register_date_start" id="register_date_start" value="<%= params[:register_date_start] %>" required>
+                                <span class="input-group-append">
+                                    <label class="input-group-text" for="register_date_end">to</label>
+                                </span>
+                                <input type="date" class="form-control" name="register_date_end" id="register_date_end" value="<%= params[:register_date_end] %>" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="status">Status</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <%= select_tag :status, options_for_select(XrayFacility::STATUSES.invert, params[:status]), include_blank: 'All',  class: 'form-control' %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button(filter_link) %>
+            <%=raw filter_button(label: "<i class=\"fa fa-download\" aria-hidden=\"true\"></i> Download") %>
+        </div>
+        <!-- /.card-footer -->
+    </form>
+
+</div>
+<!-- /.card -->

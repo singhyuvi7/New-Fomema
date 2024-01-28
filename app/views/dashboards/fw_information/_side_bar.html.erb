@@ -1,0 +1,626 @@
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<div id="sidebar">
+  <div class="filter_row">
+    <div class="filter_div">
+      <div class="filter">
+        <div class="filter-title"> Filter By</div>
+        <div class="filter-body">
+          <div id="main">
+            <div class="filtereaccordion" id="filter">
+              <div class="card">
+                <div class="card-header" id="faqhead1">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('time-period')" data-target="#time-period" aria-expanded="false" aria-controls="time-period" style="cursor: pointer">Time
+                    Period</a>
+                </div>
+                <div id="time-period" class="collapse opcl" aria-labelledby="faqhead1" data-parent="#filter">
+                  <div class="card-body">
+                    <script>
+                        $.noConflict();
+                        jQuery(document).ready(function ($) {
+                            $(document).ready(function () {
+                                $('#date-range').daterangepicker({
+                                    opens: 'left',
+                                    drops: 'down',
+                                    autoApply: true,
+                                    locale: {
+                                        format: 'YYYY-MM-DD',
+                                        separator: ' - ',
+                                        applyLabel: 'Apply',
+                                        cancelLabel: 'Cancel',
+                                        fromLabel: 'From',
+                                        toLabel: 'To',
+                                        customRangeLabel: 'Custom',
+                                        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                                        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                                        firstDay: 0
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                    <div class="input-group date-range">
+                      <input type="text" class="form-control date-range" id="date-range" placeholder="Select Date Range">
+                      <div class="input-group-append">
+                        <span class="input-group-text">
+                          <i class="fa fa-calendar"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header" id="filter2">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('Sector')" data-target="#Sector" aria-expanded="true" aria-controls="Sector" style="cursor: pointer">Sector</a>
+                </div>
+                <div id="Sector" class="collapse opcl" aria-labelledby="filter2" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="sectorcheckall" name="all_selected" value=""> Select
+                          All</label>
+                      </li>
+                      <% @job_type.each do |job_type| %>
+                        <li>
+                          <label><input type="checkbox" name="sectorcheck" value="<%= job_type[0] %> " valuename="<%= job_type[1] %>"> <%= job_type[1].capitalize %>
+                          </label>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="filter3">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('State')" data-target="#State" aria-expanded="true" aria-controls="State" style="cursor: pointer">State</a>
+                </div>
+                <div id="State" class="collapse opcl" aria-labelledby="filter3" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="statecheckall" name="all_selected" value=""> Select
+                          All</label>
+                      </li>
+                      <% @states.each do |state| %>
+                        <li>
+                          <label>
+                            <input type="checkbox" name="statecheck" value="<%= "#{state[0]}" %>" valuenamestate="<%= "#{state[1]}" %>">
+                            <%= state[1].capitalize %>
+                          </label>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- Country filter -->
+              <div class="card">
+                <div class="card-header" id="filter4">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('Country')" data-target="#Country" aria-expanded="true" aria-controls="Country" style="cursor: pointer">Country</a>
+                </div>
+                <div id="Country" class="collapse opcl" aria-labelledby="filter4" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="countrycheckall" name="all_selected" value="allCountries">
+                          Select All</label>
+                      </li>
+                      <% @countries.each do |country| %>
+                        <li>
+                          <label>
+                            <input type="checkbox" name="countrycheck" value="<%= "#{country[0]}" %>" valuenamecountry="<%= "#{country[1]}" %>">
+                            <%= country[1].capitalize %>
+                          </label>
+                        </li>
+                      <% end %>
+                      <li>
+                        <label><input type="checkbox" name="otherCountriesCheck" value="others"> Others (except from
+                          above)</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header" id="filter9">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('age')" data-target="#age" aria-expanded="false" aria-controls="age" style="cursor: pointer">Age</a>
+                </div>
+                <div id="age" class="collapse opcl" aria-labelledby="filter9" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="agecheckall" name="all_selected" value=""> Select All</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="18-24"> 18-24</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="25-34"> 25-34</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="35-44"> 35-44</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="45-54"> 45-54</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="55-64"> 55-64</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="agecheck" value="65-265"> 65+</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header" id="filter5">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('Gender')" data-target="#Gender" aria-expanded="true" aria-controls="Gender" style="cursor: pointer">Gender</a>
+                </div>
+                <div id="Gender" class="collapse opcl" aria-labelledby="filter5" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="gendercheckall" name="all_selected" value=""> Select
+                          All</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="gendercheck" value="M"> Male</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="gendercheck" value="F"> Female</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header" id="filter6">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('Registration')" data-target="#Registration" aria-expanded="true" aria-controls="Registration" style="cursor: pointer">Registration
+                    at</a>
+                </div>
+                <div id="Registration" class="collapse opcl" aria-labelledby="filter6" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="registrationcheckall" name="all_selected" value=""> Select All</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="WEBPORTAL"> Web Portal</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="AGENCY"> Agency</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="EAST COAST"> East Coast</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="NORTHERN"> Northern</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="SOUTHERN"> Southern</label>
+                      </li>
+                      <li>
+                        <label><input type="checkbox" name="registrationcheck" value="CENTRAL"> Central</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header" id="filter7">
+                  <a class="filter-link collapsed" onclick="FilterOpcl('ForeginWorker')" data-target="#ForeginWorker" aria-expanded="true" aria-controls="ForeginWorker" style="cursor: pointer">Foreign
+                    Worker Type</a>
+                </div>
+                <div id="ForeginWorker" class="collapse opcl" aria-labelledby="filter7" data-parent="#filter">
+                  <div class="card-body">
+                    <ul class="subment-li">
+                      <li>
+                        <label><input type="checkbox" id="foreignworkercheckall" name="all_selected" value="">&nbsp;Select
+                          All</label>
+                      </li>
+                      <% @foregin_worker_type.each do |fw_type| %>
+                        <li>
+                          <label><input type="checkbox" name="foreignworkercheck" value="<%= fw_type %>">&nbsp;<%= fw_type.to_s.camelcase %>
+                          </label>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-btn">
+                <button id="applyFilter" class="btn-apply" data-toggle="collapse" data-target="#tag_demo" onclick="apply_filter()">Apply</button>
+                <button id="clearButton" class="btn-clear" onclick="clear_filter()" id="sidebarCollapse">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div id="result"></div>
+          <script>
+              function getValues() {
+                  var ele = [];
+                  var cb = document.getElementsByName("addcheck");
+                  var total = 0;
+                  for (var i = 0; i < cb.length; i++) {
+                      if (cb[i].checked) {
+                          ele.push(cb[i].value);
+                      }
+                  }
+                  if (ele.length > 0) {
+                      document.getElementById("result").innerHTML = "You selected " + ele;
+                  } else {
+                      document.getElementById("result").innerHTML = "You have not selected anything";
+                  }
+              }
+          </script>
+        </div>
+      </div>
+      <div class="filter d-none">
+        <div class="filter-title" onclick=""> Export <i class="fa fa-exclamation-circle"></i>
+        </div>
+        <div class="filter-body">
+          <ul class="subment-li">
+            <li>
+              <i class="fa fa-file-excel-o"></i> Excel File
+            </li>
+            <li>
+              <i class="fa fa-file-pdf-o"></i> Pdf File
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="filter d-none">
+        <div class="filter-title"> Refresh <i class="fa fa-repeat"></i>
+        </div>
+        <div class="filter-body">
+          <ul class="subment-li">
+            <li>
+              <select class="form-control" aria-label="Filter select">
+                <option> 5 min</option>
+                <option value="January">15 min</option>
+                <option value="February">30 min</option>
+              </select>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    #sidebar {
+        height: 600px; /* Adjust the height as needed */
+    }
+
+    /* Maintain proper alignment for filter and buttons */
+    .filter-btn {
+        position: sticky;
+        bottom: 0;
+        z-index: 999;
+    }
+
+    .collapse.show {
+        margin-bottom: 0; /* Adjust as needed */
+    }
+</style>
+
+<script type="text/javascript">
+    // app/assets/javascripts/filter.js
+    function clear_filter() {
+        var selectedValues = JSON.stringify({value: false});
+        clearAllInputs();
+        $.ajax({
+            type: 'GET',
+            url: '/dashboards/fw_information/index.js', // Replace with your Rails route
+            data: selectedValues
+        });
+    }
+
+    function clearAllInputs() {
+        // Clear checkboxes
+        $('input[type="checkbox"]').prop('checked', false);
+
+        // Clear input fields
+        $('input[type="text"]').val('');
+
+        // Clear date range picker (if you're using a library like 'daterangepicker')
+        $('#date-range').val('');
+    }
+
+    // Call the clearAllInputs function when needed, e.g., when the "Clear" button is clicked
+    $('#clearButton').on('click', function () {
+        clearAllInputs();
+    });
+
+    function getCheckedValues() {
+        var checkedValues = {
+            'DateRange': '',
+            'Sector': '',
+            'Country': '',
+            'State': '',
+            'Gender': '',
+            'Age': '',
+            'Registration': '',
+            'ForeginWorker': ''
+        };
+
+        checkedValues['DateRange'] = $('#date-range').val();
+        // Retrieve values from Sector
+        checkedValues['Sector'] = $('#Sector input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+
+
+        // console.log('Sector:', checkedValues['Sector'])
+        // Retrieve values from Country
+        checkedValues['Country'] = [];
+        // Exclude the 15 individual countries when "Others" is checked
+        var excludedCountries = [
+            "Bangladesh", "Nepal", "Indonesia", "Myanmar", "India", "Pakistan", "Philippines", "Vietnam",
+            "Sri Lanka", "Thailand", "Cambodia", "Laos", "Uzbekistan", "Turkmenistan", "Kazakhstan"
+        ];
+
+        // Function to get selected countries from checkboxes
+        function getSelectedCountries() {
+            var selectedCountries = [];
+            $('#Country input[name="countrycheck"]:checked').each(function () {
+                selectedCountries.push($(this).val());
+            });
+            return selectedCountries;
+        }
+
+        if ($('#Country input[name="countrycheck"][value="Others"]').is(':checked')) {
+            var allCountries = <%= @countries.to_json.html_safe %>; // Assuming you have a variable @countries in your controller
+            var selectedCountries = getSelectedCountries();
+
+            // Combine selected countries with excluded countries
+            var combinedCountries = selectedCountries.concat(allCountries.filter(country => !excludedCountries.includes(country)));
+            checkedValues['Country'] = combinedCountries;
+        } else {
+            // If "Others" is not checked, get only the selected individual countries
+            checkedValues['Country'] = getSelectedCountries();
+        }
+        checkedValues['Country'] = checkedValues['Country'].filter(country => country !== 'Others');
+        // console.log('Country:', checkedValues['Country']);
+        // Join the selected countries into a space-separated string
+        checkedValues['Country'] = checkedValues['Country'].join(' ');
+        // Retrieve values from State
+        checkedValues['State'] = $('#State input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+        // console.log('State:', checkedValues['State'])
+        // Retrieve values from Gender
+        checkedValues['Gender'] = $('#Gender input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+        // Retrieve values from age
+        checkedValues['age'] = $('#age input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+        // Retrieve values from ForeginWorker
+        checkedValues['ForeginWorker'] = $('#ForeginWorker input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+        // Retrieve values from Registration
+        checkedValues['Registration'] = $('#Registration input[type="checkbox"]:checked').map(function () {
+            return $(this).val();
+        }).get().join(' ');
+        // console.log('Registration:', checkedValues['Registration']);
+        // Add even more divs as needed
+        return checkedValues;
+    };
+
+    function getSelectedFilterValues() {
+        selectedFilters = {
+            'date_range': '', 'sectors': [], 'states': [], 'countries': [],
+            'other_countries': false, 'age': [], 'gender': [], 'registrations': [], 'fw_types': []
+        }
+
+        setDateRangeFilterValues(selectedFilters);
+        setSectorFilterValues(selectedFilters);
+        setStateFilterValues(selectedFilters);
+        setCountrieFilterValues(selectedFilters);
+        setAgeFilterValues(selectedFilters);
+        setGenderFilterValues(selectedFilters);
+        setRegistrationTypeFilterValues(selectedFilters);
+        setFwTypeFilterValues(selectedFilters);
+
+        return selectedFilters;
+    };
+
+    setDateRangeFilterValues = (data) => {
+        data['date_range'] = $('#date-range').val();
+    };
+
+    setSectorFilterValues = (data) => {
+        if ($('#Sector input[name="all_selected"]:checked').length == 0) {
+            data['sectors'] = $('#Sector input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['sectors'] = [];
+        }
+    };
+
+    setStateFilterValues = (data) => {
+        if ($('#State input[name="all_selected"]:checked').length == 0) {
+            data['states'] = $('#State input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else if ($('#State input[name="all_selected"]:checked').length > 0) {
+            data['states'] = $('#State input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['states'] = [];
+        }
+    };
+
+
+    setCountrieFilterValues = (data) => {
+        if ($('#countrycheckall:checked').length == 0) {
+            data['countries'] = $('#Country input[name="countrycheck"]:checked').get().map((obj) => obj.value);
+            data['other_countries'] = $('#Country input[name="otherCountriesCheck"]:checked').length > 0;
+        } else if ($('#countrycheckall:checked').length > 0) {
+            data['countries'] = $('#Country input[name="countrycheck"]:checked').get().map((obj) => obj.value);
+            data['other_countries'] = $('#Country input[name="otherCountriesCheck"]:checked').length > 0;
+        } else {
+            data['countries'] = [];
+            data['other_countries'] = false;
+        }
+    };
+
+    setAgeFilterValues = (data) => {
+        if ($('#Age input[name="all_selected"]:checked').length == 0) {
+            data['age'] = $('#age input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['age'] = [];
+        }
+    };
+
+    setGenderFilterValues = (data) => {
+        if ($('#Gender input[name="all_selected"]:checked').length == 0) {
+            data['gender'] = $('#Gender input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['gender'] = [];
+        }
+    };
+
+    setRegistrationTypeFilterValues = (data) => {
+        if ($('#Registration input[name="all_selected"]:checked').length == 0) {
+            data['registration_types'] = $('#Registration input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['registration_types'] = [];
+        }
+    };
+
+    setFwTypeFilterValues = (data) => {
+        if ($('#ForeginWorker input[name="all_selected"]:checked').length == 0) {
+            data['fw_types'] = $('#ForeginWorker input[type="checkbox"]:checked').get().map((obj) => obj.value);
+        } else {
+            data['fw_types'] = [];
+        }
+    };
+
+    function FilterOpcl(value) {
+        switch (value) {
+            case 'time-period':
+                if ($('#time-period.opcl').hasClass("show")) {
+                    $('#time-period.opcl').removeClass("show")
+                } else {
+                    $("#time-period.opcl").addClass("show");
+                }
+                break;
+            case 'Sector':
+                if ($('#Sector.opcl').hasClass("show")) {
+                    $('#Sector.opcl').removeClass("show")
+                } else {
+                    $("#Sector.opcl").addClass("show");
+                }
+                break;
+            case 'State':
+                if ($('#State.opcl').hasClass("show")) {
+                    $('#State.opcl').removeClass("show")
+                } else {
+                    $("#State.opcl").addClass("show");
+                }
+                break;
+            case 'Country':
+                if ($('#Country.opcl').hasClass("show")) {
+                    $('#Country.opcl').removeClass("show")
+                } else {
+                    $("#Country.opcl").addClass("show");
+                }
+                break;
+            case 'age':
+                if ($('#age.opcl').hasClass("show")) {
+                    $('#age.opcl').removeClass("show")
+                } else {
+                    $("#age.opcl").addClass("show");
+                }
+                break;
+            case 'Gender':
+                if ($('#Gender.opcl').hasClass("show")) {
+                    $('#Gender.opcl').removeClass("show")
+                } else {
+                    $("#Gender.opcl").addClass("show");
+                }
+                break;
+            case 'Registration':
+                if ($('#Registration.opcl').hasClass("show")) {
+                    $('#Registration.opcl').removeClass("show")
+                } else {
+                    $("#Registration.opcl").addClass("show");
+                }
+                break;
+            case 'ForeginWorker':
+                if ($('#ForeginWorker.opcl').hasClass("show")) {
+                    $('#ForeginWorker.opcl').removeClass("show")
+                } else {
+                    $("#ForeginWorker.opcl").addClass("show");
+                }
+                break;
+        }
+    }
+
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const spanSector = document.getElementById('spansector');
+        const spanState = document.getElementById('spanstate');
+        const spanCountry = document.getElementById('spancountry');
+
+        const divSelectedSectors = document.getElementById('selectedsectors');
+        const divSelectedStates = document.getElementById('selectedstates');
+        const divSelectedCountries = document.getElementById('selectedcountries');
+
+        hideIfEmpty(divSelectedSectors, spanSector);
+        hideIfEmpty(divSelectedStates, spanState);
+        hideIfEmpty(divSelectedCountries, spanCountry);
+
+        function hideIfEmpty(divElement, spanElement) {
+            if (divElement.textContent.trim() === '') {
+                spanElement.style.display = 'none';
+            } else {
+                spanElement.style.display = 'inline'; // Show the span if the div is not empty
+            }
+        }
+
+        function setupCheckboxHandlers(checkboxes, selectAllCheckbox, selectedDiv, valueAttribute, spanElement) {
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedValues);
+            });
+
+            selectAllCheckbox.addEventListener('change', updateSelectedValues);
+
+            function updateSelectedValues() {
+                if (selectAllCheckbox.checked) {
+                    const allValues = Array.from(checkboxes).map(checkbox => checkbox.getAttribute(valueAttribute));
+                    selectedDiv.textContent = allValues.join(', ');
+                } else {
+                    const checkedCheckboxes = document.querySelectorAll(`input[name="${checkboxes[0].name}"]:checked`);
+                    const selectedValues = Array.from(checkedCheckboxes).map(checkedCheckbox => checkedCheckbox.getAttribute(valueAttribute));
+                    selectedDiv.textContent = selectedValues.join(', ');
+                }
+
+                hideIfEmpty(selectedDiv, spanElement);
+            }
+        }
+
+        // Usage for sectors
+        const checkboxesSectors = document.querySelectorAll('input[name="sectorcheck"]');
+        const selectAllCheckboxSectors = document.getElementById('sectorcheckall');
+        setupCheckboxHandlers(checkboxesSectors, selectAllCheckboxSectors, divSelectedSectors, 'valuename', spanSector);
+
+        // Usage for states
+        const checkboxesStates = document.querySelectorAll('input[name="statecheck"]');
+        const selectAllCheckboxStates = document.getElementById('statecheckall');
+        setupCheckboxHandlers(checkboxesStates, selectAllCheckboxStates, divSelectedStates, 'valuenamestate', spanState);
+
+        // Usage for countries
+        const checkboxesCountries = document.querySelectorAll('input[name="countrycheck"]');
+        const selectAllCheckboxCountries = document.getElementById('countrycheckall');
+        setupCheckboxHandlers(checkboxesCountries, selectAllCheckboxCountries, divSelectedCountries, 'valuenamecountry', spanCountry);
+    });
+</script>

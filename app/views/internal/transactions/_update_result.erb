@@ -1,0 +1,119 @@
+<div id="dialog-update-result" class="hidden" title="Update Result">
+    <p>
+        You are about to update MERTS Result for <b><%= transaction.fw_code %></b>.<br>
+        Current result: <b><%= transaction.final_result %></b><br><br>
+        Please specify whether this is to be considered as Wrong Transmission for:
+    </p>
+
+    <%= form_tag update_result_internal_transaction_path(@transaction), method: "post", class: "disable-enter-keypress", id: "transaction-update-result-form" do %>
+        <div class="d-flex justify-content-start align-items-center mb-2">
+            <%= check_box_tag :check_box__doctor_transmission, 'true', false %>
+            <label class="mb-0 ml-2" for="check_box__doctor_transmission"><%= "Doctor #{ @transaction.doctor&.code }, Certification date on #{ @transaction.certification_date? ? @transaction.certification_date.strftime("%d/%m/%Y") : nil }" %></label>
+        </div>
+
+        <div class="d-flex justify-content-start align-items-center mb-2">
+            <%= check_box_tag :check_box__lab_transmission, 'true', false %>
+            <label class="mb-0 ml-2" for="check_box__lab_transmission"><%= "Lab #{ @transaction.laboratory&.code }, Lab submit date #{ @transaction.laboratory_transmit_date? ? @transaction.laboratory_transmit_date.strftime("%d/%m/%Y") : nil }" %></label>
+        </div>
+
+        <div class="d-flex justify-content-start align-items-center mb-2">
+            <%= check_box_tag :check_box__xray_transmission, 'true', false %>
+            <label class="mb-0 ml-2" for="check_box__xray_transmission"><%= "X-ray #{ @transaction.xray_facility&.code }, X-ray submit date  #{ @transaction.xray_transmit_date? ? @transaction.xray_transmit_date.strftime("%d/%m/%Y") : nil }" %></label>
+        </div>
+
+        <%= text_area_tag :transaction_amendment_reason, "", rows: 5, placeholder: "Issues. Example: Case of wrongly transmitted blood pressure readings.", class: "form-control mt-3" %>
+        <p class="error-placeholder text-danger"></p>
+
+        <p><i>The transaction will be inserted to MOH Notification if the selected condition is notifiable.</i></p>
+
+        <%
+            namespacing ||= "de_attributes"
+            readonly = (@transaction.final_result == 'UNSUITABLE') ? false : true
+            @condition_index = 0
+            medical_examination = transaction.medical_examination || transaction.doctor_examination
+        %>
+
+        <% DoctorExamination.certification_conditions.each_with_index do |array, index| %>
+            <%
+                field_name, label   = array
+                value               = medical_examination.try(field_name)
+            %>
+
+            <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+                <label class="row-index"><%= @condition_index += 1 %></label>
+                <label class="flex-grow-1 mb-0"><%= label %></label>
+
+                <div class="d-flex flex-shrink-0">
+                    <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field condition-check" %>
+
+                    <div>
+                        <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+            <label class="row-index"><%= @condition_index += 1 %></label>
+            <label class="flex-grow-1 mb-0">Other</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = medical_examination.try(:condition_other) %>
+                <%= hidden_field_tag "#{ namespacing }[condition_other]", value, class: "boolean-field condition-check" %>
+
+                <div>
+                    <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                    <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+                </div>
+            </div>
+        </div>
+
+        <% DoctorExamination.certification_condition_part_2.each_with_index do |array, index| %>
+            <%
+                field_name, label   = array
+                next if transaction.fw_gender == "M" && field_name == :condition_urine_for_pregnant
+                value               = medical_examination.try(field_name)
+            %>
+
+            <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end border-bottom align-items-center">
+                <label class="row-index"><%= @condition_index += 1 %></label>
+                <label class="flex-grow-1 mb-0"><%= label %></label>
+
+                <div class="d-flex flex-shrink-0">
+                    <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field condition-check" %>
+
+                    <div>
+                        <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                        <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No") %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+
+        <div class="certification-comment-container px-4 py-2 border-bottom">
+            <div>
+                <label class="mr-4 w-em-3"><%= @condition_index += 1 %></label>
+                <label>Comments (for any abnormalities detected in PART IV)</label>
+            </div>
+
+            <%= text_area_tag "#{ namespacing }[certification_comment]", medical_examination.try(:certification_comment), rows: 5, class: "p-2", style: "width: calc(100% - 5em); margin-left: 5em;", readonly: readonly %>
+
+            <% if medical_examination.class.name != "DoctorExamination" && @transaction&.medical_examination&.certification_comment.present? %>
+                <div class="mt-3" style="margin-left: 5em;">
+                    <label>Doctor's Comment</label>
+
+                    <div class="border-left pl-2 pt-2">
+                        <%= simple_format @transaction.medical_examination.certification_comment %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        initializeToggleableFields('doctor examination');
+    </script>
+<% end %>

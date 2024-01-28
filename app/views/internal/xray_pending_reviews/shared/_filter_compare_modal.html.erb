@@ -1,0 +1,126 @@
+<!-- Modal -->
+<div class="modal fade" id="filter-compare-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="identicalModalLabel">Select Transaction Comparison</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <%= form_tag filter_compares_internal_xray_pending_reviews_path, method: :post, remote: true, class: "xray-examinations-filter-form", data: { } do %>
+                    <div class="card">
+                        <div class="card-header">Search Transaction Comparison</div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Transaction ID</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :transaction_code, "", placeholder: "Transaction Code", class: "form-control ajax-input" %>
+                                </div>
+                                <label class="col-md-2 col-form-label">Worker Code</label>
+                                <div class="col-md-4">
+                                    <%= text_field_tag :worker_code, xray_pending_review.transactionz&.fw_code, placeholder: "Worker Code", class: "form-control ajax-input" %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-right">
+                            <div class="btn btn-secondary clear-filters">Clear filters</div>
+                            <%= submit_tag "Search", class: "btn btn-primary search-btn" %>
+                        </div>
+                    </div>
+                <% end %>
+
+                <table class="table table-bordered result-table">
+                    <thead>
+                        <th width="40"><%= check_box_tag "toggle_all_checkboxes", "", false %></th>
+                        <th>Transaction ID</th>
+                        <th>X-Ray Code</th>
+                        <th>Worker Code</th>
+                        <th>Worker Name</th>
+                        <th>Result</th>
+                    </thead>
+                    <tbody id="search-results">
+                        <tr>
+                            <td colspan="6">Search Worker Transaction</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="compare-add-button">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end of modal -->
+
+<% content_for :page_end_scripts do %>
+<script>
+$('.clear-filters').click(function () {
+    $(`.xray-examinations-filter-form .ajax-input`).val('');
+});
+
+$('.search-btn').click(function () {
+    form = $(this).closest('form');
+
+    var selected_transaction_ids = [];
+    $('#compares-table input[name="xray_pending_review_compare[transaction_id][]"]').each(function (idx, inp) {
+        selected_transaction_ids.push(inp.value);
+    });
+
+    data = {
+        foreign_worker_id: '<%= xray_pending_review.transactionz.foreign_worker_id %>',
+        current_transaction_id: '<%= xray_pending_review.transactionz.id %>',
+        selected_transaction_ids: selected_transaction_ids,
+        transaction_code: $('#transaction_code.ajax-input').val(),
+        worker_code: $('#worker_code.ajax-input').val()
+    }
+
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: data,
+    })
+    .done(function (response) {
+        $(`.result-table tbody#search-results`).html(response);
+        $(`.search-btn`).prop('disabled', false);
+        
+    });
+});
+
+$('#toggle_all_checkboxes').change(function() {
+    checked = $(this).prop('checked');
+    $('input[name*="xray_review_ids["]').prop('checked', checked);
+});
+
+$('#compare-add-button').click(function(e) {
+    compare_transactions = $('input[name*="transaction_ids["]:checked').map(function() {
+        return $(this).val();
+    }).get();
+
+    if (compare_transactions.length > 0) {
+        $('#filter-compare-modal .transaction_ids:checked').each(function(index) {
+            var current_row = $(this).closest('tr');
+            clone_row = current_row.clone(true);
+            clone_row.find("td:first-child").remove();
+            clone_row.append("<td><button type='button' class='btn btn-sm btn-danger delete_compare'><i class='fa fa-trash'></i></button></td>");
+            $("#compares-table tbody").append(clone_row);
+            current_row.remove();
+        });
+
+        // side effect at main form
+        refresh_compare_ids();
+
+        // hide modal
+        $('#filter-compare-modal').modal('hide');
+    } else {
+        alert('Please select at least 1 case');
+    }
+});
+</script>
+<% end %>

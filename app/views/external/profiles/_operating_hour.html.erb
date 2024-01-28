@@ -1,0 +1,347 @@
+<%= form_for @operating_hour, url: external_profile_update_path, method: :PUT do |form| %>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <%= form.label :operating_hour, 'Operating Hour', class: 'col-form-label' %>
+                <p>
+                  Notes:<br>
+                  1. Use 24 hours format<br>
+                  2. FOMEMA operating hours is minimum of 8 hours a day (excluding Break Hours) and 5 days a week
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="<%= index_table_class %>">
+                <thead>
+                <tr>
+                  <th width='8%'>Days</th>
+                  <th width='10%'>Operation</th>
+                  <th width='10%'>Hours</th>
+                  <th width='11%'>Start Hours</th>
+                  <th width='11%'>End Hours</th>
+                  <th width='11%'>Start Break Hours</th>
+                  <th width='11%'>End Break Hours</th>
+                  <%# <th width='50%'>Break Hours (Please specify)</th> %>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>Monday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :monday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :monday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :monday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :monday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :monday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :monday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :monday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :monday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :monday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Tuesday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :tuesday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :tuesday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :tuesday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :tuesday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :tuesday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :tuesday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :tuesday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :tuesday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :tuesday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Wednesday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :wednesday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :wednesday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :wednesday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :wednesday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :wednesday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :wednesday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :wednesday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :wednesday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :wednesday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Thursday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :thursday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :thursday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :thursday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :thursday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :thursday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :thursday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :thursday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :thursday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :thursday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Friday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :friday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :friday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :friday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :friday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :friday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :friday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' }%>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :friday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :friday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :friday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Saturday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :saturday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :saturday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :saturday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :saturday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :saturday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :saturday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :saturday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :saturday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :saturday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Sunday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :sunday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :sunday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :sunday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :sunday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :sunday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :sunday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :sunday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :sunday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :sunday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td>Public Holiday</td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :public_holiday_is_close, false, class: "form-check-input" %>Open
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :public_holiday_is_close, true, class: "form-check-input" %>Close
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :public_holiday_is_24_hour, false, class: "form-check-input" %>Fixed
+                      </div>
+                      <div class="form-check form-check-inline mr-5">
+                        <%= radio_button :operating_hour, :public_holiday_is_24_hour, true, class: "form-check-input" %>24
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :public_holiday_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :public_holiday_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :public_holiday_break_start, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <td>
+                    <%= time_select :operating_hour, :public_holiday_break_end, {:default => {:hour => '00', :minute => '00'}}, { class: 'form-control-sm' } %>
+                  </td>
+                  <!--td>
+                    <%= text_field :operating_hour, :public_holiday_break, { class: 'form-control' } %>
+                  </td-->
+                </tr>
+                <tr>
+                  <td colspan='7'>
+                    <%= form.label :close_remark, 'Remark', class: 'col-form-label' %>
+                    <%= text_field :operating_hour, :close_remark, { class: 'form-control' } %>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+    </div>
+<% end %>

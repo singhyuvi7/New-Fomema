@@ -1,0 +1,24 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  title_style = s.add_style :b=>true, :sz=>9, :u=>true, :alignment => {:vertical=> :center}
+  header_style = s.add_style(b: true, sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] }, :alignment => {:horizontal => :center, :vertical => :center, :wrap_text => true})
+  data_style = s.add_style(sz: 9, border: { style: :thin, color: '000000', edges: [:top, :bottom, :left, :right] })
+
+  ## visited statistic
+  wb.add_worksheet(name: "Visited Statistics") do |sheet|
+    sheet.add_row ["Clinic and X-Ray Visited - #{@start_date.try(:to_date).try(:strftime,'%d/%m/%Y')} to #{@end_date.try(:to_date).try(:strftime,'%d/%m/%Y')}"], style: title_style
+    sheet.column_widths 5
+    sheet.add_row
+
+    sheet.add_row ['Month','Clinic','X-ray','Total','Cumulative','Target'], style: header_style
+    (1..12).each do |x|
+      statistic = @statistics.select { |statistic| statistic.month == x }
+      doctor_count = statistic.blank? ? 0 : statistic[0].doctor_count
+      xray_count = statistic.blank? ? 0 : statistic[0].xray_count
+      total = statistic.blank? ? 0 : statistic[0].total
+      sheet.add_row [Date::MONTHNAMES[x], doctor_count, xray_count, total, '',''], style: data_style
+    end
+
+    sheet.add_row ['Total',@statistics.sum(&:doctor_count), @statistics.sum(&:xray_count),@statistics.sum(&:total),'',''], style: data_style
+  end
+end

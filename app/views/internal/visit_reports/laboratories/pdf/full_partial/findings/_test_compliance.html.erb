@@ -1,0 +1,22 @@
+<tr class="finding-row method-field">
+    <td class="table-index"></td>
+    <td class="row-name"><div style="color:white;">invisible</div></td>
+    <td colspan="3">
+        <div class="yes-no-checkbox">
+            <div class="acceptable">Yes</div>
+            <div class="not-acceptable">No</div>
+        </div>
+    </td>
+</tr>
+
+<tr class="finding-row method-field">
+    <td class="row-name" colspan="2">
+        <div>Test Compliance</div>
+    </td>
+    <td colspan="3">
+        <div class="acceptable-checkbox-field">
+            <div class="acceptable"><%= finding[:test_compliance] == 'YES' ? @checkbox_checked : @checkbox_unchecked %></div>
+            <div class="not-acceptable"><%= finding[:test_compliance] == 'NO' ? @checkbox_checked : @checkbox_unchecked %></div>
+        </div>
+    </td>
+</tr>

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Service Provider Groups</strong> - Edit Service Provider Group
+    </div>
+    <%= form_for @service_provider_group, url: internal_service_provider_group_path(@service_provider_group), html: {class: "#{params[:action]}_service_provider_group service_provider_group-form with-parsley disable-enter-keypress"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

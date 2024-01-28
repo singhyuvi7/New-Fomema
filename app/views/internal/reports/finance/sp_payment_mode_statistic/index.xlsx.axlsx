@@ -1,0 +1,32 @@
+wb = xlsx_package.workbook
+
+wb.styles do |s|
+    header_style = s.add_style :alignment => {:vertical=> :center}, :border=>{:style => :thin, :color => "249021"}, :bg_color => "f7f6e7", :b=>true, :sz=>11
+    data_style = s.add_style :border=>{:style => :thin, :color => "249021"}
+    title_style = s.add_style :b=>true, :sz=>14, :u=>true
+    subtitle_style = s.add_style :fg_color=>"FF0000", :sz=>11, :i=>true, :b=>true
+    grand_total_style = s.add_style :b=>true,:border=>{:style => :thin, :color => "249021"}
+    wb.add_worksheet(:name => "Custom Styles") do |sheet|
+
+        sheet.add_row ["Service Provider Payment Mode Statistics as at #{@current_datetime}"], :style => title_style
+        sheet.add_row ["**'Online' denotes bank account is not null and payment mode is online. 'Cashier Order' denotes bank account is null or payment mode is cashier order."], :style => subtitle_style
+
+        sheet.column_widths 3
+        sheet.add_row []
+
+        @statistics.each do |key, array|
+            sheet.add_row [@sp_title[key],"","","","","","",""], :style=>header_style
+            sheet.add_row ['Payment Mode','Group Action','Group Inactive','Group Total','Non Group Active','Non Group Inactive','Non Group Total','Grand Total'], :style=>header_style
+
+            array.each.with_index do |row, index|
+                if array.count != index+1
+                    sheet.add_row row, :style => data_style
+                else
+                    sheet.add_row row, :style => grand_total_style
+                end
+            end
+
+            sheet.add_row []
+        end
+    end
+end

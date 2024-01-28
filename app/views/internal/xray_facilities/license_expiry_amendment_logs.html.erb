@@ -1,0 +1,41 @@
+<div class="card">
+    <div class="card-header">
+        <strong>X-Ray Facilities </strong> - License Expiry Amendment History (<%= @xray_facility.code %>)
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Requested Date</th>
+                <th>Requested By</th>
+                <th>Approval Date</th>
+                <th>Approval By</th>
+                <th>Approval Decision</th>
+                <th>Approval Comment</th>
+            </tr>
+            <% if @amendments.blank? %>
+                <tr>
+                    <td colspan="10" class="text-danger">No records found.</td>
+                </tr>
+            <% else %>
+                <% @amendments.each do |amendment| %>
+                    <%
+                        item = Approval::Item.find_by(request_id: amendment.id)
+                        request = Approval::Request.find_by(id: amendment.id)
+                        comment = Approval::Comment.find_by(request_id: amendment.id, user_id: request&.respond_user)
+                    %>
+                    <tr>
+                        <td><%= amendment.created_at.try(:strftime, get_standard_date_format) %></td>
+                        <td><%= request&.request_user&.name %></td>
+                        <td><%= amendment.approval_at.try(:strftime, get_standard_date_format) %></td>
+                        <td><%= request&.respond_user&.name %></td>
+                        <td><%= request.approval_decision %></td>
+                        <td><%= comment&.content if !comment&.content.start_with?('Request approved by', 'Update request by') %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+        </table>
+    </div>
+    <div class="card-footer text-right">
+        <%= raw show_back_button(request.env["HTTP_REFERER"] || internal_xray_facility_path) %>
+    </div>
+</div>

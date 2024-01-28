@@ -1,0 +1,79 @@
+<%
+    namespacing ||= "de_attributes_#{ rand(1000) }"
+    readonly    ||= false
+%>
+
+<div class="category-switchable hidden" data-type="category_2">
+    <div class="p-4 border-bottom">
+        <h3><u>PART II. MEDICAL HISTORY (cont'd)</u></h3>
+    </div>
+
+    <h5 class="px-4 py-3 border-bottom mb-0">2. Category 2 Diseases</h5>
+
+    <% DoctorExamination.category_2_diseases.each_with_index do |array, index| %>
+        <%
+            field_name, label   = array
+            value               = doctor_examination.try(field_name)
+            date_value          = doctor_examination.try("#{field_name}_date")
+            formatted           = date_value.present? ? readonly ? date_value.strftime("%d/%m/%Y") : date_value.strftime("%F") : nil
+        %>
+
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"><%= "2.#{index + 1}" %></label>
+            <label class="flex-grow-1 mb-0"><%= label %></label>
+
+            <div class="d-flex flex-shrink-0">
+                <%= hidden_field_tag "#{ namespacing }[#{ field_name }]", value, class: "boolean-field doctor-exam-date-field-wipe" %>
+                <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No", classes: "mr-4") %>
+                <%= text_field_tag "#{ namespacing }[#{ field_name }_date]", formatted, placeholder: "Select date", class: "w-em-12 form-control rounded-0 date-field-check px-2 datepicker", max: Date.today.strftime("%F"), autocomplete: "off", disabled: !value, readonly: readonly %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+        <label class="row-index">3</label>
+        <label class="flex-grow-1 mb-0">Taken medications/drugs within the last 2 weeks?</label>
+
+        <div class="d-flex flex-shrink-0">
+            <% value = doctor_examination.try(:history_taken_drug_recently) %>
+            <%= hidden_field_tag "#{ namespacing }[history_taken_drug_recently]", value, class: "boolean-field" %>
+            <%= raw boolean_field_button(active_color: "danger", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+            <%= raw boolean_field_button(active_color: "success", active: !value, readonly: readonly, value: false, placeholder: "No", classes: "mr-4") %>
+            <div class="w-em-12"></div>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 border-bottom">
+        <div class="d-flex">
+            <label class="row-index">4</label>
+            <label class="mb-0">Comments (refer to Part II)</label>
+        </div>
+
+        <%= text_area_tag "#{ namespacing }[history_comment]", doctor_examination.try(:history_comment), rows: 5, readonly: readonly, class: "mt-2", style: "margin-left: 4.5em; width: calc(100% - 4.5em);" %>
+    </div>
+
+    <div class="px-4 py-2 border-bottom">
+        <label class="row-index"></label>
+
+        <label class="mb-0">
+            Note:<br>
+            ** Foreign workers with a medical history of incurable or chronic diseases/conditions needing <u>prolonged and extensive treatment</u> may also be found unsuitable for employment in Malaysia.
+        </label>
+    </div>
+
+    <% unless readonly %>
+        <div class="px-4 py-2 boolean-field-parent d-flex flex-wrap justify-content-end align-items-center border-bottom">
+            <label class="row-index"></label>
+            <label class="flex-grow-1 mb-0">Yes, I have visited medical history (category 2) for this foreign worker</label>
+
+            <div class="d-flex flex-shrink-0">
+                <% value = doctor_examination.try(:visited_history_2) %>
+                <%= hidden_field_tag "#{ namespacing }[visited_history_2]", value, class: "boolean-field visited-bool" %>
+                <%= raw boolean_field_button(active_color: "success", active: value, readonly: readonly, value: true, placeholder: "Yes") %>
+                <%= raw boolean_field_button(active_color: "danger", active: !value, readonly: readonly, value: false, placeholder: "No", classes: "mr-4") %>
+                <div class="w-em-12"></div>
+            </div>
+        </div>
+    <% end %>
+</div>

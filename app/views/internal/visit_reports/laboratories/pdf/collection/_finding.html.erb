@@ -1,0 +1,103 @@
+<% if !finding[:sub].blank? %>
+    <tr class="bold">
+        <td class="table-index"><%= index %>.</td>
+        <td colspan="4"><%= finding[:name] %></td>
+    </tr>
+    <% finding[:sub].each.with_index(1) do |sub_finding, index_2| %>
+        <tr>
+            <td class="table-sub-index"><%= "#{index}.#{index_2}" %></td>
+            <td>
+                <div class="bold"><%= sub_finding[:name] %></div>
+                <% if !sub_finding[:value].blank? && sub_finding[:key] == 'collection_centre_to_test_lab' %>
+                    <div class="finding-comment">
+                        <span>Testing Laboratory Name :</span>
+                        <span><%= sub_finding[:value] %></span>
+                    </div>
+                <% end %>
+            </td>
+            <% if sub_finding[:has_acc_option] %>
+                <td class="text-center"><%= sub_finding[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= sub_finding[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+                <td class="text-center"><%= sub_finding[:na] ? @checkbox_checked : @checkbox_unchecked %></td>
+            <% else %>
+                <td colspan="3"></td>
+            <% end %>
+        </tr>
+        <% if !sub_finding[:value].blank? && sub_finding[:key] == 'collection_centre_to_test_lab' %>
+        <tr>
+            <td class="table-index"></td>
+            <td>
+                <div class="finding-comment">
+                    <span>Testing Laboratory Name :</span>
+                    <span><%= sub_finding[:value] %></span>
+                </div>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+        <% end %>
+        <% if !sub_finding[:comment].blank? %>
+            <tr>
+                <td class="table-index"></td>
+                <td>
+                    <div class="finding-comment">
+                        <span class="bold">Comment :</span>
+                        <span class="unbold"><%= sub_finding[:comment] %></span>
+                    </div>
+                </td>
+                <td colspan="3"></td>
+            </tr>
+        <% end %>
+    <% end %>
+<% else %>
+    <tr>
+        <td class="table-index"><%= "#{index}" %>.</td>
+        <td class="row-name">
+            <div><%= finding[:name] %></div>
+        </td>
+        <% if finding[:has_acc_option] %>
+            <td class="text-center"><%= finding[:yes] ? @checkbox_checked : @checkbox_unchecked %></td>
+            <td class="text-center"><%= finding[:no] ? @checkbox_checked : @checkbox_unchecked %></td>
+            <td class="text-center"><%= finding[:na] ? @checkbox_checked : @checkbox_unchecked %></td>
+        <% else %>
+            <td colspan="3"></td>
+        <% end %>
+    </tr>
+    <% if finding[:key] == 'adequate_instrument' %>
+        <tr>
+            <td class="table-index"></td>
+            <td class="checkbox-field">
+                <% VisitReportLabOption.get_data('', 'instrument').each do |option| %>
+                    <div class="option">
+                        <%= finding[:items].include?(option.code) ? @checkbox_checked : @checkbox_unchecked %>
+                        <div><%= option.name %></div>
+                    </div>
+                <% end %>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+    <% end %>
+    <% if !finding[:value].blank? %>
+        <tr>
+            <td class="table-index"></td>
+            <td>
+                <div class="finding-comment">
+                    <span class="bold">Comment :</span>
+                    <span class="unbold"><%= finding[:value] %></span>
+                </div>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+    <% end %>
+    <% if !finding[:comment].blank? %>
+        <tr>
+            <td class="table-index"></td>
+            <td>
+                <div class="finding-comment">
+                    <span class="bold">Comment :</span>
+                    <span class="unbold"><%= finding[:comment] %></span>
+                </div>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+    <% end %>
+<% end %>

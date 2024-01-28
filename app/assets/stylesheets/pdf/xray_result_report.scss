@@ -1,0 +1,115 @@
+.result-report{
+    .header-title{
+        font-size: 20px;
+        font-weight: bold;
+        border: 1px solid black;
+        text-align: center;
+        padding: 2px;
+    }
+
+    .transaction-details{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        padding: 1.2rem;
+        font-size: 16px;
+
+        .information{
+            display: flex;
+            flex-direction: column;
+
+            .row{
+                display: flex;
+                padding: 5px;
+
+                .label{
+                    width: 210px;
+                    font-weight: bold;
+                }
+                .value{
+                    width: 250px;
+                    text-align: left;
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+                .colon{
+                    padding-right: 5px;
+                }
+            }
+        }
+
+        .left-col{
+            margin-right: 1rem;
+        }
+        .right-col{
+            margin-left: 1rem;
+        }
+    }
+
+    table {
+        width: 100%;
+        color: #23282c;
+        margin-bottom: 1rem;
+        border-collapse: collapse;
+        border: 1.5px solid black;
+        font-size: 15px;
+        font-weight: bold;
+
+        thead {
+            display: table-header-group;
+            vertical-align: middle;
+            border-color: inherit;
+
+            th {
+                vertical-align: bottom;
+                border-bottom: 1.5px solid black;
+            }
+        }
+
+        tbody {
+            display: table-row-group;
+            vertical-align: middle;
+            border-color: inherit;
+
+            .result-title{
+                padding: 1.3rem 10px;
+            }
+            .details-value{
+                font-weight: normal;
+                white-space: normal;
+            }
+            .impression-value{
+                padding: 1.3rem 10px;
+                font-weight: normal;
+                white-space: normal;
+            }
+        }
+
+        .head-title{
+            width: 20%;
+        }
+        .head-abnormal{
+            width: 10%;
+        }
+        .head-normal{
+            width: 10%;
+        }
+        .head-details{
+            width: 60%;
+        }
+    }
+
+    th,
+    td {
+        width: 1%;
+        white-space: nowrap;
+        padding: 8px 10px;
+        border: 1.5px solid black;
+    }
+
+    thead th,
+    thead td {
+        border-bottom-width: 1.5px;
+    }
+}

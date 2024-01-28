@@ -1,0 +1,117 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Manual Payment</strong>
+    </div>
+    <div class="card-body">
+
+        <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-form-label">Transaction Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @transaction.try(:code) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-form-label">Service Provider Type</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment.service_providable_type %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label"><%= "#{@payment.service_providable_type.constantize.model_name.human.titlecase} Code" %></label>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label"><%= "#{@payment.service_providable_type.constantize.model_name.human.titlecase} Name" %></label>
+                    <p class="form-control-plaintext">
+                        <%= @service_provider.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label">Worker Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @transaction.foreign_worker.code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label">Worker Nam</label>
+                    <p class="form-control-plaintext">
+                        <%= @transaction.foreign_worker.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label">User Code</label>
+                    <p class="form-control-plaintext">
+                        <%= User.find(@payment.created_by).code %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label">Payment Amount</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment.amount %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                <label class="col-form-label">Payment Date</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment.pay_at.strftime('%d/%m/%Y') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw edit_back_button(internal_manual_payment_view_transactions_path(:worker_code => @transaction.foreign_worker.code)) %>
+        </div>
+
+    </div>
+</div>

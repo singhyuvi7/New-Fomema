@@ -1,0 +1,130 @@
+<!-- new template for index -->
+
+<div class="card">
+    <div class="card-header">
+        <strong>Refunds</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%= render "filter" %>
+
+        <%= render "/shared/all_flash" %>
+
+        <form method="post" action="<%= bulk_internal_refunds_path %>">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token -%>
+            <div class="row">
+                <!-- <div class="col form-inline">
+                    <%= select_tag :status, options_for_select({"PAYMENT_SUCCESS" => "Payment Success", "PAYMENT_FAILED" => "Payment Failed"}.invert), include_blank: "Select Status", class: "form-control mr-2", required: true %>
+                    <button type="submit" name="bulk_action" value="update_statuses" class="btn btn-sm btn-primary">Bulk Update Status</button>
+                </div> -->
+                <div class="col module-actions text-right">
+                    <% if has_permission?('CREATE_REFUND') %>
+                        <%= raw index_table_new_button(new_internal_refund_path) %>
+                    <% end %>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="<%= index_table_class %>">
+
+                            <thead>
+                                <tr>
+                                    <!-- <th class="module-row-numbers"><label><input type="checkbox" class="master-checkbox"></label></th> -->
+                                    <th class="text-center">#</th>
+                                    <th>Code</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Payment Method</th>
+                                    <th>Customer</th>
+                                    <th class="module-row-actions">Action(s)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% if @refunds.blank? %>
+                                    <tr>
+                                        <td colspan="9" class="text-danger">No records found.</td>
+                                    </tr>
+                                <% else %>
+
+                                    <% @refunds.each.with_index((@refunds.current_page - 1) * get_per + 1) do
+                                        |refund, index| %>
+                                        <tr>
+                                            <!-- <td class="module-row-numbers"><label><input type="checkbox" class="child-checkbox" name="ids[]" value="<%= refund.id %>"></label></td> -->
+                                            <td class="text-center"><%= index %></td>
+                                            <td><%= refund.code %></td>
+                                            <td><%= refund.date&.strftime("%d/%m/%Y") %></td>
+                                            <td><%= Refund::CATEGORIES[refund.category] %></td>
+                                            <td><%= number_to_currency(refund.amount, unit: "") %></td>
+                                            <td><%= Refund::STATUSES[refund.status] %></td>
+                                            <td><%= refund.payment_method&.name || raw('<i>N/A</i>') %></td>
+                                            <td><%= "#{refund.customerable&.name} (#{refund.customerable&.code})" if refund.customerable %></td>
+                                            <td class="module-row-actions">
+
+                                                <!-- show -->
+                                                <%= raw index_table_show_button(internal_refund_path(refund)) %>
+
+                                                <!-- edit -->
+                                                <% if has_permission?('EDIT_REFUND') %>
+                                                    <%= raw(index_table_edit_button(edit_internal_refund_path(refund))) if ["NEW", "APPROVED"].include?(refund.status) %>
+                                                    <%= raw(index_table_draft_button(draft_internal_refund_path(refund))) if ["DRAFT", "REJECTED"].include?(refund.status) %>
+                                                <% end %>
+
+                                                <!-- approval -->
+                                                <% if has_permission?('APPROVAL_REFUND') and refund.status.eql?("APPROVAL") and !refund.request_by.eql?(current_user.id) %>
+                                                    <%= raw index_table_approval_button(approval_internal_refund_path(refund)) %>
+                                                <% end %>
+
+                                                <!-- rejected -->
+                                                <% if ["REJECTED"].include?(refund.status) %>
+                                                    <% if has_permission?("CANCEL_REFUND") %>
+                                                        <%=raw index_table_cancel_button(cancel_internal_refund_path(refund)) %>
+                                                    <% end %>
+                                                <% end %>
+
+                                                <!-- approved -->
+                                                <% if ["APPROVED"].include?(refund.status) %>
+                                                <% end %>
+
+                                                <!-- pending payment -->
+                                               <!-- <% if ["PENDING_PAYMENT"].include?(refund.status) and has_permission?("EDIT_STATUS_REFUND") %>
+                                                    <%=raw index_table_primary_button(status_internal_refund_path(refund), title: 'Update Status') %>
+                                                <% end %> -->
+
+                                                <!-- [NF-1202] refund will be in batches -->
+                                                <!-- <% if has_permission?('REPROCESS_REFUND') && ["PAYMENT_FAILED"].include?(refund.status) %>
+                                                    <%= link_to '<i class="fas fa-arrow-right" aria-hidden="true"></i>'.html_safe, reprocess_internal_refund_path(refund), class: "btn btn-sm btn-warning",title: "Re-process Failed Payment", data: {toggle: "tooltip", html: "true"}, method: :post %>
+                                                <% end %> -->
+
+                                                <!-- delete -->
+                                                <% if has_permission?('DELETE_REFUND') %>
+                                                    <%= raw index_table_delete_button(internal_refund_path(refund)) %>
+                                                <% end %>
+
+                                            </td>
+                                        </tr>
+
+                                    <% end %>
+
+                                <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <%= paginate @refunds %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

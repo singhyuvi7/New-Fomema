@@ -1,0 +1,37 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC DX Audit Statistics Report</strong>
+    </div>
+
+    <div class="card-body">
+        <%= render "/shared/all_flash" %>
+
+        <%= form_tag request.path, method: :get, class: "disable-enter-keypress pb-3" do %>
+            <% if @excel.present? %>
+                <%= link_to "Download as excel", "#{ request.path }.xlsx#{ request.url.split(request.path)[1] }", class: "btn btn-success font-weight-bold float-right ml-2" %>
+            <% end %>
+
+            <% if @filter_options.present? %>
+                <%= submit_tag "Filter", class: "btn btn-primary font-weight-bold float-right" %>
+                <%= render partial: "shared/reports/report_filter_options" %>
+            <% end %>
+        <% end %>
+
+        <% if params[:filter_date_start].present? && params[:filter_date_end].present? %>
+            <%= render '/internal/reports/xqcc/xqcc_dx_audit_statistics/abnormal_dx_audit_statistics_table' %>
+            <%= render '/internal/reports/xqcc/xqcc_dx_audit_statistics/suspicious_dx_audit_statistics_table' %>
+        <% end %>
+    </div>
+
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

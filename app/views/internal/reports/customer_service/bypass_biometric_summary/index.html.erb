@@ -1,0 +1,22 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Customer Service - Bypass Biometric Summary</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render '/shared/all_flash' %>
+
+        <div class="row-fluid">
+            <%=render "/internal/reports/customer_service/bypass_biometric_summary/filter", filter_link: bypass_biometric_summary_internal_customer_service_reports_path %>
+            <%=render "/internal/reports/customer_service/bypass_biometric_summary/preview_table" %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>
+
+
+<% content_for :page_end_scripts do %>
+    <script>
+    </script>
+<% end %>

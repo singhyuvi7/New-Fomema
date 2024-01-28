@@ -1,0 +1,15 @@
+<% if PaymentMethod.find_by(id: @order.payment_method_id)&.code&.include? "BOLEH" %>
+    <div class="boleh-reminder-message">
+    </div>
+    <div id="boleh-reminder-popup" class="hidden" title="">
+        <div align="center">
+            <img src="<%= image_path('boleh-qr.png') %>" style="width: 100%">
+        </div>
+    </div>
+
+    <% content_for :page_end_scripts do %>
+        <script>
+            openDialog({target: '#boleh-reminder-popup', type: 'white'});
+        </script>
+    <% end %>
+<% end %>

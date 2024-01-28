@@ -1,0 +1,36 @@
+<div data-behaviour="vue">
+    
+    <visitreportxrayfacilityform inline-template
+        :visit_report="<%= @visit_report.to_json(:include => { :visit_plan_item => { :include => { :visitable => { :include => [:state, :town, :operating_hour] } } }, :visit_plan => {}, :visit_report_xray_facility => {}, :visit_report_visitors => {}, :operating_hour => {} }) %>"
+        :visit_report_visitors="<%= @visit_report.visit_report_visitors.to_json %>"
+        :org_users="<%= User.joins(:role).where(:userable_type => 'Organization').where(roles:{code: ['INSPECTORATE_EXECUTIVE','INSPECTORATE_LQCC_MEDICAL_OFFICER','LQCC_EXECUTIVE']}).select("users.id,users.username as name").all.to_json %>"
+        :categories="<%= VisitPlan::CATEGORIES.to_json %>"
+        :params="<%= params.to_json %>"
+        :recommendations="<%= VisitReportXrayFacility::RECOMMENDATIONS.to_json %>"
+        :years="<%= @years %>"
+        :pass_visit_report_details="<%= VisitReportXrayFacility.where(:xray_facility_id => @visit_report[:visitable_id]).order("created_at").last.to_json %>"
+        :allocations_last_year="<%= Transaction.where(:xray_facility_id => @visit_report[:visitable_id]).where.not(:status => ['CANCELLED','REJECTED']).by_year('transaction_date',Date.current.years_ago(1).strftime('%Y')).to_json %>"
+        :allocations_current_year="<%= Transaction.where(:xray_facility_id => @visit_report[:visitable_id]).where.not(:status => ['CANCELLED','REJECTED']).by_year('transaction_date',Date.current.year).to_json %>">
+
+        <div class="card" v-cloak>
+        
+            <div class="card-header">
+                <strong>X-ray Facilities Visit Report</strong> - New X-Ray Facility Visit Report
+            </div>
+        
+            <div class="card-body">
+                <%= render 'internal/visit_reports/xray_facilities/form', { form_method: 'POST', form_action: internal_visit_report_xray_facilities_path } %>
+            </div>
+        
+            <%= render 'internal/visit_reports/shared/card_footer', { index_path: internal_visit_report_xray_facilities_path } %>
+        
+        </div>
+
+    </visitreportxrayfacilityform>
+</div>
+
+<style>
+.form-check-label{
+    display: inline;
+}
+</style>

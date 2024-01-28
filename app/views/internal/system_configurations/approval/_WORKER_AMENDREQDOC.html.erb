@@ -1,0 +1,12 @@
+<label class="col-md-4 col-form-label"><%= @system_configurations["WORKER_AMENDREQDOC"].name %></label>
+<div class="col-md-8">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="WORKER_AMENDREQDOC_1" type="radio" value="1" name="WORKER_AMENDREQDOC" required<%= " checked" if @system_configurations["WORKER_AMENDREQDOC"].new_value == '1' %><%= " disabled" if @system_configurations["WORKER_AMENDREQDOC"].new_value != '1' %>>
+        <label class="form-check-label" for="WORKER_AMENDREQDOC_1">Yes</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" id="WORKER_AMENDREQDOC_0" type="radio" value="0" name="WORKER_AMENDREQDOC" required<%= " checked" if @system_configurations["WORKER_AMENDREQDOC"].new_value == '0' %><%= " disabled" if @system_configurations["WORKER_AMENDREQDOC"].new_value != '0' %>>
+        <label class="form-check-label" for="WORKER_AMENDREQDOC_0">No</label>
+    </div>
+    <p class="form-control-plaintext approval-previous-value"><%= @system_configurations["WORKER_AMENDREQDOC"].value == '1' ? 'Yes' : 'No' %></p>
+</div>

@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Xray Storages</strong> - New Xray Storage
+    </div>
+    <%= form_for @xray_storage, url: internal_xray_storages_path, html: { class: "with-parsley" } do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

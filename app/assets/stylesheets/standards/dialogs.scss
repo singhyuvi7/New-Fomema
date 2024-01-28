@@ -1,0 +1,92 @@
+/*
+	Custom classes for Jquery Dialog modals.
+	Colors will be named similarly to bootstrap color schemes.
+
+	.dialog__title-primary
+	.dialog__title-secondary
+	.dialog__title-success
+	.dialog__title-danger
+	.dialog__title-info
+	.dialog__title-dark
+	.dialog__title-warning
+	.dialog__title-light
+	.dialog__title-white
+*/
+
+$list: (
+	"primary": "#007bff",
+	"secondary": "#6c757d",
+	"success": "#28a745",
+	"danger": "#dc3545",
+	"info": "#17a2b8",
+	"dark": "#343a40"
+);
+
+$list_alternate: (
+	"warning": "#ffc107",
+	"light": "#dfdfdf",
+	"white": "#fff"
+);
+
+@mixin dialog_titles($name, $color, $text_color) {
+	.dialog__title-#{$name} {
+		.ui-dialog-titlebar {
+			background-color: #{$color};
+			color: $text_color;
+			border-bottom: 1px solid #d3d3d3;
+		}
+
+		.ui-dialog-buttonset button.ui-button:nth-child(2n) {
+			background-color: #{$color};
+			color: $text_color;
+		}
+	}
+}
+
+@each $name, $color in $list {
+	@include dialog_titles($name, $color, #fff);
+}
+
+@each $name, $color in $list_alternate {
+	@include dialog_titles($name, $color, #343a40);
+}
+
+.ui-dialog {
+	padding: 0;
+	border: none !important;
+	box-shadow: 0 0px 3px 0 rgba(0, 0, 0, 0.2);
+	z-index: 1021;
+}
+
+.ui-dialog-content {
+	max-height: 70vh !important;
+	font-size: 1.21em; // NF-1946 - Increased font sizes in dialog by 10% (was originally 1.1em)
+}
+
+.ui-dialog-titlebar {
+	border: none;
+	border-radius: 0;
+	font-size: 1.3em;
+}
+
+.ui-dialog-titlebar-close {
+	right: 1em !important;
+}
+
+.ui-dialog-buttonset button.ui-button {
+	font-weight: bold;
+}
+
+.ui-dialog-buttonset button.ui-button:first-child {
+	background-color: #f8f9fa;
+	color: #343a40;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+	padding: 0 0.6em 0 0;
+}
+
+// Z-index greater than bootstrap modals.
+.z-index-1060 {
+	z-index: 1060;
+}

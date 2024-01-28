@@ -1,0 +1,159 @@
+<div class="card">
+    <div id="filter-toggle" class="card-header d-flex align-items-center clickable">
+        <strong class="mb-0">Filter</strong>
+        <span class="flex-grow-1"></span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <%= form_tag "", method: 'get', id: "filter-form" do |form| %>
+        <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="transaction_code" class="col-sm-3 col-form-label">Transaction ID</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="transaction_code" id="transaction_code" value="<%= params[:transaction_code] %>">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <% if requestable_type == "XrayReview" %>
+                            <label for="radiographer_id" class="col-sm-3 col-form-label">Radiographer Name</label>
+                            <div class="col-sm-9">
+                                <%= select_tag :radiographer_id, options_from_collection_for_select(User.active.where(role_id: Role.where(code: ["XQCC_RADIOGRAPHER", "XQCC_ASSISTANT_MANAGER", "XQCC_MO"]).pluck(:id)).order(name: :asc).all, "id", "name", params[:radiographer_id]), include_blank: form_select_option_text, class: "form-control select2" %>
+                            </div>
+                        <% elsif requestable_type == "PcrReview" %>
+                            <label for="pcr_id" class="col-sm-3 col-form-label">PCR Name</label>
+                            <div class="col-sm-9">
+                                <%= select_tag :pcr_id, options_from_collection_for_select(User.active.search_role(Role.find_by(code: "PCR").id).order(name: :asc).all, "id", "name", params[:pcr_id]), include_blank: form_select_option_text, class: "form-control select2" %>
+                            </div>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="worker_code" class="col-sm-3 col-form-label">Worker Code</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :worker_code, params[:worker_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="passport_number" class="col-sm-3 col-form-label">Passport Number</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :passport_number, params[:passport_number], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="retake_status" class="col-sm-3 col-form-label">Retake Status</label>
+                        <div class="col-sm-9">
+                            <select class="col-md-12 form-control select2" name="retake_status">
+                                <option value="">Select Status</option>
+                                <% {
+                                    "DRAFT" => "Draft",
+                                    "APPROVAL" => "Pending Approval",
+                                    "APPROVED" => "Approved",
+                                    "REJECTED" => "Rejected",
+                                    "COMPLETED" => "Completed",
+                                }.each do |key, val| %>
+                                    <option value="<%= key %>"<%= " selected" if key == params[:retake_status] %>><%= val %></option>
+                                <% end %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="retake_reason" class="col-sm-3 col-form-label">Retake Reason</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :retake_reason_id, options_for_select(RetakeReason.order(:name).pluck(:name, :id), params[:retake_reason_id]), include_blank: form_select_option_text, class: 'form-control select' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">X-Ray Code</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :xray_code, params[:xray_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Retake X-Ray Facility</label>
+                        <div class="col-sm-9">
+                            <%= text_field_tag :retake_xray_code, params[:retake_xray_code], class: "form-control" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="request_date" class="col-sm-3 col-form-label">Request Date</label>
+                        <div class="col-sm-9">
+                            <div class="d-flex align-items-center">
+                                <%= text_field_tag "request_start", params["request_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'request_start' }, max: Date.today.strftime("%F") %>
+                                <span class="mx-3">to</span>
+                                <%= text_field_tag "request_end", params["request_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'request_end' }, max: Date.today.strftime("%F") %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="approval_date" class="col-sm-3 col-form-label">Approval Date</label>
+                        <div class="col-sm-9">
+                            <div class="d-flex align-items-center">
+                                <%= text_field_tag "approval_start", params["approval_start"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "Start Date", data: { type: "start", target: 'approval_start' }, max: Date.today.strftime("%F") %>
+                                <span class="mx-3">to</span>
+                                <%= text_field_tag "approval_end", params["approval_end"], class: "form-control datepicker datepicker-range-filter flex-grow-1", placeholder: "End Date", data: { type: "end", target: 'approval_end' }, max: Date.today.strftime("%F") %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <%=raw filter_clear_button params[:action] %>
+            <%=raw filter_button %>
+            <% if requestable_type == "XrayReview" %>
+                <button class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Export" data-original-title="Filter" type="submit" formaction="<%= xqcc_internal_xray_retakes_path(format: "xlsx") %>" formtarget="_BLANK"><i class="fa fa-file-excel"></i> Export</button>
+            <% elsif requestable_type == "PcrReview" %>
+                <button class="btn btn-sm btn-warning" data-toggle="tooltip" data-html="true" title="Export" data-original-title="Filter" type="submit" formaction="<%= pcr_internal_xray_retakes_path(format: "xlsx") %>" formtarget="_BLANK"><i class="fa fa-file-excel"></i> Export</button>
+            <% end %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$('#filter-toggle').click(function() {
+    $('#filter-toggle i.fas').toggleClass('fa-chevron-down fa-chevron-left');
+    $('#filter-form').slideToggle();
+});
+</script>
+<% end %>

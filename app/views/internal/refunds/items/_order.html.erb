@@ -1,0 +1,6 @@
+<tr>
+    <td><%= Refund::CATEGORIES[refund_item.refund.category] %></td>
+    <td>-</td>
+    <td>-</td>
+    <td><%= number_to_currency(refund_item.amount, unit: "") %></td>
+</tr>

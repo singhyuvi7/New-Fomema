@@ -1,0 +1,53 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  code: MyString
+  name: MyString
+  icno: MyString
+  annual_practice_certificate: MyString
+  application_number: MyString
+  application_year: MyString
+  kdm_member: MyString
+  address1: MyString
+  address2: MyString
+  address3: MyString
+  address4: MyString
+  postcode: MyString
+  phone: MyString
+  fax: MyString
+  country: one
+  state: one
+  district: one
+  area: one
+  email: MyString
+  quota: 1
+  quota_available: 1
+  grace_quota: 1
+  comment: MyText
+  status: MyString
+
+two:
+  code: MyString
+  name: MyString
+  icno: MyString
+  annual_practice_certificate: MyString
+  application_number: MyString
+  application_year: MyString
+  kdm_member: MyString
+  address1: MyString
+  address2: MyString
+  address3: MyString
+  address4: MyString
+  postcode: MyString
+  phone: MyString
+  fax: MyString
+  country: two
+  state: two
+  district: two
+  area: two
+  email: MyString
+  quota: 1
+  quota_available: 1
+  grace_quota: 1
+  comment: MyText
+  status: MyString

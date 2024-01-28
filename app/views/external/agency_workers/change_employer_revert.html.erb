@@ -1,0 +1,37 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Change Employer</strong> - Reverted
+    </div>
+    <%= form_for @foreign_worker, url: change_employer_revert_external_agency_worker_path(@foreign_worker), html: { multipart: true, class: "with-parsley" }, method: 'patch' do |form| %>
+        <div class="card-body">
+            <%= render 'shared/all_validation_flash', { model_obj: @foreign_worker} %>
+            <%= render 'pure_form', { form: form, is_change_employer: true } %>
+            <br>
+            <div class="card">
+                <div class="card-header">Comments</div>
+                <div class="card-body">
+                    <% FwChangeEmployer.where(foreign_worker_id: @foreign_worker.id, requested_by: current_user).each do |comment| %>
+                        <div class="alert alert-secondary">
+                            <%= comment.approval_comment %>
+                            <div class="text-right">
+                                By <%= comment.approval_user.name %> on <%= comment.approval_at.strftime("%d/%m/%Y %l:%M:%S %p") %>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="text-right">
+                <a href="<%= external_agency_workers_path %>" class="btn btn-primary">Back</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+</script>
+<% end %>

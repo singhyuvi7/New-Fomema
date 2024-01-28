@@ -1,0 +1,5 @@
+<%
+t = Town.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{t.name} (#{t.code})" if !value.blank? && t %></td>

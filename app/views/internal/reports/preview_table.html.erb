@@ -1,0 +1,34 @@
+<p>Preview of <b><%= @filename %></b></p>
+
+<div class="w-100 pb-3" style="overflow-x: auto;">
+    <table id="preview-csv-table" class="table-borders w-100">
+        <thead>
+            <tr>
+                <% @csv[0].each do |header| %>
+                    <th><%= header %></th>
+                <% end %>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% @csv[1..-1].each do |row| %>
+                <tr>
+                    <% row.each do |datum| %>
+                        <td><%= datum %></td>
+                    <% end %>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #preview-csv-table th,
+    #preview-csv-table td {
+        padding: 0.5em;
+    }
+
+    #preview-csv-table th {
+        background-color: #f3f3f3 !important;
+    }
+</style>

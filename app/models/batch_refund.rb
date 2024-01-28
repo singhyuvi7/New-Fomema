@@ -1,0 +1,2 @@
+class BatchRefund < ApplicationRecord
+end

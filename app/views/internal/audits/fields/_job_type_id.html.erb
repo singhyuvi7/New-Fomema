@@ -1,0 +1,5 @@
+<%
+jt = JobType.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{jt.name}" if !value.blank? && jt %></td>

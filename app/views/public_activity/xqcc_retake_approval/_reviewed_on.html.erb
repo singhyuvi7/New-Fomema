@@ -1,0 +1,7 @@
+<a href="<%= internal_user_setup_path(activity.owner_id) %>"><%= activity.owner.name %></a>  perform XQCC Retake Approval on
+
+<% if activity.trackable %>
+    <a href="<%= approval_internal_xray_retake_path(activity.trackable.transactionz, activity.trackable.id) %>"><%= activity.trackable.transactionz&.code %></a>
+<% else %>
+    which has since been removed
+<% end %>

@@ -1,0 +1,1679 @@
+<div class="row">
+
+        <div class="col-md-12">
+
+        <div v-if="visit_report_data.status" class="alert alert-info" role="alert">
+            LATEST STATUS: <b>{{ visit_report_data.status }}</b>
+        </div>
+
+        <div v-if="!canEdit" class="alert alert-warning" role="alert">
+            FORM UPDATE IS DISABLE FOR STATUS: <b>{{ visit_report_data.status }}</b>
+        </div>
+
+        <form ref="visit_report_form" method="POST" action="<%= form_action %>">
+
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+            <% if form_method.downcase !='post' %>
+                <input type="hidden" name="_method" value="<%= form_method %>">
+            <% end %>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-text 
+                            v-model="visit_report_data.id"
+                            :field_name="'visit_report[id]'" 
+                            :label="'Report Id'" 
+                            :readonly="true"
+                        ></v-text>
+                        
+                    </div>
+                </div>
+            
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-text
+                            v-model="visit_report_data.visit_plan_item.visitable.clinic_name"
+                            :field_name="'visit_report_doctor[clinic_name]'"
+                            :label="'Clinic Name'"
+                            :readonly="true"
+                        ></v-text>
+                        
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-text
+                            v-model="visit_report_data.visit_plan_item.visitable.code"
+                            :field_name="'visit_report_doctor[code]'"
+                            :label="'Doctor Code'"
+                            :readonly="true"
+                        ></v-text>
+                        
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-text
+                            v-model="visit_report_data.visit_plan_item.visitable.name"
+                            :field_name="'visit_report_doctor[doctor_name]'"
+                            :label="'Doctor Name'"
+                            :readonly="true"
+                        ></v-text>
+                
+                    </div>
+                </div>
+            
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label class="required" for="">Type of Visit</label>
+                        <multiselect
+                        v-validate="categoryRule" 
+                        :data-vv-as="'Category'" 
+                        v-model="visit_report_data.visit_report_doctor.type_of_visit"
+                        :disabled="formReadOnly"
+                        data-vv-as="Category" 
+                        :options="categories_arr" 
+                        :multiple="false"
+                        :hide-selected="true" 
+                        placeholder="Select Category"
+                        :class="{ 'is-invalid': errors.has('type_of_visit') }"
+                        >
+                        </multiselect>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <v-text
+                        v-model="visit_report_data.visit_report_doctor.interacted_with"
+                        :field_name="'visit_report_doctor[interacted_with]'"
+                        :label="'Interacted With'"
+                        :readonly="formReadOnly"
+                        :rules="interactedWithRule"
+                        :label="'Interacted With'"
+                    ></v-text>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <v-number
+                        v-model="visit_report_data.visit_report_doctor.number_of_visit_checklist"
+                        :field_name="'visit_report_doctor[number_of_visit_checklist]'"
+                        :label="'No. of visit checklist'"
+                        :readonly="formReadOnly"
+                        :rules="checklistRule"
+                        :label="'Number of visit checklist'"
+                    ></v-number>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-12">
+                    <label class="required" for="">Inspectorate Team</label>            
+                    <multiselect
+                        v-validate="inspectorateTeamRule" 
+                        :data-vv-name="'selected_visitors'"
+                        :data-vv-value-path="selected_visitors"
+                        :data-vv-as="'Inspectorate Team'" 
+                        v-model="selected_visitors"
+                        :disabled="formReadOnly"
+                        :options="org_users_arr"
+                        track-by="id"
+                        label="name"
+                        :multiple="true"
+                        :hide-selected="true" 
+                        placeholder="Select User"
+                        @input="updateInspectorateTeamSelection"
+                        :class="{ 'is-invalid': errors.has('selected_visitors') }"
+                    >
+                    </multiselect>
+                    <div class="invalid-feedback">{{ errors.first('selected_visitors') }}</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-date 
+                            v-model="visit_report_data.visit_date" 
+                            :field_name="'visit_report[visit_date]'" 
+                            :rules="visitDateRule"
+                            :label="'Visit Date'" 
+                            :readonly="formReadOnly"
+                        ></v-date>
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+                        
+                        <v-time 
+                            v-model="visit_report_data.visit_time_from"
+                            :field_name="'visit_report[visit_time_from]'" 
+                            :rules="visitTimeFromRule"
+                            :label="'Visit Begin'"  
+                            :readonly="formReadOnly"
+                        ></v-time>
+                
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-group">
+
+                        <v-time 
+                            v-model="visit_report_data.visit_time_to" 
+                            :field_name="'visit_report[visit_time_to]'"
+                            :rules="visitTimeToRule" 
+                            :label="'Visit End'" 
+                            :readonly="formReadOnly"
+                        ></v-time>
+                        
+                    </div>
+                </div>
+
+                <!-- hidden -->
+
+                <input type="hidden" name="visit_report[visit_plan_id]" v-model="visit_report_data.visit_plan_id" value="">
+                <input type="hidden" name="visit_report[visit_plan_item_id]" v-model="visit_report_data.visit_plan_item_id" value="">
+                <input type="hidden" name="visit_report[visitable_type]" v-model="visit_report_data.visitable_type" value="">
+                <input type="hidden" name="visit_report[visitable_id]" v-model="visit_report_data.visitable_id" value="">
+                <input type="hidden" name="visit_report_doctor[doctor_id]" v-model="visit_report_data.visit_plan_item.visitable.id" value="">
+
+                <select multiple name="visit_report_visitors[]" id="" class="hidden">
+                    <option selected="selected" v-for="(visitor, index) in selected_visitors" :value="visitor.id">{{ visitor.name }}</option>
+                </select>
+
+                <input type="hidden" name="submit_action" v-model="submit_action" />
+                
+            </div>
+
+            <h4>Summary of Findings</h4>
+
+            <table class="table table-bordered table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th colspan="3" class="text-center">Acceptable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.</td>
+                        <td>
+                            Verification of identity of foreign worker with original passport
+                            
+                            <div class="form-group">
+
+                                <v-number 
+                                    v-model="visit_report_data.visit_report_doctor.foreign_worker_present"
+                                    :field_name="'visit_report_doctor[foreign_worker_present]'" 
+                                    :rules="foreignWorkerPresentRule"
+                                    :label="'No Of Foreign Workers Present'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly"
+                                ></v-number>
+                            
+                            </div>
+
+                            <div class="form-group">
+
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.foreign_worker_present_comment"
+                                    :field_name="'visit_report_doctor[foreign_worker_present_comment]'"
+                                    :rules="foreignWorkerPresentCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.foreign_worker_present_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[foreign_worker_present_acceptable]'" 
+                                    :rules="foreignWorkerPresentAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[foreign_worker_present_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.foreign_worker_present_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[foreign_worker_present_acceptable]'" 
+                                    :rules="foreignWorkerPresentAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                                
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.foreign_worker_present_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[foreign_worker_present_acceptable]'" 
+                                    :rules="foreignWorkerPresentAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">2.</td>
+                        <td >
+                            Valid annual practicing certificate(APC)
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <v-text
+                                        v-model="visit_report_data.visit_report_doctor.apc_number"
+                                        :field_name="'visit_report_doctor[apc_number]'"
+                                        :rules="apcNoRule"
+                                        :label="'APC No.'"
+                                        :validation_label="'APC No.'"
+                                        :readonly="formReadOnly"
+                                        ></v-text>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <v-number 
+                                        v-model="visit_report_data.visit_report_doctor.apc_year"
+                                        :field_name="'visit_report_doctor[apc_year]'" 
+                                        :label="'Year'" 
+                                        :rules="apcYearRule"
+                                        :validation_label="'APC Year'"
+                                        :readonly="formReadOnly"
+                                    ></v-number>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.apc_comment"
+                                    :field_name="'visit_report_doctor[apc_comment]'"
+                                    :rules="apcCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.apc_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[apc_acceptable]'" 
+                                    :rules="apcAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[apc_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.apc_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[apc_acceptable]'" 
+                                    :rules="apcAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                                
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.apc_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[apc_acceptable]'" 
+                                    :rules="apcAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- reg number -->
+                    <tr>
+                        <td>
+                            Registration under private healthcare facilities and service act 1998
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <v-text
+                                    v-model="visit_report_data.visit_report_doctor.private_healthcare_registration_number"
+                                    :field_name="'visit_report_doctor[private_healthcare_registration_number]'"
+                                    :rules="regNoRule"
+                                    :label="'Registration no: '"
+                                    :validation_label="'Registration No.'"
+                                    :readonly="formReadOnly"
+                                    ></v-text>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.private_healthcare_registration_number_comment"
+                                    :field_name="'visit_report_doctor[private_healthcare_registration_number_comment]'"
+                                    :rules="regNoCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div>                        
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.private_healthcare_registration_number_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[private_healthcare_registration_number_acceptable]'" 
+                                    :rules="regNoAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                            </div>
+
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[private_healthcare_registration_number_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.private_healthcare_registration_number_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[private_healthcare_registration_number_acceptable]'" 
+                                    :rules="regNoAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+
+                                
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.private_healthcare_registration_number_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[private_healthcare_registration_number_acceptable]'" 
+                                    :rules="regNoAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end reg -->
+                    
+                    <!-- consent -->
+                    <tr>
+                        <td>3.</td>
+                        <td>
+                            Written consent from foreign workers
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.written_consent_comment"
+                                    :field_name="'visit_report_doctor[written_consent_comment]'"
+                                    :rules="contentCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.written_consent_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[written_consent_acceptable]'" 
+                                    :rules="consentAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[written_consent_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.written_consent_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[written_consent_acceptable]'" 
+                                    :rules="consentAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.written_consent_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[written_consent_acceptable]'" 
+                                    :rules="consentAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end consent -->
+
+                    <!-- maintenance -->
+                    <tr>
+                        <td>4.</td>
+                        <td>
+                            Maintenance of medical records of examined foreign workers.
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.medical_record_maintenance_comment"
+                                    :field_name="'visit_report_doctor[medical_record_maintenance_comment]'"
+                                    :rules="maintenanceCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.medical_record_maintenance_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[medical_record_maintenance_acceptable]'" 
+                                    :rules="maintenanceAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[medical_record_maintenance_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.medical_record_maintenance_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[medical_record_maintenance_acceptable]'" 
+                                    :rules="maintenanceAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.medical_record_maintenance_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[medical_record_maintenance_acceptable]'" 
+                                    :rules="maintenanceAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end maintenance -->
+                     
+                    <!-- notification comm. -->
+                    <tr>
+                        <td>5.</td>
+                        <td>
+                            Notification of communicable diseases (FOMEMA cases)
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.communicable_disease_comment"
+                                    :field_name="'visit_report_doctor[communicable_disease_comment]'"
+                                    :rules="notificationCommCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                            <div class="form-group form-check">                      
+                                <input 
+                                    type="checkbox"
+                                    name="visit_report_doctor[no_communicable_disease]"
+                                    v-model="visit_report_data.visit_report_doctor.no_communicable_disease"
+                                    value="1"
+                                    :disabled="formDisabled"
+                                    class="form-check-input"
+                                    id="">
+                                <label class="form-check-label" for="">No cases of communicable disease for this year.</label>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.communicable_disease_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[communicable_disease_acceptable]'" 
+                                    :rules="notificationCommAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[communicable_disease_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.communicable_disease_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[communicable_disease_acceptable]'" 
+                                    :rules="notificationCommAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.communicable_disease_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[communicable_disease_acceptable]'" 
+                                    :rules="notificationCommAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end notification comm. -->
+
+                    <!-- vacutainer -->
+                    <tr>
+                        <td>6.</td>
+                        <td>
+                            Validity of vacutainer.
+                            <div class="form-group">
+                                <v-date 
+                                    v-model="visit_report_data.visit_report_doctor.vacutainer_expiry_date" 
+                                    :field_name="'visit_report_doctor[vacutainer_expiry_date]'" 
+                                    :rules="vacutainerExpiryRule"
+                                    :validation_label="'Expiry Date'"
+                                    :label="'Expiry Date'"
+                                    :readonly="formReadOnly"
+                                    :disabled="vacutainerExpiryDisable"
+                                ></v-date>
+                            </div>
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.vacutainer_comment"
+                                    :field_name="'visit_report_doctor[vacutainer_comment]'"
+                                    :rules="vacutainerCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.vacutainer_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[vacutainer_acceptable]'" 
+                                    :rules="vacutainerAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[vacutainer_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.vacutainer_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[vacutainer_acceptable]'" 
+                                    :rules="vacutainerAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.vacutainer_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[vacutainer_acceptable]'" 
+                                    :rules="vacutainerAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end vacutainer -->
+
+                    <!-- facilities -->
+                    <tr>
+                        <td>7.</td>
+                        <td>
+                            Adequate facilities.
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.adequate_facility_comment"
+                                    :field_name="'visit_report_doctor[adequate_facility_comment]'"
+                                    :rules="facilitiesCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.adequate_facility_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[adequate_facility_acceptable]'" 
+                                    :rules="facilitiesAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[adequate_facility_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.adequate_facility_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[adequate_facility_acceptable]'" 
+                                    :rules="facilitiesAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.adequate_facility_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[adequate_facility_acceptable]'" 
+                                    :rules="facilitiesAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end facilities -->
+
+                    <!-- dispatch record -->
+                    <tr>
+                        <td>8.</td>
+                        <td>
+                            Laboratory specimens dispatch book/record
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.dispatch_record_comment"
+                                    :field_name="'visit_report_doctor[dispatch_record_comment]'"
+                                    :rules="dispatchRecordCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.dispatch_record_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[dispatch_record_acceptable]'" 
+                                    :rules="dispatchRecordAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[dispatch_record_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.dispatch_record_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[dispatch_record_acceptable]'" 
+                                    :rules="dispatchRecordAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.dispatch_record_acceptable" 
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[dispatch_record_acceptable]'" 
+                                    :rules="dispatchRecordAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end dispatch record -->           
+                    
+                    <!-- operation hour -->
+                    <tr>
+                        <td rowspan="2">9.</td>
+                        <td>
+                            Operation hour in FOMEMA system:
+                            <div class="form-group form-row">
+                                <div class="col-sm-1 text-center">Weekday</div>
+                                <div class="col-sm-1 text-center">Closed</div>
+                                <div class="col-sm-1 text-center">Open 24Hrs</div>
+                                <div class="col-sm-3 text-center">Operation Hours (24hour clock)</div>
+                                <div class="col-sm-3 text-center text-nowrap">Break Hour (Please Specify)</div>
+                            </div> 
+                            <div class="form-row"> <!-- monday -->
+                                <div class="col-sm-1 text-center">Mon</div>
+                                <div class="col-sm-1 text-center form-check">       
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[monday_is_close]"
+                                        v-model="visit_report_data.operating_hour.monday_is_close"
+                                        :disabled="formDisabled"
+                                        v-on:click="monClosedCheckbox($event)"
+                                        data-vv-as="Mon"
+                                        class="form-check-input"
+                                        id="mon_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[monday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.monday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="Mon"
+                                    class="form-check-input"
+                                    id="mon_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.monday_start"
+                                            :field_name="'operating_hour[monday_start]'" 
+                                            :rules="monVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.monday_end"
+                                                :field_name="'operating_hour[monday_end]'" 
+                                                :rules="monVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.monday_break"
+                                        :field_name="'operating_hour[monday_break]'"
+                                        :rules="monBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div> 
+                            <!-- end mon -->
+                            <div class="form-row"> <!-- tues -->
+                                <div class="col-sm-1 text-center">Tues</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[tuesday_is_close]"
+                                        v-model="visit_report_data.operating_hour.tuesday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="tues"
+                                        class="form-check-input"
+                                        id="tues_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[tuesday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.tuesday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="tues"
+                                    class="form-check-input"
+                                    id="tues_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.tuesday_start"
+                                            :field_name="'operating_hour[tuesday_start]'" 
+                                            :rules="tuesVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.tuesday_end"
+                                                :field_name="'operating_hour[tuesday_end]'" 
+                                                :rules="tuesVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.tuesday_break"
+                                        :field_name="'operating_hour[tuesday_break]'"
+                                        :rules="tuesBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- wed -->
+                                <div class="col-sm-1 text-center">Wed</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[wednesday_is_close]"
+                                        v-model="visit_report_data.operating_hour.wednesday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="wed"
+                                        class="form-check-input"
+                                        id="wed_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[wednesday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.wednesday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="wed"
+                                    class="form-check-input"
+                                    id="wed_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.wednesday_start"
+                                            :field_name="'operating_hour[wednesday_start]'" 
+                                            :rules="wedVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.wednesday_end"
+                                                :field_name="'operating_hour[wednesday_end]'" 
+                                                :rules="wedVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.wednesday_break"
+                                        :field_name="'operating_hour[wednesday_break]'"
+                                        :rules="wedBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- thurs -->
+                                <div class="col-sm-1 text-center">Thurs</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[thursday_is_close]"
+                                        v-model="visit_report_data.operating_hour.thursday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="thurs"
+                                        class="form-check-input"
+                                        id="thurs_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[thursday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.thursday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="thurs"
+                                    class="form-check-input"
+                                    id="thurs_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.thursday_start"
+                                            :field_name="'operating_hour[thursday_start]'" 
+                                            :rules="thursVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.thursday_end"
+                                                :field_name="'operating_hour[thursday_end]'" 
+                                                :rules="thursVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.thursday_break"
+                                        :field_name="'operating_hour[thursday_break]'"
+                                        :rules="thursBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- fri -->
+                                <div class="col-sm-1 text-center">Fri</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[friday_is_close]"
+                                        v-model="visit_report_data.operating_hour.friday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="fri"
+                                        class="form-check-input"
+                                        id="fri_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[friday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.friday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="fri"
+                                    class="form-check-input"
+                                    id="fri_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.friday_start"
+                                            :field_name="'operating_hour[friday_start]'" 
+                                            :rules="friVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.friday_end"
+                                                :field_name="'operating_hour[friday_end]'" 
+                                                :rules="friVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.friday_break"
+                                        :field_name="'operating_hour[friday_break]'"
+                                        :rules="friBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- sat -->
+                                <div class="col-sm-1 text-center">Sat</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[saturday_is_close]"
+                                        v-model="visit_report_data.operating_hour.saturday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="sat"
+                                        class="form-check-input"
+                                        id="sat_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[saturday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.saturday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="sat"
+                                    class="form-check-input"
+                                    id="sat_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.saturday_start"
+                                            :field_name="'operating_hour[saturday_start]'" 
+                                            :rules="satVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.saturday_end"
+                                                :field_name="'operating_hour[saturday_end]'" 
+                                                :rules="satVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.saturday_break"
+                                        :field_name="'operating_hour[saturday_break]'"
+                                        :rules="satBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- sun -->
+                                <div class="col-sm-1 text-center">Sun</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[sunday_is_close]"
+                                        v-model="visit_report_data.operating_hour.sunday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="sun"
+                                        class="form-check-input"
+                                        id="sun_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[sunday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.sunday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="sun"
+                                    class="form-check-input"
+                                    id="sun_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.sunday_start"
+                                            :field_name="'operating_hour[sunday_start]'" 
+                                            :rules="sunVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.sunday_end"
+                                                :field_name="'operating_hour[sunday_end]'" 
+                                                :rules="sunVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.sunday_break"
+                                        :field_name="'operating_hour[sunday_break]'"
+                                        :rules="sunBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                            <div class="form-row"> <!-- public_holiday -->
+                                <div class="col-sm-1 text-center">Public Holidays</div>
+                                <div class="col-sm-1 text-center form-check">           
+                                    <input 
+                                        type="checkbox"
+                                        name="operating_hour[public_holiday_is_close]"
+                                        v-model="visit_report_data.operating_hour.public_holiday_is_close"
+                                        :disabled="formDisabled"
+                                        data-vv-as="public_holiday"
+                                        class="form-check-input"
+                                        id="public_holiday_closed">
+                                </div>
+                                <div class="col-sm-1 text-center form-check">
+                                    <input 
+                                    type="checkbox"
+                                    name="operating_hour[public_holiday_is_24_hour]"
+                                    v-model="visit_report_data.operating_hour.public_holiday_is_24_hour"
+                                    :disabled="formDisabled"
+                                    data-vv-as="public_holiday"
+                                    class="form-check-input"
+                                    id="public_holiday_24hours">
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                            v-model="visit_report_data.operating_hour.public_holiday_start"
+                                            :field_name="'operating_hour[public_holiday_start]'" 
+                                            :rules="publicHolidayVisitTimeRule"
+                                            :label="''"  
+                                            :readonly="formReadOnly"
+                                            :validation_label="'Visit Time From'"
+                                            ></v-time>                                        
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <v-time 
+                                                v-model="visit_report_data.operating_hour.public_holiday_end"
+                                                :field_name="'operating_hour[public_holiday_end]'" 
+                                                :rules="publicHolidayVisitTimeRule"
+                                                :label="''"  
+                                                :readonly="formReadOnly"
+                                                :validation_label="'Visit Time To'"
+                                            ></v-time>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 text-center">
+                                    <v-textarea
+                                        v-model="visit_report_data.operating_hour.public_holiday_break"
+                                        :field_name="'operating_hour[public_holiday_break]'"
+                                        :rules="publicHolidayBreakHourRule"
+                                        :label="''"
+                                        :validation_label="'Break Hour'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>    
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Does the facility’s operation hours fulfil 8 hours a day, 5 days a week ? 
+                            <div class="form-group">
+                                <v-textarea
+                                    v-model="visit_report_data.visit_report_doctor.operating_hour_comment"
+                                    :field_name="'visit_report_doctor[operating_hour_comment]'"
+                                    :rules="operatingHourCommentRule"
+                                    :label="'If unacceptable, please specify'" 
+                                    :validation_label="'Comment'"
+                                    :readonly="formReadOnly" 
+                                ></v-textarea>
+                            </div> 
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.operating_hour_acceptable"
+                                    :radio_value="'Y'"
+                                    :field_name="'visit_report_doctor[operating_hour_acceptable]'" 
+                                    :rules="operatingHourAcceptableRule"
+                                    :label="'Yes'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                            <div class="invalid-feedback">{{ errors.first('visit_report_doctor[operating_hour_acceptable]') }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.operating_hour_acceptable" 
+                                    :radio_value="'N'"
+                                    :field_name="'visit_report_doctor[operating_hour_acceptable]'" 
+                                    :rules="operatingHourAcceptableRule"
+                                    :label="'No'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <v-radio 
+                                    v-model="visit_report_data.visit_report_doctor.operating_hour_acceptable"
+                                    :radio_value="'NA'"
+                                    :field_name="'visit_report_doctor[operating_hour_acceptable]'" 
+                                    :rules="operatingHourAcceptableRule"
+                                    :label="'N/A'" 
+                                    :validation_label="'Acceptable'"
+                                    :disabled="formDisabled"
+                                ></v-radio>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end operation hour -->
+
+                    <!-- remarks -->
+                    <tr>
+                        <td>10.</td>
+                        <td colspan="4">
+                            <div class="form-group form-row">
+                                <div class="col-sm-8">
+                                    <v-textarea
+                                        v-model="visit_report_data.follow_up"
+                                        :field_name="'visit_report[follow_up]'"
+                                        :label="'Remarks/Follow Up'" 
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>
+                            </div> 
+                        </td>
+                    </tr>
+                    <!-- end remarks -->
+                                        
+                    <!-- satisfactory -->
+                    <tr>
+                        <td>11.</td>
+                        <td colspan="4">
+                            <div class="form-group form-check">
+                                            
+                            <input 
+                                type="checkbox"
+                                name="visit_report_doctor[satisfactory]"
+                                v-model="visit_report_data.visit_report_doctor.satisfactory"
+                                value="1"
+                                :disabled="formDisabled"
+                                v-validate="non_verify_original_passport_fw_present_rule"
+                                data-vv-as="Satisfactory"
+                                class="form-check-input"
+                                id="">
+
+                            <label class="form-check-label" for="">Satifactory(S)</label>
+
+                            </div>  
+                            <div class="form-group">SOP Non-Compliance</div>
+
+                            <div class="form-row">
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">
+                                        <input 
+                                            type="checkbox"
+                                            name="visit_report_doctor[non_verify_original_passport_fw_present]"
+                                            v-model="visit_report_data.visit_report_doctor.non_verify_original_passport_fw_present"
+                                            value="1"
+                                            :disabled="formDisabled"
+                                            v-validate="non_verify_original_passport_fw_present_rule"
+                                            data-vv-as="Non verification of original passport - FW present (Y)"
+                                            class="form-check-input"
+                                            id="">
+                                        <label class="form-check-label" for="">Non verification of original passport - FW present (Y)</label>
+                                    </div>                   
+                                </div>                            
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[inappropriate_vacutainer]"
+                                            v-model="visit_report_data.visit_report_doctor.inappropriate_vacutainer" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Inappropriate vacutainer/specimen container (V)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Inappropriate vacutainer/specimen container (V)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[non_verify_original_passport_fw_not_present"
+                                            v-model="visit_report_data.visit_report_doctor.non_verify_original_passport_fw_not_present" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Non verification of original passport - FW not present (N)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Non verification of original passport - FW not present (N)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[no_produce_dispatch_record]"
+                                            v-model="visit_report_data.visit_report_doctor.no_produce_dispatch_record" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Unable to produce laboratory dispatch book/record (L)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Unable to produce laboratory dispatch book/record (L)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[unable_to_produce_apc]"
+                                            v-model="visit_report_data.visit_report_doctor.unable_to_produce_apc" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Unable to produce APC (A)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Unable to produce APC (A)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[no_produce_written_consent]"
+                                            v-model="visit_report_data.visit_report_doctor.no_produce_written_consent" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Unable to produce written consent (C)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Unable to produce written consent (C)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[non_notify_communicable_disease]"
+                                            v-model="visit_report_data.visit_report_doctor.non_notify_communicable_disease" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Non notification of communicable disease (G)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Non notification of communicable disease (G)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[no_produce_medical_record]"
+                                            v-model="visit_report_data.visit_report_doctor.no_produce_medical_record" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Unable to produce medical records (R)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Unable to produce medical records (R)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[inadequate_equipment]"
+                                            v-model="visit_report_data.visit_report_doctor.inadequate_equipment" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Inadequate equipment (I)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Inadequate equipment (I)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[closed]"
+                                            v-model="visit_report_data.visit_report_doctor.closed" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Clinic closed (P)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Clinic closed (P)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[insufficient_operation_hour]"
+                                            v-model="visit_report_data.visit_report_doctor.insufficient_operation_hour" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Insufficient operation hours (less than 8 hours) (H)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Insufficient operation hours (less than 8 hours) (H)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[no_produce_borang_b]"
+                                            v-model="visit_report_data.visit_report_doctor.no_produce_borang_b" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Unable to produce borang B(B)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Unable to produce borang B(B)</label>                                   
+                                    </div>                            
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-check">                                    
+                                        <input 
+                                            type="checkbox" 
+                                            name="visit_report_doctor[other]"
+                                            v-model="visit_report_data.visit_report_doctor.other" 
+                                            value="1"
+                                            :disabled="formDisabled" 
+                                            v-validate="inappropriate_vacutainer_rule"
+                                            data-vv-as="Others (K)" 
+                                            class="form-check-input" id=""
+                                        >                                    
+                                        <label class="form-check-label" for="">Others (K)</label>                                   
+                                    </div>                            
+                                </div>
+                            </div>
+                            <div class="form-group form-row">
+                                <div class="col-sm-8">
+                                    <v-textarea
+                                        v-model="visit_report_data.visit_report_doctor.other_comment"
+                                        :field_name="'visit_report_doctor[other_comment]'"
+                                        :rules="otherCommentRule"
+                                        :label="'Others, please specify'" 
+                                        :validation_label="'Others'"
+                                        :readonly="formReadOnly" 
+                                    ></v-textarea>
+                                </div>
+                            </div> 
+                        </td>
+                    </tr>
+                    <!-- end satisfactory -->
+
+                    <!-- recommendations -->
+                    <tr>
+                        <td>12.</td>
+                        <td colspan="4">
+                            <div class="form-group">
+                                <label class="required" for="">Recommendations</label>
+                                <select class="form-control col-sm-8" v-validate="recommendationsRule" name="visit_report_doctor[recommendation]" v-model="visit_report_data.visit_report_doctor.recommendation" id="recommendations" :class="{ 'is-invalid': errors.has('visit_report_doctor[recommendation]') }" :disabled="formReadOnly">
+                                    <option disabled value="">Select option</option>
+                                    <option v-for="(rec, index) in recommendations_arr" :value="rec">{{ rec }}</option>
+                                </select>
+                                <div class="invalid-feedback">{{ errors.first('visit_report_doctor[recommendation]') }}</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end recommendations -->
+
+                    <!-- prepared by -->
+                    <tr>
+                        <td>13.</td>
+                        <td colspan="4">
+                            Prepared
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">
+                                        <label class="form-label" for="visit_report[prepare_by]">By</label>
+                                        <select class="form-control" v-validate="preparedByRule" name="visit_report[prepare_by]" v-model="visit_report_data.prepare_by" id="prepare_by" :disabled="formReadOnly">
+                                            <option v-for="(visitor, index) in org_users" :value="visitor.id" :class="{ 'is-invalid': errors.has('visit_report[prepare_by]') }">{{ visitor.name }}</option>
+                                        </select>
+                                        <div class="invalid-feedback">{{ errors.first('visit_report[prepare_by]') }}</div>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <v-date 
+                                            v-model="visit_report_data.prepare_at"
+                                            :field_name="'visit_report[prepare_at]'"
+                                            :label="'Date'"
+                                            :rules="preparedDateRule"
+                                            :readonly="formReadOnly"
+                                            validation_label="'Prepared Date'"
+                                        ></v-date>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- end prepared by -->
+                </tbody>
+            </table>
+
+        </form>
+
+        </div>
+
+
+    </div>

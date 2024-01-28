@@ -1,0 +1,54 @@
+<div class="card-body p-1">
+  <script type="text/javascript">
+      google.charts.load('current', {'packages': ['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+          var chartData = <%= @pi_chart_data.nil? ? [] : @pi_chart_data.to_json.html_safe %>;
+          console.log("Chart Data:", chartData);
+
+          if (!chartData.length) {
+              var placeholderDiv = document.getElementById('piechart');
+              placeholderDiv.innerHTML = '<div class="center-message">No Data to Display</div>';
+          } else {
+              var data = google.visualization.arrayToDataTable(chartData);
+
+              var options = {
+                  legend: {
+                      position: 'right',
+                      alignment: 'center',
+                  },
+                  'chartArea': {'width': '100%', 'height': '100%'},
+                  vAxis: {minValue: 0},
+                  pieSliceText: 'percentage',
+                  pieSliceTextStyle: {
+                      fontSize: 6, // Default font size
+                  },
+              };
+
+              var maxFontSize = 6; // Default font size
+
+              // Loop through the data to adjust font size for small values
+              for (var row = 0; row < data.getNumberOfRows(); row++) {
+                  var value = data.getValue(row, 1);
+                  var fontSize = maxFontSize; // Set to default
+
+                  if (value < 7) {
+                      fontSize = 7; // Decrease font size for values less than 7
+                  }
+                  if (value < 3) {
+                      fontSize = 5; // Further decrease font size for values less than 3
+                  }
+
+                  options.pieSliceTextStyle.fontSize = fontSize;
+
+                  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                  chart.draw(data, options);
+              }
+          }
+      }
+  </script>
+  <% if has_permission?('DASHBOARD_FW_REGISTRATION_SECTOR') %>
+  <div id="piechart" class="animated-div" style="width: 100%; height:100%;"></div>
+  <%end%>
+</div>

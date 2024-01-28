@@ -1,0 +1,75 @@
+<div class="p-4 border-bottom d-flex justify-content-between">
+    <h3 class="flex-grow-1"><u>Appeal Comments</u></h3>
+
+    <% unless moh_readonly%>
+        <%= link_to appeal_employer_instruction_letter_internal_appeal_path(@appeal.id), target: "_BLANK", class: "mr-2" do %>
+            <div class="btn btn-primary"><i class="fa fa-list mr-2"></i>Employer Instruction Letter</div>
+        <% end %>
+
+        <%= link_to appeal_doctor_instruction_letter_internal_appeal_path(@appeal.id), target: "_BLANK" do %>
+            <div class="btn btn-primary"><i class="fa fa-list mr-2"></i>Doctor Instruction Letter</div>
+        <% end %>
+    <% end %>
+</div>
+
+<div class="px-4 py-4 border-bottom">
+    <div class="d-flex justify-content-between mb-2">
+        <% unless readonly || moh_readonly %>
+            <div class="d-flex align-items-center w-em-12">
+                <%= check_box_tag :document_completed_checkbox, 'true', @appeal.status == "DOCUMENT_COMPLETED", class: "" %>
+                <label class="flex-grow-1 mb-0 ml-2" for="document_completed_checkbox">Document Completed</label>
+            </div>
+            <div class="d-flex align-items-center w-em-16">
+                <%= check_box_tag :doctor_document_incomplete_checkbox, 'true', @appeal.doctor_document_uploaded == false, class: "" %>
+                <label class="flex-grow-1 mb-0 ml-2" for="doctor_document_incomplete_checkbox">Doctor Document Incomplete</label>
+            </div>
+            <div class="d-flex align-items-center w-em-18">
+                <%= check_box_tag :laboratory_document_incomplete_checkbox, 'true', @appeal.laboratory_document_uploaded == false, class: "" %>
+                <label class="flex-grow-1 mb-0 ml-2" for="laboratory_document_incomplete_checkbox">Laboratory Document Incomplete</label>
+            </div>
+        <% end %>
+
+        <% if has_permission?("COMMENT_IN_APPEALS") && !["PENDING_APPROVAL", "CLOSED"].include?(@appeal.status) %>
+            <div><!-- Pushes comment button to right in readonly mode. --></div>
+
+            <div id="new-comment-btn" class="btn btn-primary">+ New Comment</div>
+            <%= hidden_field_tag :remove_appeal_comments, "" %>
+        <% end %>
+    </div>
+
+    <table class="table-borders w-100">
+        <thead>
+            <tr>
+                <th class="py-1 px-2">No.</th>
+                <th class="py-1 px-2">Date</th>
+                <th class="py-1 px-2">MLE Name</th>
+                <th class="py-1 px-2">Comments</th>
+
+                <% unless readonly %>
+                    <th class="py-1 px-2"></th>
+                <% end %>
+            </tr>
+        </thead>
+
+        <tbody id="appeal-comment-body">
+            <% @appeal_comments.each_with_index do |comment, index| %>
+                <tr>
+                    <td class="py-1 px-2" valign="top"><%= index + 1 %></td>
+                    <td class="py-1 px-2" valign="top"><%= comment.created_at.strftime("%d/%m/%Y") %></td>
+                    <td class="py-1 px-2" valign="top"><%= comment.user.name %></td>
+                    <td class="py-1 px-2"><%= simple_format comment.comment %></td>
+
+                    <% unless readonly %>
+                        <td class="py-1 px-2" valign="top"><div class="remove-appeal-comment btn btn-danger" data-id="<%= comment.id %>">Remove</div></td>
+                    <% end %>
+                </tr>
+            <% end %>
+
+            <% if @appeal_comments.blank? %>
+                <tr>
+                    <td colspan="<%= readonly ? 4 : 5 %>" class="text-center py-1 px-2">There are no comments</td>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,82 @@
+<script>
+$(document).ready(function() {
+
+    days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+
+    $('#save').click(function (e) {
+
+        e.preventDefault();
+
+        if ($("#hidden_title_id").length != 0) {
+            $('#hidden_title_id').val($('#user_title_id').val());
+        }
+
+        if (!document.forms["profile_form"].checkValidity()) {
+            document.forms["profile_form"].reportValidity();
+        } else {
+            over_8_count = 0;
+
+            days.forEach(function (day) {
+                if ($('#operating_hour_'+day+'_is_close_false').is(":checked")) {
+                    if ($('#operating_hour_'+day+'_is_24_hour_true').is(":checked")) {
+                        over_8_count++;
+                    } else {
+                        start_hour = $('#operating_hour_'+day+'_start_4i').val();
+                        start_min = $('#operating_hour_'+day+'_start_5i').val();
+
+                        end_hour = $('#operating_hour_'+day+'_end_4i').val();
+                        end_min =  $('#operating_hour_'+day+'_end_5i').val();
+
+                        break_start_hour = $('#operating_hour_'+day+'_break_start_4i').val();
+                        break_start_min = $('#operating_hour_'+day+'_break_start_5i').val();
+
+                        break_end_hour = $('#operating_hour_'+day+'_break_end_4i').val();
+                        break_end_min =  $('#operating_hour_'+day+'_break_end_5i').val();
+
+                        // start_time = parseFloat(start_hour+'.'+start_min)
+                        // end_time = parseFloat(end_hour+'.'+end_min)
+                        start_time = parseInt(start_hour) * 100 + parseInt(start_min);
+                        end_time = parseInt(end_hour) * 100 + parseInt(end_min);
+
+                        break_start_time = parseInt(break_start_hour) * 100 + parseInt(break_start_min);
+                        break_end_time = parseInt(break_end_hour) * 100 + parseInt(break_end_min);
+
+                        time_diff = end_time - start_time;
+                        break_time_diff = break_end_time - break_start_time;
+
+                        new_time_diff = time_diff - break_time_diff;
+
+                        if (new_time_diff >= 800) {
+                            over_8_count++;
+                        }
+                    }
+                }
+            })
+
+            if (over_8_count < 5) {
+                alert("Operation hour does not comply to the '8 hours per day for 5 days' condition");
+            } else {
+                $('#profile_form').submit();
+            }
+        }
+
+    });
+
+    days.forEach(function (day) {
+        $('#operating_hour_'+day+'_is_close_true').on("click", function() {
+            $('#operating_hour_'+day+'_start_4i').val("00");
+            $('#operating_hour_'+day+'_start_5i').val("00");
+
+            $('#operating_hour_'+day+'_end_4i').val("00");
+            $('#operating_hour_'+day+'_end_5i').val("00");
+
+            $('#operating_hour_'+day+'_break_start_4i').val("00");
+            $('#operating_hour_'+day+'_break_start_5i').val("00");
+
+            $('#operating_hour_'+day+'_break_end_4i').val("00");
+            $('#operating_hour_'+day+'_break_end_5i').val("00");
+        });
+    });
+
+});
+</script>

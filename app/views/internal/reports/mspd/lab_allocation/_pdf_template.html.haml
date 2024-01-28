@@ -1,0 +1,45 @@
+%table.table.w-100.text-center
+  %thead
+    %tr
+      - @headers.each do |header|
+        %th= header
+  %tbody
+    - if @laboratories.present?
+      - @laboratories.each.with_index(1) do |laboratory|
+        %tr
+          %td= laboratory.code
+          %td= laboratory.name
+          %td= laboratory.town_name
+          %td= laboratory.postcode
+          %td= laboratory.state_name
+          %td= laboratory.active_gp_count
+
+
+:css
+  .w-100 {
+      width: 100%;
+  }
+
+  table {
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+  }
+
+  thead {
+      background-color: #d0d0d0;
+  }
+
+  thead th {
+      padding: 10px 3px;
+      border: 1px solid #aaa;
+  }
+
+  tbody td {
+      padding: 10px 5px;
+      vertical-align: center;
+      border: 1px solid #aaa;
+  }
+
+  .bold {
+      font-weight: bold;
+  }

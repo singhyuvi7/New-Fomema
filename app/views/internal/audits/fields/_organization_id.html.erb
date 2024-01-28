@@ -1,0 +1,5 @@
+<%
+o = Organization.find(value) || false if !value.blank?
+%>
+<th><%= name.titleize %></th>
+<td><%= "#{value} - #{o.name} (#{o.code})" if !value.blank? && o %></td>

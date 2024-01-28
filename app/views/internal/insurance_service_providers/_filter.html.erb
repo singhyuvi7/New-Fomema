@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Filter</strong>
+    </div>
+
+    <%= form_tag internal_insurance_service_providers_path, method: 'get' do |form| %>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="code" class="col-sm-3 col-form-label">Code</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="code" id="code" value="<%= params[:code] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="name" id="name" value="<%= params[:name] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Display Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="display_name" id="display_name" value="<%= params[:display_name] %>">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-3 col-form-label">Active</label>
+                        <div class="col-sm-9">
+                            <%= select_tag :active, options_for_select(InsuranceServiceProvider::ACTIVE, params[:active]), include_blank: form_select_option_text, class: 'form-control select' %>
+                        </div>
+                    </div>
+                </div>
+                <%= hidden_field_tag :per, params[:per] || get_per_options.first %>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <%=raw filter_clear_button internal_insurance_service_providers_path %>
+                <%=raw filter_button %>
+            </div>
+        </div>
+    <% end %>
+</div>

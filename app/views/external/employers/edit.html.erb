@@ -1,0 +1,5 @@
+<div id="notice"><%= alert %></div>
+
+<%= form_for @employer, url: external_employer_path(@employer), html: { multipart: true , id: 'form'} do |f| %>
+  <%= render 'form', f: f %>
+<% end %>

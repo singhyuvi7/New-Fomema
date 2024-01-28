@@ -1,0 +1,10 @@
+<div class="card" data-behaviour="vue">
+  <div class="card-header">
+    <strong>Visit Plan Approvals</strong> - Edit Visit Plan Approval
+  </div>
+
+  <div class="card-body">
+        <%= render 'form', { form_method: 'PUT', form_action: internal_visit_plan_approval_path(@visit_plan), index_path: internal_visit_plan_approvals_path } %>
+  </div>
+
+</div>

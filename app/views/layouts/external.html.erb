@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!--
+* CoreUI - Free Bootstrap Admin Template
+* @version v2.1.6
+* @link https://coreui.io
+* Copyright (c) 2018 creativeLabs Łukasz Holeczek
+* Licensed under MIT (https://coreui.io/license)
+-->
+<html lang="en">
+
+    <head>
+        <base href="./">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+        <%= csrf_meta_tags %>
+        <%= csp_meta_tag %>
+        <title><%= site %></title>
+        <meta name="robots" content="noindex" />
+        <meta name="google-site-verification" content="d3W-wiiqd7ubYClb235-3wyQhhtu4Bu2KanjCJVs8VE" />
+        <!-- Icons-->
+        <link href="/vendors/@coreui/icons/css/coreui-icons.min.css" rel="stylesheet">
+        <link href="/vendors/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+        <link href="/vendors/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+        <!-- Main styles for this application-->
+        <link href="/css/style.css" rel="stylesheet">
+        <link href="/vendors/pace-progress/css/pace.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.11/flatpickr.min.css">
+        <%= stylesheet_link_tag 'application', media: 'all' %>
+        <%= stylesheet_link_tag 'external/application', media: 'all' %>
+    </head>
+
+    <body class="app header-fixed sidebar-lg-show <%= controller_action_name %>">
+        <%= render "external/shared/header" %>
+        <div class="app-body">
+            <%#= render "external/shared/sidebar" %>
+            <main class="main">
+                <%= render "external/shared/breadcrumb" %>
+                <div class="container-fluid">
+                    <div class="animated fadeIn">
+                        <%= yield %>
+                    </div>
+                </div>
+            </main>
+            <%= render "external/shared/aside" %>
+        </div>
+
+        <%= render "external/shared/bulletin_pop_up" %>
+
+        <%= render "external/shared/footer" %>
+        <!-- CoreUI and necessary plugins-->
+        <script src="/vendors/jquery/js/jquery.min.js"></script>
+        <script src="/vendors/popper.js/js/popper.min.js"></script>
+        <script src="/vendors/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/vendors/pace-progress/js/pace.min.js"></script>
+        <script src="/vendors/select2/js/select2.min.js"></script>
+        <script src="/vendors/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
+        <script src="/vendors/@coreui/coreui/js/coreui.min.js"></script>
+        <!-- Plugins and scripts required by this view-->
+        <script src="/vendors/chart.js/js/Chart.min.js"></script>
+        <script src="/vendors/@coreui/coreui-plugin-chartjs-custom-tooltips/js/custom-tooltips.min.js"></script>
+        <script src="/vendors/js-cookie/js/js.cookie.min.js"></script>
+        <script src="/vendors/parsley/js/parsley.min.js"></script>
+        <script src="/vendors/jquery-orgchart/js/jquery.orgchart.min.js"></script>
+        <script src="/vendors/js-tree/js/jstree.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.11/flatpickr.min.js"></script>
+
+        <%= javascript_include_tag 'application' %>
+        <%= javascript_include_tag 'external/application' %>
+        <%= yield :page_end_scripts %>
+        <%= render "/layouts/browser_compatibility_modal" %>
+    </body>
+</html>

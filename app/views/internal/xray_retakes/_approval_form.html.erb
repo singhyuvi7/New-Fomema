@@ -1,0 +1,72 @@
+<div class="card border-primary">
+    <div class="card-header">
+        Retake Approval
+    </div>
+    <div class="card-body">
+
+        <div class="row">
+            <div class="form-group col">
+                <%= form.label :approval_decision, "Decision", class: "required"%>
+                <div class="col-form-label">
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :approval_decision, "APPROVE", class: "xray_retake_approval_decision form-check-input", data: {parsley_errors_container: "#approval_decision_errors"}, required: true %>
+                        <label class="form-check-label" for="xray_retake_approval_decision_approve"><%= XrayRetake::APPROVAL_DECISIONS["APPROVE"] %></label>
+                    </div>
+                    <div class="form-check form-check-inline mr-3">
+                        <%= form.radio_button :approval_decision, "REJECT", class: "xray_retake_approval_decision form-check-input", data: {parsley_errors_container: "#approval_decision_errors"} %>
+                        <label class="form-check-label" for="xray_retake_approval_decision_reject"><%= XrayRetake::APPROVAL_DECISIONS["REJECT"] %></label>
+                    </div>
+                </div>
+                <div id="approval_decision_errors"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col<%= " hidden" unless xray_retake.approval_decision == "REJECT" %>" id="select_xray_facility">
+                <%= form.label :xray_facility_id, "X-Ray Facility", class: "required"%>
+                <%= form.select :xray_facility_id, options_from_collection_for_select(@xray_facilities || XrayFacility.select("id", "name || ' (' || code || ')' as label").where(status: "ACTIVE").order(:label), :id, :label, xray_retake.xray_facility_id), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#xray_retake_xray_facility_id_errors", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-xray_retake_xray_facility_id-container\"]", parsley_group: "xray_retake_xray_facility_id" } %>
+                <div id="xray_retake_xray_facility_id_errors"></div>
+            </div>
+            <% if xray_retake.requestable_type == "PcrReview" && xray_retake.transaction_id == xray_retake.requestable.transaction_id %>
+                <div class="form-group col<%= " hidden" unless xray_retake.approval_decision == "APPROVE" %>" id="reassign_pcr">
+                    <%= form.label :reassign_to_pcr_id, "Reassign to PCR", class: "required"%>
+                    <%= form.select :reassign_to_pcr_id, options_from_collection_for_select(@pcrs || User.active.search_permission("PICKUP_PCR_POOL").order(:name), :id, :name, xray_retake.reassign_to_pcr_id), {include_blank: form_select_option_text}, class: 'form-control select2', data: { parsley_errors_container: "#xray_retake_reassign_to_pcr_id_errors", parsley_class_handler: ".select2-selection--single[aria-labelledby=\"select2-xray_retake_reassign_to_pcr_id-container\"]", parsley_group: "xray_retake_reassign_to_pcr_id" } %>
+                    <div id="xray_retake_reassign_to_pcr_id_errors"></div>
+                </div>
+            <% end %>
+        </div>
+
+        <div class="row">
+            <div class="form-group col">
+                <label for="" class="required">Comment</label>
+                <textarea class="form-control" name="xray_retake[approval_comment]" id="xray_retake_approval_comment" rows="2" required><%= @xray_retake.approval_comment %></textarea>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer text-right">
+        <%=raw edit_back_button(@xray_retake.index_path) %>
+        <%=raw edit_save_button() %>
+    </div>
+    <!-- /.card-footer -->
+</div>
+
+<% content_for :page_end_scripts do %>
+<script>
+$(".xray_retake_approval_decision").change(function () {
+    var xray_retake_approval_decision = $(this).val();
+    if (xray_retake_approval_decision == "APPROVE") {
+        $('#select_xray_facility').show();
+        $('#xray_retake_xray_facility_id').prop('required', true);
+        $('#reassign_pcr').hide();
+        $('#xray_retake_reassign_to_pcr_id').prop('required', false);
+    } else if (xray_retake_approval_decision == "REJECT") {
+        $('#select_xray_facility').hide();
+        $('#xray_retake_xray_facility_id').prop('required', false);
+        $('#reassign_pcr').show();
+        $('#xray_retake_reassign_to_pcr_id').prop('required', true);
+    }
+});
+</script>
+<% end %>

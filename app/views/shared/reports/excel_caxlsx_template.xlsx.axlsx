@@ -1,0 +1,41 @@
+# Guide for row styles.
+# https://www.rubydoc.info/github/randym/axlsx/Axlsx/Worksheet#add_row-instance_method -> This is the old version.
+# https://www.rubydoc.info/gems/caxlsx -> This is for the gem we are using.
+
+wb = xlsx_package.workbook
+
+@excel.each_with_index do |worksheet, index|
+    sheet_name      = @worksheet_names[index] if @worksheet_names.present?
+    sheet_name      ||= "Worksheet #{ index + 1 }"
+    merge_options   = @merge_fields[index] if @merge_fields.present?
+    width_options   = @column_widths[index] if @column_widths.present?
+
+    wb.add_worksheet(name: sheet_name) do |ws|
+        worksheet.each do |row|
+            if row.class == Hash
+                data                = row[:data]
+                options             = {}
+
+                if row[:style]
+                    custom_styles   = {}
+
+                    row[:style].each_with_index do |custom_style, index|
+                        custom_styles[index] = ws.styles.add_style custom_style
+                    end
+
+                    options[:style] = custom_styles.values
+                end
+
+                options[:height]    = row[:height] if row[:height]
+                options[:widths]    = row[:widths] if row[:widths]
+                options[:types]     = row[:types]
+                ws.add_row(data, options)
+            else
+                ws.add_row(row)
+            end
+        end
+
+        merge_options.each {|merge_option| ws.merge_cells merge_option } if merge_options.present?
+        ws.column_widths *width_options if width_options.present? # Please note, must pass as splat operator!!
+    end
+end

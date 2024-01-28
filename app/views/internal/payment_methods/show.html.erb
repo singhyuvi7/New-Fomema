@@ -1,0 +1,106 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>Payment Methods</strong> - Payment Method Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="payment_method_category">Category</label>
+                    <p class="form-control-plaintext">
+                        <%= PaymentMethod::CATEGORIES[@payment_method.category] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment_method.code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment_method.name %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Payment Code</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment_method.payment_code %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Use Main Account</label>
+                    <p class="form-control-plaintext">
+                        <%= PaymentMethod::IS_MAINS.invert[@payment_method.is_main] %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Active</label>
+                    <p class="form-control-plaintext">
+                        <%= PaymentMethod::ACTIVE.invert[@payment_method.active] %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="payment_method_code">Transaction Fee (%)</label>
+                    <p class="form-control-plaintext">
+                        <%= @payment_method.transaction_fee %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_payment_methods_path) %>
+            <% if has_permission?('EDIT_PAYMENT_METHOD') %>
+                <%=raw show_edit_button(edit_internal_payment_method_path(@payment_method)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>
+<!-- /.card -->
+
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group">
+            <% if has_permission?("VIEW_AUDIT_PAYMENT_METHOD") %>
+                <li class="list-group-item">
+                    <%= link_to "Audits", internal_payment_method_audits_path(@payment_method) %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
+</div>

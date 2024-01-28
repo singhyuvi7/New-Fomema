@@ -1,0 +1,17 @@
+<div class="card">
+    <div class="card-header"><strong>Foreign Workers</strong> - Editing Foreign Worker</div>
+    <%= form_for @foreign_worker, {url: internal_employer_employer_worker_path(@employer, @foreign_worker), html: {multipart: true, class: "with-parsley"}} do |form| %>
+        <%= render 'form', { form: form } %>
+
+        <div class="card-footer">
+        
+            <div class="text-right">
+                <%=raw edit_back_button(request.env["HTTP_REFERER"] || internal_employer_employer_workers_path) %>
+                <%=raw edit_submit_for_approval_button(label: "<i class=\"icon-pencil\"></i> Submit#{@foreign_worker.code.blank? ? "" : " for approval"}", title: "Submit#{@foreign_worker.code.blank? ? "" : " for approval"}") %>
+            </div>
+        
+        </div>
+    <% end %>
+
+    <%= render "change_gender_modal" %>
+</div>

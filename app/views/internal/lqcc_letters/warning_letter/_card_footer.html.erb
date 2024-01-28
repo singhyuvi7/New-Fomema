@@ -1,0 +1,18 @@
+<div class="card-footer">
+    <div class="text-right">
+        <%=raw edit_back_button(internal_lqcc_letters_path) %>
+
+        <% if has_any_permission?("CREATE_LQCC_LETTER", "EDIT_LQCC_LETTER") && !['APPROVAL','APPROVED'].include?(@letter.warning_status) %>
+            <%= link_to "Preview", preview_warning_letter_internal_lqcc_letter_path(@letter), target: "_blank", class: "btn btn-success btn-sm" if ['edit_warning_letter'].include?(params[:action]) %>
+
+            <!-- <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#signatureModal">E-Signature</button>
+            <% if has_any_permission?("CREATE_LQCC_LETTER", "EDIT_LQCC_LETTER") && !@letter.warning_signature_name.blank? && !@letter.warning_signature_designation.blank? && !@letter.warning_signature.blank? %>
+                <%=raw edit_submit_for_approval_button() %>
+            <% end %>
+             -->
+            <button id="draft_submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-html="true" title="Save draft" data-original-title="Save draft" type="submit" name="submit" value="Save draft" data-disable-with="Save" formnovalidate><i class="icon-pencil"></i> Save draft</button>
+            <%=raw edit_submit_for_approval_button() %>
+        <% end %>
+
+    </div>
+</div>

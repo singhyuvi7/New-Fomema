@@ -1,0 +1,76 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Payment Methods</strong>
+    </div>
+
+    <!-- card-body -->
+    <div class="card-body">
+        <%=render "filter" %>
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col module-actions text-right">
+                <% if has_permission?('CREATE_PAYMENT_METHOD') %>
+                    <%=raw index_table_new_button(new_internal_payment_method_path) %>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="<%= index_table_class %>">
+                        <thead>
+                            <tr>
+                                <th class="module-row-numbers">#</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Payment Code</th>
+                                <th>Category</th>
+                                <th>Use Main Account</th>
+                                <th>Active</th>
+                                <th class="module-row-actions">Action(s)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if @payment_methods.blank? %>
+                                <tr>
+                                    <td colspan="9" class="text-danger">No records found.</td>
+                                </tr>
+                            <% else %>
+
+                                <% @payment_methods.each.with_index((@payment_methods.current_page - 1) * get_per + 1) do |payment_method, index| %>
+                                    <tr>
+                                        <td class="module-row-numbers"><%= index %></td>
+                                        <td><%= payment_method.code %></td>
+                                        <td><%= payment_method.name %></td>
+                                        <td><%= payment_method.payment_code %></td>
+                                        <td><%= PaymentMethod::CATEGORIES[payment_method.category] %></td>
+                                        <td><%= PaymentMethod::IS_MAINS.invert[payment_method.is_main] %></td>
+                                        <td><%= PaymentMethod::ACTIVE.invert[payment_method.active] %></td>
+                                        <td class="module-row-actions">
+                                        <%=raw index_table_show_button(internal_payment_method_path(payment_method)) %>
+                                        <% if has_permission?('EDIT_PAYMENT_METHOD') %>
+                                            <%=raw index_table_edit_button edit_internal_payment_method_path(payment_method) %>
+                                        <% end %>
+                                        <% if has_permission?('DELETE_PAYMENT_METHOD') %>
+                                            <%=raw index_table_delete_button(internal_payment_method_path(payment_method)) %>
+                                        <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <%= paginate @payment_methods %>
+        </div>
+    </div>
+    <!-- /card-body -->
+</div>

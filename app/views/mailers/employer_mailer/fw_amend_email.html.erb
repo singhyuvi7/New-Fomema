@@ -1,0 +1,67 @@
+<p>
+     <b>Dear <%= @customer.name %></b>,<br>
+    <b><i>Tuan/ Puan </i><%= @customer.name %></b></b>,
+</p>
+
+<p>
+    <% if @foreign_worker.approval_status == "UPDATE_APPROVED" %>
+        Please be informed that your request for amendment was approved. The details are as follows: <br>
+    <% elsif @foreign_worker.approval_status == "UPDATE_REJECTED" %>
+        Please be informed that your request for amendment was not approved due to <%= "#{@approval_comment}" %>. The details are as follows: <br>
+    <% elsif @foreign_worker.approval_status == "UPDATE_REVERTED" %>
+        Please be informed that your request for amendment was reverted due to <%= "#{@approval_comment}" %>. The details are as follows: <br>
+    <% else %>
+        Foreign Worker Amendment details as follows: <br>
+    <% end %>
+
+    <% if @foreign_worker.approval_status == "UPDATE_APPROVED" %>
+        <i>Dimaklumkan permohonan Pindaan Maklumat Pekerja Asing anda telah berjaya. Maklumat adalah seperti berikut:</i>
+    <% elsif @foreign_worker.approval_status == "UPDATE_REJECTED" %>
+        <i>Dimaklumkan permohonan Pindaan Pekerja Asing anda tidak berjaya kerana <%= @approval_comment %>. Maklumat adalah seperti berikut:</i>
+    <% elsif @foreign_worker.approval_status == "UPDATE_REVERTED" %>
+        <i>Dimaklumkan permohonan Pindaan Pekerja Asing anda dikembalikan kerana <%= @approval_comment %>. Maklumat adalah seperti berikut:</i>
+    <% else %>
+        <i>Maklumat Pindaan Pekerja Asing adalah seperti berikut:</i>
+    <% end %>
+</p>
+
+<div>
+    Foreign Worker Information:<br>
+    <i>Maklumat perkerja asing</i><br>
+
+    Code : <%= @foreign_worker.code %><br>
+    <i>Kod</i><br>
+
+    Name : <%= @foreign_worker.name %><br>
+    <i>Nama:</i><br>
+
+    Passport Number : <%= @foreign_worker.passport_number %><br>
+    <i>Nombor Pasport</i><br>
+
+    Country of Origin: <%= @foreign_worker.country.name %><br>
+    <i>Negara Asal</i><br>
+
+    Date of Birth : <%= @foreign_worker.date_of_birth.try(:strftime, '%d/%m/%Y') %><br>
+    <i>Tarikh Lahir</i><br>
+
+    Gender : <%= @foreign_worker.gender_name %><br>
+    <i>Jantina</i><br>
+
+    <% if !@agency.nil? %>
+        Employer Name : <%= "#{@employer.name} (#{@employer.code})" %><br>
+        <i>Nama Majikan</i><br>
+    <% elsif !@foreign_worker.employer_supplement.nil? %>
+        Supplementary Employer Name : <%= "#{@foreign_worker.employer_supplement.name}" %><br>
+        <i>Nama Majikan Tambahan</i><br>
+    <% end %>
+</div>
+
+<p>
+    Thank you.<br>
+    <i>Terima kasih</i>
+</p>
+
+<p>
+    ***This is an auto generated email. Please do not reply to this email. *** <br>
+    <i>***E-mel dibuat secara auto. Tidak perlu untuk membalas e-mel.***</i>
+</p>

@@ -1,0 +1,53 @@
+<hr>
+<% if @order_items.present? %>
+    <% total_amount = 0 %>
+    <table class="w-100">
+        <tr class="text-left">
+            <th class="px-6px py-3px">Date</th>
+            <th class="px-6px py-3px">Worker Code</th>
+            <th class="px-6px py-3px">Worker Name</th>
+            <th class="px-6px py-3px">Amount</th>
+        </tr>
+        <% @order_items.each do |order_item| %>
+            <% total_amount += order_item.final_amount %>
+            <tr>
+                <td class="px-6px py-3px"><%= order_item.paid_at.try(:strftime, get_standard_date_format) %></td>
+                <td class="px-6px py-3px"><%= order_item.fw_code %></td>
+                <td class="px-6px py-3px"><%= order_item.fw_name %></td>
+                <td class="px-6px py-3px"><%= order_item.final_amount %></td>
+            </tr>
+        <% end %>
+        <tr>
+            <td class="px-6px py-3px border-top-1" colspan="3">Total</td>
+            <td class="px-6px py-3px border-top-1"><%= total_amount %></td>
+        </tr>
+    </table>
+<% end %>
+<style>
+.w-100 {
+    width: 100%;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.px-6px {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.py-3px {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.border-top-1 {
+    border-top: 1px solid black;
+}
+</style>

@@ -1,0 +1,23 @@
+<div class="card">
+    <div class="card-header border-0 bg-transparent text-dark">
+        <strong> Cancel Transaction</strong> - <%= @transaction.code %>
+    </div>
+
+    <%= form_for @transaction_cancel, url: cancel_external_transaction_path(@transaction), method: :patch do |form| %>
+        <div class="card-body">
+            <%=render '/shared/all_flash' %>
+
+            <%= render 'shared/all_validation_flash', { model_obj: @transaction } %>
+
+            <div class="alert alert-danger">
+                <strong>Disclaimer:</strong><br>
+                For every foreign worker's medical examination, any request for cancellation of registration or refund will be subjected to a service fee of <b>RM25.00</b> per foreign worker.
+            </div>
+        </div>
+
+        <div class="card-footer border-0 bg-transparent text-dark text-right">
+            <a class="btn btn-blue-portal" href="<%= external_transactions_path %>">Back</a>
+            <%= button_tag 'Agree', type: 'submit', class: 'btn btn-success', data: { disable_with: "Cancelling..."} %>
+        </div>
+    <% end %>
+</div>

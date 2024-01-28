@@ -1,0 +1,105 @@
+<visitplanform
+    inline-template
+    :provider_type="'radiologists'"
+    :visit_plan="<%= @visit_plan.to_json %>"
+    :visit_plan_states="<%= @visit_plan.visit_plan_states.to_json %>"
+    :visit_plan_towns="<%= @visit_plan.visit_plan_towns.to_json %>"
+    :visit_plan_items="<%= @visit_plan.visit_plan_items.to_json %>"
+    :states="<%= State.select("name, id").all.to_json %>"
+>
+    <div>
+
+        <div class="card-body">
+        
+            <%= render 'shared/all_validation_flash', { model_obj: @visit_plan } %>
+        
+            <div class="row">
+        
+                <div class="form-group col-md-12">
+                    <label class="required" for="">States</label>
+                    
+                    <multiselect 
+                        v-model="selected_visit_plan_states" 
+                        :options="states" 
+                        :multiple="true" 
+                        placeholder="Select State" 
+                        label="name"
+                        track-by="id"
+                        @select="selectNewState"
+                        >
+                    </multiselect>
+                </div>
+        
+            </div>
+
+            <div class="row">
+                
+                <div class="form-group col-md-12">
+
+                    <template v-for="visit_plan_state in selected_visit_plan_states">
+
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th>State</th>
+                                    <th>Towns</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        
+                                <tr>
+                                    <td width="100">{{ visit_plan_state.name }}</td>
+                                    <td>
+                                        <multiselect v-model="selected_visit_plan_towns[visit_plan_state.name]"
+                                            :options="getStateTowns(visit_plan_state.name)" :multiple="true" placeholder="Select Town"
+                                            label="name" track-by="id" @select="selectNewTown">
+                                        </multiselect>
+                                    </td>
+                                </tr>
+                        
+                                <tr class="table-secondary">
+                                    <th>Town</th>
+                                    <th>Clinics</th>
+                                </tr>
+                        
+                                <template v-for="visit_plan_town in selected_visit_plan_towns[visit_plan_state.name]">
+                                    <tr>
+                                        <td width="100">{{ visit_plan_town.name }}</td>
+                                        <td>
+                                            <multiselect v-model="selected_visit_plan_providers[visit_plan_town.name]"
+                                                :options="getTownProviders(visit_plan_town.name)" :multiple="true" placeholder="Select Provider"
+                                                label="name" track-by="id" @select="selectNewProvider">
+                                            </multiselect>
+                                        </td>
+                                    </tr>
+                                </template>
+                        
+                            </tbody>
+                        </table>
+
+                    </template>
+
+                </div>
+
+            </div>
+        
+        </div>
+        
+        <div class="card-footer">
+        
+            <div class="text-right">
+                <%=raw edit_back_button(internal_visit_plans_path) %>
+                <%=raw edit_save_button() %>
+            </div>
+        
+        </div>
+
+    </div>
+
+</visitplanform>
+  
+<!-- javascript can be found here -->
+<!-- app/javascript/components/internal/visit_plans/_form.vue -->
+
+
+

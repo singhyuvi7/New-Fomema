@@ -1,0 +1,307 @@
+<div class="card">
+    <div class="card-header">
+        <strong>XQCC Identical Letter</strong>
+    </div>
+
+    <%= form_for @letter, url: xqcc_identical_letter_save_internal_xqcc_letters_path, method: :post, html: { class: "with-parsley" } do |f| %>
+        <%= f.hidden_field :id %>
+        <%= f.hidden_field :xray_name %>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :transaction_code, "Transaction Code" %>
+
+                        <div class="d-flex align-items-center">
+                            <%= f.text_field :transaction_code, class: "form-control search-field", required: true, data: { parsley_errors_container: "#t_code_parsley_error" } %>
+                            <div class="btn btn-primary ml-2" id="search-button">Search</div>
+                        </div>
+
+                        <div id="t_code_parsley_error"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :custom_ref_tag, "Reference Tag (L00XX/2020-11/XQCC/ID/TAGHERE) Only For Xray Letter" %>
+                        <%= text_field_tag :custom_ref_tag, @letter.ref_tag || "EXAMPLE", class: "form-control", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :issuer_name, "Approver Name" %>
+                        <%= f.text_field :issuer_name, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :issuer_title, "Designation" %>
+                        <%= f.text_field :issuer_title, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :retake_period, "Time given for retake (days)" %>
+                        <%= f.number_field :retake_period, value: @letter.retake_period_number, min: 0, step: 1, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :reply_period, "Explanation reply (days)" %>
+                        <%= f.number_field :reply_period, value: @letter.reply_period_number, min: 0, step: 1, class: "form-control no-uppercase", required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <%= label_tag :identical_workers, "Add Foreign Workers by Transaction Code" %>
+
+                        <div class="d-flex align-items-center">
+                            <%= text_field_tag :fw_transaction_code, "", placeholder: "Transaction Code", class: "form-control search-field", data: { parsley_errors_container: "#tfw_code_parsley_error" } %>
+                            <div class="btn btn-primary ml-2" id="search-foreign_worker-button">Search</div>
+                        </div>
+
+                        <div id="tfw_code_parsley_error"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tables-1-placeholder">
+                <!-- First one is a placeholder for seeding empty fields -->
+                <% ([XqccLetterIdenticalWorker.new] + @letter.identical_workers).each.with_index do |worker, index| %>
+                    <div class="p-2 <%= "edit-data" if index > 0 %>" id="foreign-worker-table-fields" style="display: <%= index == 0 ? "none" : "block" %>;">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <% if index > 0 %>
+                                        <%= hidden_field_tag "foreign_workers[#{ index }][id]", worker.id %>
+                                    <% end %>
+
+                                    <%= label_tag :worker_code, "Worker Code" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][worker_code]", worker.worker_code, placeholder: "Worker Code", class: "form-control" %>
+                                </div>
+
+                                <div class="form-group">
+                                    <%= label_tag :worker_passport, "Worker Passport" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][worker_passport]", worker.worker_passport, placeholder: "Worker Passport", class: "form-control" %>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+
+                                    <%= label_tag :worker_name, "Worker Name" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][worker_name]", worker.worker_name, placeholder: "Worker Name", class: "form-control" %>
+                                </div>
+
+                                <div class="form-group">
+                                    <%= label_tag :employer_name, "Employer Name" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][employer_name]", worker.employer_name, placeholder: "Employer Name", class: "form-control" %>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <%= label_tag :xray_date, "Xray Date" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][xray_date]", worker.xray_date&.strftime("%F"), placeholder: "dd/mmy/yyyy", class: "form-control no-uppercase #{ "datepicker-custom-enable" if index > 0 }" %>
+                                </div>
+
+                                <div class="form-group">
+                                    <%= label_tag :audit_date, "Audit Date" %>
+                                    <%= text_field_tag "foreign_workers#{ "_placeholder" if index == 0 }[#{ index }][audit_date]", worker.audit_date&.strftime("%F"), placeholder: "dd/mm/yyyy", class: "form-control no-uppercase #{ "datepicker-custom-enable" if index > 0 }" %>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <span class="remove-btn font-weight-bold text-right clickable" style="width: 2em; font-size: 1.5em;"><i class="fa fa-times"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <% [:xray_ref_no, :employer_ref_no, :xray_code, :doctor_code, :employer_code, :xray_address, :doctor_address, :employer_address].each do |label| %>
+                    <div class="col-md-6 mb-2">
+                        <div class="form-group">
+                            <%= label_tag label, label.to_s.titleize %>
+
+                            <% if label.to_s.include?("address") %>
+                                <%= f.text_area label, class: "form-control", readonly: true, rows: 8, required: true %>
+                            <% else %>
+                                <%= f.text_field label, class: "form-control", readonly: true, required: true %>
+                            <% end %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div id="letter-placeholder"></div>
+
+        <div class="card-footer text-right submit-buttons">
+            <!-- Please note, the names of the Preview Xray Letter & Preview Employer Letter is important. It is being used in the controller -->
+            <%= f.submit "Preview Xray Letter", class: "btn btn-sm btn-primary remove-disabled-states", formtarget: :_blank %>
+            <%= f.submit "Preview Employer Letter", class: "btn btn-sm btn-primary remove-disabled-states", formtarget: :_blank %>
+            <%= f.submit "Save", class: "btn btn-sm btn-success", data: { confirm: "You are about to save, please confirm." } %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :page_end_scripts do %>
+    <script>
+        generateRefNumbers();
+        $('#custom_ref_tag').change(generateRefNumbers);
+
+        function generateRefNumbers() {
+            var refTag      = $('#custom_ref_tag').val().toUpperCase();
+            var today       = new Date();
+            var month       = String(today.getMonth() + 1).padStart(2, '0');
+            var year        = today.getFullYear();
+            $('#xqcc_letter_identical_xray_ref_no').val(`L00XX/${ year }-${ month }/XQCC/ID/${ refTag }`);
+            $('#xqcc_letter_identical_employer_ref_no').val(`L00XX/${ year }-${ month }/XQCC/ID-EMP`);
+        }
+
+        $('.search-field:first').on('keypress',function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                searchTransaction();
+            }
+        });
+
+        $('#search-button').click(function(e) {
+            searchTransaction();
+        });
+
+        function searchTransaction() {
+            var btn = $('#search-button');
+            var btnState = btn.hasClass('btn-primary');
+
+            if (btnState) {
+                btn.removeClass('btn-primary').addClass('btn-secondary');
+                $('<i class="spinner-load-icon fas fa-spinner fa-spin text-primary font-size-11 ml-2"></i>').insertAfter(btn);
+
+                var transactionCode = btn.closest('.form-group').find('.search-field').val();
+
+                $.ajax({
+                    url: 'xqcc_identical_letter_search',
+                    type: 'POST',
+                    data: { transaction_code: transactionCode },
+                }).done(function(response) {
+                    $(Object.keys(response)).each(function() {
+                        $(`#${ this }`).val(response[this]);
+                    });
+
+                    btn.addClass('btn-primary').removeClass('btn-secondary');
+                    $('i.spinner-load-icon').remove();
+                });
+            }
+        };
+
+        $('.remove-disabled-states').click(function(){
+            setTimeout(function() {
+                $('.submit-buttons input').removeAttr('disabled');
+            }, 3000);
+        });
+
+        var tableOneCount = $('.edit-data').length + 1;
+        bindRemoveButton($('.edit-data .remove-btn'));
+
+        function bindRemoveButton(btn) {
+            btn.click(function() {
+                confirmation = confirm('Remove this row?');
+                if (confirmation) $(this).closest('.row').remove();
+            });
+        }
+
+        $('.search-field:last').on('keypress',function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                searchForeignWorker();
+            }
+        });
+
+        $('#search-foreign_worker-button').click(function(e) {
+            searchForeignWorker();
+        });
+
+        function searchForeignWorker() {
+            var btn = $('#search-foreign_worker-button');
+            var btnState = btn.hasClass('btn-primary');
+
+            if (btnState) {
+                btn.removeClass('btn-primary').addClass('btn-secondary');
+                $('<i class="spinner-load-icon fas fa-spinner fa-spin text-primary font-size-11 ml-2"></i>').insertAfter(btn);
+
+                var transactionCode = $('#search-foreign_worker-button').closest('.form-group').find('.search-field').val();
+
+                $.ajax({
+                    url: 'xqcc_identical_foreign_worker_search',
+                    type: 'POST',
+                    data: { transaction_code: transactionCode },
+                }).done(function(response) {
+                    if (response.no_results) {
+                        alert(`Could not find transaction by the code ${ transactionCode }`);
+                    } else {
+                        var fields = $('#foreign-worker-table-fields').clone();
+                        fields.find('input').val('');
+
+                        $(Object.keys(response)).each(function() {
+                            fields.find(`#${ this }`).val(response[this]);
+                        });
+
+                        fields.find('input').each(function() {
+                            var name        = $(this).attr('name');
+                            var id          = $(this).attr('id');
+                            var replaced    = name.replace('foreign_workers_placeholder[0]', `foreign_workers[${ tableOneCount }]`);
+                            var replacedId  = id.replace('foreign_workers_placeholder_0', `foreign_workers_${ tableOneCount }`);
+                            $(this).attr('name', replaced);
+                            $(this).attr('id', replacedId);
+                            $(this).attr('required', true);
+
+                            if ($(this).attr('id').includes('xray_date') || $(this).attr('id').includes('audit_date')) {
+                                $(this).addClass('datepicker-custom-enable');
+                            }
+                        });
+
+                        fields.show();
+                        fields.appendTo($('#tables-1-placeholder'));
+                        bindRemoveButton(fields.find('.remove-btn'));
+                        enableCustomDatepicker(fields.find('.datepicker-custom-enable'));
+                        tableOneCount++;
+                    }
+
+                    btn.addClass('btn-primary').removeClass('btn-secondary');
+                    $('i.spinner-load-icon').remove();
+                });
+            }
+        };
+
+        enableCustomDatepicker('.datepicker-custom-enable');
+
+        function enableCustomDatepicker(selector) {
+            $(selector).each(function() {
+                var options     = datepickerDefault();
+                insertFlatpickrParsley(this);
+                $(this).flatpickr(options);
+            });
+        }
+    </script>
+<% end %>

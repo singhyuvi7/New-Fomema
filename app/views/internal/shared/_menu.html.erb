@@ -1,0 +1,1033 @@
+<div class="sidebar">
+    <nav class="sidebar-nav pb-4">
+        <ul class="nav">
+            <li class="nav-item">
+                <%= link_to internal_root_path, :method => :get, class: 'nav-link' do %>
+                    <i class="nav-icon fa fa-home"></i> Home
+                <% end %>
+            </li>
+
+            <li class="nav-item nav-dropdown"><a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon fas fa-tachometer-alt"></i>Dashboards</a>
+                <ul class="nav-dropdown-items">  
+                <% if has_permission?('DASHBOARD_FW_REGISTRATION') %>         
+                    <li class="nav-item">
+                        <%= active_link_to dashboards_fw_information_path, :method => :get, class: 'nav-link' do %>
+                           Foreign Workers Information
+                        <% end %>
+                    </li> 
+                <%end%>   
+                <% if has_permission?('DASHBOARD_GEOGRAPHICAL') %>   
+                    <li class="nav-item">
+                        <%= active_link_to dashboards_geographical_path, :method => :get, class: 'nav-link' do %>
+                           Geographical
+                        <% end %>
+                    </li>
+                <%end%>  
+                <% if has_permission?('DASHBOARD_DEPT_MSP') %>   
+                    <li class="nav-item">
+                        <%= active_link_to dashboards_dep_information_path, :method => :get, class: 'nav-link' do %>
+                           Department Information
+                        <% end %>
+                    </li>   
+                <%end%>  
+                <% if has_permission?('DASHBOARD_CS_RESPONDENT_NUMBER_BY_AGE') %>          
+                    <li class="nav-item">
+                        <%= active_link_to dashboards_customer_satisfaction_path, :method => :get, class: 'nav-link' do %>
+                           Customer Satisfaction
+                        <% end %>
+                    </li>  
+                <%end%>   
+                <% if has_permission?('DASHBOARD_SP_DOCTOR') %>          
+                    <li class="nav-item">
+                        <%= active_link_to dashboards_service_provider_path, :method => :get, class: 'nav-link' do %>
+                           Service Provider Information
+                        <% end %>
+                    </li>   
+                <%end%>            
+                </ul>
+            </li>   
+            
+             
+
+            <% if has_any_permission?("VIEW_ALL_EMPLOYER", "VIEW_BRANCH_EMPLOYER", "VIEW_OWN_EMPLOYER") %>
+                <li class="nav-item">
+                    <%= active_link_to internal_employers_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon fas fa-users"></i> Employer
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_ALL_AGENCY", "VIEW_OWN_AGENCY") %>
+                <li class="nav-item">
+                    <%= active_link_to internal_agencies_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon fas fa-users"></i> Agency
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_ALL_FOREIGN_WORKER", "VIEW_BRANCH_FOREIGN_WORKER", "VIEW_OWN_FOREIGN_WORKER") %>
+                <li class="nav-item">
+                    <%= active_link_to internal_foreign_workers_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon fa fa-question"></i> Foreign Worker
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_BRANCH_TRANSACTION", "VIEW_OWN_TRANSACTION", "VIEW_MYIMMS") %>
+                <li class="nav-item nav-dropdown <%= 'open' if ["transactions", "medical", "myimms"].include?(controller_name) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Transactions</a>
+
+                    <ul class="nav-dropdown-items" >
+                        <% if has_any_permission?("VIEW_ALL_TRANSACTION", "VIEW_BRANCH_TRANSACTION", "VIEW_OWN_TRANSACTION") %>
+                            <li class="nav-item">
+                                <%= link_to internal_transactions_path, method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "" } do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> All Transactions
+                                <% end %>
+                            </li>
+
+                            <% if has_permission?("VIEW_PENDING_REVIEWS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_transactions_path(review_status: "pending_review_and_review_approval"), method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "review_status=pending_review_and_review_approval" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Review
+                                    <% end %>
+                                </li>
+                            <% end %>
+
+                            <% if has_permission?("VIEW_PENDING_REVIEWS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_transactions_path(review_status: "pending_pr_qa"), method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "review_status=pending_pr_qa" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Review QA
+                                    <% end %>
+                                </li>
+                            <% end %>
+
+                            <% if has_permission?("VIEW_TCUPI_REVIEWS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_transactions_path(review_status: "tcupi", field_set: "tcupi"), method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "review_status=tcupi&field_set=tcupi" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> TCUPI
+                                    <% end %>
+                                </li>
+                            <% end %>
+
+                            <% if has_permission?("VIEW_TCUPI_APPROVALS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_transactions_path(review_status: "tcupi_approval", field_set: "tcupi"), method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "review_status=tcupi_approval&field_set=tcupi" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> TCUPI Approval
+                                    <% end %>
+                                </li>
+                            <% end %>
+
+                            <% if has_permission?("VIEW_COMMUNICABLE_DISEASES_FILTER_OPTIONS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_transactions_path(certification_status: "inspectorate_cases", field_set: "inspectorate_cases"), method: :get, class: "nav-link custom-active-link", data: { path: "/transactions", params: "certification_status=inspectorate_cases&field_set=inspectorate_cases" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Communicable Diseases
+                                    <% end %>
+                                </li>
+                            <% end %>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_MYIMMS") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_myimms_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> MyIMMs
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_APPEALS") || current_user.role.code == "MOH_APPROVER" %>
+                <li class="nav-item nav-dropdown <%= 'open' if ["appeals"].include?(controller_name) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Appeals</a>
+
+                    <% if current_user.role.code == "MOH_APPROVER" %>
+                        <ul class="nav-dropdown-items" >
+                            <% if has_permission?("REVIEW_MOH_APPEALS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_appeals_path(status: "PENDING_MOH_APPROVAL"), method: :get, class: "nav-link custom-active-link", data: { path: "/appeals", params: "status=PENDING_MOH_APPROVAL" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> MOH Approval Pool
+                                    <% end %>
+                                </li>
+                            <% end %>
+                        </ul>
+                    <% else %>
+                        <ul class="nav-dropdown-items" >
+                            <li class="nav-item">
+                                <%= link_to internal_appeals_path, method: :get, class: "nav-link custom-active-link", data: { path: "/appeals", params: "" } do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Appeal
+                                <% end %>
+                            </li>
+
+                            <li class="nav-item">
+                                <%= link_to internal_appeals_path(status: "EXAMINATIONS_ONLY"), method: :get, class: "nav-link custom-active-link", data: { path: "/appeals", params: "status=EXAMINATIONS_ONLY" } do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Appeal Pending Pool
+                                <% end %>
+                            </li>
+
+                            <% if has_permission?("APPROVE_APPEALS") %>
+                                <li class="nav-item">
+                                    <%= link_to internal_appeals_path(status: "PENDING_APPROVAL"), method: :get, class: "nav-link custom-active-link", data: { path: "/appeals", params: "status=PENDING_APPROVAL" } do %>
+                                        <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Approval Pool
+                                    <% end %>
+                                </li>
+                            <% end %>
+                        </ul>
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("PICKUP_XQCC_POOL", "XRAY_XQCC_POOL_REVIEW_TRANSACTION", "XQCC_RETAKE_APPROVAL_TRANSACTION", "VIEW_XQCC_PENDING_REVIEW", "XRAY_PENDING_DECISION_TRANSACTION", "XRAY_PENDING_DECISION_APPROVAL_TRANSACTION", "PICKUP_PCR_POOL", "VIEW_PCR_REVIEW", "PCR_RETAKE_APPROVAL_TRANSACTION", "PCR_XRAY_RETAKE", "XRAY_IMAGE_MOVEMENT_TRANSACTION", "VIEW_APPROVAL_XQCC_PENDING_DECISION", "EDIT_APPROVAL_XQCC_PENDING_DECISION", "VIEW_XQCC_PENDING_DECISION", "EDIT_XQCC_PENDING_REVIEW", "XQCC_XRAY_RETAKE", "VIEW_XQCC_REVIEW") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(xqccs pcrs)) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">XQCC Reviews</a>
+
+                    <ul class="nav-dropdown-items">
+
+                        <% if has_permission? "PICKUP_XQCC_POOL" %>
+                            <li class="nav-item">
+                                <%= active_link_to pickup_internal_xqcc_pools_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> XQCC Pool
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_XQCC_REVIEW" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_xray_reviews_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> XQCC Review
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "XQCC_XRAY_RETAKE" %>
+                            <li class="nav-item">
+                                <%= active_link_to xqcc_internal_xray_retakes_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> XQCC Retake
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_XQCC_PENDING_REVIEW", "EDIT_XQCC_PENDING_REVIEW") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_xray_pending_reviews_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Review
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_XQCC_PENDING_DECISION" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_xray_pending_decisions_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Decision
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_any_permission?("VIEW_APPROVAL_XQCC_PENDING_DECISION", "EDIT_APPROVAL_XQCC_PENDING_DECISION") %>
+                            <li class="nav-item">
+                                <%= active_link_to approval_internal_xray_pending_decisions_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Decision Approval
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "PICKUP_PCR_POOL" %>
+                            <li class="nav-item">
+                                <%= active_link_to pickup_internal_pcr_pools_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> PCR Pool
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_PCR_REVIEW" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_pcr_reviews_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> PCR Review
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "PCR_XRAY_RETAKE" %>
+                            <li class="nav-item">
+                                <%= active_link_to pcr_internal_xray_retakes_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> PCR Retake
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "XRAY_IMAGE_MOVEMENT_TRANSACTION" %>
+                          <li class="nav-item">
+                            <%= active_link_to movement_index_internal_xqccs_path, :method => :get, class: 'nav-link' do %>
+                              <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> X-Ray Image Movement
+                            <% end %>
+                          </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("REASSIGN_APPEAL_PCR_REVIEWS") %>
+                <li class="nav-item nav-dropdown <%= "open" if ["reassign_appeal_pcr_reviews"].include?(controller_name) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Reassign XQCC/PCR</a>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_permission? "REASSIGN_APPEAL_PCR_REVIEWS" %>
+                            <li class="nav-item">
+                                <%= active_link_to appeal_pcr_reviews_internal_reassign_xqcc_pcr_index_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Appeal PCR Reviews
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_FW_CHANGE_EMPLOYER", "CHANGE_EMPLOYER_APPROVAL_FOREIGN_WORKER") %>
+                <li class="nav-item nav-dropdown <%= 'open' if ["fw_change_employers"].include?(controller_name) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Change Employers</a>
+                    <ul class="nav-dropdown-items" >
+                        <% if has_permission?("VIEW_FW_CHANGE_EMPLOYER") %>
+                            <li class="nav-item">
+                                <%= link_to internal_fw_change_employers_path, method: :get, class: "nav-link custom-active-link" do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> All Change Employers
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items" >
+                        <% if has_permission?("CHANGE_EMPLOYER_APPROVAL_FOREIGN_WORKER") %>
+                            <li class="nav-item">
+                                <%= link_to internal_fw_change_employers_path(status: "APPROVAL"), method: :get, class: "nav-link custom-active-link" do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Pending Approval
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(reports medical_reports it_reports finance_reports operation_reports mspd_reports xqcc_reports pcr_reports branch_reports hcm_reports customer_service_reports inspectorate_reports lqcc_reports)) %>">
+                <a class="nav-link nav-dropdown-toggle" href="#">Reports</a>
+
+                <ul class="nav-dropdown-items" >
+
+                    <% if on_development? %>
+                        <li class="nav-item">
+                            <%= link_to internal_reports_path, method: :get, class: "nav-link custom-active-link", data: { path: "/reports", params: "" } do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "MEDICAL_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_medical_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Medical Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "IT_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_it_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> IT Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "FINANCE_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_finance_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Finance Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "OPERATION_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_operation_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Operation Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "MSPD_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_mspd_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> MSPD Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_any_permission? "XQCC_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_xqcc_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> XQCC Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_any_permission? "PCR_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_pcr_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> PCR Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "BRANCH_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_branch_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Branch Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_any_permission? "INSPECTORATE_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_inspectorate_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Inspectorate Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_any_permission? "LQCC_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_lqcc_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> LQCC Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "HCM_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_hcm_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> HCM Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "CUSTOMER_SERVICE_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_customer_service_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Customer Service Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+
+                    <% if has_permission? "INSURANCE_REPORTS" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_insurance_reports_path, method: :get, class: "nav-link" do %>
+                                <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Insurance Reports
+                            <% end %>
+                        </li>
+                    <% end %>
+                </ul>
+            </li>
+
+            <% if has_permission? "VIEW_MOH_NOTIFICATIONS" %>
+                <li class="nav-item">
+                    <%= active_link_to internal_moh_notifications_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon far fa-newspaper"></i> MOH Notifications
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission? "VIEW_XQCC_LETTERS" %>
+                <li class="nav-item">
+                    <%= active_link_to internal_xqcc_letters_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon far fa-newspaper"></i> XQCC Letters
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission? "VIEW_BULLETIN" %>
+                <li class="nav-item">
+                    <%= active_link_to internal_bulletins_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon far fa-newspaper"></i> Bulletin
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission? "VIEW_CALL_LOG" %>
+                <li class="nav-item">
+                    <%= active_link_to internal_call_logs_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon far fa-newspaper"></i> Call Log
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_permission? "VIEW_INSURANCE_PURCHASE" %>
+                <li class="nav-item">
+                    <%= active_link_to internal_insurance_histories_path, :method => :get, class: 'nav-link' do %>
+                        <i class="nav-icon far fa-hospital"></i> Insurance
+                    <% end %>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_DOCTOR_VISIT_PLAN", "VIEW_LABORATORY_VISIT_PLAN", "VIEW_XRAY_FACILITY_VISIT_PLAN", "APPROVAL_LEVEL_1_DOCTOR_VISIT_PLAN") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                        visit_plan_clinics visit_plan_xray_facilities visit_plan_laboratories visit_plan_approvals
+                )) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Visit Plan</a>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_DOCTOR_VISIT_PLAN") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_plans_clinics_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Plan Clinic
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_LABORATORY_VISIT_PLAN") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_plans_laboratories_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Plan Laboratory
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_XRAY_FACILITY_VISIT_PLAN") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_plans_xray_facilities_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Plan X-Ray Facility
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <!-- <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("APPROVAL_LEVEL_1_DOCTOR_VISIT_PLAN", "APPROVAL_LEVEL_2_DOCTOR_VISIT_PLAN", "APPROVAL_LEVEL_1_XRAY_FACILITY_VISIT_PLAN", "APPROVAL_LEVEL_2_XRAY_FACILITY_VISIT_PLAN", "APPROVAL_LEVEL_1_LABORATORY_VISIT_PLAN", "APPROVAL_LEVEL_2_LABORATORY_VISIT_PLAN") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_plan_approvals_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Plan Approval
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul> -->
+
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_DOCTOR_VISIT_REPORT", "CREATE_DOCTOR_VISIT_REPORT", "EDIT_DOCTOR_VISIT_REPORT", "DELETE_DOCTOR_VISIT_REPORT", "APPROVAL_LEVEL_1_DOCTOR_VISIT_REPORT", "APPROVAL_LEVEL_2_DOCTOR_VISIT_REPORT", "APPROVAL_LEVEL_1_XRAY_FACILITY_VISIT_REPORT", "APPROVAL_LEVEL_2_XRAY_FACILITY_VISIT_REPORT", "APPROVAL_LEVEL_1_LABORATORY_VISIT_REPORT", "APPROVAL_LEVEL_2_LABORATORY_VISIT_REPORT","VIEW_LQCC_LETTER") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                        visit_report_clinics visit_report_xray_facilities visit_report_laboratories visit_report_approvals
+                )) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Visit Report</a>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_DOCTOR_VISIT_REPORT", "CREATE_DOCTOR_VISIT_REPORT", "EDIT_DOCTOR_VISIT_REPORT", "DELETE_DOCTOR_VISIT_REPORT", "APPROVAL_LEVEL_1_DOCTOR_VISIT_REPORT", "APPROVAL_LEVEL_2_DOCTOR_VISIT_REPORT") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_report_clinics_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Report Clinic
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_LABORATORY_VISIT_REPORT", "CREATE_LABORATORY_VISIT_REPORT", "EDIT_LABORATORY_VISIT_REPORT", "DELETE_LABORATORY_VISIT_REPORT", "APPROVAL_LEVEL_1_LABORATORY_VISIT_REPORT", "APPROVAL_LEVEL_2_LABORATORY_VISIT_REPORT") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_reports_laboratories_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Report Laboratory
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_XRAY_FACILITY_VISIT_REPORT", "CREATE_XRAY_FACILITY_VISIT_REPORT", "EDIT_XRAY_FACILITY_VISIT_REPORT", "DELETE_XRAY_FACILITY_VISIT_REPORT", "APPROVAL_LEVEL_1_XRAY_FACILITY_VISIT_REPORT", "APPROVAL_LEVEL_2_XRAY_FACILITY_VISIT_REPORT") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_visit_report_xray_facilities_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> Visit Report X-Ray Facility
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_LQCC_LETTER") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_lqcc_letters_path, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file"></i> LQCC Letter
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_XRAY_DISPATCH", "VIEW_XRAY_STORAGE") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                            xray_dispatches xray_storages
+                )) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">XQCC</a>
+                    <ul class="nav-dropdown-items">
+                        <% if has_permission? "VIEW_XRAY_DISPATCH" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_xray_dispatches_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon far fa-newspaper"></i> Dispatch
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_XRAY_STORAGE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_xray_storages_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon far fa-newspaper"></i> Storage
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_EMPLOYER_ORDER", "VIEW_MSPD_ORDER", "VIEW_BANK_DRAFT", "VIEW_REFUND","VIEW_OTHER_PAYMENT","VIEW_SERVICE_PROVIDER_PAYMENT","VIEW_MANUAL_PAYMENT","VIEW_PAYMENT_LISTING","VIEW_INSURANCE_PAYMENT") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                            orders bank_drafts
+                )) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">Finance</a>
+                    <ul class="nav-dropdown-items">
+                        <% if has_any_permission?("VIEW_EMPLOYER_ORDER", "VIEW_MSPD_ORDER") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_orders_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon far fa-newspaper"></i> Order
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_any_permission?("VIEW_OTHER_PAYMENT") %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_order_payments_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon far fa-newspaper"></i> Other Payment
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_BANK_DRAFT" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_bank_drafts_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon far fa-newspaper"></i> Bank Draft
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_REFUND" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_refunds_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-question"></i> Refund
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_REFUND_BATCH" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_refund_batches_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-question"></i> Refund Batches
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_SERVICE_PROVIDER_PAYMENT" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_payments_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-file-invoice"></i> Service Provider Payment
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_any_permission?("VIEW_MANUAL_PAYMENT") %>
+                            <li class="nav-item">
+                                <%= link_to internal_manual_payment_view_transactions_path, method: :get, class: "nav-link" do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Manual Payment
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_any_permission?("VIEW_PAYMENT_LISTING") %>
+                            <li class="nav-item">
+                                <%= link_to internal_payment_listing_view_payment_listing_path, method: :get, class: "nav-link" do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Payment Listing
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_any_permission?("VIEW_INSURANCE_PAYMENT") %>
+                            <li class="nav-item">
+                                <%= link_to internal_insurance_payments_path, method: :get, class: "nav-link" do %>
+                                    <i class="nav-icon fas fa-level-up-alt fa-rotate-90"></i> Insurance Payment
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_DOCTOR", "DOWNLOAD_WALL_LIST_DOCTOR", "VIEW_XRAY_FACILITY", "VIEW_LABORATORY", "VIEW_RADIOLOGIST", "VIEW_SERVICE_PROVIDER_GROUP", "VIEW_STATUS_SCHEDULE", "VIEW_GROUP_SCHEDULE") %>
+            <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                        doctors laboratories xray_facilities radiologists service_provider_groups
+            )) %>">
+                <a class="nav-link nav-dropdown-toggle" href="#">Service Provider</a>
+                <ul class="nav-dropdown-items">
+                    <% if has_any_permission?("VIEW_DOCTOR", "DOWNLOAD_WALL_LIST_DOCTOR", "MSPD_REPORTS") %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_doctors_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Doctor
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_LABORATORY" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_laboratories_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Laboratory
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_XRAY_FACILITY" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_xray_facilities_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> X-Ray Facility
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_RADIOLOGIST" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_radiologists_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Radiologist
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_STATUS_SCHEDULE" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_status_schedules_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Status Schedule
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_SERVICE_PROVIDER_GROUP" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_service_provider_groups_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Service Provider Groups
+                            <% end %>
+                        </li>
+                    <% end %>
+                    <% if has_permission? "VIEW_GROUP_SCHEDULE" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_group_schedules_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon icon-user"></i> Group Schedule
+                            <% end %>
+                        </li>
+                    <% end %>
+                </ul>
+            </li>
+            <% end %>
+
+            <% if has_any_permission?("VIEW_USER", "VIEW_ROLE", "VIEW_PASSWORD_POLICY") %>
+                <!-- acl -->
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(
+                        user_setups roles password_policies
+            )) %>">
+                    <a class="nav-link nav-dropdown-toggle" href="#">ACL</a>
+                    <ul class="nav-dropdown-items">
+                        <% if has_permission? "VIEW_USER" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_user_setups_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon icon-user"></i> User
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_ROLE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_roles_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon icon-calendar"></i> Role
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_PASSWORD_POLICY" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_password_policies_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-key"></i> Password Policy
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_ACTIVITY_LOG" %>
+                          <li class="nav-item">
+                            <%= active_link_to internal_activities_path, :method => :get, class: 'nav-link' do %>
+                              <i class="nav-icon icon-user"></i> User Activity
+                            <% end %>
+                          </li>
+                        <% end %>
+
+                    </ul>
+                </li>
+                <!-- /acl -->
+            <% end %>
+
+            <!-- system setup related -->
+            <% if has_any_permission?("VIEW_COUNTRY", "VIEW_STATE", "VIEW_TOWN", "VIEW_ZONE", "VIEW_BANK", "VIEW_PAYMENT_METHOD", "VIEW_CHANGE_SP_REASON", "VIEW_BLOCK_REASON", "VIEW_MONITOR_REASON", "VIEW_AMENDMENT_REASON", "VIEW_FEE", "VIEW_EMPLOYER_TYPE", "VIEW_JOB_TYPE", "VIEW_LABORATORY_TYPE", "VIEW_TITLE", "VIEW_TCUPI_TODO", "VIEW_APPEAL_TODO", "VIEW_FP_DEVICE", "VIEW_ORGANIZATION", "VIEW_DISTRICT_HEALTH_OFFICE", "VIEW_SYSTEM_CONFIGURATION", "VIEW_FINANCE_SYSTEM_CONFIGURATION", "VIEW_XQCC_SYSTEM_CONFIGURATION", "VIEW_CALL_LOG_CASE_TYPE", "VIEW_FINANCE_SETTING", "VIEW_APPROVAL_APPROVER", "VIEW_RACE", "VIEW_ASSOCIATION", "VIEW_INSURANCE_SERVICE_PROVIDER") %>
+                <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(states countries postcodes towns banks payment_methods change_sp_reasons block_reasons bypass_fingerprint_reasons monitor_reasons amendment_reasons fees employer_types job_types laboratory_types titles tcupi_todos appeal_todos fp_devices organizations district_health_offices call_log_case_types template_variables digital_xray_providers associations )) %>">
+
+                    <a class="nav-link nav-dropdown-toggle" href="#">Settings</a>
+                    <ul class="nav-dropdown-items">
+
+                        <% if has_permission? "VIEW_ASSOCIATION" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_associations_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Association
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_COUNTRY" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_countries_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-globe"></i> Country
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_STATE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_states_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-paw"></i> State
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_TOWN" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_towns_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-street-view"></i> Town
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_ZONE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_zones_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-street-view"></i> Zone
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_BANK" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_banks_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Bank
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_PAYMENT_METHOD" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_payment_methods_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Payment Method
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_CHANGE_SP_REASON" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_change_sp_reasons_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon fas fa-address-card"></i> Change SP Reason
+                            <% end %>
+                        </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_RETAKE_REASON" %>
+                        <li class="nav-item">
+                            <%= active_link_to internal_retake_reasons_path, :method => :get, class: 'nav-link' do %>
+                                <i class="nav-icon fas fa-address-card"></i> Retake Reason
+                            <% end %>
+                        </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_BLOCK_REASON" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_block_reasons_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Block Reason
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_BYPASS_FINGERPRINT_REASON" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_bypass_fingerprint_reasons_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Bypass Fingerprint Reason
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_MONITOR_REASON" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_monitor_reasons_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Monitor Reason
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_AMENDMENT_REASON" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_amendment_reasons_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Amendment Reason
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_FEE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_fees_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Fee
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_EMPLOYER_TYPE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_employer_types_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Employer Type
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_JOB_TYPE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_job_types_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Job Type
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_LABORATORY_TYPE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_laboratory_types_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Laboratory Type
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_TITLE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_titles_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Title
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_TCUPI_TODO" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_tcupi_todos_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> TCUPI ToDo
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_APPEAL_TODO" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_appeal_todos_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Appeal ToDo
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_ORGANIZATION" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_organizations_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-sitemap"></i> Organization
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_DISTRICT_HEALTH_OFFICE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_district_health_offices_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-thermometer"></i> District Health Office
+                                <% end %>
+                            </li>
+                        <% end %>
+                        <% if has_permission? "VIEW_CALL_LOG_CASE_TYPE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_call_log_case_types_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-thermometer"></i> Call Log Case Type
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_TEMPLATE_VARIABLE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_template_variables_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-address-card"></i> Template Variable
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_DIGITAL_XRAY_PROVIDER" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_digital_xray_providers_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-address-card"></i> Digital X-Ray Provider
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_INSURANCE_SERVICE_PROVIDER" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_insurance_service_providers_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-address-card"></i> Insurance Service Provider
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_FINANCE_SETTING" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_finance_settings_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-address-card"></i> Finance Setting
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_APPROVAL_APPROVER" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_approval_approvers_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fa fa-address-card"></i> Approval Approver
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <% if has_permission? "VIEW_RACE" %>
+                            <li class="nav-item">
+                                <%= active_link_to internal_races_path, :method => :get, class: 'nav-link' do %>
+                                    <i class="nav-icon fas fa-address-card"></i> Race
+                                <% end %>
+                            </li>
+                        <% end %>
+
+                        <li class="nav-item nav-dropdown <%= 'open' if current_controller?(%w(system_configurations)) %>">
+                            <% if has_any_permission?("VIEW_SYSTEM_CONFIGURATION", "VIEW_FINANCE_SYSTEM_CONFIGURATION", "VIEW_XQCC_SYSTEM_CONFIGURATION") %>
+                                <a class="nav-link nav-dropdown-toggle" href="#">System Configuration</a>
+                                <ul class="nav-dropdown-items" >
+
+                                    <% if has_permission? "VIEW_SYSTEM_CONFIGURATION" %>
+                                        <li class="nav-item">
+                                            <%= active_link_to system_internal_system_configurations_path, :method => :get, class: 'nav-link' do %>
+                                                <i class="nav-icon fas fa-cogs"></i> System
+                                            <% end %>
+                                        </li>
+                                    <% end %>
+
+                                    <% if has_permission? "VIEW_XQCC_SYSTEM_CONFIGURATION" %>
+                                        <li class="nav-item">
+                                            <%= active_link_to xqcc_internal_system_configurations_path, :method => :get, class: 'nav-link' do %>
+                                                <i class="nav-icon fas fa-cogs"></i> XQCC
+                                            <% end %>
+                                        </li>
+                                    <% end %>
+
+                                    <% if has_permission? "VIEW_FINANCE_SYSTEM_CONFIGURATION" %>
+                                        <li class="nav-item">
+                                            <%= active_link_to finance_internal_system_configurations_path, :method => :get, class: 'nav-link' do %>
+                                                <i class="nav-icon fas fa-cogs"></i> Finance
+                                            <% end %>
+                                        </li>
+                                    <% end %>
+
+                                </ul>
+                            <% end %>
+                        </li>
+                         
+                    </ul>
+                </li>
+            <% end %>
+            <li class="nav-item nav-dropdown"><a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon fas fa-tachometer-alt"></i>Dashboard Settings</a>
+            <ul class="nav-dropdown-items">
+              <li class="nav-item">
+                <%= active_link_to internal_dashboards_settings_customer_survey_upload_path, :method => :get, class: 'nav-link' do %>Department Information<% end %>
+              </li>
+              <li class="nav-item">
+                <%= active_link_to internal_dashboards_settings_customer_survey_upload_path		, :method => :get, class: 'nav-link' do %>Customer Satisfaction<% end %>
+              </li>
+            </ul>
+          </li>
+            <!-- /system setup related -->
+        </ul>
+    </nav>
+
+    <!-- Hiding this because causes UI bug for fomema icon -->
+    <button class="sidebar-minimizer brand-minimizer hidden" type="button"></button>
+</div>

@@ -1,0 +1,70 @@
+<% if has_permission?('DASHBOARD_SP_LABORATORY') %>
+  <div id="lab-chart" class="col-md-12" style="height: 218px;">
+    Loading...
+  </div>
+
+  <script type="text/javascript">
+      // Declare a global variable for the container
+      var chartContainer;
+
+      function updateLabTransmission(data) {
+          google.charts.load("current", {packages: ["corechart"]});
+          google.charts.setOnLoadCallback(function () {
+              createLabTransmission(data);
+          });
+      }
+
+
+      function createLabTransmission(data) {
+          var labwithin48 = data.labwithin48;
+          var labbeyond48 = data.labbeyond48;
+          console.log('lablab', labwithin48)
+
+
+          if (labwithin48 > 0 || labbeyond48 > 0) {
+
+              var data = google.visualization.arrayToDataTable([
+                  ['Task', 'Hours per Day'],
+                  [' ', labwithin48],
+                  ['', labbeyond48]
+              ]);
+
+              var options = {
+                  title: 'Lab Submit Results Within TAT',
+                  legend: 'none',
+                  colors: ['#0e7dc1', '#99bed6'],
+                  pieHole: 0.4,
+                  chartArea: {
+                      height: "218px",
+                      width: "100%"
+                  }
+              };
+
+              var chart = new google.visualization.PieChart(document.getElementById('lab-chart'));
+              chart.draw(data, options);
+          } else {
+              document.getElementById('lab-chart').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+          }
+      }
+
+      // Call the function on initial page load
+      document.addEventListener("DOMContentLoaded", function () {
+          // Set the global variable with the container
+          chartContainer = $('#lab-chart');
+
+          $.ajax({
+              url: '/dashboards/service_provider/laboratory_result_transmission',
+              method: 'GET',
+              dataType: 'json',
+              success: function (data) {
+                  // Once data is loaded, update the chart
+                  updateLabTransmission(data);
+              },
+              error: function () {
+                  // Handle errors here
+                  console.error('Failed to fetch certification data.');
+              }
+          });
+      });
+  </script>
+<% end %>

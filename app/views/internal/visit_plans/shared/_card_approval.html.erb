@@ -1,0 +1,38 @@
+<div class="card" v-if="onApprove">
+    <div class="card-header">APPROVAL</div>
+    <div class="card-body">
+
+        <div class="form-group row">
+            <label class="col-md-4 col-form-label required">
+                Decision
+            </label>
+            <div class="col-md-8">
+                <div class="form-check form-check-inline mr-5" :class="{ 'is-invalid': errors.has('visit_plan[visit_plan_approval[decision]') }">
+                    <input v-validate="'required'" data-vv-as="Decision" v-model="visit_plan_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_plan_approval[decision]') }" id="decision_approve" type="radio" value="APPROVE" name="visit_plan_approval[decision]" @change="approvalUpdate($event)" required>
+                    <label class="form-check-label" for="decision_approve">APPROVE</label>
+                    
+                </div>
+                <div class="form-check form-check-inline mr-5">
+                    <input v-model="visit_plan_approval.decision" class="form-check-input" :class="{ 'is-invalid': errors.has('visit_plan_approval[decision]') }" id="decision_reject" type="radio" value="REJECT" name="visit_plan_approval[decision]" @change="approvalUpdate($event)" required>
+                    <label class="form-check-label" for="decision_reject">REJECT</label>
+                    <div class="invalid-feedback">{{ errors.first('visit_plan_approval[decision]') }}</div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <div class="form-group">
+                    <v-textarea
+                        v-model="visit_plan_approval.comment"
+                        :field_name="'visit_plan_approval[comment]'"
+                        :rules="commentValidationRule"
+                        :label="'Comments'" 
+                        :validation_label="'Comment'"
+                        :class="{ 'is-invalid': errors.has('visit_plan_approval[comment]') }"
+                    ></v-textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

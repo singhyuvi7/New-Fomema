@@ -1,0 +1,26 @@
+<% 
+foreign_worker = order_item.order_itemable
+foreign_worker.assign_attributes(order_item.additional_information["foreign_worker"]) if !order_item.additional_information.blank? and order_item.additional_information.key?("foreign_worker")
+@has_plks_optional = true if order_item.order_itemable.plks_optional? %>
+
+<tr class="<%= "plks-optional" if order_item.order_itemable.plks_optional? %>">
+   <!-- <td><input type="checkbox" class="bulk" name="addon_foreign_worker_ids[]" value="<%= order_item.order_itemable.id %>"></td> -->
+    <td><a href="<%= internal_employer_employer_worker_path(foreign_worker.employer, foreign_worker) %>" target="_blank"><%= foreign_worker.name %></a>
+      <button class="btn btn-sm btn-warning" type="button" style="float: right;" data-toggle="modal" data-target="#modal-fw-<%= order_item.order_itemable_id %>">Edit</button>
+    </td>
+    <td><%= ForeignWorker::GENDERS[order_item&.gender] %></td>
+     <td><pre><%= order_item.additional_information["comments"] %></pre></td>
+    <td><%= order_item.order_itemable.plks_number.to_i %></td>
+     <td><textarea name="comment[<%= order_item.id %>]" id="comment_<%= order_item.id %>" data-order_item_id="<%= order_item.id %>" class="form-control" required onblur="comment_changed(this)"><%= order_item.comment %></textarea></td>
+    <td><% if has_permission?("CREATE_FOC_TRANSACTION") %>
+             <%= select_tag("fee", options_from_collection_for_select(Fee.select("id, name || ' (' || amount || ')' as label").where("code in (?)", ["TRANSACTION_#{ForeignWorker::GENDERS[order_item&.gender]}", "FOC"]), :id, :label, order_item.fee_id), class: "form-control", onchange: "change_fee(this)", data: {order_item_id: order_item.id}) %>
+        <% else %>
+            <%= number_to_currency(order_item.amount, unit: "") %>
+        <% end %>
+    </td>   
+    <td class="text-right">
+        <input type="hidden" name="foreign_worker_ids[]" value="<%= order_item.order_itemable.id %>" class="etr-foreign_workers" data-amount="<%= order_item.amount %>">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="etr_remove(this)">X</button>
+    </td>
+    <td></td>  
+</tr>

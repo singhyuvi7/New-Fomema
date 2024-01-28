@@ -1,0 +1,94 @@
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th class="table-index"></th>
+                <th class="table-items"></th>
+                <th colspan="3" class="text-center table-acceptable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1.</td>
+                <td>
+                    <%= visit_report_laboratory.label :checked_before_transcription_comment, 'Reports been checked before transcription/issue' %>
+                    <%= visit_report_laboratory.text_area :checked_before_transcription_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="record_keeping">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :checked_before_transcription, 'YES', class: 'record_keeping' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :checked_before_transcription, 'NO', class: 'record_keeping' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :checked_before_transcription, 'NA', class: 'record_keeping' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>
+                    <%= visit_report_laboratory.label :precaution_taken_comment, 'Precaution taken to avoid manipulation of results (Level of IT security)' %>
+                    <%= visit_report_laboratory.text_area :precaution_taken_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="record_keeping">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :precaution_taken, 'YES', class: 'record_keeping' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :precaution_taken, 'NO', class: 'record_keeping' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :precaution_taken, 'NA', class: 'record_keeping' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>3.</td>
+                <td>
+                    <%= visit_report_laboratory.label :records_kept_reg_lab_comment, 'Records of specimens and results are kept at the registered laboratory for at the last two(2) years' %>
+                    <%= visit_report_laboratory.text_area :records_kept_reg_lab_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="record_keeping">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :records_kept_reg_lab, 'YES', class: 'record_keeping' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :records_kept_reg_lab, 'NO', class: 'record_keeping' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :records_kept_reg_lab, 'NA', class: 'record_keeping' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>4.</td>
+                <td>
+                    <%= visit_report_laboratory.label :records_kept_at_least_comment, 'Records of specimens and results are kept for at least seven(7) years' %>
+                    <%= visit_report_laboratory.text_area :records_kept_at_least_comment, class: 'form-control comment-field', placeholder: 'If NO, please specify' %>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group btn-group-toggle w-75" data-toggle="buttons" data-group-name="record_keeping">
+                        <label class="btn btn-outline-success">
+                            <%= visit_report_laboratory.radio_button :records_kept_at_least, 'YES', class: 'record_keeping' %> Yes
+                        </label>
+                        <label class="btn btn-outline-danger">
+                            <%= visit_report_laboratory.radio_button :records_kept_at_least, 'NO', class: 'record_keeping' %> No
+                        </label>
+                        <label class="btn btn-outline-secondary">
+                            <%= visit_report_laboratory.radio_button :records_kept_at_least, 'NA', class: 'record_keeping' %> N/A
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

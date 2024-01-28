@@ -1,0 +1,274 @@
+<pdfbody>
+    <h4 class="text-center" style="font-size: 1.6em;">PCR Review Report</h4>
+
+    <table class="w-100 info-table">
+        <tr>
+            <th>Worker Name</th>
+            <td>:&nbsp;&nbsp;<%= @data[:worker_name] %></td>
+            <th>Worker Code</th>
+            <td>:&nbsp;&nbsp;<%= @data[:worker_code] %></td>
+        </tr>
+
+        <tr>
+            <th>Country of Origin</th>
+            <td>:&nbsp;&nbsp;<%= @data[:country] %></td>
+            <th>Transaction ID</th>
+            <td>:&nbsp;&nbsp;<%= @data[:transaction_code] %></td>
+        </tr>
+
+        <tr>
+            <th>Passport Number</th>
+            <td>:&nbsp;&nbsp;<%= @data[:passport] %></td>
+            <th>Date of X-Ray Report</th>
+            <td>:&nbsp;&nbsp;<%= @data[:xray_report_date] %></td>
+        </tr>
+
+        <tr>
+            <th>Date of X-Ray Taken</th>
+            <td>:&nbsp;&nbsp;<%= @data[:xray_taken_date] %></td>
+            <th>Date of X-Ray Audited</th>
+            <td>:&nbsp;&nbsp;<%= @data[:xray_audit_date] %></td>
+        </tr>
+
+        <tr>
+            <th>In-House Radiologist Name</th>
+            <td>:&nbsp;&nbsp;<%= @data[:inhouse_radiologist] %></td>
+            <th>X-Ray Ref No</th>
+            <td>:&nbsp;&nbsp;<%= @data[:xray_ref_number] %></td>
+        </tr>
+
+        <tr>
+            <th>Reported/Acknowledged by</th>
+            <td>:&nbsp;&nbsp;<%= @data[:reported_by] %></td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <% if @data[:type] == "Appeal" %>
+        <table class="w-100 results-table" style="border-collapse: collapse;">
+            <tr>
+                <th colspan="2" style="text-align: center;">PCR Review Results (Appeal Retake)</th>
+            </tr>
+
+            <tr>
+                <th>X-Ray Details</th>
+                <td>X-Ray images <%= @pcr_review.belong == "YES" ? "BELONG" : "DO NOT BELONG" %> to the same worker.</td>
+            </tr>
+
+            <tr>
+                <th>X-Ray Detail Comment</th>
+                <td><%= simple_format @pcr_review.belong_comment %></td>
+            </tr>
+
+            <tr>
+                <%
+                    impression_types = {
+                        "NORMAL"    => "X-ray's are normal. Lung clear heart normal.",
+                        "ABNORMAL"  => "X-ray is abnormal.",
+                        "REPEAT"    => "Repeat.",
+                    }
+                %>
+
+                <th>Impression</th>
+                <td><%= impression_types[@pcr_review.result] %></td>
+            </tr>
+
+            <tr>
+                <th>Comment</th>
+                <td><%= simple_format @pcr_review.comment %></td>
+            </tr>
+        </table>
+    <% else %>
+        <table class="w-100 results-table triple-row" style="border-collapse: collapse;">
+            <tr>
+                <th colspan="3" style="text-align: center;">PCR Audit Checklist - Quality</th>
+            </tr>
+
+            <tr>
+                <th>Parameter</th>
+                <th>Status</th>
+                <th>Comments</th>
+            </tr>
+
+            <tr>
+                <td>ID</td>
+                <td><%= @pcr_review.get_condition_detail("4021") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4121") %></td>
+            </tr>
+
+            <tr>
+                <td>Processing</td>
+                <td><%= @pcr_review.get_condition_detail("4022") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4122") %></td>
+            </tr>
+
+            <tr>
+                <td>Positioning</td>
+                <td><%= @pcr_review.get_condition_detail("4023") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4123") %></td>
+            </tr>
+
+            <tr>
+                <td>Exposure</td>
+                <td><%= @pcr_review.get_condition_detail("4024") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4124") %></td>
+            </tr>
+
+            <tr>
+                <td>Artifacts</td>
+                <td><%= @pcr_review.get_condition_detail("4025") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4125") %></td>
+            </tr>
+
+            <tr>
+                <td>Inspiratory Effort</td>
+                <td><%= @pcr_review.get_condition_detail("4026") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4126") %></td>
+            </tr>
+
+            <tr>
+                <td>Movement / Breathing</td>
+                <td><%= @pcr_review.get_condition_detail("4027") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4127") %></td>
+            </tr>
+
+            <tr>
+                <td>Anatomical Marker</td>
+                <td><%= @pcr_review.get_condition_detail("4028") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4128") %></td>
+            </tr>
+
+            <tr>
+                <td>Others</td>
+                <td><%= @pcr_review.get_condition_detail("4029") ? "Not Acceptable" : "Acceptable" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4129") %></td>
+            </tr>
+        </table>
+
+        <br><br>
+
+        <table class="w-100 results-table triple-row" style="border-collapse: collapse;">
+            <tr>
+                <th colspan="3" style="text-align: center;">PCR Audit Checklist - Reporting</th>
+            </tr>
+
+            <tr>
+                <th>Parameter</th>
+                <th>Status</th>
+                <th>Comments</th>
+            </tr>
+
+            <tr>
+                <td>Thoracic Cage</td>
+                <td><%= @pcr_review.get_condition_detail("4012") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4112") %></td>
+            </tr>
+
+            <tr>
+                <td>Heart Size & Shape</td>
+                <td><%= @pcr_review.get_condition_detail("4013") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4113") %></td>
+            </tr>
+
+            <tr>
+                <td>Lung Fields</td>
+                <td><%= @pcr_review.get_condition_detail("4014") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4114") %></td>
+            </tr>
+
+            <tr>
+                <td>Mediastinum & Hilar Region</td>
+                <td><%= @pcr_review.get_condition_detail("4015") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4115") %></td>
+            </tr>
+
+            <tr>
+                <td>Pleura / Diaphragm / CPA</td>
+                <td><%= @pcr_review.get_condition_detail("4016") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4116") %></td>
+            </tr>
+
+            <tr>
+                <td>Other Abnormalities</td>
+                <td><%= @pcr_review.get_condition_detail("4017") ? "Abnormal" : "Normal" %></td>
+                <td><%= simple_format @pcr_review.get_condition_comment("4117") %></td>
+            </tr>
+        </table>
+
+        <br><br>
+
+        <table class="w-100 results-table" style="border-collapse: collapse;">
+            <tr>
+                <th colspan="3" style="text-align: center;">PCR Review - Conclusion</th>
+            </tr>
+
+            <tr>
+                <th>Parameter</th>
+                <th>Results</th>
+            </tr>
+
+            <% if @pcr_review.belong.present? %>
+                <tr>
+                    <td>X-Ray Details</td>
+                    <td>X-Ray images <%= @pcr_review.belong == "YES" ? "BELONG" : "DO NOT BELONG" %> to the same worker.</td>
+                </tr>
+            <% end %>
+
+            <tr>
+                <td>Decision</td>
+                <td><%= @pcr_review.result %></td>
+            </tr>
+
+            <tr>
+                <td>Comment</td>
+                <td><%= simple_format @pcr_review.comment %></td>
+            </tr>
+        </table>
+    <% end %>
+</pdfbody>
+
+<style>
+    pdfbody {
+        font-size: 14px;
+    }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    .paragraph-spacing {
+        padding-top: 0.5em;
+    }
+
+    .paragraph-double-spacing {
+        padding-top: 1em;
+    }
+
+    .letter-header-underline {
+        border-bottom: 2px solid black;
+    }
+
+    table.info-table td, table.info-table th {
+        text-align: left;
+        font-size: 0.8em;
+    }
+
+    table.results-table td,
+    table.results-table th {
+        text-align: left;
+        border: 1px solid black;
+        padding: 0.5em;
+        font-size: 0.9em;
+    }
+
+    table.results-table td:first-child,
+    table.results-table th:first-child {
+        width: 14em;
+    }
+
+    table.results-table.triple-row td:nth-child(2),
+    table.results-table.triple-row th:nth-child(2) {
+        width: 8em;
+    }
+</style>

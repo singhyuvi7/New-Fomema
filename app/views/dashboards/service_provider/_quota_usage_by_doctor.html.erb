@@ -1,0 +1,79 @@
+<% if has_permission?('DASHBOARD_SP_QUOTA_USAGE') %>
+  <div id="chart_div" style="width: 100%; height: 218px;">
+    Loading...
+  </div>
+
+  <script type="text/javascript">
+      // Define the function to update the chart
+      function updateChart(data) {
+          google.load('visualization', '1', {'packages': ['columnchart']});
+          google.setOnLoadCallback(function () {
+              createChart(data);
+          });
+      }
+
+      function createChart(data) {
+          var dataTable = new google.visualization.DataTable({
+              "cols": [
+                  {"id": "a", "label": "Topping", "pattern": "", "type": "string"},
+                  {"id": "v", "label": "Promedio", "pattern": "", "type": "number"}
+              ],
+              "rows": [
+                  {"c": [{"v": "<1", "f": null}, {"v": data.zero, "f": null}]},
+                  {"c": [{"v": "1-100", "f": null}, {"v": data.oneToHundred, "f": null}]},
+                  {"c": [{"v": "101-200", "f": null}, {"v": data.oneTwoHundred, "f": null}]},
+                  {"c": [{"v": "201-300", "f": null}, {"v": data.ThreeHundred, "f": null}]},
+                  {"c": [{"v": "301-400", "f": null}, {"v": data.fourHundred, "f": null}]},
+                  {"c": [{"v": "401-500", "f": null}, {"v": data.fiveHundred, "f": null}]},
+                  {"c": [{"v": "501-600", "f": null}, {"v": data.sixHundred, "f": null}]},
+                  {"c": [{"v": "601-700", "f": null}, {"v": data.sevenHundred, "f": null}]},
+                  {"c": [{"v": "701-800", "f": null}, {"v": data.eightHundred, "f": null}]},
+              ]
+          });
+
+          var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+
+          var options = {
+              height: 218,
+              is3D: true,
+              legend: 'none',
+              title: '',
+              chartArea: {
+                  top: 18,
+                  height: '70%'
+              },
+              hAxis: {
+                  title: 'Quota Used',
+                  titleTextStyle: {color: 'black'},
+                  textPosition: 'out',
+                  slantedText: true,
+                  slantedTextAngle: 30,
+              },
+              vAxis: {
+                  title: '# of Doctor',
+                  minValue: 0,
+                  maxValue: 10
+              }
+          };
+
+          chart.draw(dataTable, options);
+      }
+
+      // Call the function on initial page load
+      document.addEventListener("DOMContentLoaded", function () {
+          $.ajax({
+              url: '/dashboards/service_provider/quota_usage_by_doctor',
+              method: 'GET',
+              dataType: 'json',
+              success: function (data) {
+                  // Once data is loaded, update the chart
+                  updateChart(data);
+              },
+              error: function () {
+                  // Handle errors here
+                  console.error('Failed to fetch quota data.');
+              }
+          });
+      });
+  </script>
+<% end %>

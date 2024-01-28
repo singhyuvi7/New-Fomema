@@ -1,0 +1,48 @@
+<%=render '/shared/all_flash' %>
+
+<div class="card">
+    <div class="card-header">
+        System Configurations - Finance
+        <div class="card-header-actions">
+        </div>
+        <!-- /.card-header-actions -->
+
+    </div>
+    <!-- /.card-header -->
+
+    <%= form_tag finance_edit_internal_system_configurations_path, method: :patch, class: "form-horizontal" do %>
+        <div class="card-body">
+
+            <% SystemConfiguration::FINANCES.each do |code| %>
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label">
+                        <% if has_permission?("VIEW_AUDIT_SYSTEM_CONFIGURATION") %>
+                            <a href="<%= internal_system_configuration_audits_path(@system_configurations[code]) %>"><i class="fa fa-history"></i></a>
+                        <% end %>
+                        <%= @system_configurations[code].name %>
+                    </label>
+                    <% if ['INSURANCE_RECOGNIZED_COLLECTION'].include?(code) %>
+                        <%= render "internal/system_configurations/form/boolean_field", :code => code %>
+                    <% elsif ['HOWDEN_CODE','FGSB_CODE','TFSB_CODE'].include?(code) %>
+                        <%= render "internal/system_configurations/form/text_field", :code => code %>
+                    <% else %>
+                        <div class="col-md-8">
+                            <input type="number" name="system_configuration[<%= code %>]" value="<%= @system_configurations[code].value %>" step="0.01" class="form-control" required>
+                            <% if !@system_configurations[code].comment.present? %>
+                                <p class="form-control-plaintext"><%= @system_configurations[code].comment %></p>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
+            <% end %>
+
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer text-right">
+            <%=raw edit_back_button(finance_internal_system_configurations_path) %>
+            <%=raw edit_save_button %>
+        </div>
+    <% end %>
+
+</div>

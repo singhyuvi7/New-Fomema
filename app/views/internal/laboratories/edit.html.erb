@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Laboratories</strong> - Edit Laboratory
+    </div>
+    <%= form_for @laboratory, url: internal_laboratory_path(@laboratory), html: {class: "#{params[:action]}_laboratory laboratory-form with-parsley disable-enter-keypress"} do |form| %>
+        <%= render 'form', { form: form } %>
+    <% end %>
+</div>

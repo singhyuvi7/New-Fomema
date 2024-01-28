@@ -1,0 +1,96 @@
+<div class="card">
+
+    <div class="card-header">
+        <strong>PasswordPolicies</strong> - PasswordPolicy Detail
+    </div>
+
+    <div class="card-body">
+
+        <%=render '/shared/all_flash' %>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="password_policy_code">Name</label>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.name %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :minimum_length %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.minimum_length %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :require_alphabet %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.require_alphabet %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :require_numeric %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.require_numeric %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :require_special_characters %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.require_special_characters %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :require_small_and_capital %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.require_small_and_capital %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :password_expiry %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.password_expiry %>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <%= label_tag :block_previous_password %>
+                    <p class="form-control-plaintext">
+                        <%= @password_policy.block_previous_password %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+
+        <div class="text-right">
+            <%=raw show_back_button(internal_password_policies_path) %>
+            <% if has_permission?('EDIT_PASSWORDPOLICY') %>
+                <%=raw show_edit_button(edit_internal_password_policy_path(@password_policy)) %>
+            <% end %>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,116 @@
+<div class="card">
+    <div class="card-header">
+        <strong>Other Payment</strong> - Replace Bad Payment
+    </div>
+    <%= form_for @new_order_payment, url: replace_internal_order_payment_path(@order_payment),html: {class: "with-parsley"}, method: :patch do |form| %>
+        <!-- card-body -->
+        <div class="card-body">
+
+            <%=render '/shared/all_flash' %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="col-md-3 col-form-label">Order Code</label>
+                        <div class="col-md-9">
+                           <%= link_to @order_payment.order.code, internal_order_path(@order_payment.order),target: "_blank" %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="required" for="_payment_method_id">Payment Method</label>
+                        <%= select_tag :_payment_method_id, options_for_select(@payment_methods.map{ |payment_method| [payment_method.name, payment_method.id, { 'data-code' => payment_method.code }] }, @order_payment.order.payment_method_id), {include_blank: form_select_option_text, required: true, class: "form-control",disabled: !@order_payment.sync_date.blank?} %>
+                        <input type="hidden" name="payment_method_id" id="payment_method_id" value="<%= @order_payment.order.payment_method_id %>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :amount, class: 'required' %>
+                        <%= form.number_field :amount, class: 'form-control', required: true, min: 0.01, step: 0.01, readonly: true %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :reference, class: 'required' %>
+                        <%= form.text_field :reference, class: 'form-control', required: true %>
+                    </div>
+                </div>
+            </div>
+
+            <% if @order_payment.order.payment_method&.code == 'CIMB_CLICKS' %>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <%= form.label :issue_date,"Date of Issue", class: 'required' %>
+                            <%= form.date_field :issue_date, class: 'form-control', required: true, max: Time.now.strftime('%Y-%m-%d') %>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <%= form.label :comment %>
+                        <%= form.text_area :comment, class: 'form-control' %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /card-body -->
+
+        <input type="hidden" name="id" value="<%= @order_payment.id %>">
+        <input type="hidden" name="order_payment_type" value="replace">
+        <div class="card-footer">
+            <div class="text-right">
+                <a class="btn btn-sm btn-primary" href="<%= internal_order_payments_path %>">Back</a>
+                <button id="submitBtn" class="btn btn-sm btn-primary" type="button">Save</button>
+            </div>
+        </div>
+    <% end %>
+</div><% content_for :page_end_scripts do %>
+<script>
+$(document).ready(function() {
+    $("#submitBtn").click(function (e) {
+        e.preventDefault();
+        _form = $('form')
+        _form.parsley().validate();
+        form = _form[0]
+        validity = form.checkValidity();
+
+        if (validity){
+            $('#submitBtn').prop('disabled', true);
+            $.ajax({
+                url: '<%= check_unique_cimb_internal_order_payments_path %>',
+                method: 'GET',
+                data: _form.serialize(),
+                success: function (response) {
+                    if(response == 'false'){
+                        if(confirm("A same CIMB draft with a different issue date exist. Are you sure you wanna proceed with the payment ?")){
+                            _form.submit();
+                        }else{
+                            $('#submitBtn').prop('disabled', false);
+                        }
+                    }else{
+                        _form.submit();
+                    }
+                },error: function(){
+                    alert('Error Occured. Please try again.')
+                    $('#submitBtn').prop('disabled', false);
+                }
+            })
+        }
+    });
+});
+</script>
+<% end %>
