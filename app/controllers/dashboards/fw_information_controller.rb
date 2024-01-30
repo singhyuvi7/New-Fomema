@@ -116,7 +116,12 @@ class Dashboards::FwInformationController < InternalController
         chart_data[year] = [0] * 12
       end
     end
-    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+    if @transaction_line_chart.present? && @transaction_line_chart.values.any? { |data| data.sum > 0 }
+      @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+    else
+      selected_year = params[:data][:date_range].split(' - ').first.to_i
+      @sums_by_year = { selected_year => 0 }
+    end
 
     render layout: false
   end
