@@ -162,7 +162,13 @@
         location.reload();
     }
 
+    function closeSidebar() {
+        // Close the sidebar by removing the 'active' class
+        $('#sidebar').removeClass('active');
+    }
+
     function apply_filter() {
+        closeSidebar()
         selectedFilters = getSelectedFilterValues();
 
         var selectedVals = getCheckedValues();

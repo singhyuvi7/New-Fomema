@@ -10,7 +10,7 @@ class Dashboards::GeographicalController < InternalController
      def towns       
        id = JSON.parse( params.keys.first)["id"]
        state = State.where('name=?',id).pluck(:id) rescue nil       
-       @towns = Town.where("state_id=?",state).pluck(:name,:id)
+       @towns = Town.where("state_id=?",state).order("name Asc").pluck(:name,:id)
      end 
      
      def filter
@@ -54,7 +54,7 @@ class Dashboards::GeographicalController < InternalController
            @dtectnoncommunicableothers=Transaction.joins("join medical_examination_details on medical_examination_details.transaction_id=transactions.id").joins("join medical_examinations on medical_examinations.transaction_id=transactions.id").joins("join doctors on doctors.id=transactions.doctor_id").joins("join doctor_examination_details on doctor_examination_details.transaction_id=transactions.id").joins("join states on states.id=doctors.state_id").where("medical_examination_details.condition_id IN('3519')").count
 
          end
-         @states = State.pluck(:id,:name)
+         @states = State.order("name Asc").pluck(:id,:name)
          #@towns = Town.pluck(:name,:id)
     end
        

@@ -17,28 +17,36 @@
                 <div id="time-period" class="collapse opcl" aria-labelledby="faqhead1" data-parent="#filter">
                   <div class="card-body">
                     <script>
-                        $.noConflict();
-                        jQuery(document).ready(function ($) {
-                            $(document).ready(function () {
+                    $.noConflict();
+                    jQuery(document).ready(function ($) {
+                        $(document).ready(function () {
+                            $(function () {
+
+                                var currentDate = new Date();
+                                var currentYear = currentDate.getFullYear();
+                                var currentMonth = currentDate.getMonth() + 1;
+
+
+                                var formattedYear = currentYear.toString();
+                                var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
+
+
+                                var startDateString = "01/" + formattedMonth + "/" + formattedYear;
+                                var endDateString = "31/" + formattedMonth + "/" + formattedYear;
+
+
                                 $('#date-range').daterangepicker({
-                                    opens: 'left',
-                                    drops: 'down',
-                                    autoApply: true,
+                                    "startDate": startDateString,
+                                    "endDate": endDateString,
+                                    opens: 'center',
+                                    showDropdowns: true,
                                     locale: {
-                                        format: 'YYYY-MM-DD',
-                                        separator: ' - ',
-                                        applyLabel: 'Apply',
-                                        cancelLabel: 'Cancel',
-                                        fromLabel: 'From',
-                                        toLabel: 'To',
-                                        customRangeLabel: 'Custom',
-                                        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-                                        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                                        firstDay: 0
+                                        format: 'DD/MM/YYYY'
                                     }
                                 });
                             });
                         });
+                    });
                     </script>
                     <div class="input-group date-range">
                       <input type="text" class="form-control date-range" id="date-range" placeholder="Select Date Range">
