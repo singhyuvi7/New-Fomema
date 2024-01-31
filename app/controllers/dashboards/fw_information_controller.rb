@@ -143,28 +143,29 @@ class Dashboards::FwInformationController < InternalController
     transactions = apply_date_range_filer(filters, transactions)
 
     if filters[:sectors].present?
-      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(job_types: { id: filters[:sectors] })
+      start_time, end_time = date_range_values(filters)
+      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(job_types: { id: filters[:sectors] })
 
-       # sector data to display in state
-       state_ids = transactions.joins(doctor: :state).pluck('states.id')
-       hash = {}
-       state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
-       state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
-       converted_hash = {}
-       state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
-       @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
- 
-       # sector data to display in country
-       @fw_Reg_by_countries = transactions
-                                .joins("JOIN countries ON countries.id = transactions.fw_country_id")
-                                .group('countries.name', 'countries.code')
-                                .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                                .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+     # sector data to display in state
+     state_ids = transactions.joins(doctor: :state).pluck('states.id')
+     hash = {}
+     state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+     state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+     converted_hash = {}
+     state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+     @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
 
+     # sector data to display in country
+     @fw_Reg_by_countries = transactions
+                              .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                              .group('countries.name', 'countries.code')
+                              .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                              .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
     end
 
     if filters[:states].present?
-      state_ids = Transaction.joins(doctor: :state).where(states: { id: filters[:states] }).pluck('states.id')
+      start_time, end_time = date_range_values(filters)
+      state_ids = Transaction.joins(doctor: :state).where(created_at: start_time..end_time).where(states: { id: filters[:states] }).pluck('states.id')
       hash = {}
       state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
       state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
@@ -172,11 +173,15 @@ class Dashboards::FwInformationController < InternalController
       state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
       @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
 
-      # state data to display in sector
-      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(states: { id: filters[:states] })
+       # state data to display in sector
+       transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(states: { id: filters[:states] })
+       job_types_count = transactions.
+         group('job_types.name').
+         pluck('job_types.name', 'COUNT(1)')
+       @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
 
       # state data to display in country
-      @fw_Reg_by_countries = transactions
+      @fw_Reg_by_countries = Transaction
                               .joins("JOIN countries ON countries.id = transactions.fw_country_id")
                               .where(states: { id: filters[:states] })
                               .group('countries.name', 'countries.code')
@@ -214,15 +219,34 @@ class Dashboards::FwInformationController < InternalController
 
   def apply_country_filter(filters, transactions)
     if filters[:countries].present? && filters[:other_countries].to_s == 'false'
+      start_time, end_time = date_range_values(params[:data])
       countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id").where(
         "countries.id IN (?)",
         (filters[:countries].present? ? filters[:countries] : [])
-      )
+      ).where(created_at: start_time..end_time)
                              .group('countries.name', 'countries.code')
                              .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
                              .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
 
-      @fw_Reg_by_countries = countries
+        @fw_Reg_by_countries = countries
+
+        # country data to display in sectors
+        transactions = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id")
+        .joins("JOIN job_types ON job_types.id = transactions.fw_job_type_id")
+        .where(created_at: start_time..end_time)
+        .where(countries: { id: filters[:countries] })
+        job_types_count = transactions.group('job_types.name').pluck('job_types.name', 'COUNT(1)')
+        @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+        # country data to display in states
+        state_ids = Transaction.where(fw_country_id: filters[:countries]).where(created_at: start_time..end_time).joins(doctor: :state).pluck('states.id')
+        hash = {}
+        state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+        state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+        converted_hash = {}
+        state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+        @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
     elsif filters[:other_countries].to_s == 'true'
       country_ids = specific_countries.map { |i| i[0] }
       other_countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id")
