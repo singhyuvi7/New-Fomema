@@ -204,18 +204,134 @@ class Dashboards::FwInformationController < InternalController
 
     end
 
-    if filters[:gender].present?
-      transactions = transactions.where("UPPER(fw_gender) = (?)", values)
-    end
+    if filters[:age].present?
+      age_params = filters[:age]
 
-    filters.each do |key, values|
-      if values.present?
-        case key
-        when 'age'
-        when 'registration_types'
-        when 'fw_types'
+      conditions = age_params.map do |age_param|
+        if age_param.include?('-')
+          age_start, age_end = age_param.split('-').map(&:to_i)
+          birth_date_start = Date.today - age_end.years
+          birth_date_end = Date.today - age_start.years
+
+          "(fw_date_of_birth BETWEEN '#{birth_date_end}' AND '#{birth_date_start}')"
+        else
+          age_value = age_param.to_i
+          birth_date_start = Date.today - age_value.years
+
+          "fw_date_of_birth <= '#{birth_date_start}'"
         end
       end
+      conditions_query = conditions.join(' OR ')
+
+      # age data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(conditions_query)
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # age data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(conditions_query).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # age data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(conditions_query)
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+    end
+
+    if filters[:gender].present?
+
+
+      # gender data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(fw_gender: filters[:gender])
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # gender data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(fw_gender: filters[:gender]).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # gender data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(fw_gender: filters[:gender])
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+    end
+
+    if filters[:fw_types].present?
+      registration_type_values = {
+        "new" => 0,
+        "renewal" => 1
+      }
+
+      # registration data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # registration data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types])).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # registration data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+    end
+
+    if filters[:registration_types].present?
+      organization_ids = Organization.where(name: filters[:registration_types]).pluck(:id)
+
+      # registration_types data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(organization_id: organization_ids)
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # registration_types data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(organization_id: organization_ids).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # registration_types data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(organization_id: organization_ids)
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
     end
 
     transactions
