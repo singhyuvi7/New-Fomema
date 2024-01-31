@@ -116,15 +116,17 @@ class Dashboards::FwInformationController < InternalController
         chart_data[year] = [0] * 12
       end
     end
+    
     if @transaction_line_chart.present? && @transaction_line_chart.values.any? { |data| data.sum > 0 }
-      @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
-    else
-      date_range = params[:data][:date_range]
-      start_date_str = date_range.split('-').map(&:strip)
-      start_date = Date.strptime(start_date_str, '%d/%m/%Y')
-      selected_year = start_date.year
-      @sums_by_year = { selected_year => 0 }
-    end
+    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+  else
+    date_range = params[:data][:date_range]
+    start_date_str, end_date_str = date_range.split(" - ")
+    selected_year = start_date_str.split("/").last.to_i
+
+    @transaction_line_chart = { selected_year => Array.new(12, 0) }
+    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+  end
 
     render layout: false
   end
