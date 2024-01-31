@@ -631,4 +631,29 @@
         const selectAllCheckboxCountries = document.getElementById('countrycheckall');
         setupCheckboxHandlers(checkboxesCountries, selectAllCheckboxCountries, divSelectedCountries, 'valuenamecountry', spanCountry);
     });
+
+    $(document).ready(function () {
+        $('#sectorcheckall').prop('checked', true)
+        $('input[name="sectorcheck"]').prop('checked', true)
+
+        $('#statecheckall').prop('checked', true)
+        $('input[name="statecheck"]').prop('checked', true)
+
+        $('#countrycheckall').prop('checked', true)
+        $('input[name="countrycheck"]').prop('checked', true)
+
+        $('#agecheckall').prop('checked', true)
+        $('input[name="agecheck"]').prop('checked', true)
+
+        $('#gendercheckall').prop('checked', true)
+        $('input[name="gendercheck"]').prop('checked', true)
+
+        $('#registrationcheckall').prop('checked', true)
+        $('input[name="registrationcheck"]').prop('checked', true)
+
+        $('#foreignworkercheckall').prop('checked', true)
+        $('input[name="foreignworkercheck"]').prop('checked', true)
+
+    });
+
 </script>
