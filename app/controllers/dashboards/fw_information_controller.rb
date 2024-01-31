@@ -186,6 +186,7 @@ class Dashboards::FwInformationController < InternalController
       @fw_Reg_by_countries = Transaction
                               .joins("JOIN countries ON countries.id = transactions.fw_country_id")
                               .joins(doctor: :state)
+                              .where(created_at: start_time..end_time)
                               .where(states: { id: filters[:states] })
                               .group('countries.name', 'countries.code')
                               .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
