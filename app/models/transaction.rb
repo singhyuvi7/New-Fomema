@@ -1357,10 +1357,11 @@ private
 
     ##dashboard first dashboard
     def self.transaction_data_last_5_years
-        current_time = Time.now
+        current_year = Time.now.year
 
         transactions_data = Transaction
-                              .where(created_at: ((current_time-4.years).beginning_of_year..current_time.end_of_year))
+                              .where(created_at: (Time.new(current_year - 4, 1, 1)..Time.new(current_year, 12, 31, 23, 59, 59)))
+                              .where.not(status: ['CANCELLED', 'REJECTED'])
                               .group("EXTRACT(YEAR FROM created_at)")
                               .select("EXTRACT(YEAR FROM created_at) AS year, array_agg(EXTRACT(MONTH FROM created_at) ORDER BY EXTRACT(MONTH FROM created_at)) AS months")
                               .order("EXTRACT(YEAR FROM created_at)")
@@ -1380,6 +1381,7 @@ private
     def self.transaction_data_between(start_time:, end_time:)
         transactions_data = Transaction
                               .where(created_at: (start_time..end_time))
+                              .where.not(status: ['CANCELLED', 'REJECTED'])
                               .group("EXTRACT(YEAR FROM transactions.created_at)")
                               .select("EXTRACT(YEAR FROM transactions.created_at) AS year, array_agg(EXTRACT(MONTH FROM transactions.created_at) ORDER BY EXTRACT(MONTH FROM transactions.created_at)) AS months")
                               .order("EXTRACT(YEAR FROM transactions.created_at)")
