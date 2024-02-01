@@ -84,12 +84,22 @@ class Dashboards::FwInformationController < InternalController
     filtered_data = if params[:data].present?
                       filtered_transactions(params[:data])
                     else
+                      allowed_countries = ['BANGLADESH', 'NEPAL', 'INDONESIA', 'MYANMAR', 'INDIA',
+                      'PAKISTAN', 'PHILIPPINES', 'VIETNAM', 'SRI LANKA', 'THAILAND', 'CAMBODIA', 'LAOS',
+                      'UZBEKISTAN', 'TURKMENISTAN', 'KAZAKHSTAN']
+
                       @fw_Reg_by_countries = Transaction
-                                               .joins("JOIN countries ON countries.id = transactions.fw_country_id")
-                                               .group('countries.name', 'countries.code')
-                                               .where("extract(year from transactions.created_at) = ?", Date.today.year)
-                                               .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                                               .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+                      .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                      .group('countries.name', 'countries.code')
+                      .where("extract(year from transactions.created_at) = ?", Date.today.year)
+                      .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                      .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+                      .select { |entry| allowed_countries.include?(entry[0].upcase) }
+
+                      others_count = Transaction.count - @fw_Reg_by_countries.sum { |entry| entry[2] }
+                      others_entry = ['Others', 'OTH', others_count]
+                      @fw_Reg_by_countries << others_entry
+                      @fw_Reg_by_countries.sort_by! { |entry| entry[0] }
                     end
 
     filtered_data
