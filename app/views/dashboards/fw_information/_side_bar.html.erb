@@ -193,24 +193,12 @@
                       <li>
                         <label><input type="checkbox" id="registrationcheckall" name="all_selected" value=""> Select All</label>
                       </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="WEBPORTAL"> Web Portal</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="AGENCY"> Agency</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="EAST COAST"> East Coast</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="NORTHERN"> Northern</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="SOUTHERN"> Southern</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="CENTRAL"> Central</label>
-                      </li>
+                      <% @organizations.each do |organization| %>
+                        <li>
+                          <input type="checkbox" name="registrationcheck" value="<%= organization %>">
+                          <%= organization.split.map(&:capitalize).join(' ') %>
+                        </li>
+                      <% end %>
                     </ul>
                   </div>
                 </div>

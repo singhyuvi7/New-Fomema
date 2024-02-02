@@ -8,6 +8,7 @@ class Dashboards::FwInformationController < InternalController
     @job_type = JobType.order(:name).pluck(:id, :name) # Sectors
     # @organizations = Organization.distinct.pluck(:name)
     @foregin_worker_type = Transaction.registration_types.keys # Foreign Worker Type
+    @organizations = Organization.order(:name).pluck(:name)
 
     respond_to do |format|
       format.html
