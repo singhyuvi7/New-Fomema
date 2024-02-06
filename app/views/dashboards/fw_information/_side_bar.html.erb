@@ -17,25 +17,29 @@
                 <div id="time-period" class="collapse opcl" aria-labelledby="faqhead1" data-parent="#filter">
                   <div class="card-body">
                     <script>
-                        $.noConflict();
+                    $.noConflict();
                         jQuery(document).ready(function ($) {
                             $(document).ready(function () {
-                                $('#date-range').daterangepicker({
-                                    opens: 'left',
-                                    drops: 'down',
-                                    autoApply: true,
-                                    locale: {
-                                        format: 'YYYY-MM-DD',
-                                        separator: ' - ',
-                                        applyLabel: 'Apply',
-                                        cancelLabel: 'Cancel',
-                                        fromLabel: 'From',
-                                        toLabel: 'To',
-                                        customRangeLabel: 'Custom',
-                                        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-                                        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                                        firstDay: 0
-                                    }
+                                $(function () {
+                                    var currentDate = new Date();
+                                    var currentYear = currentDate.getFullYear();
+                                    var currentMonth = currentDate.getMonth() + 1;
+
+                                    var formattedYear = currentYear.toString();
+                                    var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
+
+                                    var startDateString = "01/" + formattedMonth + "/" + formattedYear;
+                                    var endDateString = moment(currentDate).endOf('month').format('DD/MM/YYYY');
+
+                                    $('#date-range').daterangepicker({
+                                        "startDate": startDateString,
+                                        "endDate": endDateString,
+                                        opens: 'center',
+                                        showDropdowns: true,
+                                        locale: {
+                                            format: 'DD/MM/YYYY'
+                                        }
+                                    });
                                 });
                             });
                         });
@@ -189,24 +193,12 @@
                       <li>
                         <label><input type="checkbox" id="registrationcheckall" name="all_selected" value=""> Select All</label>
                       </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="WEBPORTAL"> Web Portal</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="AGENCY"> Agency</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="EAST COAST"> East Coast</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="NORTHERN"> Northern</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="SOUTHERN"> Southern</label>
-                      </li>
-                      <li>
-                        <label><input type="checkbox" name="registrationcheck" value="CENTRAL"> Central</label>
-                      </li>
+                      <% @organizations.each do |organization| %>
+                        <li>
+                          <input type="checkbox" name="registrationcheck" value="<%= organization %>">
+                          <%= organization.split.map(&:capitalize).join(' ') %>
+                        </li>
+                      <% end %>
                     </ul>
                   </div>
                 </div>
@@ -623,4 +615,29 @@
         const selectAllCheckboxCountries = document.getElementById('countrycheckall');
         setupCheckboxHandlers(checkboxesCountries, selectAllCheckboxCountries, divSelectedCountries, 'valuenamecountry', spanCountry);
     });
+
+    $(document).ready(function () {
+        $('#sectorcheckall').prop('checked', true)
+        $('input[name="sectorcheck"]').prop('checked', true)
+
+        $('#statecheckall').prop('checked', true)
+        $('input[name="statecheck"]').prop('checked', true)
+
+        $('#countrycheckall').prop('checked', true)
+        $('input[name="countrycheck"]').prop('checked', true)
+
+        $('#agecheckall').prop('checked', true)
+        $('input[name="agecheck"]').prop('checked', true)
+
+        $('#gendercheckall').prop('checked', true)
+        $('input[name="gendercheck"]').prop('checked', true)
+
+        $('#registrationcheckall').prop('checked', true)
+        $('input[name="registrationcheck"]').prop('checked', true)
+
+        $('#foreignworkercheckall').prop('checked', true)
+        $('input[name="foreignworkercheck"]').prop('checked', true)
+
+    });
+
 </script>

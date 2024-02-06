@@ -8,6 +8,7 @@ class Dashboards::FwInformationController < InternalController
     @job_type = JobType.order(:name).pluck(:id, :name) # Sectors
     # @organizations = Organization.distinct.pluck(:name)
     @foregin_worker_type = Transaction.registration_types.keys # Foreign Worker Type
+   @organizations = Organization.order(:name).where(status: 'ACTIVE').pluck(:name)
 
     respond_to do |format|
       format.html
@@ -84,12 +85,22 @@ class Dashboards::FwInformationController < InternalController
     filtered_data = if params[:data].present?
                       filtered_transactions(params[:data])
                     else
+                      allowed_countries = ['BANGLADESH', 'NEPAL', 'INDONESIA', 'MYANMAR', 'INDIA',
+                      'PAKISTAN', 'PHILIPPINES', 'VIETNAM', 'SRI LANKA', 'THAILAND', 'CAMBODIA', 'LAOS',
+                      'UZBEKISTAN', 'TURKMENISTAN', 'KAZAKHSTAN']
+
                       @fw_Reg_by_countries = Transaction
-                                               .joins("JOIN countries ON countries.id = transactions.fw_country_id")
-                                               .group('countries.name', 'countries.code')
-                                               .where("extract(year from transactions.created_at) = ?", Date.today.year)
-                                               .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                                               .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+                      .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                      .group('countries.name', 'countries.code')
+                      .where("extract(year from transactions.created_at) = ?", Date.today.year)
+                      .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                      .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+                      .select { |entry| allowed_countries.include?(entry[0].upcase) }
+
+                      others_count = Transaction.count - @fw_Reg_by_countries.sum { |entry| entry[2] }
+                      others_entry = ['Others', 'OTH', others_count]
+                      @fw_Reg_by_countries << others_entry
+                      @fw_Reg_by_countries.sort_by! { |entry| entry[0] }
                     end
 
     filtered_data
@@ -116,7 +127,17 @@ class Dashboards::FwInformationController < InternalController
         chart_data[year] = [0] * 12
       end
     end
+    
+    if @transaction_line_chart.present? && @transaction_line_chart.values.any? { |data| data.sum > 0 }
     @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+  else
+    date_range = params[:data][:date_range]
+    start_date_str, end_date_str = date_range.split(" - ")
+    selected_year = start_date_str.split("/").last.to_i
+
+    @transaction_line_chart = { selected_year => Array.new(12, 0) }
+    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
+  end
 
     render layout: false
   end
@@ -135,17 +156,52 @@ class Dashboards::FwInformationController < InternalController
     transactions = apply_date_range_filer(filters, transactions)
 
     if filters[:sectors].present?
-      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(job_types: { id: filters[:sectors] })
+      start_time, end_time = date_range_values(filters)
+      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(job_types: { id: filters[:sectors] })
+
+     # sector data to display in state
+     state_ids = transactions.joins(doctor: :state).pluck('states.id')
+     hash = {}
+     state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+     state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+     converted_hash = {}
+     state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+     @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+     # sector data to display in country
+     @fw_Reg_by_countries = transactions
+                              .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                              .group('countries.name', 'countries.code')
+                              .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                              .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
     end
 
     if filters[:states].present?
-      state_ids = Transaction.joins(doctor: :state).where(states: { id: filters[:states] }).pluck('states.id')
+      start_time, end_time = date_range_values(filters)
+      state_ids = Transaction.joins(doctor: :state).where(created_at: start_time..end_time).where(states: { id: filters[:states] }).pluck('states.id')
       hash = {}
       state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
       state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
       converted_hash = {}
       state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
       @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+       # state data to display in sector
+       transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(states: { id: filters[:states] })
+       job_types_count = transactions.
+         group('job_types.name').
+         pluck('job_types.name', 'COUNT(1)')
+       @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # state data to display in country
+      @fw_Reg_by_countries = Transaction
+                              .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                              .joins(doctor: :state)
+                              .where(created_at: start_time..end_time)
+                              .where(states: { id: filters[:states] })
+                              .group('countries.name', 'countries.code')
+                              .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                              .map { |entry| entry.country_info.split(',') + [entry.count.to_i] } 
 
     else
       start_time, end_time = date_range_values(filters)
@@ -159,18 +215,134 @@ class Dashboards::FwInformationController < InternalController
 
     end
 
-    if filters[:gender].present?
-      transactions = transactions.where("UPPER(fw_gender) = (?)", values)
-    end
+    if filters[:age].present?
+      age_params = filters[:age]
 
-    filters.each do |key, values|
-      if values.present?
-        case key
-        when 'age'
-        when 'registration_types'
-        when 'fw_types'
+      conditions = age_params.map do |age_param|
+        if age_param.include?('-')
+          age_start, age_end = age_param.split('-').map(&:to_i)
+          birth_date_start = Date.today - age_end.years
+          birth_date_end = Date.today - age_start.years
+
+          "(fw_date_of_birth BETWEEN '#{birth_date_end}' AND '#{birth_date_start}')"
+        else
+          age_value = age_param.to_i
+          birth_date_start = Date.today - age_value.years
+
+          "fw_date_of_birth <= '#{birth_date_start}'"
         end
       end
+      conditions_query = conditions.join(' OR ')
+
+      # age data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(conditions_query)
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # age data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(conditions_query).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # age data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(conditions_query)
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+    end
+
+    if filters[:gender].present?
+
+
+      # gender data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(fw_gender: filters[:gender])
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # gender data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(fw_gender: filters[:gender]).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # gender data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(fw_gender: filters[:gender])
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+    end
+
+    if filters[:fw_types].present?
+      registration_type_values = {
+        "new" => 0,
+        "renewal" => 1
+      }
+
+      # registration data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # registration data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types])).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # registration data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+    end
+
+    if filters[:registration_types].present?
+      organization_ids = Organization.where(name: filters[:registration_types]).pluck(:id)
+
+      # registration_types data to display in sectors
+      transactions = Transaction.joins(doctor: :state).joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(organization_id: organization_ids)
+      job_types_count = transactions.
+        group('job_types.name').
+        pluck('job_types.name', 'COUNT(1)')
+      @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+      # registration_types data to display in states
+      state_ids = Transaction.where(created_at: start_time..end_time).where(organization_id: organization_ids).joins(doctor: :state).pluck('states.id')
+      hash = {}
+      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+      converted_hash = {}
+      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
+      # registration_types data to display in countries
+      @fw_Reg_by_countries = Transaction.where(created_at: start_time..end_time).where(organization_id: organization_ids)
+                                        .joins("JOIN countries ON countries.id = transactions.fw_country_id")
+                                        .group('countries.name', 'countries.code')
+                                        .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
+                                        .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
     end
 
     transactions
@@ -178,15 +350,34 @@ class Dashboards::FwInformationController < InternalController
 
   def apply_country_filter(filters, transactions)
     if filters[:countries].present? && filters[:other_countries].to_s == 'false'
+      start_time, end_time = date_range_values(params[:data])
       countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id").where(
         "countries.id IN (?)",
         (filters[:countries].present? ? filters[:countries] : [])
-      )
+      ).where(created_at: start_time..end_time)
                              .group('countries.name', 'countries.code')
                              .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
                              .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
 
-      @fw_Reg_by_countries = countries
+        @fw_Reg_by_countries = countries
+
+        # country data to display in sectors
+        transactions = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id")
+        .joins("JOIN job_types ON job_types.id = transactions.fw_job_type_id")
+        .where(created_at: start_time..end_time)
+        .where(countries: { id: filters[:countries] })
+        job_types_count = transactions.group('job_types.name').pluck('job_types.name', 'COUNT(1)')
+        @pi_chart_data = [['Task', 'Hours per Day'], *job_types_count]
+
+        # country data to display in states
+        state_ids = Transaction.where(fw_country_id: filters[:countries]).where(created_at: start_time..end_time).joins(doctor: :state).pluck('states.id')
+        hash = {}
+        state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
+        state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
+        converted_hash = {}
+        state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
+        @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+
     elsif filters[:other_countries].to_s == 'true'
       country_ids = specific_countries.map { |i| i[0] }
       other_countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id")
@@ -285,470 +476,439 @@ class Dashboards::FwInformationController < InternalController
   end
 
   def excel_generate
-    @total_fw_registration = {}
-    @examination_count = {}
-    @certification_count = {}
-    @xqcc_pool_received = {}
-    @xqcc_pool_reviewed = {}
-    @pcr_pool_received = {}
-    @pcr_pool_reviewed = {}
-    @xray_pending_review_received = {}
-    @xray_pending_review_reviewed = {}
-    @xray_pending_decision_received = {}
-    @xray_pending_decision_reviewed = {}
 
-    @countries_excel = Country.pluck(:name).compact.uniq
-    @countries_with_ids = Country.where(name: @countries_excel).pluck(:name, :id).to_h
-
-    generate_data_for_countries
-
-    @states_excel = State.pluck(:name).compact.uniq
-    @states_with_ids = State.where(name: @states_excel).pluck(:name, :id).to_h
-
-    generate_data_for_states
-
-    @job_type_excel = JobType.pluck(:name).compact.uniq
-    @job_type_with_ids = JobType.where(name: @job_type_excel).pluck(:name, :id).to_h
-    generate_data_for_job
-
-    @male_count = Transaction.where(fw_gender: 'M')
-                             .order(created_at: :desc)
-                             .limit(20)
-                             .count
-
-    @female_count = Transaction.where(fw_gender: 'F')
-                               .order(created_at: :desc)
-                               .limit(20)
-                               .count
-
-    @male_examination_count = Transaction.where(fw_gender: 'M')
-                                         .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                         .order(created_at: :desc)
-                                         .limit(20)
-                                         .count
-
-    @female_examination_count = Transaction.where(fw_gender: 'F')
-                                           .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                           .order(created_at: :desc)
-                                           .limit(20)
-                                           .count
-
-    @male_certification_count = Transaction.where(fw_gender: 'M')
-                                           .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                           .order(created_at: :desc)
-                                           .limit(20)
-                                           .count
-
-    @female_certification_count = Transaction.where(fw_gender: 'F')
-                                             .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                             .order(created_at: :desc)
-                                             .limit(20)
-                                             .count
-
-    @organizations_excel = Organization.pluck(:name).uniq
-    @organization_with_ids = Organization.where(name: @organizations_excel).pluck(:name, :id).to_h
-
-    generate_data_for_organization
-
-    @new_count = Transaction.where(registration_type: 0)
-                            .order(created_at: :desc)
-                            .limit(20)
-                            .count
-
-    @renewal_count = Transaction.where(registration_type: 1)
-                                .order(created_at: :desc)
-                                .limit(20)
-                                .count
-
-    @new_examination_count = Transaction.where(registration_type: 0)
-                                        .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                        .order(created_at: :desc)
-                                        .limit(20)
-                                        .count
-
-    @renewal_examination_count = Transaction.where(registration_type: 1)
-                                            .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                            .order(created_at: :desc)
-                                            .limit(20)
-                                            .count
-
-    @new_certification_count = Transaction.where(registration_type: 0)
-                                          .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                          .order(created_at: :desc)
-                                          .limit(20)
-                                          .count
-
-    @renewal_certification_count = Transaction.where(registration_type: 1)
-                                              .where("EXTRACT(YEAR FROM medical_examination_date) = ? AND medical_examination_date < ?", Date.current.year, Date.current)
-                                              .order(created_at: :desc)
-                                              .limit(20)
-                                              .count
-
-    @latest_transactions = Transaction.order(created_at: :desc).limit(20).pluck(:created_at).map { |date| date.strftime("%Y-%m-%d %H:%M:%S") }
-
-    current_year = Date.current.year
-
-    (0..4).each do |i|
-      year = current_year - i
-      raw_data_for_year = Transaction
-                            .where(created_at: (Time.new(year, 1, 1)..Time.new(year, 12, 31, 23, 59, 59)))
-                            .order(created_at: :desc)
-                            .limit(20)
-                            .pluck(:created_at, :medical_examination_date, :certification_date)
-                            .map { |record| record.map { |date| date&.strftime("%Y-%m-%d %H:%M:%S") } }
-
-      # Creating  instance variable dynamically
-      instance_variable_set("@raw_data_#{year}", raw_data_for_year)
-    end
-
-    @sheet_data = generate_dynamic_sheet_data
+    @xqcc_pool_received_count = fetch_counts(Transaction.joins(:xqcc_pools), 'xqcc_pools.created_at')
+    @xqcc_pool_reviewed_count = fetch_counts(Transaction.joins(:xray_reviews), 'xray_reviews.transmitted_at')
+    @pcr_pool_received_count = fetch_counts(Transaction.joins(:pcr_pools), 'pcr_pools.created_at')
+    @pcr_pool_reviewed_count = fetch_counts(Transaction.joins(:pcr_reviews), 'pcr_reviews.created_at')
+    @xray_pending_review_received_count = fetch_counts(Transaction.joins(:xray_pending_reviews), 'xray_pending_reviews.created_at')
+    @xray_pending_review_reviewed_count = fetch_counts(Transaction.joins(:xray_pending_reviews), 'xray_pending_reviews.transmitted_at')
+    @xray_pending_decision_received_count = fetch_counts(Transaction.joins(:xray_pending_decisions), 'xray_pending_decisions.created_at')
+    @xray_pending_decision_reviewed_count = fetch_counts(Transaction.joins(:xray_pending_decisions), 'xray_pending_decisions.transmitted_at')
 
     respond_to do |format|
-      format.xlsx { render xlsx: 'excel_generate', filename: 'ForeignWorker.xlsx' }
-    end
-  end
+      format.xlsx do
+        package = Axlsx::Package.new
 
-  private
+        add_sheet_by_country(package)
+        add_sheet_by_state(package)
+        add_sheet_by_sector(package)
+        add_sheet_by_gender(package)
+        add_sheet_by_registration_at(package)
+        add_sheet_by_fw_type(package)
+        add_sheet_by_line_chart(package)
 
-  def generate_dynamic_sheet_data
-    current_year = Time.now.year
-    years = (current_year.downto(current_year - 4)).to_a
-
-    sheet_data = {}
-
-    sheet_data['FW Reg. by Country'] = generate_sheet_data_for_category('FW Registration by Country', years)
-    sheet_data['FW Reg. by State'] = generate_sheet_data_for_category('FW Registration by State', years)
-    sheet_data['FW Reg. by Sector'] = generate_sheet_data_for_category('FW Registration by Sector', years)
-    sheet_data['FW Reg. by Gender'] = generate_sheet_data_for_category('FW Registration by Gender', years)
-    sheet_data['FW Reg. by Registration at'] = generate_sheet_data_for_category('FW Registration by Registration at', years)
-    sheet_data['FW Reg. by FW Type'] = generate_sheet_data_for_category('FW Registration by FW Type', years)
-    sheet_data['Trend of FW Reg. by year'] = ['Trend of FW registration by Year', ['Transaction date by Month', 'Transaction date by Day'] + years.map(&:to_s) + ['Count']]
-
-    years.each do |year|
-      sheet_name = "Raw Data #{year}"
-      title = "Data #{year}"
-      headers = [
-        'Transaction Date (Month)', 'Medical Examination Date (Month)', 'Certification Date (Month)',
-        'State', 'Country', 'Age', 'Gender', 'Registration at', 'Foreign Worker Type',
-        'XQCC Pool (Film Received)', 'XQCC Pool (Film Reviewed)',
-        'PCR Pool (Film Received)', 'PCR Pool (Film Reviewed)',
-        'X-Ray Pending Review (Film Received)', 'X-Ray Pending Review (Film Reviewed)',
-        'X-Ray Pending Decision (Film Received)', 'X-Ray Pending Decision (Film Reviewed)',
-        'Medical Review (Received)', 'Medical Review (Reviewed)',
-        'Final Result Released', 'Result Transmitted to Immigration',
-        'Blocked FW', 'Appeal', 'FW Insured'
-      ]
-
-      sheet_data[sheet_name] = [title, headers]
-    end
-
-    sheet_data
-  end
-
-  def generate_sheet_data_for_category(category_name, years)
-    [category_name, [category_name, 'Total FW Registration', 'FW went for medical examination', 'Certification', 'XQCC Pool (Film Received)', 'XQCC Pool (Film Reviewed)', 'PCR Pool (Film Received)', 'PCR Pool (Film Reviewed)', 'X-Ray Pending Review (Film Received)', 'X-Ray Pending Review (Film Reviewed)', 'X-Ray Pending Decision (Film Received)', 'X-Ray Pending Decision (Film Reviewed)', 'Medical Review (Received)', 'Medical Review (Reviewed)', 'Final Result Released', 'Result Transmitted to Immigration', 'Blocked FW', 'Appeal', 'FW Insured']]
-  end
-
-  def generate_data_for_countries
-    @countries_excel.each do |country|
-      cache_key = "country_#{country}_data"
-
-      @country_id = @countries_with_ids[country]
-
-      @total_fw_registration[country] = Rails.cache.fetch("#{cache_key}_total_fw_registration", expires_in: 1.hour) do
-        Transaction.where(fw_country_id: @country_id)
-                   .order(created_at: :desc)
-                   .limit(20)
-                   .count
-      end
-
-      @examination_count[country] = Rails.cache.fetch("#{cache_key}_examination_count", expires_in: 1.hour) do
-        generate_examination_count_data
-      end
-
-      @certification_count[country] = Rails.cache.fetch("#{cache_key}_certification_count", expires_in: 1.hour) do
-        generate_certification_count_data
-      end
-
-      @xqcc_pool_received[country] = Rails.cache.fetch("#{cache_key}_xqcc_pool_received", expires_in: 1.hour) do
-        generate_xqcc_pool_received_data
-      end
-
-      @xqcc_pool_reviewed[country] = Rails.cache.fetch("#{cache_key}_xqcc_pool_reviewed", expires_in: 1.hour) do
-        generate_xqcc_pool_reviewed_data
-      end
-
-      @pcr_pool_received[country] = Rails.cache.fetch("#{cache_key}_pcr_pool_received", expires_in: 1.hour) do
-        generate_pcr_pool_received_data
-      end
-
-      @pcr_pool_reviewed[country] = Rails.cache.fetch("#{cache_key}_pcr_pool_reviewed", expires_in: 1.hour) do
-        generate_pcr_pool_reviewed_data
-      end
-
-      @xray_pending_review_received[country] = Rails.cache.fetch("#{cache_key}_xray_pending_review_received", expires_in: 1.hour) do
-        generate_xray_pending_review_received_data
-      end
-
-      @xray_pending_review_reviewed[country] = Rails.cache.fetch("#{cache_key}_xray_pending_review_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_review_reviewed_data
-      end
-
-      @xray_pending_decision_received[country] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_received", expires_in: 1.hour) do
-        generate_xray_pending_decision_received_data
-      end
-
-      @xray_pending_decision_reviewed[country] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_decision_reviewed_data
+        # Save the Excel file
+        send_data package.to_stream.read, filename: 'fw_information.xlsx'
       end
     end
   end
 
-  def generate_data_for_states
-
-    @states_excel.each do |state|
-      cache_key = "state_#{state}_data"
-
-      @doctor_ids = Doctor.where(state_id: @states_with_ids[state]).pluck(:id)
-
-      @total_fw_registration[state] = Rails.cache.fetch("#{cache_key}_total_fw_registration", expires_in: 1.hour) do
-        Transaction.where(doctor_id: @doctor_ids)
-                   .order(created_at: :desc)
-                   .limit(20)
-                   .count
-      end
-
-      @examination_count[state] = Rails.cache.fetch("#{cache_key}_examination_count", expires_in: 1.hour) do
-        generate_examination_count_data
-      end
-
-      @certification_count[state] = Rails.cache.fetch("#{cache_key}_certification_count", expires_in: 1.hour) do
-        generate_certification_count_data
-      end
-
-      @xqcc_pool_received[state] = Rails.cache.fetch("#{cache_key}_xqcc_pool_received", expires_in: 1.hour) do
-        generate_xqcc_pool_received_data
-      end
-
-      @xqcc_pool_reviewed[state] = Rails.cache.fetch("#{cache_key}_xqcc_pool_reviewed", expires_in: 1.hour) do
-        generate_xqcc_pool_reviewed_data
-      end
-
-      @pcr_pool_received[state] = Rails.cache.fetch("#{cache_key}_pcr_pool_received", expires_in: 1.hour) do
-        generate_pcr_pool_received_data
-      end
-
-      @pcr_pool_reviewed[state] = Rails.cache.fetch("#{cache_key}_pcr_pool_reviewed", expires_in: 1.hour) do
-        generate_pcr_pool_reviewed_data
-      end
-
-      @xray_pending_review_received[state] = Rails.cache.fetch("#{cache_key}_xray_pending_review_received", expires_in: 1.hour) do
-        generate_xray_pending_review_received_data
-      end
-
-      @xray_pending_review_reviewed[state] = Rails.cache.fetch("#{cache_key}_xray_pending_review_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_review_reviewed_data
-      end
-
-      @xray_pending_decision_received[state] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_received", expires_in: 1.hour) do
-        generate_xray_pending_decision_received_data
-      end
-
-      @xray_pending_decision_reviewed[state] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_decision_reviewed_data
-      end
-
-    end
+  def fetch_counts(query, date_column)
+    query.order('transactions.created_at DESC')
+         .limit(50)
+         .group("#{date_column}, transactions.certification_date, transactions.created_at")
+         .count.values
   end
 
-  def generate_data_for_job
+  def add_sheet_by_country(package)
+    @countries = Country.pluck(:name).compact.reject(&:empty?).uniq
 
-    @job_type_excel.each do |job|
-
-      @job_id = @job_type_with_ids[job]
-
-      cache_key = "job_#{job}_data"
-
-      @total_fw_registration[job] = Rails.cache.fetch("#{cache_key}_total_fw_registration", expires_in: 1.hour) do
-        Transaction.where(fw_job_type_id: @job_id)
-                   .order(created_at: :desc)
-                   .limit(20)
-                   .count
+    unless @countries.empty?
+      country_ids = Country.where(name: @countries).pluck(:id)
+      country_data = Transaction.where(fw_country_id: country_ids)
+                                .group(:fw_country_id)
+                                .select(
+                                  'fw_country_id',
+                                  'COUNT(*) AS total_fw_registration_count',
+                                  'COUNT(medical_examination_date) AS examination_count',
+                                  'COUNT(certification_date) AS certification_count'
+                                )
+      result_hash = {}
+      country_data.each do |data|
+        result_hash[data.fw_country_id] = {
+          total_fw_registration_count: data.total_fw_registration_count.to_i,
+          examination_count: data.examination_count.to_i,
+          certification_count: data.certification_count.to_i
+        }
       end
+      package.workbook.add_worksheet(name: 'FW Reg. by Country') do |sheet|
+        # Header row
+        sheet.add_row [
+                        'Country',
+                        'Total FW Registration',
+                        'Examination Count',
+                        'Certification Count',
+                        'XQCC Pool Received',
+                        'XQCC Pool Reviewed',
+                        'PCR Pool Received',
+                        'PCR Pool Reviewed',
+                        'Xray Pending Review Received',
+                        'Xray Pending Review Reviewed',
+                        'Xray Pending Decision Received',
+                        'Xray Pending Decision Reviewed'
+                      ], b: true
 
-      @examination_count[job] = Rails.cache.fetch("#{cache_key}_examination_count", expires_in: 1.hour) do
-        generate_examination_count_data
-      end
+        # Add data for each country
+        result_hash.each do |fw_country_id, counts|
+          country_name = Country.find(fw_country_id).name
+          xqcc_pool_received_count = @xqcc_pool_received_count.sum
+          xqcc_pool_reviewed_count = @xqcc_pool_reviewed_count.sum
+          pcr_pool_received_count = @pcr_pool_received_count.sum
+          pcr_pool_received_count = @pcr_pool_reviewed_count.sum
+          xray_pending_review_received_count = @xray_pending_review_received_count.sum
+          xray_pending_review_reviewed_count = @xray_pending_review_reviewed_count.sum
+          xray_pending_decision_received_count = @xray_pending_decision_received_count.sum
+          xray_pending_decision_reviewed_count = @xray_pending_decision_reviewed_count.sum
 
-      @certification_count[job] = Rails.cache.fetch("#{cache_key}_certification_count", expires_in: 1.hour) do
-        generate_certification_count_data
-      end
-
-      @xqcc_pool_received[job] = Rails.cache.fetch("#{cache_key}_xqcc_pool_received", expires_in: 1.hour) do
-        generate_xqcc_pool_received_data
-      end
-
-      @xqcc_pool_reviewed[job] = Rails.cache.fetch("#{cache_key}_xqcc_pool_reviewed", expires_in: 1.hour) do
-        generate_xqcc_pool_reviewed_data
-      end
-
-      @pcr_pool_received[job] = Rails.cache.fetch("#{cache_key}_pcr_pool_received", expires_in: 1.hour) do
-        generate_pcr_pool_received_data
-      end
-
-      @pcr_pool_reviewed[job] = Rails.cache.fetch("#{cache_key}_pcr_pool_reviewed", expires_in: 1.hour) do
-        generate_pcr_pool_reviewed_data
-      end
-
-      @xray_pending_review_received[job] = Rails.cache.fetch("#{cache_key}_xray_pending_review_received", expires_in: 1.hour) do
-        generate_xray_pending_review_received_data
-      end
-
-      @xray_pending_review_reviewed[job] = Rails.cache.fetch("#{cache_key}_xray_pending_review_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_review_reviewed_data
-      end
-
-      @xray_pending_decision_received[job] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_received", expires_in: 1.hour) do
-        generate_xray_pending_decision_received_data
-      end
-
-      @xray_pending_decision_reviewed[job] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_decision_reviewed_data
-      end
-
-    end
-
-  end
-
-  def generate_data_for_organization
-    @organizations_excel.each do |organization|
-      @organization_id = @organization_with_ids[organization]
-      cache_key = "organization_#{organization}_data"
-
-      @total_fw_registration[organization] = Rails.cache.fetch("#{cache_key}_total_fw_registration", expires_in: 1.hour) do
-        Transaction.where(organization_id: @organization_id)
-                   .order(created_at: :desc)
-                   .limit(20)
-                   .count
-      end
-
-      @examination_count[organization] = Rails.cache.fetch("#{cache_key}_examination_count", expires_in: 1.hour) do
-        generate_examination_count_data
-      end
-
-      @certification_count[organization] = Rails.cache.fetch("#{cache_key}_certification_count", expires_in: 1.hour) do
-        generate_certification_count_data
-      end
-
-      @xqcc_pool_received[organization] = Rails.cache.fetch("#{cache_key}_xqcc_pool_received", expires_in: 1.hour) do
-        generate_xqcc_pool_received_data
-      end
-
-      @xqcc_pool_reviewed[organization] = Rails.cache.fetch("#{cache_key}_xqcc_pool_reviewed", expires_in: 1.hour) do
-        generate_xqcc_pool_reviewed_data
-      end
-
-      @pcr_pool_received[organization] = Rails.cache.fetch("#{cache_key}_pcr_pool_received", expires_in: 1.hour) do
-        generate_pcr_pool_received_data
-      end
-
-      @pcr_pool_reviewed[organization] = Rails.cache.fetch("#{cache_key}_pcr_pool_reviewed", expires_in: 1.hour) do
-        generate_pcr_pool_reviewed_data
-      end
-
-      @xray_pending_review_received[organization] = Rails.cache.fetch("#{cache_key}_xray_pending_review_received", expires_in: 1.hour) do
-        generate_xray_pending_review_received_data
-      end
-
-      @xray_pending_review_reviewed[organization] = Rails.cache.fetch("#{cache_key}_xray_pending_review_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_review_reviewed_data
-      end
-
-      @xray_pending_decision_received[organization] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_received", expires_in: 1.hour) do
-        generate_xray_pending_decision_received_data
-      end
-
-      @xray_pending_decision_reviewed[organization] = Rails.cache.fetch("#{cache_key}_xray_pending_decision_reviewed", expires_in: 1.hour) do
-        generate_xray_pending_decision_reviewed_data
+          sheet.add_row [
+                          country_name,
+                          counts[:total_fw_registration_count],
+                          counts[:examination_count],
+                          counts[:certification_count],
+                          xqcc_pool_received_count,
+                          xqcc_pool_reviewed_count,
+                          pcr_pool_received_count,
+                          pcr_pool_received_count,
+                          xray_pending_review_received_count,
+                          xray_pending_review_reviewed_count,
+                          xray_pending_decision_received_count,
+                          xray_pending_decision_reviewed_count
+                        ]
+        end
       end
     end
   end
 
-  def generate_total_fw_registration_data(country_id = nil, state_id = nil, job_id = nil, organization_id = nil)
-    query = Transaction.order(created_at: :desc).limit(20)
+  def add_sheet_by_state(package)
+    @states = State.pluck(:name).compact.uniq
+    states_with_ids = State.where(name: @states).pluck(:name, :id).to_h
+    doctor_ids = Doctor.where(state_id: states_with_ids.values).pluck(:id)
 
-    query = query.where(fw_country_id: country_id) if country_id
-    query = query.joins(doctor: :state).where('doctors.state_id' => state_id) if state_id
-    query = query.where(fw_job_type_id: job_id) if job_id
-    query = query.where(organization_id: organization_id) if organization_id
-    query.count
+    unless @states.empty?
+      state_data = Transaction.joins(doctor: :state)
+                              .where(states: { id: states_with_ids.values })
+                              .group('states.name')
+                              .select(
+                                'states.name AS state',
+                                'COUNT(DISTINCT transactions.id) AS total_fw_registration_count',
+                                'SUM(CASE WHEN transactions.medical_examination_date IS NOT NULL THEN 1 ELSE 0 END) AS examination_count',
+                                'SUM(CASE WHEN transactions.certification_date IS NOT NULL THEN 1 ELSE 0 END) AS certification_count'
+                              )
+      package.workbook.add_worksheet(name: 'FW Reg. by State') do |sheet|
+
+        # Header row
+        sheet.add_row [
+                        'State',
+                        'Total FW Registration',
+                        'Examination Count',
+                        'Certification Count',
+                        'XQCC Pool Received',
+                        'XQCC Pool Reviewed',
+                        'PCR Pool Received',
+                        'PCR Pool Reviewed',
+                        'Xray Pending Review Received',
+                        'Xray Pending Review Reviewed',
+                        'Xray Pending Decision Received',
+                        'Xray Pending Decision Reviewed'
+                      ], b: true
+
+        # Add data for each state
+        state_data.each do |data|
+          sheet.add_row [
+                          data.state,
+                          data.total_fw_registration_count.to_i,
+                          data.examination_count.to_i,
+                          data.certification_count.to_i,
+                          @xqcc_pool_received_count,
+                          @xqcc_pool_reviewed_count,
+                          @pcr_pool_received_count,
+                          @pcr_pool_reviewed_count,
+                          @xray_pending_review_received_count,
+                          @xray_pending_review_reviewed_count,
+                          @xray_pending_decision_received_count,
+                          @xray_pending_decision_reviewed_count
+                        ]
+        end
+      end
+    end
   end
 
-  def generate_examination_count_data
-    Transaction.where.not(medical_examination_date: nil).order(created_at: :desc).count
+  def add_sheet_by_gender(package)
+    genders = ['M', 'F']
+    gender_data = Transaction.where(fw_gender: genders)
+                             .group(:fw_gender)
+                             .select(
+                               'fw_gender AS gender',
+                               'COUNT(*) AS total_fw_registration_count',
+                               'COUNT(medical_examination_date) AS examination_count',
+                               'COUNT(certification_date) AS certification_count'
+                             )
+
+    package.workbook.add_worksheet(name: 'FW Reg. by Gender') do |sheet|
+
+      # Header row
+      sheet.add_row [
+                      'Gender',
+                      'Total FW Registration',
+                      'Examination Count',
+                      'Certification Count',
+                      'XQCC Pool Received',
+                      'XQCC Pool Reviewed',
+                      'PCR Pool Received',
+                      'PCR Pool Reviewed',
+                      'Xray Pending Review Received',
+                      'Xray Pending Review Reviewed',
+                      'Xray Pending Decision Received',
+                      'Xray Pending Decision Reviewed'
+                    ], b: true
+
+      xqcc_pool_received_count = @xqcc_pool_received_count.sum
+      xqcc_pool_reviewed_count = @xqcc_pool_reviewed_count.sum
+      pcr_pool_received_count = @pcr_pool_received_count.sum
+      pcr_pool_received_count = @pcr_pool_reviewed_count.sum
+      xray_pending_review_received_count = @xray_pending_review_received_count.sum
+      xray_pending_review_reviewed_count = @xray_pending_review_reviewed_count.sum
+      xray_pending_decision_received_count = @xray_pending_decision_received_count.sum
+      xray_pending_decision_reviewed_count = @xray_pending_decision_reviewed_count.sum
+
+      gender_data.each do |data|
+        sheet.add_row [
+                        data.gender,
+                        data.total_fw_registration_count.to_i,
+                        data.examination_count.to_i,
+                        data.certification_count.to_i,
+                        xqcc_pool_received_count,
+                        xqcc_pool_reviewed_count,
+                        pcr_pool_received_count,
+                        pcr_pool_received_count,
+                        xray_pending_review_received_count,
+                        xray_pending_review_reviewed_count,
+                        xray_pending_decision_received_count,
+                        xray_pending_decision_reviewed_count
+                      ]
+      end
+    end
   end
 
-  def generate_certification_count_data
-    Transaction.where.not(certification_date: nil).order(created_at: :desc).count
+  def add_sheet_by_sector(package)
+    @job_type = JobType.pluck(:name).compact.uniq
+
+    unless @job_type.empty?
+      job_type_with_ids = JobType.where(name: @job_type).pluck(:id)
+      job_type_data = Transaction.where(fw_job_type_id: job_type_with_ids)
+                                 .group(:fw_job_type_id)
+                                 .select(
+                                   'fw_job_type_id',
+                                   'COUNT(*) AS total_fw_registration_count',
+                                   'COUNT(medical_examination_date) AS examination_count',
+                                   'COUNT(certification_date) AS certification_count'
+                                 )
+      result_hash = {}
+      job_type_data.each do |data|
+        result_hash[data.fw_job_type_id] = {
+          total_fw_registration_count: data.total_fw_registration_count.to_i,
+          examination_count: data.examination_count.to_i,
+          certification_count: data.certification_count.to_i
+        }
+      end
+      package.workbook.add_worksheet(name: 'FW Reg. by Sector') do |sheet|
+        # Header row
+        sheet.add_row [
+                        'Sector',
+                        'Total FW Registration',
+                        'Examination Count',
+                        'Certification Count',
+                        'XQCC Pool Received',
+                        'XQCC Pool Reviewed',
+                        'PCR Pool Received',
+                        'PCR Pool Reviewed',
+                        'Xray Pending Review Received',
+                        'Xray Pending Review Reviewed',
+                        'Xray Pending Decision Received',
+                        'Xray Pending Decision Reviewed'
+                      ], b: true
+
+        result_hash.each do |fw_job_type_id, counts|
+          sector_name = JobType.find(fw_job_type_id).name
+          xqcc_pool_received_count = @xqcc_pool_received_count.sum
+          xqcc_pool_reviewed_count = @xqcc_pool_reviewed_count.sum
+          pcr_pool_received_count = @pcr_pool_received_count.sum
+          pcr_pool_received_count = @pcr_pool_reviewed_count.sum
+          xray_pending_review_received_count = @xray_pending_review_received_count.sum
+          xray_pending_review_reviewed_count = @xray_pending_review_reviewed_count.sum
+          xray_pending_decision_received_count = @xray_pending_decision_received_count.sum
+          xray_pending_decision_reviewed_count = @xray_pending_decision_reviewed_count.sum
+
+          sheet.add_row [
+                          sector_name,
+                          counts[:total_fw_registration_count],
+                          counts[:examination_count],
+                          counts[:certification_count],
+                          xqcc_pool_received_count,
+                          xqcc_pool_reviewed_count,
+                          pcr_pool_received_count,
+                          pcr_pool_received_count,
+                          xray_pending_review_received_count,
+                          xray_pending_review_reviewed_count,
+                          xray_pending_decision_received_count,
+                          xray_pending_decision_reviewed_count
+                        ]
+        end
+      end
+    end
   end
 
-  def generate_xqcc_pool_received_data
-    Transaction.joins("JOIN xqcc_pools ON xqcc_pools.transaction_id = transactions.id")
-               .order('transactions.created_at DESC')
-               .limit(20)
-               .group('xqcc_pools.created_at, transactions.certification_date, transactions.created_at')
-               .count.values
+  def add_sheet_by_registration_at(package)
+    @organizations = Organization.pluck(:name).uniq
+
+    unless @organizations.empty?
+      organization_with_ids = Organization.where(name: @organizations).pluck(:id)
+      registration_at_data = Transaction.where(organization_id: organization_with_ids)
+                                        .group(:organization_id)
+                                        .select(
+                                          'organization_id',
+                                          'COUNT(*) AS total_fw_registration_count',
+                                          'COUNT(medical_examination_date) AS examination_count',
+                                          'COUNT(certification_date) AS certification_count'
+                                        )
+      result_hash = {}
+      registration_at_data.each do |data|
+        result_hash[data.organization_id] = {
+          total_fw_registration_count: data.total_fw_registration_count.to_i,
+          examination_count: data.examination_count.to_i,
+          certification_count: data.certification_count.to_i
+        }
+      end
+      package.workbook.add_worksheet(name: 'FW Reg. by FW Type') do |sheet|
+        # Header row
+        sheet.add_row [
+                        'FW registration by Registration at',
+                        'Total FW Registration',
+                        'Examination Count',
+                        'Certification Count',
+                        'XQCC Pool Received',
+                        'XQCC Pool Reviewed',
+                        'PCR Pool Received',
+                        'PCR Pool Reviewed',
+                        'Xray Pending Review Received',
+                        'Xray Pending Review Reviewed',
+                        'Xray Pending Decision Received',
+                        'Xray Pending Decision Reviewed'
+                      ], b: true
+
+        result_hash.each do |organization_id, counts|
+          organization_name = Organization.find(organization_id).name
+          xqcc_pool_received_count = @xqcc_pool_received_count.sum
+          xqcc_pool_reviewed_count = @xqcc_pool_reviewed_count.sum
+          pcr_pool_received_count = @pcr_pool_received_count.sum
+          pcr_pool_received_count = @pcr_pool_reviewed_count.sum
+          xray_pending_review_received_count = @xray_pending_review_received_count.sum
+          xray_pending_review_reviewed_count = @xray_pending_review_reviewed_count.sum
+          xray_pending_decision_received_count = @xray_pending_decision_received_count.sum
+          xray_pending_decision_reviewed_count = @xray_pending_decision_reviewed_count.sum
+
+          sheet.add_row [
+                          organization_name,
+                          counts[:total_fw_registration_count],
+                          counts[:examination_count],
+                          counts[:certification_count],
+                          xqcc_pool_received_count,
+                          xqcc_pool_reviewed_count,
+                          pcr_pool_received_count,
+                          pcr_pool_received_count,
+                          xray_pending_review_received_count,
+                          xray_pending_review_reviewed_count,
+                          xray_pending_decision_received_count,
+                          xray_pending_decision_reviewed_count
+                        ]
+        end
+      end
+    end
   end
 
-  def generate_xqcc_pool_reviewed_data
-    Transaction.joins("JOIN xray_reviews ON xray_reviews.transaction_id = transactions.id")
-               .order('transactions.created_at DESC')
-               .limit(20)
-               .group('xray_reviews.transmitted_at, transactions.certification_date, transactions.created_at')
-               .count.values
+  def add_sheet_by_fw_type(package)
+    registration = ['0', '1']
+    fw_data = Transaction.where(registration_type: registration)
+                         .group(:registration_type)
+                         .select(
+                           'registration_type AS registration_type',
+                           'COUNT(*) AS total_fw_registration_count',
+                           'COUNT(medical_examination_date) AS examination_count',
+                           'COUNT(certification_date) AS certification_count'
+                         )
+
+    package.workbook.add_worksheet(name: 'FW Reg. by FW Type') do |sheet|
+
+      # Header row
+      sheet.add_row [
+                      'FW registration by FW Type',
+                      'Total FW Registration',
+                      'Examination Count',
+                      'Certification Count',
+                      'XQCC Pool Received',
+                      'XQCC Pool Reviewed',
+                      'PCR Pool Received',
+                      'PCR Pool Reviewed',
+                      'Xray Pending Review Received',
+                      'Xray Pending Review Reviewed',
+                      'Xray Pending Decision Received',
+                      'Xray Pending Decision Reviewed'
+                    ], b: true
+
+      xqcc_pool_received_count = @xqcc_pool_received_count.sum
+      xqcc_pool_reviewed_count = @xqcc_pool_reviewed_count.sum
+      pcr_pool_received_count = @pcr_pool_received_count.sum
+      pcr_pool_received_count = @pcr_pool_reviewed_count.sum
+      xray_pending_review_received_count = @xray_pending_review_received_count.sum
+      xray_pending_review_reviewed_count = @xray_pending_review_reviewed_count.sum
+      xray_pending_decision_received_count = @xray_pending_decision_received_count.sum
+      xray_pending_decision_reviewed_count = @xray_pending_decision_reviewed_count.sum
+
+      fw_data.each do |data|
+        sheet.add_row [
+                        data.registration_type,
+                        data.total_fw_registration_count.to_i,
+                        data.examination_count.to_i,
+                        data.certification_count.to_i,
+                        xqcc_pool_received_count,
+                        xqcc_pool_reviewed_count,
+                        pcr_pool_received_count,
+                        pcr_pool_received_count,
+                        xray_pending_review_received_count,
+                        xray_pending_review_reviewed_count,
+                        xray_pending_decision_received_count,
+                        xray_pending_decision_reviewed_count
+                      ]
+      end
+    end
   end
 
-  def generate_pcr_pool_received_data
-    Transaction.joins("JOIN pcr_pools ON pcr_pools.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('pcr_pools.created_at, transactions.certification_date, transactions.created_at')
-               .count.values
-  end
+  def add_sheet_by_line_chart(package)
 
-  def generate_pcr_pool_reviewed_data
-    Transaction.joins("JOIN pcr_reviews ON pcr_reviews.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('pcr_reviews.created_at,transactions.certification_date, transactions.created_at')
-               .count.values
-  end
+    Transaction.transaction_data_last_5_years rescue {}
+    if @transaction_line_chart.blank?
+      current_year = start_of_curr_year.year
+      last_five_years = (current_year - 4..current_year)
 
-  def generate_xray_pending_review_received_data
-    Transaction.joins("JOIN xray_pending_reviews ON xray_pending_reviews.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('xray_pending_reviews.created_at, transactions.certification_date, transactions.created_at')
-               .count.values
-  end
+      @transaction_line_chart = last_five_years.each_with_object({}) do |year, chart_data|
+        chart_data[year] = [0] * 12
+      end
+    end
 
-  def generate_xray_pending_review_reviewed_data
-    Transaction.joins("JOIN xray_pending_reviews ON xray_pending_reviews.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('xray_pending_reviews.transmitted_at, transactions.certification_date, transactions.created_at')
-               .count.values
-  end
+    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
 
-  def generate_xray_pending_decision_received_data
-    Transaction.joins("JOIN xray_pending_decisions ON xray_pending_decisions.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('xray_pending_decisions.created_at, transactions.certification_date, transactions.created_at')
-               .count.values
+    @headers_line_chart = @sums_by_year.keys.map(&:to_s)
+    @data_line_chart = @sums_by_year.values.map(&:to_i)
 
-  end
 
-  def generate_xray_pending_decision_reviewed_data
-    Transaction.joins("JOIN xray_pending_decisions ON xray_pending_decisions.transaction_id = transactions.id").order('transactions.created_at DESC')
-               .limit(20)
-               .group('xray_pending_decisions.transmitted_at, transactions.certification_date, transactions.created_at')
-               .count.values
+
+    package.workbook.add_worksheet(name: 'FW Reg. by FW Type') do |sheet|
+
+      sheet.add_row @headers_line_chart
+      sheet.add_row @data_line_chart
+    end
+
   end
 
   def convert_values_to_arrays(filters)
