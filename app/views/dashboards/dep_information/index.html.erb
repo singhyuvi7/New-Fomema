@@ -62,33 +62,29 @@
               });
           </script>
           <script>
-              $.noConflict();
-              jQuery(document).ready(function ($) {
-                  $(document).ready(function () {
-                      $(function () {
+          $.noConflict();
+          jQuery(document).ready(function ($) {
+              $(document).ready(function () {
+                  $(function () {
+                      var currentDate = new Date();
+                      var currentYear = currentDate.getFullYear();
+                      var currentMonth = currentDate.getMonth() + 1;
 
-                          var currentDate = new Date();
-                          var currentYear = currentDate.getFullYear();
-                          var currentMonth = currentDate.getMonth() + 1;
+                      var formattedYear = currentYear.toString();
+                      var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
 
+                      var startDateString = "01/" + formattedMonth + "/" + formattedYear;
+                      var endDateString = moment(currentDate).endOf('month').format('DD/MM/YYYY');
 
-                          var formattedYear = currentYear.toString();
-                          var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
-
-
-                          var startDateString = "01/" + formattedMonth + "/" + formattedYear;
-                          var endDateString = "31/" + formattedMonth + "/" + formattedYear;
-
-
-                          $('input[name="daterange"]').daterangepicker({
-                              "startDate": startDateString,
-                              "endDate": endDateString,
-                              opens: 'center',
-                              showDropdowns: true,
-                              locale: {
-                                  format: 'DD/MM/YYYY'
-                              }
-                          });
+                      $('input[name="daterange"]').daterangepicker({
+                          "startDate": startDateString,
+                          "endDate": endDateString,
+                          opens: 'center',
+                          showDropdowns: true,
+                          locale: {
+                              format: 'DD/MM/YYYY'
+                          }
+                      });
                       });
                   });
               });
