@@ -28,9 +28,9 @@
   <div class="col-12">
     <div class="card">
 
-    <div class="card-header py-0">
-    <strong style="line-height: 40px;">Department Information</strong>
-    <span class="float-right card-headermenu">
+      <div class="card-header py-0">
+        <strong style="line-height: 40px;">Department Information</strong>
+        <span class="float-right card-headermenu">
 
 
 
@@ -61,40 +61,40 @@
                   });
               });
           </script>
-          <script>
-          $.noConflict();
-          jQuery(document).ready(function ($) {
-              $(document).ready(function () {
-                  $(function () {
-                      var currentDate = new Date();
-                      var currentYear = currentDate.getFullYear();
-                      var currentMonth = currentDate.getMonth() + 1;
+            <script>
+                $.noConflict();
+                jQuery(document).ready(function ($) {
+                    $(document).ready(function () {
+                        $(function () {
+                            var currentDate = new Date();
+                            var currentYear = currentDate.getFullYear();
+                            var currentMonth = currentDate.getMonth() + 1;
 
-                      var formattedYear = currentYear.toString();
-                      var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
+                            var formattedYear = currentYear.toString();
+                            var formattedMonth = currentMonth < 10 ? '0' + currentMonth.toString() : currentMonth.toString();
 
-                      var startDateString = "01/" + formattedMonth + "/" + formattedYear;
-                      var endDateString = moment(currentDate).endOf('month').format('DD/MM/YYYY');
+                            var startDateString = "01/" + formattedMonth + "/" + formattedYear;
+                            var endDateString = moment(currentDate).endOf('month').format('DD/MM/YYYY');
 
-                      $('input[name="daterange"]').daterangepicker({
-                          "startDate": startDateString,
-                          "endDate": endDateString,
-                          opens: 'center',
-                          showDropdowns: true,
-                          locale: {
-                              format: 'DD/MM/YYYY'
-                          }
-                      });
-                      });
-                  });
-              });
+                            $('input[name="daterange"]').daterangepicker({
+                                "startDate": startDateString,
+                                "endDate": endDateString,
+                                opens: 'center',
+                                showDropdowns: true,
+                                locale: {
+                                    format: 'DD/MM/YYYY'
+                                }
+                            });
+                        });
+                    });
+                });
 
-              jQuery(document).ready(function () {
-                  $(".dropdown-toggle").click(function () {
-                      $(".caret").toggleClass('rotate-180');
-                  });
-              });
-          </script>
+                jQuery(document).ready(function () {
+                    $(".dropdown-toggle").click(function () {
+                        $(".caret").toggleClass('rotate-180');
+                    });
+                });
+            </script>
 
         </li>
     <li>
@@ -140,7 +140,7 @@
 
             </ul>
 </span>
-  </div>
+      </div>
 
         <div class="wrapper">
           <!-- Page Content  -->
