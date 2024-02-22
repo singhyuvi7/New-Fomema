@@ -51,3 +51,14 @@ function NonCommunicableOpenClose() {
     }
 }
 
+// maximize/minimize
+
+function toggleFullScreen() {
+    if ($("body").hasClass("fullscreen")) {
+        $("body").removeClass("fullscreen");
+        $("#result_html_div .result").css("min-height", "");
+    } else {
+        $("body").addClass("fullscreen");
+        $("#result_html_div .result").css("min-height", "");
+    }
+}
