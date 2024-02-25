@@ -6,8 +6,8 @@ class Dashboards::FwInformationController < InternalController
     @countries = specific_countries
     @states = Rails.cache.fetch("state_names", expires_in: 1.day) { State.order(:name).pluck(:id, :name) }
     @job_type = JobType.order(:name).pluck(:id, :name) # Sectors
-    # @organizations = Organization.distinct.pluck(:name)
     @foregin_worker_type = Transaction.registration_types.keys # Foreign Worker Type
+    @organizations = Organization.order(:name).where(status: 'ACTIVE').pluck(:name)
 
     respond_to do |format|
       format.html
@@ -17,34 +17,32 @@ class Dashboards::FwInformationController < InternalController
 
   def registration_counts
     filters = params[:data]
-    start_time, end_time = date_range_values(filters)
     filtered_data = if filters.present?
-                      Transaction.where(created_at: start_time..end_time)
-                      # filtered_transactions(params[:data]).joins(doctor: :state).order("states.name")
+                      filtered_transactions(params[:data])
                     else
-                      Transaction.where(created_at: start_time..end_time)
+                      @fw_registration = Transaction.where.not(transaction_date: nil).where.not(status: ['CANCELLED', 'REJECTED']).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_medical_examination = Transaction.where.not(medical_examination_date: nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_certification = Transaction.where.not(certification_date: nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @final_result_release = Transaction.where.not(transaction_date: nil).where.not(final_result_date: nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @result_transmit_immigration = Transaction.joins("JOIN myimms_transactions ON myimms_transactions.transaction_id = transactions.id").where.not(myimms_transactions: { transaction_id: nil }).where.not(myimms_transactions: { status: nil }).where.not(final_result_date: nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_blocked = Transaction.joins("JOIN myimms_transactions ON myimms_transactions.transaction_id = transactions.id").where.not(myimms_transactions: { transaction_id: nil }).where.not(myimms_transactions: { status: nil }).where.not(myimms_transactions: { status: 1 }).where.not(final_result_date: nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_appeal = Transaction.joins(:medical_appeals).where.not(medical_appeals: { created_at: nil }).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_insured = Transaction.joins(" INNER JOIN insurance_purchases ON transactions.foreign_worker_id =insurance_purchases.foreign_worker_id INNER JOIN orders ON insurance_purchases.order_id = orders.id").where.not('insurance_purchases.foreign_worker_id' => nil, 'orders.id' => nil, 'transactions.transaction_date' => nil).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).count
+                      @fw_pending_view = {
+                        xqcc_pool_received: Transaction.joins(:xqcc_pools).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xqcc_pools: { created_at: nil }).where.not(certification_date: nil).count,
+                        xqcc_pool_reviewed: Transaction.joins(:xray_reviews, :xqcc_pools).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xqcc_pools: { created_at: nil }).where.not(xray_reviews: { transmitted_at: nil }).count,
+                        pcr_pool_received: Transaction.joins(:pcr_pools).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(pcr_pools: { created_at: nil }).where.not(certification_date: nil).count,
+                        pcr_pool_reviewed: Transaction.joins(:pcr_reviews, :pcr_pools).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(pcr_pools: { created_at: nil }).where.not(pcr_reviews: { transmitted_at: nil }).count,
+                        xray_pending_review_received: Transaction.joins(:xray_pending_reviews).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xray_pending_reviews: { created_at: nil }).where.not(certification_date: nil).count,
+                        xray_pending_review_reviewed: Transaction.joins(:xray_pending_reviews).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xray_pending_reviews: { created_at: nil }).where.not(xray_pending_reviews: { transmitted_at: nil }).where.not(certification_date: nil).count,
+                        xray_pending_decision_received: Transaction.joins(:xray_pending_decisions).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xray_pending_decisions: { created_at: nil }).where.not(certification_date: nil).count,
+                        xray_pending_decision_reviewed: Transaction.joins(:xray_pending_decisions).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(xray_pending_decisions: { created_at: nil }).where.not(xray_pending_decisions: { transmitted_at: nil }).where.not(certification_date: nil).count,
+                        medical_review_received: Transaction.joins(:medical_reviews).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(medical_reviews: { created_at: nil }).where.not(certification_date: nil).count,
+                        medical_review_reviewed: Transaction.joins(:medical_reviews).where("EXTRACT(YEAR FROM transactions.created_at) = ?", Date.today.year).where.not(medical_reviews: { medical_mle1_decision_at: nil }).where(medical_reviews: { is_qa: 'TRUE' }).where.not(medical_reviews: { qa_decision_at: nil }).count
+                      }
+                      @fw_pending_view_count = @fw_pending_view.values.sum
                     end
-
-    select_clause = <<~SQL
-      COUNT(1) as transactions_count,
-      COUNT(CASE WHEN medical_examination_date BETWEEN '#{start_time}' AND '#{end_time}' THEN transactions.id END) AS passed_examination_count,
-      COUNT(DISTINCT CASE WHEN certification_date BETWEEN '#{start_time}' AND '#{end_time}' THEN transactions.id END) AS certification_count,
-      COUNT(DISTINCT CASE WHEN final_result IS NULL THEN transactions.id END) AS final_result_count
-    SQL
-
-    resp = filtered_data.select(select_clause)[0]
-    @transactions_count = resp.transactions_count
-    @passed_examination_count = resp.passed_examination_count
-    @certification_count = resp.certification_count
-    @final_result = resp.final_result_count
-
-    @side_bar_medical_appeals = filtered_data.joins(:medical_appeals).count
-    @block_fw = filtered_data.joins(:myimms_transaction).group('myimms_transactions.status').count
-    @block_fw.transform_keys! { |key| MyimmsTransaction::RESPONSE_STATUS[key] || key }
-
-    # FW counts
-    fetch_fw_counts(filtered_data, start_time, end_time)
-    other_fw_counts(filtered_data, start_time, end_time)
+    filtered_data
 
     render layout: false
   end
@@ -84,12 +82,27 @@ class Dashboards::FwInformationController < InternalController
     filtered_data = if params[:data].present?
                       filtered_transactions(params[:data])
                     else
-                      @fw_Reg_by_countries = Transaction
+                      allowed_countries = ['BANGLADESH', 'NEPAL', 'INDONESIA', 'MYANMAR', 'INDIA',
+                                           'PAKISTAN', 'PHILIPPINES', 'VIETNAM', 'SRI LANKA', 'THAILAND', 'CAMBODIA', 'LAOS',
+                                           'UZBEKISTAN', 'TURKMENISTAN', 'KAZAKHSTAN']
+
+                      all_reg_by_countries = Transaction
                                                .joins("JOIN countries ON countries.id = transactions.fw_country_id")
                                                .group('countries.name', 'countries.code')
                                                .where("extract(year from transactions.created_at) = ?", Date.today.year)
                                                .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
                                                .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+                      if all_reg_by_countries.nil? || all_reg_by_countries.empty?
+                        @fw_Reg_by_countries = nil
+                      else
+                        allowed_countries_data = all_reg_by_countries.select { |entry| allowed_countries.include?(entry[0].upcase) }
+
+                        others_count = all_reg_by_countries.reject { |entry| allowed_countries.include?(entry[0].upcase) }
+                                                           .map { |entry| entry[2] }
+                                                           .sum
+                        @fw_Reg_by_countries = (allowed_countries_data + [["OTHERS", "OTH", others_count]]).sort_by! { |entry| entry[0] }
+                      end
                     end
 
     filtered_data
@@ -98,26 +111,24 @@ class Dashboards::FwInformationController < InternalController
   end
 
   def registration_trends
-    start_time, end_time = date_range_values(params[:data])
+    filtered_data = if params[:data].present?
+                      filtered_transactions(params[:data])
+                    else
+                      @transaction_line_chart = Transaction.transaction_data_last_5_years rescue {}
+                      if @transaction_line_chart.blank?
+                        current_year = start_of_curr_year.year
+                        last_five_years = (current_year - 4..current_year)
 
-    @transaction_line_chart = if params[:data].present?
-                                filtered_transactions(params[:data]).transaction_data_between(start_time: start_time, end_time: end_time)
-                              else
-                                start_time = start_of_curr_year - 4.years
-                                end_time = end_of_curr_year
-                                Transaction.transaction_data_last_5_years rescue {}
-                              end
+                        @transaction_line_chart = last_five_years.each_with_object({}) do |year, chart_data|
+                          chart_data[year] = [0] * 12
+                        end
+                      end
+                      @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
 
-    if @transaction_line_chart.blank?
-      current_year = start_of_curr_year.year
-      last_five_years = (current_year - 4..current_year)
+                    end
 
-      @transaction_line_chart = last_five_years.each_with_object({}) do |year, chart_data|
-        chart_data[year] = [0] * 12
-      end
-    end
-    @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
-
+    filtered_data
+    
     render layout: false
   end
 
@@ -131,82 +142,411 @@ class Dashboards::FwInformationController < InternalController
 
   def filtered_transactions(filters)
     transactions = Transaction
-    transactions = apply_country_filter(filters, transactions)
-    transactions = apply_date_range_filer(filters, transactions)
+    transactions = apply_date_range_filter(filters, transactions)
+    start_time, end_time = date_range_values(filters)
+
+    allowed_countries = ['BANGLADESH', 'NEPAL', 'INDONESIA', 'MYANMAR', 'INDIA',
+                         'PAKISTAN', 'PHILIPPINES', 'VIETNAM', 'SRI LANKA', 'THAILAND', 'CAMBODIA', 'LAOS',
+                         'UZBEKISTAN', 'TURKMENISTAN', 'KAZAKHSTAN']
+
+    base_query_trend_fw = Transaction.where(created_at: start_time..end_time)
+    base_query_sectors = Transaction.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time)
+    base_query_states = Transaction.joins(doctor: :state).where(created_at: start_time..end_time)
+    base_query_countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id").where(created_at: start_time..end_time)
+
+    # side view section
+
+    base_query_fw_registration = Transaction.where.not(transaction_date: nil).where.not(status: ['CANCELLED', 'REJECTED']).where(created_at: start_time..end_time)
+    base_query_fw_medical_examination = Transaction.where.not(medical_examination_date: nil).where(created_at: start_time..end_time)
+    base_query_fw_certification = Transaction.where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_final_result_release = Transaction.where.not(transaction_date: nil).where.not(final_result_date: nil)
+    base_query_result_transmit_immigration = Transaction.joins("JOIN myimms_transactions ON myimms_transactions.transaction_id = transactions.id").where.not(myimms_transactions: { transaction_id: nil }).where.not(myimms_transactions: { status: nil }).where.not(final_result_date: nil).where(created_at: start_time..end_time)
+    base_query_fw_blocked = Transaction.joins("JOIN myimms_transactions ON myimms_transactions.transaction_id = transactions.id").where.not(myimms_transactions: { transaction_id: nil }).where.not(myimms_transactions: { status: nil }).where.not(myimms_transactions: { status: 1 }).where.not(final_result_date: nil).where(created_at: start_time..end_time)
+    base_query_fw_appeal = Transaction.joins(:medical_appeals).where.not(medical_appeals: { created_at: nil }).where(created_at: start_time..end_time)
+    base_query_fw_insured = Transaction.joins(" INNER JOIN insurance_purchases ON transactions.foreign_worker_id =insurance_purchases.foreign_worker_id INNER JOIN orders ON insurance_purchases.order_id = orders.id").where.not('insurance_purchases.foreign_worker_id' => nil, 'orders.id' => nil, 'transactions.transaction_date' => nil).where(created_at: start_time..end_time)
+
+    # fomema pending to view section
+
+    base_query_xqcc_pool_received = Transaction.joins(:xqcc_pools).where.not(xqcc_pools: { created_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_xqcc_pool_reviewed = Transaction.joins(:xray_reviews, :xqcc_pools).where.not(xqcc_pools: { created_at: nil }).where.not(xray_reviews: { transmitted_at: nil }).where(created_at: start_time..end_time)
+    base_query_pcr_pool_received = Transaction.joins(:pcr_pools).where.not(pcr_pools: { created_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_pcr_pool_reviewed = Transaction.joins(:pcr_reviews, :pcr_pools).where.not(pcr_pools: { created_at: nil }).where.not(pcr_reviews: { transmitted_at: nil }).where(created_at: start_time..end_time)
+    base_query_xray_pending_review_received = Transaction.joins(:xray_pending_reviews).where.not(xray_pending_reviews: { created_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_xray_pending_review_reviewed = Transaction.joins(:xray_pending_reviews).where.not(xray_pending_reviews: { created_at: nil }).where.not(xray_pending_reviews: { transmitted_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_xray_pending_decision_received = Transaction.joins(:xray_pending_decisions).where.not(xray_pending_decisions: { created_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_xray_pending_decision_reviewed = Transaction.joins(:xray_pending_decisions).where.not(xray_pending_decisions: { created_at: nil }).where.not(xray_pending_decisions: { transmitted_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_medical_review_received = Transaction.joins(:medical_reviews).where.not(medical_reviews: { created_at: nil }).where.not(certification_date: nil).where(created_at: start_time..end_time)
+    base_query_medical_review_reviewed = Transaction.joins(:medical_reviews).where.not(medical_reviews: { medical_mle1_decision_at: nil }).where(medical_reviews: { is_qa: 'TRUE' }).where.not(medical_reviews: { qa_decision_at: nil }).where(created_at: start_time..end_time)
 
     if filters[:sectors].present?
-      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(job_types: { id: filters[:sectors] })
+
+      transactions = transactions.joins("JOIN job_types on transactions.fw_job_type_id = job_types.id").where(created_at: start_time..end_time).where(job_types: { id: filters[:sectors] })
+
+      base_query_trend_fw = base_query_trend_fw.where(fw_job_type_id: filters[:sectors])
+
+      base_query_sectors = transactions
+
+      # sector data to display in state
+
+      base_query_states = base_query_states.where(fw_job_type_id: filters[:sectors])
+
+      # sector data to display in country
+
+      country_ids = transactions.pluck(:fw_country_id).uniq
+
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids).where(fw_job_type_id: filters[:sectors])
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.where(fw_job_type_id: filters[:sectors])
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(fw_job_type_id: filters[:sectors])
+      base_query_fw_certification = base_query_fw_certification.where(fw_job_type_id: filters[:sectors])
+      base_query_final_result_release = base_query_final_result_release.where(fw_job_type_id: filters[:sectors])
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(fw_job_type_id: filters[:sectors])
+      base_query_fw_blocked = base_query_fw_blocked.where(fw_job_type_id: filters[:sectors])
+      base_query_fw_appeal = base_query_fw_appeal.where(fw_job_type_id: filters[:sectors])
+      base_query_fw_insured = base_query_fw_insured.where(fw_job_type_id: filters[:sectors])
+
+      # # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(fw_job_type_id: filters[:sectors])
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(fw_job_type_id: filters[:sectors])
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(fw_job_type_id: filters[:sectors])
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(fw_job_type_id: filters[:sectors])
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(fw_job_type_id: filters[:sectors])
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(fw_job_type_id: filters[:sectors])
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(fw_job_type_id: filters[:sectors])
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(fw_job_type_id: filters[:sectors])
+      base_query_medical_review_received = base_query_medical_review_received.where(fw_job_type_id: filters[:sectors])
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(fw_job_type_id: filters[:sectors])
+
     end
 
     if filters[:states].present?
-      state_ids = Transaction.joins(doctor: :state).where(states: { id: filters[:states] }).pluck('states.id')
-      hash = {}
-      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
-      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
-      converted_hash = {}
-      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
-      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
 
-    else
-      start_time, end_time = date_range_values(filters)
-      state_ids = Transaction.joins(doctor: :state).where(created_at: start_time..end_time).pluck('states.id')
-      hash = {}
-      state_ids.sort.uniq.each { |h| hash[h] = state_ids.count(h) }
-      state_names = State.where(id: state_ids.sort.uniq).pluck(:name, :long_code)
-      converted_hash = {}
-      state_names.each_with_index { |value, index| converted_hash[value] = hash.values[index] }
-      @fw_reg_by_states = converted_hash.map { |key, value| key + [value] }
+      base_query_trend_fw = base_query_trend_fw.joins(doctor: :state).where(states: { id: filters[:states] })
+
+      base_query_states = base_query_states.where(states: { id: filters[:states] })
+
+      # state data to display in sector
+      base_query_sectors = base_query_sectors.joins(doctor: :state).where(states: { id: filters[:states] })
+
+      # state data to display in country
+      doctor_ids = Doctor.where(state_id: filters[:states]).pluck(:id).compact.uniq
+      country_ids = Transaction.where(doctor_id: doctor_ids).pluck(:fw_country_id).compact.uniq
+
+      base_query_countries = base_query_countries.joins(doctor: :state).where(states: { id: filters[:states] }).where(fw_country_id: country_ids)
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_fw_medical_examination = base_query_fw_medical_examination.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_fw_certification = base_query_fw_certification.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_final_result_release = base_query_final_result_release.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_fw_blocked = base_query_fw_blocked.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_fw_appeal = base_query_fw_appeal.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_fw_insured = base_query_fw_insured.joins(doctor: :state).where(states: { id: filters[:states] })
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_pcr_pool_received = base_query_pcr_pool_received.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_medical_review_received = base_query_medical_review_received.joins(doctor: :state).where(states: { id: filters[:states] })
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.joins(doctor: :state).where(states: { id: filters[:states] })
+
+    end
+
+    if filters[:countries].present?
+      country_ids = filters[:countries]
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids)
+
+      base_query_trend_fw = base_query_trend_fw.where(fw_country_id: filters[:countries])
+
+      # country data to display in sectors
+      base_query_sectors = base_query_sectors.where(fw_country_id: country_ids)
+
+      # country data to display in states
+      base_query_states = base_query_states.where(fw_country_id: country_ids)
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.where(fw_country_id: country_ids)
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(fw_country_id: country_ids)
+      base_query_fw_certification = base_query_fw_certification.where(fw_country_id: country_ids)
+      base_query_final_result_release = base_query_final_result_release.where(fw_country_id: country_ids)
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(fw_country_id: country_ids)
+      base_query_fw_blocked = base_query_fw_blocked.where(fw_country_id: country_ids)
+      base_query_fw_appeal = base_query_fw_appeal.where(fw_country_id: country_ids)
+      base_query_fw_insured = base_query_fw_insured.where(fw_country_id: country_ids)
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(fw_country_id: country_ids)
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(fw_country_id: country_ids)
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(fw_country_id: country_ids)
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(fw_country_id: country_ids)
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(fw_country_id: country_ids)
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(fw_country_id: country_ids)
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(fw_country_id: country_ids)
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(fw_country_id: country_ids)
+      base_query_medical_review_received = base_query_medical_review_received.where(fw_country_id: country_ids)
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(fw_country_id: country_ids)
+
+    elsif filters[:other_countries].to_s == 'true'
+
+      country_ids = allowed_countries.map { |country| Country.find_by(name: country)&.id }.compact
+      base_query_countries = base_query_countries.where.not(fw_country_id: country_ids)
+      base_query_trend_fw = base_query_trend_fw.where.not(fw_country_id: country_ids)
+    end
+
+    if filters[:age].present?
+      filtered_age_ranges = filters[:age]
+
+      # Calculate birth year ranges based on the provided age ranges
+      conditions = filtered_age_ranges.map do |range|
+        min_age, max_age = range.split('-').map(&:to_i)
+        "EXTRACT(YEAR FROM AGE(CURRENT_DATE, transactions.fw_date_of_birth)) BETWEEN ? AND ?"
+      end.join(" OR ")
+
+      transactions = Transaction.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      base_query_trend_fw = base_query_trend_fw.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      # age data to display in sectors
+      base_query_sectors = base_query_sectors.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      # age data to display in states
+      base_query_states = base_query_states.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      # age data to display in countries
+      country_ids = base_query_countries.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) }).pluck(:fw_country_id).compact.uniq
+
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids).where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_fw_certification = base_query_fw_certification.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_final_result_release = base_query_final_result_release.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_fw_blocked = base_query_fw_blocked.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_fw_appeal = base_query_fw_appeal.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_fw_insured = base_query_fw_insured.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_medical_review_received = base_query_medical_review_received.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(conditions, *filtered_age_ranges.flat_map { |range| range.split('-').map(&:to_i) })
 
     end
 
     if filters[:gender].present?
-      transactions = transactions.where("UPPER(fw_gender) = (?)", values)
+
+      base_query_trend_fw = base_query_trend_fw.where(fw_gender: filters[:gender])
+
+      # gender data to display in sectors
+      base_query_sectors = base_query_sectors.where(fw_gender: filters[:gender])
+
+      # gender data to display in states
+      base_query_states = base_query_states.where(fw_gender: filters[:gender])
+
+      # gender data to display in countries
+      country_ids = base_query_countries.where(fw_gender: filters[:gender]).pluck(:fw_country_id).compact.uniq
+
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids).where(fw_gender: filters[:gender])
+
+      base_query_fw_registration = base_query_fw_registration.where(fw_gender: filters[:gender])
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(fw_gender: filters[:gender])
+      base_query_fw_certification = base_query_fw_certification.where(fw_gender: filters[:gender])
+      base_query_final_result_release = base_query_final_result_release.where(fw_gender: filters[:gender])
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(fw_gender: filters[:gender])
+      base_query_fw_blocked = base_query_fw_blocked.where(fw_gender: filters[:gender])
+      base_query_fw_appeal = base_query_fw_appeal.where(fw_gender: filters[:gender])
+      base_query_fw_insured = base_query_fw_insured.where(fw_gender: filters[:gender])
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(fw_gender: filters[:gender])
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(fw_gender: filters[:gender])
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(fw_gender: filters[:gender])
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(fw_gender: filters[:gender])
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(fw_gender: filters[:gender])
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(fw_gender: filters[:gender])
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(fw_gender: filters[:gender])
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(fw_gender: filters[:gender])
+      base_query_medical_review_received = base_query_medical_review_received.where(fw_gender: filters[:gender])
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(fw_gender: filters[:gender])
+
     end
 
-    filters.each do |key, values|
-      if values.present?
-        case key
-        when 'age'
-        when 'registration_types'
-        when 'fw_types'
-        end
+    if filters[:fw_types].present?
+      registration_type_values = {
+        "new" => 0,
+        "renewal" => 1
+      }
+
+      base_query_trend_fw = base_query_trend_fw.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+      # registration data to display in sectors
+      base_query_sectors = base_query_sectors.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+      # registration data to display in states
+      base_query_states = base_query_states.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+      # registration data to display in countries
+
+      country_ids = base_query_countries.where(registration_type: registration_type_values.values_at(*filters[:fw_types])).pluck(:fw_country_id).compact.uniq
+
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids).where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_fw_certification = base_query_fw_certification.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_final_result_release = base_query_final_result_release.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_fw_blocked = base_query_fw_blocked.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_fw_appeal = base_query_fw_appeal.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_fw_insured = base_query_fw_insured.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_medical_review_received = base_query_medical_review_received.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(registration_type: registration_type_values.values_at(*filters[:fw_types]))
+
+    end
+
+    if filters[:registration_types].present?
+      organization_ids = Organization.where(name: filters[:registration_types]).pluck(:id)
+
+      base_query_trend_fw = base_query_trend_fw.where(organization_id: organization_ids)
+
+      # registration_types data to display in sectors
+      base_query_sectors = base_query_sectors.where(organization_id: organization_ids)
+
+      # registration_types data to display in states
+      base_query_states = base_query_states.where(organization_id: organization_ids)
+
+      # registration_types data to display in countries
+
+      country_ids = base_query_countries.where(organization_id: organization_ids).pluck(:fw_country_id).compact.uniq
+
+      base_query_countries = base_query_countries.where(fw_country_id: country_ids).where(organization_id: organization_ids)
+
+      # side section
+      base_query_fw_registration = base_query_fw_registration.where(organization_id: organization_ids)
+      base_query_fw_medical_examination = base_query_fw_medical_examination.where(organization_id: organization_ids)
+      base_query_fw_certification = base_query_fw_certification.where(organization_id: organization_ids)
+      base_query_final_result_release = base_query_final_result_release.where(organization_id: organization_ids)
+      base_query_result_transmit_immigration = base_query_result_transmit_immigration.where(organization_id: organization_ids)
+      base_query_fw_blocked = base_query_fw_blocked.where(organization_id: organization_ids)
+      base_query_fw_appeal = base_query_fw_appeal.where(organization_id: organization_ids)
+      base_query_fw_insured = base_query_fw_insured.where(organization_id: organization_ids)
+
+      # fomema pending to view
+      base_query_xqcc_pool_received = base_query_xqcc_pool_received.where(organization_id: organization_ids)
+      base_query_xqcc_pool_reviewed = base_query_xqcc_pool_reviewed.where(organization_id: organization_ids)
+      base_query_pcr_pool_received = base_query_pcr_pool_received.where(organization_id: organization_ids)
+      base_query_pcr_pool_reviewed = base_query_pcr_pool_reviewed.where(organization_id: organization_ids)
+      base_query_xray_pending_review_received = base_query_xray_pending_review_received.where(organization_id: organization_ids)
+      base_query_xray_pending_review_reviewed = base_query_xray_pending_review_reviewed.where(organization_id: organization_ids)
+      base_query_xray_pending_decision_received = base_query_xray_pending_decision_received.where(organization_id: organization_ids)
+      base_query_xray_pending_decision_reviewed = base_query_xray_pending_decision_reviewed.where(organization_id: organization_ids)
+      base_query_medical_review_received = base_query_medical_review_received.where(organization_id: organization_ids)
+      base_query_medical_review_reviewed = base_query_medical_review_reviewed.where(organization_id: organization_ids)
+
+    end
+
+    # line chart
+    @transaction_line_chart = Transaction.transaction_data_between(base_query_trend_fw)
+    if @transaction_line_chart.blank?
+      current_year = start_of_curr_year.year
+      last_five_years = (current_year - 4..current_year)
+
+      @transaction_line_chart = last_five_years.each_with_object({}) do |year, chart_data|
+        chart_data[year] = [0] * 12
       end
     end
-
-    transactions
-  end
-
-  def apply_country_filter(filters, transactions)
-    if filters[:countries].present? && filters[:other_countries].to_s == 'false'
-      countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id").where(
-        "countries.id IN (?)",
-        (filters[:countries].present? ? filters[:countries] : [])
-      )
-                             .group('countries.name', 'countries.code')
-                             .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                             .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
-
-      @fw_Reg_by_countries = countries
-    elsif filters[:other_countries].to_s == 'true'
-      country_ids = specific_countries.map { |i| i[0] }
-      other_countries = Transaction.joins("JOIN countries ON countries.id = transactions.fw_country_id")
-                                   .where.not(countries: { id: country_ids })
-                                   .group('countries.name', 'countries.code')
-                                   .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                                   .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
-      @fw_Reg_by_countries = other_countries
+    if @transaction_line_chart.present? && @transaction_line_chart.values.any? { |data| data.sum > 0 }
+      @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
     else
-      start_time, end_time = date_range_values(filters)
-      @fw_Reg_by_countries = Transaction
-                               .joins("JOIN countries ON countries.id = transactions.fw_country_id").where(created_at: start_time..end_time)
-                               .group('countries.name', 'countries.code')
-                               .select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count")
-                               .map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+      date_range = params[:data][:date_range]
+      start_date_str, end_date_str = date_range.split(" - ")
+      selected_year = start_date_str.split("/").last.to_i
+
+      @transaction_line_chart = { selected_year => Array.new(12, 0) }
+      @sums_by_year = @transaction_line_chart.transform_values { |data| data.sum }
     end
+
+    all_reg_by_countries = base_query_countries.group('countries.name', 'countries.code').select("countries.name || ',' || countries.code AS country_info, COUNT(*) AS count").map { |entry| entry.country_info.split(',') + [entry.count.to_i] }
+
+    if all_reg_by_countries.nil? || all_reg_by_countries.empty?
+      @fw_Reg_by_countries = nil
+    else
+      allowed_countries_data = all_reg_by_countries.select { |entry| allowed_countries.include?(entry[0].upcase) }
+
+      if filters[:countries].present?
+        @fw_Reg_by_countries = allowed_countries_data.sort_by! { |entry| entry[0] }
+      else
+        others_count = all_reg_by_countries.reject { |entry| allowed_countries.include?(entry[0].upcase) }
+                                           .map { |entry| entry[2] }
+                                           .sum
+        @fw_Reg_by_countries = (allowed_countries_data + [["OTHERS", "OTH", others_count]]).sort_by! { |entry| entry[0] }
+      end
+
+    end
+
+    job_types_count = base_query_sectors.
+      group('job_types.name').
+      pluck('job_types.name', 'COUNT(1)')
+    @pi_chart_filtered_data = [['Task', 'Hours per Day'], *job_types_count]
+
+    @fw_reg_by_filtered_states = base_query_states
+                                   .group('states.id')
+                                   .pluck('states.name, states.long_code, COUNT(*)')
+                                   .map { |name, long_code, count| { name: name, long_code: long_code, count: count } }
+
+    # side view
+    @fw_registration = base_query_fw_registration.count
+    @fw_medical_examination = base_query_fw_medical_examination.count
+    @fw_certification = base_query_fw_certification.count
+    @final_result_release = base_query_final_result_release.count
+    @result_transmit_immigration = base_query_result_transmit_immigration.count
+    @fw_blocked = base_query_fw_blocked.count
+    @fw_appeal = base_query_fw_appeal.count
+    @fw_insured = base_query_fw_insured.count
+    @fw_pending_view = {
+      xqcc_pool_received: base_query_xqcc_pool_received.count,
+      xqcc_pool_reviewed: base_query_xqcc_pool_reviewed.count,
+      pcr_pool_received: base_query_pcr_pool_received.count,
+      pcr_pool_reviewed: base_query_pcr_pool_reviewed.count,
+      xray_pending_review_received: base_query_xray_pending_review_received.count,
+      xray_pending_review_reviewed: base_query_xray_pending_review_reviewed.count,
+      xray_pending_decision_received: base_query_xray_pending_decision_received.count,
+      xray_pending_decision_reviewed: base_query_xray_pending_decision_reviewed.count,
+      medical_review_received: base_query_medical_review_received.count,
+      medical_review_reviewed: base_query_medical_review_reviewed.count
+    }
+    @fw_pending_view_count = @fw_pending_view.values.sum
+
     transactions
   end
 
-  def apply_date_range_filer(filters, transactions)
+  def apply_date_range_filter(filters, transactions)
     start_time, end_time = date_range_values(filters)
     transactions = transactions.where(created_at: start_time..end_time)
     transactions
@@ -230,58 +570,6 @@ class Dashboards::FwInformationController < InternalController
       end_time = end_of_curr_year
     end
     [start_time, end_time]
-  end
-
-  def fetch_fw_counts(transactions, start_time, end_time)
-    select_clause = <<~SQL
-      COUNT(DISTINCT transactions.id) AS fw_insured,
-      COUNT(DISTINCT CASE WHEN medical_examination_date BETWEEN '#{start_time}' AND '#{end_time}' THEN transactions.id END) AS fw_medicalexamiation,
-      COUNT(DISTINCT CASE WHEN certification_date BETWEEN '#{start_time}' AND '#{end_time}' THEN transactions.id END) AS fw_certification,
-      COUNT(DISTINCT CASE WHEN final_result_date BETWEEN '#{start_time}' AND '#{end_time}' THEN transactions.id END) AS fw_finalresult,
-      COUNT(DISTINCT CASE WHEN final_result_date BETWEEN '#{start_time}' AND '#{end_time}' THEN myimms_transactions.id END) AS fw_resulttransmitted,
-      COUNT(DISTINCT CASE WHEN medical_appeals.created_at BETWEEN '#{start_time}' AND '#{end_time}' THEN medical_appeals.id END) AS fw_appeal
-    SQL
-    fw_counts = transactions.left_joins(:medical_appeals, :myimms_transaction).
-      select(select_clause)
-    result = fw_counts[0]
-    @fw_insured = result.fw_insured
-    @fw_medicalexamiation = result.fw_medicalexamiation
-    @fw_certification = result.fw_certification
-    @fw_finalresult = result.fw_finalresult
-    @fw_resulttransmitted = result.fw_resulttransmitted
-    @fw_blocked = result.fw_resulttransmitted
-    @fw_appeal = result.fw_appeal
-  end
-
-  def other_fw_counts(transactions, start_time, end_time)
-    select_clause = <<~SQL
-      COUNT(DISTINCT CASE WHEN xray_reviews.transaction_id IS NOT NULL THEN transactions.id END) AS xqcc_poolreviewed_count,
-      COUNT(DISTINCT CASE WHEN xray_reviews.transaction_id IS NOT NULL THEN transactions.id END) AS xqcc_poolreview_count,
-      COUNT(DISTINCT CASE WHEN xqcc_pools.transaction_id IS NOT NULL THEN transactions.id END) AS xqcc_poolreceive_count,
-      COUNT(DISTINCT CASE WHEN pcr_pools.transaction_id IS NOT NULL THEN transactions.id END) AS pcr_poolreceived_count,
-      COUNT(DISTINCT CASE WHEN pcr_reviews.transaction_id IS NOT NULL THEN transactions.id END) AS pcr_poolreviewed_count,
-      COUNT(DISTINCT CASE WHEN xray_pending_reviews.transaction_id IS NOT NULL THEN transactions.id END) AS x_ray_pending_review_count,
-      COUNT(DISTINCT CASE WHEN xray_pending_decisions.transaction_id IS NOT NULL THEN transactions.id END) AS x_ray_pending_decision_count,
-      COUNT(DISTINCT CASE WHEN medical_reviews.created_at IS NOT NULL
-                              AND medical_reviews.medical_mle1_decision_at IS NOT NULL
-                              AND medical_reviews.qa_decision_at IS NOT NULL
-                              AND medical_reviews.is_qa = TRUE
-                            THEN transactions.id END) AS medical_review_count
-    SQL
-    fw_counts = transactions.left_joins(:xray_reviews, :xqcc_pools, :pcr_pools, :pcr_reviews,
-                                        :xray_pending_reviews, :xray_pending_decisions, :medical_reviews).
-      where.not(certification_date: nil).
-      select(select_clause)
-    result = fw_counts[0]
-    @xqcc_poolreviewed = result.xqcc_poolreviewed_count
-    @xqcc_poolreview = result.xqcc_poolreview_count
-    @xqcc_poolreceive = result.xqcc_poolreceive_count
-    @pcr_poolreceived = result.pcr_poolreceived_count
-    @pcr_poolreviewed = result.pcr_poolreviewed_count
-    @x_ray_pending_review = result.x_ray_pending_review_count
-    @x_ray_pending_decision = result.x_ray_pending_decision_count
-    @medical_review = result.medical_review_count
-    @fw_pendingview = @xqcc_poolreceive + @xqcc_poolreview + @pcr_poolreceived + @pcr_poolreviewed + @x_ray_pending_review + @x_ray_pending_decision + @medical_review
   end
 
   def excel_generate
