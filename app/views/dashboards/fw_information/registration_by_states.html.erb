@@ -8,9 +8,7 @@
         <% else %>
         var chartData = <%= @fw_reg_by_states.to_json.html_safe %>;
         <% end %>
-        console.log('datafilter', <%= @fw_reg_by_filtered_states.to_json.html_safe %>)
-        console.log('purana', <%= @fw_reg_by_states.to_json.html_safe %>)
-        // console.log("Chart Data:", chartData);
+
 
         if (!chartData || chartData.length === 0) {
             var placeholderDiv = document.getElementById('columnchart_values');
