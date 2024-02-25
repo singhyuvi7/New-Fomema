@@ -3,9 +3,16 @@
     google.charts.setOnLoadCallback(drawStacked);
 
     function drawStacked() {
-        var chartData = <%= @fw_reg_by_states.nil? ? [] : @fw_reg_by_states.to_json.html_safe %>;
-        console.log("Chart Data:", chartData);
-        if (!chartData.length) {
+        <% if params[:data].present? %>
+        var chartData = <%= @fw_reg_by_filtered_states.to_json.html_safe %>;
+        <% else %>
+        var chartData = <%= @fw_reg_by_states.to_json.html_safe %>;
+        <% end %>
+        console.log('datafilter', <%= @fw_reg_by_filtered_states.to_json.html_safe %>)
+        console.log('purana', <%= @fw_reg_by_states.to_json.html_safe %>)
+        // console.log("Chart Data:", chartData);
+
+        if (!chartData || chartData.length === 0) {
             var placeholderDiv = document.getElementById('columnchart_values');
             placeholderDiv.innerHTML = '<div class="center-message">No Data to Display</div>';
         } else {
@@ -16,9 +23,9 @@
             data.addColumn({type: 'string', role: 'tooltip'});
 
             chartData.forEach(function (entry) {
-                var stateName = entry[0];
-                var stateCode = entry[1];
-                var total = entry[2];
+                var stateName = entry.name;
+                var stateCode = entry.long_code;
+                var total = entry.count;
                 var tooltip = stateName + ' (' + stateCode + ') \nTotal: ' + total;
 
                 data.addRow([stateCode, total, tooltip]);
@@ -47,5 +54,5 @@
     }
 </script>
 <% if has_permission?('DASHBOARD_FW_REGISTRATION_STATE') %>
-<div id="columnchart_values" class="animated-div" style="width: 100%; height:100%;"></div>
-<%end%>
+  <div id="columnchart_values" class="animated-div" style="width: 100%; height:100%;"></div>
+<% end %>
