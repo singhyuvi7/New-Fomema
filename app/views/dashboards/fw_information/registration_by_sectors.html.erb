@@ -4,10 +4,13 @@
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
+          <% if params[:data].present? %>
+          var chartData = <%= @pi_chart_filtered_data.nil? ? [] : @pi_chart_filtered_data.to_json.html_safe %>;
+          <% else %>
           var chartData = <%= @pi_chart_data.nil? ? [] : @pi_chart_data.to_json.html_safe %>;
-          console.log("Chart Data:", chartData);
-
-          if (!chartData.length) {
+          <% end %>
+     
+          if (chartData.length === 1 && chartData[0].length === 2 && chartData[0][0] === 'Task' && chartData[0][1] === 'Hours per Day') {
               var placeholderDiv = document.getElementById('piechart');
               placeholderDiv.innerHTML = '<div class="center-message">No Data to Display</div>';
           } else {
@@ -49,6 +52,6 @@
       }
   </script>
   <% if has_permission?('DASHBOARD_FW_REGISTRATION_SECTOR') %>
-  <div id="piechart" class="animated-div" style="width: 100%; height:100%;"></div>
-  <%end%>
+    <div id="piechart" class="animated-div" style="width: 100%; height:100%;"></div>
+  <% end %>
 </div>
