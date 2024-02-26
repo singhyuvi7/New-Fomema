@@ -72,29 +72,17 @@
           <div class="tags collapse" id="tag_demo">
             <div class="allcode_tag">
               <div class="doctorBlock">
-                <span class="allcode_tagright"><b id="doctorValue">Initial Value</b></span>
-                <span class="allcode_tagleft">
-                    <% image_files = ['dashboards/service_provider/gradeA.jpg', 'dashboards/service_provider/gradeB.png', 'dashboards/service_provider/gradeC.png', 'dashboards/service_provider/gradeD.png', 'dashboards/service_provider/gradeE.png'] %>
-                  <% grade_image = image_files.sample %>
-                  <%= image_tag grade_image, class: 'labImage', style: 'width: 20px;' %>
-                </span>
+               <span class="allcode_tagleft" id="doctorGradeImageContainer"></span>
               </div>
+
               <div class="xrayBlock">
-                <span class="allcode_tagright"><b id="xrayValue">Initial Value</b></span>
-                <span class="allcode_tagleft">
-                    <% image_files = ['dashboards/service_provider/gradeA.jpg', 'dashboards/service_provider/gradeB.png', 'dashboards/service_provider/gradeC.png', 'dashboards/service_provider/gradeD.png', 'dashboards/service_provider/gradeE.png'] %>
-                  <% grade_image = image_files.sample %>
-                  <%= image_tag grade_image, class: 'labImage', style: 'width: 20px;' %>
-                </span>
+                <span class="allcode_tagleft" id="xrayGradeImageContainer"></span>
               </div>
+
               <div class="laboratoryBlock">
-                <span class="allcode_tagright"><b id="laboratoryValue">Initial Value</b></span>
-                <span class="allcode_tagleft">
-                    <% image_files = ['dashboards/service_provider/gradeA.jpg', 'dashboards/service_provider/gradeB.png', 'dashboards/service_provider/gradeC.png', 'dashboards/service_provider/gradeD.png', 'dashboards/service_provider/gradeE.png'] %>
-                  <% grade_image = image_files.sample %>
-                  <%= image_tag grade_image, class: 'labImage', style: 'width: 20px;' %>
-                </span>
+                 <span class="allcode_tagleft" id="labGradeImageContainer"></span>
               </div>
+
             </div>
             <a class="close" data-toggle="collapse" data-target="#tag_demo" style="font-size: 18px;">&times;</a>
           </div>
