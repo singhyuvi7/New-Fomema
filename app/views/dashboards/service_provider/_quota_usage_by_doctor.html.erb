@@ -6,30 +6,39 @@
   <script type="text/javascript">
       // Define the function to update the chart
       function updateChart(data) {
-          google.load('visualization', '1', {'packages': ['columnchart']});
-          google.setOnLoadCallback(function () {
-              createChart(data);
-          });
+          if (dataIsEmpty(data)) {
+              // Display a message when there is no data
+              document.getElementById('chart_div').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+          } else {
+              google.charts.load('current', {'packages': ['corechart']});
+              google.charts.setOnLoadCallback(function () {
+                  createChart(data);
+              });
+          }
+      }
+
+      function dataIsEmpty(data) {
+          // Check if all data values are zero
+          return Object.values(data).every(value => value === 0);
       }
 
       function createChart(data) {
-          var dataTable = new google.visualization.DataTable({
-              "cols": [
-                  {"id": "a", "label": "Topping", "pattern": "", "type": "string"},
-                  {"id": "v", "label": "Promedio", "pattern": "", "type": "number"}
-              ],
-              "rows": [
-                  {"c": [{"v": "<1", "f": null}, {"v": data.zero, "f": null}]},
-                  {"c": [{"v": "1-100", "f": null}, {"v": data.oneToHundred, "f": null}]},
-                  {"c": [{"v": "101-200", "f": null}, {"v": data.oneTwoHundred, "f": null}]},
-                  {"c": [{"v": "201-300", "f": null}, {"v": data.ThreeHundred, "f": null}]},
-                  {"c": [{"v": "301-400", "f": null}, {"v": data.fourHundred, "f": null}]},
-                  {"c": [{"v": "401-500", "f": null}, {"v": data.fiveHundred, "f": null}]},
-                  {"c": [{"v": "501-600", "f": null}, {"v": data.sixHundred, "f": null}]},
-                  {"c": [{"v": "601-700", "f": null}, {"v": data.sevenHundred, "f": null}]},
-                  {"c": [{"v": "701-800", "f": null}, {"v": data.eightHundred, "f": null}]},
-              ]
-          });
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn('string', 'Quota Range');
+          dataTable.addColumn('number', 'Count');
+
+          // Add data to the chart
+          dataTable.addRows([
+              ['<1', data.zero],
+              ['1-100', data.oneToHundred],
+              ['101-200', data.oneTwoHundred],
+              ['201-300', data.ThreeHundred],
+              ['301-400', data.fourHundred],
+              ['401-500', data.fiveHundred],
+              ['501-600', data.sixHundred],
+              ['601-700', data.sevenHundred],
+              ['701-800', data.eightHundred]
+          ]);
 
           var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
 
@@ -59,20 +68,28 @@
           chart.draw(dataTable, options);
       }
 
+      function displayNoDataMessage() {
+          document.getElementById('chart_div').innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">No data to display</div>';
+      }
+
       // Call the function on initial page load
       document.addEventListener("DOMContentLoaded", function () {
-          $.ajax({
-              url: '/dashboards/service_provider/quota_usage_by_doctor',
-              method: 'GET',
-              dataType: 'json',
-              success: function (data) {
-                  // Once data is loaded, update the chart
-                  updateChart(data);
-              },
-              error: function () {
-                  // Handle errors here
-                  console.error('Failed to fetch quota data.');
-              }
+          google.charts.load('current', {'packages': ['corechart']});
+          google.charts.setOnLoadCallback(function () {
+              $.ajax({
+                  url: '/dashboards/service_provider/quota_usage_by_doctor',
+                  method: 'GET',
+                  dataType: 'json',
+                  success: function (data) {
+                      // Once data is loaded, update the chart
+                      updateChart(data);
+                  },
+                  error: function () {
+                      // Handle errors here
+                      console.error('Failed to fetch quota data.');
+                      displayNoDataMessage();
+                  }
+              });
           });
       });
   </script>
