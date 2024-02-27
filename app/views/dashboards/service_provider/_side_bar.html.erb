@@ -64,7 +64,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtdoctor'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtdoctor'>
                       </li>
                     </ul>
                   </div>
@@ -79,7 +79,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtxray'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtxray'>
                       </li>
                     </ul>
                   </div>
@@ -94,7 +94,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtlab'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtlab'>
                       </li>
                     </ul>
                   </div>
@@ -134,8 +134,8 @@
     }
 
     function clear_filter() {
-      location.reload();
-  }
+        location.reload();
+    }
 
     var checkedValues = {};
 
@@ -199,61 +199,125 @@
         console.log(selectedValues);
         const url = '/dashboards/service_provider/apply_filter';
         $.ajax({
-            type: 'GET',
-            url: url,
-            data: {filter_params: selectedValues},
-            dataType: 'json',
-            success: function (response) {
-                console.log('Response of apply filter:', response);
+                type: 'GET',
+                url: url,
+                data: {filter_params: selectedValues},
+                dataType: 'json',
+                success: function (response) {
+                    console.log('Response of apply filter:', response);
+                    const doctorGrade = response.doctorgrade;
+                    const xrayGrade = response.xray_grade;
+                    const labGrade = response.lab_grade;
 
-                $('#doctorStatesList').empty();
-                Object.keys(response.doctorsstates).forEach(function (state) {
-                    var count = response.doctorsstates[state];
-                    $('#doctorStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
-                });
-                $('#doctorsactive').html(response.doctorsactive);
-                $('#newCount').text(response.doctorsnew);
-                $('#withdrawalCount').text(response.doctorwithdrawl);
-                $('#demisedCount').text(response.doctordemised);
-                $('#noncompCount').text(response.doctornoncomp);
+                    if (typeof doctorGrade === 'undefined') {
+                        $('.doctorBlock').html('Invalid doctor code');
+                    }
+
+                    if (typeof xrayGrade === 'undefined') {
+                        $('.xrayBlock').html('Invalid xray code');
+                    }
+
+                    if (typeof labGrade === 'undefined') {
+                        $('.laboratoryBlock').html('Invalid laboratory code');
+                    }
+
+                    var imagetagDoctor = getGradeImageTag(doctorGrade);
+                    var imagetagLab = getGradeImageTag(labGrade);
+                    var imagetagXray = getGradeImageTag(xrayGrade);
+
+                    const doctorimageContainer = document.getElementById('doctorGradeImageContainer');
+                    const xrayimageContainer = document.getElementById('xrayGradeImageContainer');
+                    const labimageContainer = document.getElementById('labGradeImageContainer');
+
+                    doctorimageContainer.innerHTML = imagetagDoctor;
+                    labimageContainer.innerHTML = imagetagLab;
+                    xrayimageContainer.innerHTML = imagetagXray;
+
+                    $('#doctorStatesList').empty();
+                    Object.keys(response.doctorsstates).forEach(function (state) {
+                        var count = response.doctorsstates[state];
+                        $('#doctorStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
+                    });
+                    $('#doctorsactive').html(response.doctorsactive);
+                    $('#newCount').text(response.doctorsnew);
+                    $('#withdrawalCount').text(response.doctorswithdrawal);
+                    $('#demisedCount').text(response.doctorsdemised);
+                    $('#noncompCount').text(response.doctorsnoncomp);
 
 
-                $('#labStatesList').empty();
-                Object.keys(response.laboratoriesstates).forEach(function (state) {
-                    var count = response.laboratoriesstates[state];
-                    $('#labStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
-                });
-                $('#laboratoriesactive').html(response.laboratoriesactive);
-                $('#newlabCount').text(response.laboratoriesnew);
-                $('#withdrawallabCount').text(response.laboratorieswithdrawal);
-                $('#demisedlabCount').text(response.laboratoriesdemised);
-                $('#noncomplabCount').text(response.laboratoriesnoncomp);
+                    $('#labStatesList').empty();
+                    Object.keys(response.laboratoriesstates).forEach(function (state) {
+                        var count = response.laboratoriesstates[state];
+                        $('#labStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
+                    });
+                    $('#laboratoriesactive').html(response.laboratoriesactive);
+                    $('#newlabCount').text(response.laboratoriesnew);
+                    $('#withdrawallabCount').text(response.laboratorieswithdrawal);
+                    $('#demisedlabCount').text(response.laboratoriesdemised);
+                    $('#noncomplabCount').text(response.laboratoriesnoncomp);
 
-                $('#xrayStatesList').empty();
-                Object.keys(response.xrayfacilitiesstates).forEach(function (state) {
-                    var count = response.xrayfacilitiesstates[state];
-                    $('#xrayStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
-                });
-                $('#xrayactive').html(response.xrayfacilityactive);
-                $('#newxrayCount').text(response.xrayfacilitynew);
-                $('#withdrawalxrayCount').text(response.xrayfacilitywithdrawal);
-                $('#demisedxrayCount').text(response.xrayfacilitydemised);
-                $('#noncompxrayCount').text(response.xrayfacilitynoncomp);
+                    $('#xrayStatesList').empty();
+                    Object.keys(response.xrayfacilitiesstates).forEach(function (state) {
+                        var count = response.xrayfacilitiesstates[state];
+                        $('#xrayStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
+                    });
+                    $('#xrayactive').html(response.xrayfacilityactive);
+                    $('#newxrayCount').text(response.xrayfacilitynew);
+                    $('#withdrawalxrayCount').text(response.xrayfacilitywithdrawal);
+                    $('#demisedxrayCount').text(response.xrayfacilitydemised);
+                    $('#noncompxrayCount').text(response.xrayfacilitynoncomp);
 
 
-                $('#radioStatesList').empty();
-                Object.keys(response.radiologiststates).forEach(function (state) {
-                    var count = response.radiologiststates[state];
-                    $('#radioStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
-                });
-                $('#newradioCount').html(response.radiologistactive);
-                $('#newradioCount').text(response.radiologistnew);
-                $('#withdrawalradioCount').text(response.radiologistwithdrawal);
-                $('#demisedradioCount').text(response.radiologistdemised);
-                $('#noncompradioCount').text(response.radiologistnoncomp);
+                    $('#radioStatesList').empty();
+                    Object.keys(response.radiologiststates).forEach(function (state) {
+                        var count = response.radiologiststates[state];
+                        $('#radioStatesList').append('<li><span>' + state + '</span> <span id="' + state.replace(/\s+/g, '') + 'Count">' + count + '</span></li>');
+                    });
+                    $('#newradioCount').html(response.radiologistactive);
+                    $('#newradioCount').text(response.radiologistnew);
+                    $('#withdrawalradioCount').text(response.radiologistwithdrawal);
+                    $('#demisedradioCount').text(response.radiologistdemised);
+                    $('#noncompradioCount').text(response.radiologistnoncomp);
 
+                },
+                   error: function (xhr) {
+                    // Try to parse the responseText as JSON to get the specific error message
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse && errorResponse.error) {
+                            // Display the specific error message in the specified div
+                            if (errorResponse.error.includes('Invalid doctor code')) {
+                                $('.doctorBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            } else if (errorResponse.error.includes('Invalid laboratory code')) {
+                                $('.laboratoryBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            } else if (errorResponse.error.includes('Invalid xray code')) {
+                                $('.xrayBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            }
+                        } else {
+                            // Display a generic error message in the specified div
+                            $('.allcode_tag').html('<div class="error-message">An error occurred. Please try again.</div>');
+                        }
+                    } catch (e) {
+                        // Display a generic error message in the specified div if parsing fails
+                        $('.allcode_tag').html('<div class="error-message">An error occurred. Please try again.</div>');
+                    }
+                }
             }
-        });
+        )
+    }
+
+       function getGradeImageTag(grade) {
+        if (grade === 'A') {
+            return '<%= image_tag "dashboards/service_provider/gradeA.png", style: "width: 20px;" %>';
+        } else if (grade === 'B') {
+            return '<%= image_tag "dashboards/service_provider/gradeB.png", style: "width: 20px;" %>';
+        } else if (grade === 'C') {
+            return '<%= image_tag "dashboards/service_provider/gradeC.png", style: "width: 20px;" %>';
+        } else if (grade === 'D') {
+            return '<%= image_tag "dashboards/service_provider/gradeD.png", style: "width: 20px;" %>';
+        } else if (grade === 'E') {
+            return '<%= image_tag "dashboards/service_provider/gradeE.png", style: "width: 20px;" %>';
+        }
     }
 
     function updateQuotaChartAfterFilter(selectedValues) {
