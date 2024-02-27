@@ -206,8 +206,8 @@ class Dashboards::ServiceProviderController < InternalController
     @filter_params = JSON.parse(params[:filter_params]) rescue nil
 
     if @filter_params.present? && (@filter_params['doctor'].present?)
-      @doctorquotausagezero = 100
-      @doctorquotausage1to100 = 500
+      @doctorquotausagezero = Doctor.where('quota_used = ? AND code = ?', 0, @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, code: @filter_params['doctor']).count
       @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, code: @filter_params['doctor']).count
       @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, code: @filter_params['doctor']).count
       @doctorquotausage301to400 = Doctor.where(quota_used: 301..400, code: @filter_params['doctor']).count
@@ -219,7 +219,7 @@ class Dashboards::ServiceProviderController < InternalController
       date_range = @filter_params['DateRange'].split(' - ').map { |date| Date.parse(date) }
       start_date = date_range[0]
       end_date = date_range[1]
-      @doctorquotausagezero = Doctor.where(quota_used: 0, created_at: date_range[0]..date_range[1]).count
+      @doctorquotausagezero = Doctor.where(quota_used: 0, created_at: date_range[0]..date_range[1]).where(status: 'ACTIVE').count
       @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, created_at: start_date..end_date).count
       @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, created_at: start_date..end_date).count
       @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, created_at: start_date..end_date).count
@@ -229,7 +229,7 @@ class Dashboards::ServiceProviderController < InternalController
       @doctorquotausage601to700 = Doctor.where(quota_used: 601..700, created_at: start_date..end_date).count
       @doctorquotausage701to800 = Doctor.where(quota_used: 701..800, created_at: start_date..end_date).count
     else
-      @doctorquotausagezero = Doctor.where(quota_used: 0).count
+      @doctorquotausagezero = Doctor.where(quota_used: 0).where(status: 'ACTIVE').count
       @doctorquotausage1to100 = Doctor.where(quota_used: 1..100).count
       @doctorquotausage101to200 = Doctor.where(quota_used: 101..200).count
       @doctorquotausage201to300 = Doctor.where(quota_used: 201..300).count
