@@ -207,37 +207,37 @@ class Dashboards::ServiceProviderController < InternalController
 
     if @filter_params.present? && (@filter_params['doctor'].present?)
       @doctorquotausagezero = Doctor.where('quota_used = ? AND code = ?', 0, @filter_params['doctor']).where(status: 'ACTIVE').count
-      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, code: @filter_params['doctor']).count
-      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, code: @filter_params['doctor']).count
-      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, code: @filter_params['doctor']).count
-      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400, code: @filter_params['doctor']).count
-      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500, code: @filter_params['doctor']).count
-      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600, code: @filter_params['doctor']).count
-      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700, code: @filter_params['doctor']).count
-      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800, code: @filter_params['doctor']).count
+      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700, code: @filter_params['doctor']).where(status: 'ACTIVE').count
+      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800, code: @filter_params['doctor']).where(status: 'ACTIVE').count
     elsif @filter_params.present? && (@filter_params['DateRange'].present?)
       date_range = @filter_params['DateRange'].split(' - ').map { |date| Date.parse(date) }
       start_date = date_range[0]
       end_date = date_range[1]
       @doctorquotausagezero = Doctor.where(quota_used: 0, created_at: date_range[0]..date_range[1]).where(status: 'ACTIVE').count
-      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, created_at: start_date..end_date).count
-      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, created_at: start_date..end_date).count
-      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, created_at: start_date..end_date).count
-      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400, created_at: start_date..end_date).count
-      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500, created_at: start_date..end_date).count
-      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600, created_at: start_date..end_date).count
-      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700, created_at: start_date..end_date).count
-      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800, created_at: start_date..end_date).count
+      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700, created_at: start_date..end_date).where(status: 'ACTIVE').count
+      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800, created_at: start_date..end_date)..where(status: 'ACTIVE').count
     else
       @doctorquotausagezero = Doctor.where(quota_used: 0).where(status: 'ACTIVE').count
-      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100).count
-      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200).count
-      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300).count
-      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400).count
-      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500).count
-      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600).count
-      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700).count
-      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800).count
+      @doctorquotausage1to100 = Doctor.where(quota_used: 1..100).where(status: 'ACTIVE').count
+      @doctorquotausage101to200 = Doctor.where(quota_used: 101..200).where(status: 'ACTIVE').count
+      @doctorquotausage201to300 = Doctor.where(quota_used: 201..300).where(status: 'ACTIVE').count
+      @doctorquotausage301to400 = Doctor.where(quota_used: 301..400).where(status: 'ACTIVE').count
+      @doctorquotausage401to500 = Doctor.where(quota_used: 401..500).where(status: 'ACTIVE').count
+      @doctorquotausage501to600 = Doctor.where(quota_used: 501..600).where(status: 'ACTIVE').count
+      @doctorquotausage601to700 = Doctor.where(quota_used: 601..700).where(status: 'ACTIVE').count
+      @doctorquotausage701to800 = Doctor.where(quota_used: 701..800).where(status: 'ACTIVE').count
     end
 
     respond_to do |format|
