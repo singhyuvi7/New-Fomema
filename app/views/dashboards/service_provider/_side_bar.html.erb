@@ -208,25 +208,30 @@
                     const doctorGrade = response.doctorgrade;
                     const xrayGrade = response.xray_grade;
                     const labGrade = response.lab_grade;
-                    let imagetag;
-                    if (doctorGrade === 'A' || xrayGrade === 'A' || labGrade === 'A') {
-                        imagetag = '<%= image_tag "dashboards/service_provider/gradeA.png",  style: "width: 20px;" %>';
-                    } else if (doctorGrade === 'B' || xrayGrade === 'B' || labGrade === 'B') {
-                        imagetag = '<%= image_tag "dashboards/service_provider/gradeB.png",  style: "width: 20px;" %>';
-                    } else if (doctorGrade === 'C' || xrayGrade === 'C' || labGrade === 'C') {
-                        imagetag = '<%= image_tag "dashboards/service_provider/gradeC.png", style: "width: 20px;" %>';
-                    } else if (doctorGrade === 'D' || xrayGrade === 'D' || labGrade === 'D') {
-                        imagetag = '<%= image_tag "dashboards/service_provider/gradeD.png",  style: "width: 20px;" %>';
-                    } else if (doctorGrade === 'E' || xrayGrade === 'E' || labGrade === 'E') {
-                        imagetag = '<%= image_tag "dashboards/service_provider/gradeE.png",  style: "width: 20px;" %>';
+
+                    if (typeof doctorGrade === 'undefined') {
+                        $('.doctorBlock').html('Invalid doctor code');
                     }
+
+                    if (typeof xrayGrade === 'undefined') {
+                        $('.xrayBlock').html('Invalid xray code');
+                    }
+
+                    if (typeof labGrade === 'undefined') {
+                        $('.laboratoryBlock').html('Invalid laboratory code');
+                    }
+
+                    var imagetagDoctor = getGradeImageTag(doctorGrade);
+                    var imagetagLab = getGradeImageTag(labGrade);
+                    var imagetagXray = getGradeImageTag(xrayGrade);
 
                     const doctorimageContainer = document.getElementById('doctorGradeImageContainer');
                     const xrayimageContainer = document.getElementById('xrayGradeImageContainer');
                     const labimageContainer = document.getElementById('labGradeImageContainer');
-                    doctorimageContainer.innerHTML = imagetag;
-                    labimageContainer.innerHTML = imagetag;
-                    xrayimageContainer.innerHTML = imagetag;
+
+                    doctorimageContainer.innerHTML = imagetagDoctor;
+                    labimageContainer.innerHTML = imagetagLab;
+                    xrayimageContainer.innerHTML = imagetagXray;
 
                     $('#doctorStatesList').empty();
                     Object.keys(response.doctorsstates).forEach(function (state) {
@@ -299,6 +304,20 @@
                 }
             }
         )
+    }
+
+       function getGradeImageTag(grade) {
+        if (grade === 'A') {
+            return '<%= image_tag "dashboards/service_provider/gradeA.png", style: "width: 20px;" %>';
+        } else if (grade === 'B') {
+            return '<%= image_tag "dashboards/service_provider/gradeB.png", style: "width: 20px;" %>';
+        } else if (grade === 'C') {
+            return '<%= image_tag "dashboards/service_provider/gradeC.png", style: "width: 20px;" %>';
+        } else if (grade === 'D') {
+            return '<%= image_tag "dashboards/service_provider/gradeD.png", style: "width: 20px;" %>';
+        } else if (grade === 'E') {
+            return '<%= image_tag "dashboards/service_provider/gradeE.png", style: "width: 20px;" %>';
+        }
     }
 
     function updateQuotaChartAfterFilter(selectedValues) {
