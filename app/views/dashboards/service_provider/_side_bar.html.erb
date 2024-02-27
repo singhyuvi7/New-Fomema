@@ -64,7 +64,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtdoctor'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtdoctor'>
                       </li>
                     </ul>
                   </div>
@@ -79,7 +79,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtxray'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtxray'>
                       </li>
                     </ul>
                   </div>
@@ -94,7 +94,7 @@
                   <div class="card-body">
                     <ul class="subment-li">
                       <li>
-                        <input type="text" class="form-control" id='txtlab'>
+                        <input type="text" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" maxlength="10" class="form-control" id='txtlab'>
                       </li>
                     </ul>
                   </div>
@@ -274,6 +274,28 @@
                     $('#demisedradioCount').text(response.radiologistdemised);
                     $('#noncompradioCount').text(response.radiologistnoncomp);
 
+                },
+                   error: function (xhr) {
+                    // Try to parse the responseText as JSON to get the specific error message
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse && errorResponse.error) {
+                            // Display the specific error message in the specified div
+                            if (errorResponse.error.includes('Invalid doctor code')) {
+                                $('.doctorBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            } else if (errorResponse.error.includes('Invalid laboratory code')) {
+                                $('.laboratoryBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            } else if (errorResponse.error.includes('Invalid xray code')) {
+                                $('.xrayBlock').html('<div class="error-message">' + errorResponse.error + '</div>');
+                            }
+                        } else {
+                            // Display a generic error message in the specified div
+                            $('.allcode_tag').html('<div class="error-message">An error occurred. Please try again.</div>');
+                        }
+                    } catch (e) {
+                        // Display a generic error message in the specified div if parsing fails
+                        $('.allcode_tag').html('<div class="error-message">An error occurred. Please try again.</div>');
+                    }
                 }
             }
         )

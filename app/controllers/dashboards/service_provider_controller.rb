@@ -109,6 +109,13 @@ class Dashboards::ServiceProviderController < InternalController
 
     if @filter_params.present? && @filter_params['doctor'].present?
       doctor_code = @filter_params['doctor']
+      doctor_exists = Doctor.exists?(code: doctor_code)
+
+      unless doctor_exists
+        render json: { error: 'Invalid doctor code' }, status: :unprocessable_entity
+        return
+      end
+
       @certifydoctoroverallcount = Transaction.joins(:doctor).where(doctors: { code: doctor_code }).where("laboratory_transmit_date is not null and xray_transmit_date is not null and  certification_date is not null ").count
 
       # doctor xrays within 24 hours
@@ -136,6 +143,14 @@ class Dashboards::ServiceProviderController < InternalController
     elsif @filter_params.present? && @filter_params['lab'].present?
 
       lab_code = @filter_params['lab']
+
+      lab_exists = Laboratory.exists?(code: lab_code)
+
+      unless lab_exists
+        render json: { error: 'Invalid laboratory code' }, status: :unprocessable_entity
+        return
+      end
+
       @laboratoryoverallcount = Transaction.joins(" JOIN laboratory_examinations ON laboratory_examinations.transaction_id = transactions.id ").joins("JOIN laboratories ON laboratories.id = transactions.laboratory_id").where("laboratories.code =  '#{lab_code}'").where("transactions.laboratory_transmit_date is not null and laboratory_examinations.specimen_taken_date is not null and  certification_date is not null ").count
       @laboratorydonutwithin48 = Transaction.joins(" JOIN laboratory_examinations ON laboratory_examinations.transaction_id = transactions.id ").joins("JOIN laboratories ON laboratories.id = transactions.laboratory_id").where("laboratories.code = '#{lab_code}'").where("transactions.status not in ('CANCELLED', 'REJECTED')  and DATE_PART('Day', transactions.laboratory_transmit_date - laboratory_examinations.specimen_taken_date) < 2 ").count
       @laboratorydonutbeyond48 = Transaction.joins(" JOIN laboratory_examinations ON laboratory_examinations.transaction_id = transactions.id ").where("laboratories.code = '#{lab_code}'").where(" transactions.status not in ('CANCELLED', 'REJECTED') and DATE_PART('Day', transactions.laboratory_transmit_date - laboratory_examinations.specimen_taken_date) > 2 ")
@@ -148,6 +163,13 @@ class Dashboards::ServiceProviderController < InternalController
     elsif @filter_params.present? && @filter_params['xray'].present?
 
       xray_code = @filter_params['xray']
+
+      xray_exists = XrayFacility.exists?(code: xray_code)
+
+      unless xray_exists
+        render json: { error: 'Invalid xray code' }, status: :unprocessable_entity
+        return
+      end
 
       @xraytransmissionoverallcount = Transaction.joins("JOIN xray_examinations ON xray_examinations.transaction_id = transactions.id").joins(" JOIN xray_facilities ON transactions.xray_facility_id = xray_facilities.id ").where("xray_examinations.transmitted_at is not null and xray_examinations.xray_taken_date is not null and  certification_date is not null ").where("xray_facilities.code = '#{xray_code}'").count
 
